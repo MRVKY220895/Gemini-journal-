@@ -170,7 +170,15 @@ class GeminiService:
                     "parts": [{"text": final_input}]
                 })
 
-                candidate_models = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.5-pro"]
+                candidate_models = [
+                    "gemini-3.6-flash",
+                    "gemini-3.5-flash",
+                    "gemini-3.7-flash",
+                    "gemini-flash-latest",
+                    "gemini-3.1-flash-lite",
+                    "gemini-2.5-flash"
+                ]
+                last_api_error = None
                 for model_name in candidate_models:
                     try:
                         response = self._genai_client.models.generate_content(
@@ -190,23 +198,24 @@ class GeminiService:
                                 "is_live_gemini": True
                             }
                     except Exception as model_err:
-                        logger.debug(f"Model {model_name} attempt failed: {model_err}")
+                        last_api_error = str(model_err)
+                        logger.debug(f"Model {model_name} attempt notice: {model_err}")
                         continue
             except Exception as e:
                 err_str = str(e)
-                logger.warning(f"Error calling modern Gemini SDK: {err_str}. Falling back to legacy/simulation.")
-                if "API_KEY_SERVICE_BLOCKED" in err_str or "PERMISSION_DENIED" in err_str:
+                logger.warning(f"Error calling modern Gemini SDK: {err_str}. Falling back to smart processor.")
+                if "RESOURCE_EXHAUSTED" in err_str or (last_api_error and "RESOURCE_EXHAUSTED" in last_api_error):
                     return {
                         "role": "model",
                         "content": (
-                            "⚠️ **Google API Key Restriction Notice**\n\n"
-                            "Your Google API key (`AIzaSy...`) was reached, but Google returned `403 PERMISSION_DENIED (API_KEY_SERVICE_BLOCKED)`.\n\n"
-                            "**How to enable live Gemini in 1 minute:**\n"
-                            "1. Go to [Google AI Studio (aistudio.google.com/app/apikey)](https://aistudio.google.com/app/apikey) and click **Create API Key**.\n"
-                            "2. *Or* in [Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials), click your API Key and under **API restrictions**, add **Generative Language API** (or select *Don't restrict key*).\n\n"
+                            "⚠️ **Google Gemini Billing / Free Tier Notice**\n\n"
+                            "Google accepted your API key, but returned: `429 RESOURCE_EXHAUSTED (Prepayment credits depleted on this GCP Project)`.\n\n"
+                            "**How to get 100% free unlimited calls:**\n"
+                            "1. Go to [Google AI Studio (aistudio.google.com/app/apikey)](https://aistudio.google.com/app/apikey).\n"
+                            "2. Create a key under a standard personal Google account (which gives **15 free requests per minute forever** without requiring prepayment/credit card).\n\n"
                             "---\n\n" + self._generate_simulated_reflective_response(last_user_msg, persona)["content"]
                         ),
-                        "model_used": "gemini-fallback-restricted-key",
+                        "model_used": "gemini-fallback-quota-exhausted",
                         "is_live_gemini": False
                     }
 
