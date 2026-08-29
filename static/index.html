@@ -85,21 +85,21 @@
   <!-- Custom Styling -->
   <link rel="stylesheet" href="/static/style.css">
 </head>
-<body class="p-3 md:p-6 flex flex-col min-h-screen">
+<body class="p-2 sm:p-4 md:p-6 pb-24 md:pb-6 flex flex-col min-h-screen">
 
   <!-- Background Glow Orbs -->
   <div class="fixed top-12 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse-slow"></div>
   <div class="fixed bottom-12 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse-slow"></div>
 
   <!-- Top Floating Glass Navigation Header -->
-  <header class="floating-nav flex items-center justify-between gap-1.5 sm:gap-3 mb-4">
+  <header class="floating-nav flex items-center justify-between gap-1 sm:gap-2 mb-2.5 sm:mb-4 px-2.5 sm:px-4 py-2 sm:py-2.5">
     <!-- Brand / Logo -->
     <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-      <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-400 via-blue-500 to-indigo-600 flex items-center justify-center shadow-md shadow-cyan-500/25 text-white cursor-pointer" onclick="switchTab('studio')">
-        <i data-lucide="sparkles" class="w-4 h-4"></i>
+      <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-tr from-cyan-400 via-blue-500 to-indigo-600 flex items-center justify-center shadow-md shadow-cyan-500/25 text-white cursor-pointer" onclick="switchTab('studio')">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
       </div>
       <div class="flex items-center gap-1.5 cursor-pointer" onclick="switchTab('studio')">
-        <span class="text-sm font-bold tracking-tight text-white whitespace-nowrap">Mind Cave</span>
+        <span class="text-xs sm:text-sm font-bold tracking-tight text-white whitespace-nowrap">Mind Cave</span>
         <span class="hidden xl:inline-flex text-[10px] text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2 py-0.5 rounded-full font-mono whitespace-nowrap items-center gap-1.5">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Private Vault
         </span>
@@ -131,34 +131,34 @@
     </nav>
 
     <!-- User Identity & Auth Action -->
-    <div class="flex items-center gap-1 sm:gap-2 shrink-0">
+    <div class="flex items-center gap-1 sm:gap-1.5 shrink-0">
       <!-- Mobile Menu Button (Direct Access to Master Modal on Small Screens) -->
-      <button onclick="openMasterMenuModal()" class="md:hidden flex items-center gap-1 bg-cyan-950/60 hover:bg-cyan-900/80 px-2 py-1.5 rounded-full border border-cyan-500/40 text-xs text-cyan-300 font-semibold transition-colors" title="Directory Menu">
-        <i data-lucide="menu" class="w-3.5 h-3.5 text-cyan-400"></i>
-        <span class="text-[11px]">Menu</span>
+      <button onclick="openMasterMenuModal()" class="md:hidden flex items-center gap-1 bg-cyan-950/60 hover:bg-cyan-900/80 px-2 py-1 rounded-full border border-cyan-500/40 text-xs text-cyan-300 font-semibold transition-colors" title="Directory Menu">
+        <i data-lucide="menu" class="w-3 h-3 text-cyan-400"></i>
+        <span class="text-[10px] font-bold">Menu</span>
       </button>
 
       <!-- Gemini API Status -->
-      <button onclick="openGeminiKeyModal()" id="gemini-key-pill" class="flex items-center gap-1 sm:gap-1.5 bg-emerald-950/30 hover:bg-emerald-900/40 px-2 sm:px-2.5 py-1.5 rounded-full border border-emerald-500/30 text-xs transition-all whitespace-nowrap" title="Gemini Status">
+      <button onclick="openGeminiKeyModal()" id="gemini-key-pill" class="flex items-center gap-1 bg-emerald-950/30 hover:bg-emerald-900/40 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-full border border-emerald-500/30 text-xs transition-all whitespace-nowrap" title="Gemini Status">
         <span id="gemini-key-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
-        <span id="gemini-key-label" class="font-mono text-[10px] sm:text-[11px] text-emerald-300 font-medium whitespace-nowrap hidden xs:inline">Gemini 3.5</span>
+        <span id="gemini-key-label" class="font-mono text-[10px] text-emerald-300 font-medium whitespace-nowrap hidden sm:inline">Gemini 3.5</span>
       </button>
 
       <!-- Consolidated User Profile & Auth Trigger -->
-      <button onclick="openAuthModal()" id="user-pill" class="flex items-center gap-1 sm:gap-1.5 bg-slate-900/90 hover:bg-slate-800 px-2 sm:px-2.5 py-1.5 rounded-full border border-slate-800 text-xs whitespace-nowrap cursor-pointer transition-colors" title="Account & Profile Settings">
+      <button onclick="openAuthModal()" id="user-pill" class="flex items-center gap-1 bg-slate-900/90 hover:bg-slate-800 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-full border border-slate-800 text-xs whitespace-nowrap cursor-pointer transition-colors" title="Account & Profile Settings">
         <div id="user-avatar-indicator" class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></div>
-        <span id="user-display-name" class="font-medium text-slate-200 truncate max-w-[60px] xs:max-w-[85px] sm:max-w-[120px] whitespace-nowrap text-[11px] sm:text-xs">Guest User</span>
-        <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400 shrink-0 hidden xs:inline"></i>
+        <span id="user-display-name" class="font-medium text-slate-200 truncate max-w-[55px] sm:max-w-[120px] whitespace-nowrap text-[10px] sm:text-xs">Guest</span>
+        <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400 shrink-0 hidden sm:inline"></i>
       </button>
       
       <!-- Notifications Trigger Button -->
-      <button onclick="openNotificationsModal()" id="notifications-btn" class="flex items-center justify-center w-7 h-7 sm:w-auto sm:h-auto sm:px-2.5 sm:py-1.5 rounded-full text-xs font-semibold border transition-all duration-200 whitespace-nowrap bg-slate-900/90 hover:bg-slate-800 border-slate-800 text-slate-200 shrink-0" title="Reminders & Notifications">
+      <button onclick="openNotificationsModal()" id="notifications-btn" class="flex items-center justify-center w-7 h-7 sm:px-2.5 sm:py-1.5 rounded-full text-xs font-semibold border transition-all duration-200 whitespace-nowrap bg-slate-900/90 hover:bg-slate-800 border-slate-800 text-slate-200 shrink-0" title="Reminders & Notifications">
         <i data-lucide="bell" class="w-3.5 h-3.5 text-amber-400"></i>
         <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse hidden sm:inline-block"></span>
       </button>
 
       <!-- Theme Switcher (Light / Dark) -->
-      <button onclick="toggleTheme()" id="theme-toggle-btn" class="flex items-center justify-center w-7 h-7 sm:w-auto sm:h-auto sm:px-2.5 sm:py-1.5 rounded-full text-xs font-semibold border transition-all duration-200 whitespace-nowrap theme-toggle-pill shrink-0" title="Toggle Light / Dark Theme">
+      <button onclick="toggleTheme()" id="theme-toggle-btn" class="flex items-center justify-center w-7 h-7 sm:px-2.5 sm:py-1.5 rounded-full text-xs font-semibold border transition-all duration-200 whitespace-nowrap theme-toggle-pill shrink-0" title="Toggle Light / Dark Theme">
         <i id="theme-toggle-icon" data-lucide="sun" class="w-3.5 h-3.5"></i>
         <span id="theme-toggle-label" class="hidden sm:inline">Light</span>
       </button>
@@ -296,33 +296,33 @@
     <section id="view-journals" class="hidden flex-1 flex flex-col gap-3">
 
       <!-- ─── Master Journal Page Header & Actions ─── -->
-      <div class="journal-page-header flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-        <div class="journal-header-title">
-          <span class="eyebrow-badge">Life Intelligence System</span>
-          <h2 class="text-lg font-bold tracking-tight mt-0.5" style="color: var(--text-primary)">Mind Cave Journal</h2>
+      <div class="journal-page-header flex flex-row items-center justify-between gap-2 mb-1">
+        <div class="journal-header-title min-w-0">
+          <span class="eyebrow-badge !text-[9px] !py-0.5 !px-2">Life Intelligence System</span>
+          <h2 class="text-base sm:text-lg font-bold tracking-tight mt-0.5 truncate" style="color: var(--text-primary)">Mind Cave Journal</h2>
         </div>
 
-        <div class="journal-header-actions flex items-center gap-1.5 sm:gap-2 flex-wrap">
+        <div class="journal-header-actions flex items-center gap-1 sm:gap-2 shrink-0">
           <!-- Aesthetic Scrapbook Social Card Exporter -->
-          <button onclick="openScrapbookModal()" class="btn-secondary text-xs !py-1.5 !px-2.5 flex items-center gap-1 hover:border-pink-400 text-pink-300" title="Export Aesthetic Social Journal / Scrapbook Page">
+          <button onclick="openScrapbookModal()" class="btn-secondary text-xs !py-1 sm:!py-1.5 !px-2 sm:!px-2.5 flex items-center gap-1 hover:border-pink-400 text-pink-400" title="Export Aesthetic Social Journal / Scrapbook Page">
             <i data-lucide="palette" class="w-3.5 h-3.5 text-pink-400"></i>
             <span class="hidden sm:inline">Scrapbook</span>
           </button>
 
           <!-- 2-Way GCal Sync Badge -->
-          <button onclick="toggleGCalSync()" id="btn-gcal-sync" class="btn-secondary text-xs !py-1.5 !px-2.5 flex items-center gap-1">
+          <button onclick="toggleGCalSync()" id="btn-gcal-sync" class="btn-secondary text-xs !py-1 sm:!py-1.5 !px-2 sm:!px-2.5 flex items-center gap-1" title="Google Calendar Sync">
             <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
             <span id="gcal-btn-text" class="hidden sm:inline">GCal</span>
           </button>
 
           <!-- Quick Action Buttons -->
-          <button onclick="openNewTaskModal()" class="btn-secondary text-xs !py-1.5 !px-2.5 flex items-center gap-1 hover:border-blue-400">
+          <button onclick="openNewTaskModal()" class="btn-secondary text-xs !py-1 sm:!py-1.5 !px-2 sm:!px-2.5 flex items-center gap-1 hover:border-blue-400 text-blue-400" title="Add New Task">
             <i data-lucide="check-square" class="w-3.5 h-3.5 text-blue-400"></i>
             <span class="hidden sm:inline">Task</span>
           </button>
           
-          <button onclick="openNewJournalModal()" class="btn-island !py-1.5 !px-3 text-xs">
-            <span>+ Moment</span>
+          <button onclick="openNewJournalModal()" class="btn-island !py-1 sm:!py-1.5 !px-2.5 sm:!px-3 text-xs font-semibold" title="Record New Journal Moment">
+            <span>Moment</span>
             <div class="btn-island-icon !w-4 !h-4">
               <i data-lucide="plus" class="w-3 h-3 text-white"></i>
             </div>
@@ -331,21 +331,21 @@
       </div>
 
       <!-- ─── Master 5-Page Journal Sub-Navigation Architecture ─── -->
-      <div id="journal-tracks-nav" class="journal-track-nav overflow-x-auto no-scrollbar flex-nowrap py-1">
-        <button onclick="switchJournalTrack('chrono')" id="track-btn-chrono" class="track-tab-btn active-chrono shrink-0">
-          <i data-lucide="calendar" class="w-4 h-4"></i><span>Living Timeline</span>
+      <div id="journal-tracks-nav" class="journal-track-nav overflow-x-auto no-scrollbar flex-nowrap py-1 gap-1.5 -mx-1 px-1">
+        <button onclick="switchJournalTrack('chrono')" id="track-btn-chrono" class="track-tab-btn active-chrono shrink-0 !text-xs !py-1.5 !px-3">
+          <i data-lucide="calendar" class="w-3.5 h-3.5"></i><span>Living Timeline</span>
         </button>
-        <button onclick="switchJournalTrack('harmony')" id="track-btn-harmony" class="track-tab-btn shrink-0">
-          <i data-lucide="sparkles" class="w-4 h-4 text-emerald-500"></i><span>Daily Harmony</span>
+        <button onclick="switchJournalTrack('harmony')" id="track-btn-harmony" class="track-tab-btn shrink-0 !text-xs !py-1.5 !px-3">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-emerald-500"></i><span>Daily Harmony</span>
         </button>
-        <button onclick="switchJournalTrack('memory_lane')" id="track-btn-memory_lane" class="track-tab-btn shrink-0">
-          <i data-lucide="history" class="w-4 h-4 text-amber-500"></i><span>Memory Lane</span>
+        <button onclick="switchJournalTrack('memory_lane')" id="track-btn-memory_lane" class="track-tab-btn shrink-0 !text-xs !py-1.5 !px-3">
+          <i data-lucide="history" class="w-3.5 h-3.5 text-amber-500"></i><span>Memory Lane</span>
         </button>
-        <button onclick="switchJournalTrack('memory')" id="track-btn-memory" class="track-tab-btn shrink-0">
-          <i data-lucide="image" class="w-4 h-4 text-purple-500"></i><span>Photo Stream</span>
+        <button onclick="switchJournalTrack('memory')" id="track-btn-memory" class="track-tab-btn shrink-0 !text-xs !py-1.5 !px-3">
+          <i data-lucide="image" class="w-3.5 h-3.5 text-purple-500"></i><span>Photo Stream</span>
         </button>
-        <button onclick="switchJournalTrack('sanctuary')" id="track-btn-sanctuary" class="track-tab-btn shrink-0">
-          <i data-lucide="heart-pulse" class="w-4 h-4 text-indigo-500"></i><span>Bio Sanctuary</span>
+        <button onclick="switchJournalTrack('sanctuary')" id="track-btn-sanctuary" class="track-tab-btn shrink-0 !text-xs !py-1.5 !px-3">
+          <i data-lucide="heart-pulse" class="w-3.5 h-3.5 text-indigo-500"></i><span>Bio Sanctuary</span>
         </button>
       </div>
 
@@ -357,36 +357,36 @@
         <!-- DYNAMIC FOCUS & HABITS HUB: COLLAPSIBLE 2-TILE DECK -->
         <div class="today-goal-card p-3 sm:p-4 rounded-2xl bg-white dark:bg-slate-900/90 border border-amber-500/30 dark:border-amber-500/25 shadow-md flex flex-col gap-3" id="today-focus-habits-hub">
           <!-- Hub Master Header Bar -->
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-2.5 pb-2.5 border-b border-slate-100 dark:border-white/5">
-            <div class="flex items-center gap-2.5 min-w-0">
-              <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-500 dark:text-amber-400 flex items-center justify-center font-bold shrink-0">
-                <i data-lucide="target" class="w-4 h-4 text-amber-500 dark:text-amber-400"></i>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-100 dark:border-white/5">
+            <div class="flex items-center gap-2 min-w-0">
+              <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-amber-500/20 text-amber-500 dark:text-amber-400 flex items-center justify-center font-bold shrink-0">
+                <i data-lucide="target" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500 dark:text-amber-400"></i>
               </div>
-              <div class="min-w-0">
-                <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                  <h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">Daily Focus & Habits Hub</h4>
-                  <span id="goals-completed-badge" class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-300 font-mono font-bold flex items-center gap-1">
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">Focus & Habits Hub</h4>
+                  <span id="goals-completed-badge" class="text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-300 font-mono font-bold flex items-center gap-1">
                     <i data-lucide="check-circle" class="w-3 h-3 text-emerald-500"></i>
-                    <span>2/3 Done (67%)</span>
+                    <span>2/3 Done</span>
                   </span>
-                  <span id="goals-duration-badge" class="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-500/30 text-amber-700 dark:text-amber-300 font-mono font-bold flex items-center gap-1">
+                  <span id="goals-duration-badge" class="text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-500/30 text-amber-700 dark:text-amber-300 font-mono font-bold flex items-center gap-1">
                     <i data-lucide="clock" class="w-3 h-3 text-amber-500"></i>
                     <span>3h 15m</span>
                   </span>
-                  <span id="habit-streak-badge" class="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-bold border border-amber-200 dark:border-amber-500/30 flex items-center gap-1">
+                  <span id="habit-streak-badge" class="text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-bold border border-amber-200 dark:border-amber-500/30 flex items-center gap-1">
                     <i data-lucide="flame" class="w-3 h-3 text-amber-500"></i>
-                    <span>12 Days Streak</span>
+                    <span>12d streak</span>
                   </span>
                 </div>
               </div>
             </div>
 
             <!-- Action Buttons & Collapse Controls -->
-            <div class="flex items-center gap-1.5 shrink-0 self-end md:self-auto">
-              <button type="button" onclick="openNewGoalModal()" class="btn-secondary !py-1 !px-2.5 text-[11px] flex items-center gap-1 text-amber-600 dark:text-amber-300 hover:border-amber-400 font-semibold" title="Add New Achievable Goal">
+            <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-auto">
+              <button type="button" onclick="openNewGoalModal()" class="btn-secondary !py-1 !px-2 text-[11px] flex items-center gap-1 text-amber-600 dark:text-amber-300 hover:border-amber-400 font-semibold" title="Add New Achievable Goal">
                 <i data-lucide="plus" class="w-3 h-3 text-amber-500"></i> <span>Goal</span>
               </button>
-              <button type="button" onclick="openNewHabitModal()" class="btn-secondary !py-1 !px-2.5 text-[11px] flex items-center gap-1 text-cyan-600 dark:text-cyan-300 hover:border-cyan-400 font-semibold" title="Add New Habit">
+              <button type="button" onclick="openNewHabitModal()" class="btn-secondary !py-1 !px-2 text-[11px] flex items-center gap-1 text-cyan-600 dark:text-cyan-300 hover:border-cyan-400 font-semibold" title="Add New Habit">
                 <i data-lucide="plus" class="w-3 h-3 text-cyan-400"></i> <span>Habit</span>
               </button>
               <button type="button" onclick="openGoalsHabitsModal()" class="w-7 h-7 rounded-lg bg-gradient-to-r from-amber-500/20 to-cyan-500/20 hover:from-amber-500/30 hover:to-cyan-500/30 text-amber-600 dark:text-amber-300 border border-amber-500/30 flex items-center justify-center transition-all shadow-sm" title="Expand Focus Deck Modal">
@@ -439,26 +439,26 @@
             <!-- Daily Habits & Streaks (Right Column, 5 Cols) -->
             <div class="lg:col-span-5 flex flex-col justify-between p-3 rounded-2xl bg-slate-50/80 dark:bg-black/30 border border-slate-200/80 dark:border-white/5 space-y-3">
               <div class="space-y-2.5">
-                <div class="flex items-center justify-between flex-wrap gap-1">
-                  <div class="flex items-center gap-2">
+                <div class="flex items-center justify-between gap-1 flex-wrap">
+                  <div class="flex items-center gap-1.5">
                     <span class="w-2 h-2 rounded-full bg-cyan-500"></span>
-                    <h5 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider font-mono">Daily Habits & Streaks</h5>
+                    <h5 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider font-mono">Habits & Streaks</h5>
                   </div>
-                  <div class="flex items-center gap-2">
+                  <div class="flex items-center gap-1.5 shrink-0 flex-wrap">
                     <button type="button" onclick="refreshHabitsTracker(this)" class="text-[10px] text-slate-500 hover:text-cyan-500 dark:text-slate-400 dark:hover:text-cyan-300 font-mono flex items-center gap-1 transition-colors group" title="Refresh & Recalculate Habit Streaks">
                       <i data-lucide="refresh-cw" class="w-3 h-3 text-cyan-500 group-hover:rotate-180 transition-transform duration-500"></i>
-                      <span>Refresh</span>
+                      <span class="hidden xs:inline">Refresh</span>
                     </button>
-                    <button type="button" onclick="openArchivedHabitsModal()" class="text-[10px] text-slate-500 hover:text-cyan-500 dark:text-slate-400 dark:hover:text-cyan-300 font-mono flex items-center gap-1 transition-colors" title="View & Recover Archived Habits">
-                      <i data-lucide="archive" class="w-3 h-3 text-cyan-500"></i>
+                    <button type="button" onclick="openArchivedHabitsModal()" class="text-[10px] text-slate-500 hover:text-amber-400 dark:text-slate-400 dark:hover:text-amber-300 font-mono flex items-center gap-1 transition-colors" title="View & Recover Archived Habits">
+                      <i data-lucide="archive" class="w-3 h-3 text-amber-500"></i>
                       <span id="archived-habits-badge-inline">Archive</span>
                     </button>
                     <button type="button" onclick="toggleHabitWeeklyView()" class="text-[10px] text-slate-500 hover:text-cyan-500 dark:text-slate-400 dark:hover:text-cyan-300 font-mono flex items-center gap-1 transition-colors" title="Toggle between Today Focus and 7-Day History View">
                       <i data-lucide="calendar" class="w-3 h-3 text-cyan-500"></i>
-                      <span>7-Day View</span>
+                      <span>7D</span>
                     </button>
-                    <span class="text-[10px] text-cyan-600 dark:text-cyan-400 font-mono font-semibold" id="habit-progress-pill">
-                      5/6 Done Today
+                    <span class="text-[10px] text-cyan-600 dark:text-cyan-400 font-mono font-semibold shrink-0" id="habit-progress-pill">
+                      5/6 Done
                     </span>
                   </div>
                 </div>

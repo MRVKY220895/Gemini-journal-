@@ -4108,39 +4108,39 @@ function renderHabitTracker() {
       const pct = isCounter ? Math.min(100, Math.round((currentCount / targetCount) * 100)) : (isDoneToday ? 100 : 0);
 
       return `
-        <div class="habit-row p-2.5 rounded-xl border transition-all duration-200 flex items-center justify-between gap-2.5 shadow-sm ${isDoneToday ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-500/30' : 'bg-white dark:bg-black/40 border-slate-200 dark:border-white/5 hover:border-cyan-400/40'}" id="habit_row_${h.id}">
-          <div class="flex items-center gap-2.5 min-w-0 flex-1">
-            <span class="text-lg shrink-0">${h.emoji || '💧'}</span>
+        <div class="habit-row p-2 sm:p-2.5 rounded-xl border transition-all duration-200 flex items-center justify-between gap-1.5 sm:gap-2.5 shadow-sm ${isDoneToday ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-500/30' : 'bg-white dark:bg-black/40 border-slate-200 dark:border-white/5 hover:border-cyan-400/40'}" id="habit_row_${h.id}">
+          <div class="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
+            <span class="text-base sm:text-lg shrink-0">${h.emoji || '💧'}</span>
             <div class="min-w-0 flex-1">
               <div class="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate flex items-center gap-1.5 flex-wrap">
-                <span class="cursor-pointer hover:text-cyan-500 transition-colors ${isDoneToday ? 'font-bold text-emerald-600 dark:text-emerald-300' : ''}" onclick="openNewHabitModal('${h.id}')" title="Click to edit">${escapeHtml(h.title)}</span>
-                ${isCounter ? `<span class="text-[9px] px-1.5 py-0.2 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30 font-mono font-bold">Summation: ${currentCount}/${targetCount} ${unit}</span>` : ''}
-                ${h.isTimelineShortcut !== false ? '<span class="text-[9px] px-1.5 py-0.2 rounded-full bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-500/30 font-mono">Shortcut</span>' : ''}
+                <span class="cursor-pointer hover:text-cyan-500 transition-colors truncate ${isDoneToday ? 'font-bold text-emerald-600 dark:text-emerald-300' : ''}" onclick="openNewHabitModal('${h.id}')" title="Click to edit">${escapeHtml(h.title)}</span>
+                ${isCounter ? `<span class="text-[9px] px-1.5 py-0.2 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30 font-mono font-bold shrink-0">${currentCount}/${targetCount} ${unit}</span>` : ''}
+                ${h.isTimelineShortcut !== false ? '<span class="hidden sm:inline text-[9px] px-1.5 py-0.2 rounded-full bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-500/30 font-mono shrink-0">Shortcut</span>' : ''}
               </div>
-              <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono flex items-center gap-2 mt-0.5 flex-wrap">
-                <span class="text-amber-600 dark:text-amber-400 font-bold flex items-center gap-0.5"><i data-lucide="flame" class="w-3 h-3 text-amber-500"></i><span>${h.streak}d streak</span></span>
+              <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono flex items-center gap-1.5 sm:gap-2 mt-0.5 flex-wrap">
+                <span class="text-amber-600 dark:text-amber-400 font-bold flex items-center gap-0.5 shrink-0"><i data-lucide="flame" class="w-3 h-3 text-amber-500"></i><span>${h.streak}d streak</span></span>
                 ${isCounter ? `
                   <div class="flex items-center gap-1.5">
-                    <div class="w-16 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden flex">
+                    <div class="w-12 sm:w-16 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden flex">
                       <div class="h-full ${isDoneToday ? 'bg-emerald-500' : 'bg-cyan-500'} rounded-full transition-all duration-300" style="width: ${pct}%"></div>
                     </div>
                     <span class="text-slate-600 dark:text-slate-300 font-bold">${pct}%</span>
                   </div>
-                ` : (h.target ? `<span class="text-slate-400">•</span> <span class="text-slate-600 dark:text-slate-300">${escapeHtml(h.target)}</span>` : '')}
+                ` : (h.target ? `<span class="text-slate-400 hidden xs:inline">•</span> <span class="text-slate-600 dark:text-slate-300 truncate hidden xs:inline">${escapeHtml(h.target)}</span>` : '')}
               </div>
             </div>
           </div>
 
           <!-- Actions: Repeatable Counter Stepper OR 1-Tap Toggle -->
-          <div class="flex items-center gap-1.5 shrink-0">
+          <div class="flex items-center gap-1 sm:gap-1.5 shrink-0">
             ${isCounter ? `
               <!-- Repeatable Counter Stepper: [-] [Count/Target] [+1] -->
-              <div class="flex items-center gap-1 bg-slate-100 dark:bg-white/5 p-0.5 rounded-xl border border-slate-200 dark:border-white/10">
-                <button type="button" onclick="incrementHabitCount('${h.id}', -1)" class="w-6 h-6 rounded-lg bg-white dark:bg-black/40 hover:bg-slate-200 dark:hover:bg-white/20 text-slate-700 dark:text-slate-300 flex items-center justify-center font-bold text-xs transition-colors" title="Subtract 1 ${unit}">-</button>
-                <span class="px-2 font-mono font-bold text-xs ${isDoneToday ? 'text-emerald-600 dark:text-emerald-400' : 'text-cyan-600 dark:text-cyan-300'}">${currentCount}/${targetCount}</span>
-                <button type="button" onclick="incrementHabitCount('${h.id}', 1)" class="px-2 h-6 rounded-lg ${isDoneToday ? 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-sm' : 'bg-cyan-500 text-white hover:bg-cyan-600 shadow-sm'} flex items-center gap-0.5 font-bold text-xs transition-colors" title="Log +1 ${unit}">
+              <div class="flex items-center gap-0.5 sm:gap-1 bg-slate-100 dark:bg-white/5 p-0.5 rounded-xl border border-slate-200 dark:border-white/10">
+                <button type="button" onclick="incrementHabitCount('${h.id}', -1)" class="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-white dark:bg-black/40 hover:bg-slate-200 dark:hover:bg-white/20 text-slate-700 dark:text-slate-300 flex items-center justify-center font-bold text-xs transition-colors" title="Subtract 1 ${unit}">-</button>
+                <span class="px-1.5 font-mono font-bold text-[11px] sm:text-xs ${isDoneToday ? 'text-emerald-600 dark:text-emerald-400' : 'text-cyan-600 dark:text-cyan-300'}">${currentCount}/${targetCount}</span>
+                <button type="button" onclick="incrementHabitCount('${h.id}', 1)" class="px-1.5 sm:px-2 h-5 sm:h-6 rounded-lg ${isDoneToday ? 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-sm' : 'bg-cyan-500 text-white hover:bg-cyan-600 shadow-sm'} flex items-center gap-0.5 font-bold text-xs transition-colors" title="Log +1 ${unit}">
                   <i data-lucide="plus" class="w-3 h-3 text-white"></i>
-                  <span>+1</span>
+                  <span class="text-[10px] sm:text-xs">+1</span>
                 </button>
               </div>
             ` : (showWeeklyHabitMatrix ? `
@@ -4153,9 +4153,9 @@ function renderHabitTracker() {
               </div>
             ` : `
               <!-- 1-Tap Today Action Button -->
-              <button type="button" onclick="toggleHabitToday('${h.id}')" class="px-2.5 py-1 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${isDoneToday ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20 hover:bg-emerald-600' : 'bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:border-cyan-400 hover:text-cyan-500'}" title="Toggle completion for Today (${currentDayName})">
-                <i data-lucide="${isDoneToday ? 'check-circle' : 'circle'}" class="w-3.5 h-3.5 ${isDoneToday ? 'text-white' : 'text-slate-400'}"></i>
-                <span>${isDoneToday ? 'Done Today' : 'Mark Done'}</span>
+              <button type="button" onclick="toggleHabitToday('${h.id}')" class="px-2 sm:px-2.5 py-1 rounded-xl text-[11px] sm:text-xs font-bold flex items-center gap-1 sm:gap-1.5 transition-all cursor-pointer ${isDoneToday ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20 hover:bg-emerald-600' : 'bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:border-cyan-400 hover:text-cyan-500'}" title="Toggle completion for Today (${currentDayName})">
+                <i data-lucide="${isDoneToday ? 'check-circle' : 'circle'}" class="w-3 h-3 sm:w-3.5 sm:h-3.5 ${isDoneToday ? 'text-white' : 'text-slate-400'}"></i>
+                <span class="whitespace-nowrap">${isDoneToday ? 'Done Today' : 'Mark Done'}</span>
               </button>
             `)}
             <button type="button" onclick="openNewHabitModal('${h.id}')" class="p-1 text-slate-400 hover:text-amber-500 transition-colors" title="Edit Habit & Target Metrics">
