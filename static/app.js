@@ -2061,30 +2061,71 @@ function clearAllChatHistory() {
   }
 }
 
+let currentNarratingButton = null;
+
+function stopCurrentNarration() {
+  if ('speechSynthesis' in window) {
+    try { window.speechSynthesis.cancel(); } catch(e) {}
+  }
+  if (currentNarratingButton) {
+    const span = currentNarratingButton.querySelector('span');
+    const icon = currentNarratingButton.querySelector('i');
+    if (span) span.textContent = 'Listen';
+    if (icon) icon.setAttribute('data-lucide', 'volume-2');
+    currentNarratingButton.classList.remove('text-rose-400', 'border-rose-500/40', 'bg-rose-500/10', 'animate-pulse');
+    currentNarratingButton = null;
+    lucide.createIcons();
+  }
+}
+
 function narrateAIMessage(text, btnElement) {
-
   if (!('speechSynthesis' in window)) {
-
     showToast('Speech synthesis not supported in this browser.');
-
     return;
-
   }
 
-  window.speechSynthesis.cancel();
+  // If already speaking and user clicks Stop, cancel playback
+  if (window.speechSynthesis.speaking && currentNarratingButton === btnElement) {
+    stopCurrentNarration();
+    showToast('Audio playback stopped.');
+    return;
+  }
 
-  const cleanText = text.replace(/[*#_`~\[\]]/g, '');
+  // Cancel any prior speech
+  stopCurrentNarration();
+
+  const cleanText = text.replace(/[*#_`~\[\]]/g, '').trim();
+  if (!cleanText) return;
 
   const utterance = new SpeechSynthesisUtterance(cleanText);
-
   utterance.rate = 1.0;
-
   utterance.pitch = 1.0;
 
+  const voices = window.speechSynthesis.getVoices();
+  const currentLang = localStorage.getItem('mind_cave_language') || 'en';
+  const matchingVoice = voices.find(v => v.lang.startsWith(currentLang) || v.name.includes('Natural') || v.name.includes('Google'));
+  if (matchingVoice) utterance.voice = matchingVoice;
+
+  if (btnElement) {
+    currentNarratingButton = btnElement;
+    const span = btnElement.querySelector('span');
+    const icon = btnElement.querySelector('i');
+    if (span) span.textContent = 'Stop';
+    if (icon) icon.setAttribute('data-lucide', 'square');
+    btnElement.classList.add('text-rose-400', 'border-rose-500/40', 'bg-rose-500/10', 'animate-pulse');
+    lucide.createIcons();
+  }
+
+  utterance.onend = () => {
+    stopCurrentNarration();
+  };
+
+  utterance.onerror = () => {
+    stopCurrentNarration();
+  };
+
   window.speechSynthesis.speak(utterance);
-
-  showToast('Speaking AI response...');
-
+  showToast('Playing audio narration. Tap Stop anytime to cancel.');
 }
 
 
