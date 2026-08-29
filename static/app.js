@@ -1,5 +1,5 @@
 /**
- * Gemini Cognitive Journal & Brainstorming Studio - Client Controller
+ * Mind Cave — Cognitive Sanctuary & Reflective Studio - Client Controller
  * Manages Firebase authentication state, isolated multi-turn chat sessions,
  * MindPulse analytics charts, and security inspection sandboxes.
  */
