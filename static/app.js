@@ -57,7 +57,28 @@ const state = {
       completed: false,
       gcalSynced: true
     }
-  ]
+  ],
+  todayGoal: JSON.parse(localStorage.getItem('mind_cave_today_goal') || 'null') || {
+    text: "Ship Core System Architecture & complete evening 30m mindful walk",
+    completed: false
+  },
+  habitsList: JSON.parse(localStorage.getItem('mind_cave_habits_list') || 'null') || [
+    { id: 'h1', title: '💧 Hydrate 2.5 Liters', streak: 12, history: [true, true, true, true, true, true, true] },
+    { id: 'h2', title: '🧘 15m Mindfulness & CBT', streak: 7, history: [true, true, true, false, true, true, true] },
+    { id: 'h3', title: '🏃 30m Zone-2 Cardio / Walk', streak: 5, history: [true, true, true, true, false, true, true] },
+    { id: 'h4', title: '📖 20m Focused Reading', streak: 9, history: [true, true, true, true, true, true, false] },
+    { id: 'h5', title: '🌙 8h Circadian Sleep Protocol', streak: 6, history: [true, true, true, true, true, true, true] },
+    { id: 'h6', title: '💻 90m Deep Work Block', streak: 14, history: [true, true, true, true, true, true, true] }
+  ],
+  bucketList: JSON.parse(localStorage.getItem('mind_cave_bucket_list') || 'null') || [
+    { id: 'b1', title: 'Scuba dive the Great Barrier Reef', category: 'travel', year: '2027', achieved: false },
+    { id: 'b2', title: 'Publish Open-Source AI Architecture Benchmark', category: 'career', year: '2026', achieved: true },
+    { id: 'b3', title: 'Trek the Annapurna Circuit in Himalayas', category: 'adventure', year: '2027', achieved: false },
+    { id: 'b4', title: 'Run a sub-4-hour Marathon', category: 'wellness', year: '2026', achieved: false },
+    { id: 'b5', title: 'Solo Roadtrip across New Zealand South Island', category: 'travel', year: '2028', achieved: false },
+    { id: 'b6', title: 'Build a private off-grid mountain cabin sanctuary', category: 'wellness', year: '2029', achieved: false }
+  ],
+  scrapbookTheme: 'pastel'
 };
 
 // Initialize Application on DOM Ready
@@ -69,6 +90,9 @@ document.addEventListener('DOMContentLoaded', () => {
   updateUserUI();
   initDiarySpace();
   initAgendaList();
+  initTodayGoal();
+  initHabitTracker();
+  initBucketList();
   initAnalyticsCharts();
   loadJournals();
   loadSecurityAudit();
@@ -2936,4 +2960,592 @@ function syncGoogleFitData() {
   if (harmonyBadge) harmonyBadge.textContent = '🌿 96%';
 
   showToast('⚡ Google Fit & Health Connect: 9,140 steps • 8.1h sleep • High Recovery Synced!');
+}
+
+// =============================================================================
+// TODAY'S NORTH STAR GOAL & INTENT
+// =============================================================================
+
+function initTodayGoal() {
+  renderTodayGoal();
+}
+
+function renderTodayGoal() {
+  const textEl = document.getElementById('today-goal-text');
+  const checkBtn = document.getElementById('today-goal-check-btn');
+  const checkIcon = document.getElementById('today-goal-check-icon');
+
+  if (textEl) {
+    textEl.textContent = state.todayGoal.text || "Click to set today's primary focus & intent...";
+    if (state.todayGoal.completed) {
+      textEl.classList.add('line-through', 'text-slate-400');
+    } else {
+      textEl.classList.remove('line-through', 'text-slate-400');
+    }
+  }
+
+  if (checkBtn && checkIcon) {
+    if (state.todayGoal.completed) {
+      checkBtn.classList.add('bg-emerald-500/20', 'border-emerald-500');
+      checkIcon.classList.remove('hidden');
+    } else {
+      checkBtn.classList.remove('bg-emerald-500/20', 'border-emerald-500');
+      checkIcon.classList.add('hidden');
+    }
+  }
+}
+
+function openTodayGoalModal() {
+  const input = document.getElementById('goal-input-text');
+  if (input) input.value = state.todayGoal.text || '';
+  document.getElementById('goal-modal')?.classList.remove('hidden');
+}
+
+function closeTodayGoalModal() {
+  document.getElementById('goal-modal')?.classList.add('hidden');
+}
+
+function submitTodayGoal(event) {
+  event.preventDefault();
+  const input = document.getElementById('goal-input-text');
+  if (!input || !input.value.trim()) return;
+
+  state.todayGoal.text = input.value.trim();
+  state.todayGoal.completed = false;
+  localStorage.setItem('mind_cave_today_goal', JSON.stringify(state.todayGoal));
+
+  closeTodayGoalModal();
+  renderTodayGoal();
+  showToast('🎯 Today\'s North Star Goal updated!');
+}
+
+function toggleTodayGoalComplete() {
+  state.todayGoal.completed = !state.todayGoal.completed;
+  localStorage.setItem('mind_cave_today_goal', JSON.stringify(state.todayGoal));
+  renderTodayGoal();
+  showToast(state.todayGoal.completed ? '🎉 North Star Goal Achieved!' : 'Goal marked in progress.');
+}
+
+// =============================================================================
+// DAILY HABIT TRACKER & STREAKS
+// =============================================================================
+
+function initHabitTracker() {
+  renderHabitTracker();
+}
+
+function renderHabitTracker() {
+  const container = document.getElementById('habit-tracker-list');
+  if (!container) return;
+
+  const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+  const todayDayIdx = (new Date().getDay() + 6) % 7; // Monday = 0
+
+  container.innerHTML = state.habitsList.map(h => `
+    <div class="habit-row" id="habit_row_${h.id}">
+      <div class="flex items-center gap-2 min-w-0">
+        <span class="text-xs font-semibold text-slate-200 truncate">${escapeHtml(h.title)}</span>
+        <span class="text-[10px] text-amber-400 font-mono font-bold flex items-center shrink-0">
+          🔥 ${h.streak}d
+        </span>
+      </div>
+
+      <div class="flex items-center gap-1 shrink-0">
+        ${h.history.map((isDone, idx) => `
+          <div onclick="toggleHabitDay('${h.id}', ${idx})" class="habit-dot ${isDone ? 'done' : ''} ${idx === todayDayIdx ? 'ring-1 ring-amber-400' : ''}" title="${days[idx]} - ${isDone ? 'Done' : 'Missed'}">
+            ${isDone ? '✓' : days[idx]}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  // Update Done count pill
+  const doneCount = state.habitsList.filter(h => h.history[todayDayIdx]).length;
+  const pill = document.getElementById('habit-progress-pill');
+  if (pill) pill.textContent = `🔥 ${doneCount}/${state.habitsList.length} Done Today`;
+}
+
+function toggleHabitDay(habitId, dayIndex) {
+  const habit = state.habitsList.find(h => h.id === habitId);
+  if (!habit) return;
+
+  habit.history[dayIndex] = !habit.history[dayIndex];
+  if (habit.history[dayIndex]) habit.streak += 1;
+  else habit.streak = Math.max(0, habit.streak - 1);
+
+  localStorage.setItem('mind_cave_habits_list', JSON.stringify(state.habitsList));
+  renderHabitTracker();
+  showToast(`${habit.title}: ${habit.history[dayIndex] ? 'Completed!' : 'Marked incomplete'}`);
+}
+
+function openNewHabitModal() {
+  document.getElementById('habit-modal')?.classList.remove('hidden');
+}
+
+function closeNewHabitModal() {
+  document.getElementById('habit-modal')?.classList.add('hidden');
+}
+
+function submitNewHabit(event) {
+  event.preventDefault();
+  const title = document.getElementById('habit-title-input').value.trim();
+  if (!title) return;
+
+  const newHabit = {
+    id: `h_${Date.now()}`,
+    title: title,
+    streak: 1,
+    history: [true, false, false, false, false, false, false]
+  };
+
+  state.habitsList.push(newHabit);
+  localStorage.setItem('mind_cave_habits_list', JSON.stringify(state.habitsList));
+
+  closeNewHabitModal();
+  renderHabitTracker();
+  showToast(`✓ Added habit: ${title}`);
+}
+
+// =============================================================================
+// PLAN VS ACTION & BLOCKER / FRICTION LOGGING
+// =============================================================================
+
+function openBlockerModal(taskId) {
+  const input = document.getElementById('blocker-task-id-input');
+  if (input) input.value = taskId;
+  document.getElementById('blocker-modal')?.classList.remove('hidden');
+}
+
+function closeBlockerModal() {
+  document.getElementById('blocker-modal')?.classList.add('hidden');
+}
+
+function setTaskBlockerReason(reasonKey) {
+  const taskId = document.getElementById('blocker-task-id-input')?.value;
+  closeBlockerModal();
+  showToast(`⚡ Logged friction blocker for task. Added to AI Reframing analysis.`);
+}
+
+// =============================================================================
+// LIFE BUCKET LIST & MILESTONE DREAMS VAULT
+// =============================================================================
+
+function initBucketList() {
+  renderBucketList();
+}
+
+function renderBucketList() {
+  const container = document.getElementById('bucket-list-grid');
+  if (!container) return;
+
+  const catMap = {
+    travel: '✈️ Travel',
+    career: '🏆 Career',
+    adventure: '🧗 Adventure',
+    wellness: '🌿 Wellness',
+    creative: '🎨 Creative'
+  };
+
+  container.innerHTML = state.bucketList.map(b => `
+    <div class="bucket-card ${b.achieved ? 'is-achieved' : ''}" id="bucket_${b.id}">
+      <div class="flex items-center justify-between gap-1.5 mb-1.5">
+        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-black/40 border border-white/10 text-slate-300">
+          ${catMap[b.category] || b.category}
+        </span>
+        <span class="text-[10px] text-amber-300 font-mono font-bold">${b.year || 'Aspiration'}</span>
+      </div>
+
+      <h5 class="text-xs font-bold text-white mb-2 leading-snug ${b.achieved ? 'line-through text-slate-400' : ''}">${escapeHtml(b.title)}</h5>
+
+      <div class="flex items-center justify-between pt-1 border-t border-white/5 text-[10px]">
+        <button type="button" onclick="toggleBucketAchieved('${b.id}')" class="font-semibold transition-colors ${b.achieved ? 'text-emerald-400' : 'text-slate-400 hover:text-pink-400'}">
+          ${b.achieved ? '✨ Achieved' : '○ Mark Achieved'}
+        </button>
+        <button type="button" onclick="deleteBucketItem('${b.id}')" class="text-slate-500 hover:text-rose-400">
+          <i data-lucide="trash-2" class="w-3 h-3"></i>
+        </button>
+      </div>
+    </div>
+  `).join('');
+
+  lucide.createIcons();
+
+  const countBadge = document.getElementById('bucket-count-badge');
+  if (countBadge) {
+    const done = state.bucketList.filter(b => b.achieved).length;
+    countBadge.textContent = `${done}/${state.bucketList.length} Fulfilled`;
+  }
+}
+
+function openBucketListModal() {
+  document.getElementById('bucket-modal')?.classList.remove('hidden');
+}
+
+function closeBucketListModal() {
+  document.getElementById('bucket-modal')?.classList.add('hidden');
+}
+
+function submitBucketItem(event) {
+  event.preventDefault();
+  const title = document.getElementById('bucket-title-input').value.trim();
+  const category = document.getElementById('bucket-category-select').value;
+  const year = document.getElementById('bucket-year-input').value.trim();
+
+  if (!title) return;
+
+  const newItem = {
+    id: `b_${Date.now()}`,
+    title: title,
+    category: category,
+    year: year || '2027',
+    achieved: false
+  };
+
+  state.bucketList.unshift(newItem);
+  localStorage.setItem('mind_cave_bucket_list', JSON.stringify(state.bucketList));
+
+  closeBucketListModal();
+  renderBucketList();
+  showToast(`🌠 Pinned dream: "${title}" to your Bucket List!`);
+}
+
+function toggleBucketAchieved(id) {
+  const item = state.bucketList.find(b => b.id === id);
+  if (!item) return;
+
+  item.achieved = !item.achieved;
+  localStorage.setItem('mind_cave_bucket_list', JSON.stringify(state.bucketList));
+  renderBucketList();
+  showToast(item.achieved ? '🎉 Congratulations! Dream milestone achieved!' : 'Milestone returned to active bucket list.');
+}
+
+function deleteBucketItem(id) {
+  state.bucketList = state.bucketList.filter(b => b.id !== id);
+  localStorage.setItem('mind_cave_bucket_list', JSON.stringify(state.bucketList));
+  renderBucketList();
+  showToast('Item removed from Bucket List.');
+}
+
+// =============================================================================
+// AESTHETIC HANDWRITTEN SCRAPBOOK SOCIAL EXPORTER (CANVAS & PNG DOWNLOAD)
+// =============================================================================
+
+function openScrapbookModal() {
+  document.getElementById('scrapbook-modal')?.classList.remove('hidden');
+  renderScrapbookCard();
+}
+
+function closeScrapbookModal() {
+  document.getElementById('scrapbook-modal')?.classList.add('hidden');
+}
+
+function setScrapbookTheme(theme) {
+  state.scrapbookTheme = theme;
+  document.querySelectorAll('#scrapbook-theme-selector .scrapbook-theme-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  event?.currentTarget?.classList.add('active');
+  renderScrapbookCard();
+}
+
+function renderScrapbookCard() {
+  const canvas = document.getElementById('scrapbook-render-canvas');
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  const width = canvas.width;
+  const height = canvas.height;
+
+  // Selected font
+  const fontSelect = document.getElementById('scrapbook-font-select');
+  const selectedFont = fontSelect ? fontSelect.value : "'Caveat', cursive";
+
+  // Checkbox toggles
+  const incGoal = document.getElementById('scrap-toggle-goal')?.checked ?? true;
+  const incHabits = document.getElementById('scrap-toggle-habits')?.checked ?? true;
+  const incMetrics = document.getElementById('scrap-toggle-metrics')?.checked ?? true;
+  const incPolaroid = document.getElementById('scrap-toggle-polaroid')?.checked ?? true;
+  const incReflection = document.getElementById('scrap-toggle-reflection')?.checked ?? true;
+
+  // Theme palettes
+  const themes = {
+    pastel: {
+      bg: '#fdf6f0',
+      pageInner: '#fff9f5',
+      ink: '#3f3a52',
+      accent1: '#f472b6',
+      accent2: '#38bdf8',
+      washi1: '#fbcfe8',
+      washi2: '#bae6fd',
+      tapeBorder: '#f472b6',
+      paperLines: '#f1e7de',
+      stickerBg: '#fef08a'
+    },
+    vintage: {
+      bg: '#eedcc9',
+      pageInner: '#f7eee3',
+      ink: '#2b2118',
+      accent1: '#b45309',
+      accent2: '#78350f',
+      washi1: '#d7c4b7',
+      washi2: '#c4b5a5',
+      tapeBorder: '#92400e',
+      paperLines: '#e6d5c3',
+      stickerBg: '#fed7aa'
+    },
+    notebook: {
+      bg: '#f8fafc',
+      pageInner: '#ffffff',
+      ink: '#0f172a',
+      accent1: '#0284c7',
+      accent2: '#6366f1',
+      washi1: '#e2e8f0',
+      washi2: '#cbd5e1',
+      tapeBorder: '#38bdf8',
+      paperLines: '#e2e8f0',
+      stickerBg: '#bfdbfe'
+    },
+    cyber: {
+      bg: '#090d16',
+      pageInner: '#0f172a',
+      ink: '#f8fafc',
+      accent1: '#ec4899',
+      accent2: '#06b6d4',
+      washi1: '#1e293b',
+      washi2: '#334155',
+      tapeBorder: '#38bdf8',
+      paperLines: '#1e293b',
+      stickerBg: '#312e81'
+    }
+  };
+
+  const t = themes[state.scrapbookTheme] || themes.pastel;
+
+  // 1. Draw Page Background
+  ctx.fillStyle = t.bg;
+  ctx.fillRect(0, 0, width, height);
+
+  // 2. Draw Inner Paper with subtle margin
+  ctx.save();
+  ctx.fillStyle = t.pageInner;
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.12)';
+  ctx.shadowBlur = 24;
+  ctx.shadowOffsetY = 8;
+  ctx.beginPath();
+  ctx.roundRect(40, 30, width - 80, height - 60, 20);
+  ctx.fill();
+  ctx.restore();
+
+  // 3. Draw Spiral Wire Notebook Spine on Left Edge
+  ctx.fillStyle = 'rgba(100, 116, 139, 0.4)';
+  for (let y = 60; y < height - 60; y += 36) {
+    // Spiral hole
+    ctx.beginPath();
+    ctx.arc(60, y, 6, 0, Math.PI * 2);
+    ctx.fillStyle = state.scrapbookTheme === 'cyber' ? '#090d16' : '#cbd5e1';
+    ctx.fill();
+
+    // Spiral wire loop
+    ctx.beginPath();
+    ctx.ellipse(54, y, 14, 4, -0.2, 0, Math.PI * 2);
+    ctx.strokeStyle = state.scrapbookTheme === 'cyber' ? '#38bdf8' : '#64748b';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+  }
+
+  // 4. Subtle Ruled / Grid Lines across the notebook
+  ctx.strokeStyle = t.paperLines;
+  ctx.lineWidth = 1;
+  for (let y = 140; y < height - 70; y += 32) {
+    ctx.beginPath();
+    ctx.moveTo(90, y);
+    ctx.lineTo(width - 60, y);
+    ctx.stroke();
+  }
+
+  // 5. Header: "ABOUT TODAY / DAILY CHRONICLE"
+  ctx.fillStyle = t.ink;
+  ctx.font = `bold 42px ${selectedFont}`;
+  const d = state.selectedDiaryDate || new Date();
+  const dateStr = d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' });
+  ctx.fillText("✦ ABOUT TODAY ✦", 100, 95);
+
+  ctx.font = `24px ${selectedFont}`;
+  ctx.fillStyle = t.accent1;
+  ctx.fillText(`📅 ${dateStr}`, 100, 125);
+
+  // Doodle Stars & Heart in top right
+  ctx.font = `26px ${selectedFont}`;
+  ctx.fillText("✨ ♡ ★", width - 170, 95);
+
+  let currentY = 165;
+
+  // 6. TODAY'S GOAL (Washi tape container)
+  if (incGoal) {
+    // Washi tape sticker
+    ctx.save();
+    ctx.fillStyle = t.washi1;
+    ctx.beginPath();
+    ctx.roundRect(95, currentY, width - 180, 75, 12);
+    ctx.fill();
+    ctx.strokeStyle = t.tapeBorder;
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([6, 4]);
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.fillStyle = t.ink;
+    ctx.font = `bold 22px ${selectedFont}`;
+    ctx.fillText("🎯 North Star Goal:", 115, currentY + 30);
+    ctx.font = `20px ${selectedFont}`;
+    const goalText = state.todayGoal?.text || "Ship core system architecture";
+    ctx.fillText(`"${goalText}"`, 115, currentY + 58);
+
+    currentY += 100;
+  }
+
+  // 7. POLAROID PHOTO with Washi Tape & Rotated Angle
+  if (incPolaroid && memoryPhotosList.length > 0) {
+    const photo = memoryPhotosList[0];
+    ctx.save();
+    ctx.translate(width - 240, currentY + 110);
+    ctx.rotate(0.06); // Cute tilt angle
+
+    // Polaroid frame
+    ctx.fillStyle = '#ffffff';
+    ctx.shadowColor = 'rgba(0,0,0,0.18)';
+    ctx.shadowBlur = 12;
+    ctx.shadowOffsetY = 6;
+    ctx.fillRect(-110, -110, 220, 240);
+
+    // Inner photo area
+    ctx.fillStyle = '#e2e8f0';
+    ctx.fillRect(-95, -95, 190, 150);
+
+    // Placeholder or Photo
+    ctx.fillStyle = '#0284c7';
+    ctx.font = `bold 18px ${selectedFont}`;
+    ctx.textAlign = 'center';
+    ctx.fillText("📷 Visual Memory", 0, -15);
+    ctx.font = `14px ${selectedFont}`;
+    ctx.fillStyle = '#64748b';
+    ctx.fillText("📍 Connaught Place", 0, 10);
+
+    // Polaroid bottom handwritten caption
+    ctx.font = `18px ${selectedFont}`;
+    ctx.fillStyle = '#1e293b';
+    ctx.fillText(photo.caption || "Morning Walk Flow", 0, 95);
+
+    // Washi tape across polaroid top
+    ctx.rotate(-0.06);
+    ctx.fillStyle = t.washi2;
+    ctx.fillRect(-50, -135, 100, 24);
+    ctx.restore();
+  }
+
+  // 8. HABITS STAMP LIST (Left Column)
+  if (incHabits) {
+    ctx.fillStyle = t.ink;
+    ctx.font = `bold 26px ${selectedFont}`;
+    ctx.fillText("🌿 Daily Habit Streaks", 100, currentY + 25);
+
+    let habitY = currentY + 60;
+    state.habitsList.slice(0, 5).forEach((h) => {
+      ctx.font = `22px ${selectedFont}`;
+      ctx.fillStyle = t.ink;
+      ctx.fillText(`☑ ${h.title}`, 105, habitY);
+      ctx.fillStyle = t.accent1;
+      ctx.font = `bold 20px ${selectedFont}`;
+      ctx.fillText(`🔥 ${h.streak}d`, 290, habitY);
+      habitY += 32;
+    });
+
+    currentY = Math.max(currentY + 230, currentY + 200);
+  }
+
+  // 9. PLAN VS ACTION VELOCITY METRICS
+  if (incMetrics) {
+    ctx.save();
+    ctx.fillStyle = t.stickerBg;
+    ctx.beginPath();
+    ctx.roundRect(100, currentY, 320, 70, 14);
+    ctx.fill();
+    ctx.strokeStyle = t.accent1;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.fillStyle = '#1e293b';
+    ctx.font = `bold 22px ${selectedFont}`;
+    ctx.fillText("⚡ Plan vs Action Score", 115, currentY + 28);
+    ctx.font = `19px ${selectedFont}`;
+    ctx.fillText("80% Velocity • 4/5 Done • 1 Reframed", 115, currentY + 54);
+    ctx.restore();
+
+    currentY += 95;
+  }
+
+  // 10. TOP REFLECTION QUOTE & SIGN-OFF
+  if (incReflection) {
+    ctx.fillStyle = t.ink;
+    ctx.font = `bold 24px ${selectedFont}`;
+    ctx.fillText("💭 Daily Reflection & CBT Note", 100, currentY + 25);
+
+    ctx.font = `italic 22px ${selectedFont}`;
+    ctx.fillStyle = t.ink;
+    const quote = "Energy aligned with execution. Afternoon dip reframed as restorative pause.";
+    ctx.fillText(`"${quote}"`, 105, currentY + 55);
+
+    // Signature stamp
+    ctx.font = `20px ${selectedFont}`;
+    ctx.fillStyle = t.accent2;
+    ctx.fillText("✍ Mind Cave Life Intelligence", width - 320, height - 75);
+  }
+}
+
+function downloadScrapbookPNG() {
+  const canvas = document.getElementById('scrapbook-render-canvas');
+  if (!canvas) return;
+
+  const link = document.createElement('a');
+  const d = state.selectedDiaryDate || new Date();
+  const dateFormatted = d.toISOString().split('T')[0];
+  link.download = `MindCave-Scrapbook-${dateFormatted}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+
+  showToast('📥 High-Res Scrapbook Card downloaded as PNG!');
+}
+
+async function shareScrapbookImage() {
+  const canvas = document.getElementById('scrapbook-render-canvas');
+  if (!canvas) return;
+
+  canvas.toBlob(async (blob) => {
+    if (!blob) return;
+    const file = new File([blob], 'mind-cave-scrapbook.png', { type: 'image/png' });
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: 'My Daily Mind Cave Journal',
+          text: 'My aesthetic daily life intelligence chronicle from Mind Cave ✦'
+        });
+        showToast('✨ Shared scrapbook card successfully!');
+      } catch (e) {
+        downloadScrapbookPNG();
+      }
+    } else {
+      // Fallback: Copy Image to Clipboard or Download
+      try {
+        await navigator.clipboard.write([
+          new ClipboardItem({ 'image/png': blob })
+        ]);
+        showToast('📋 Scrapbook image copied to clipboard! Ready to paste into social apps.');
+      } catch (e) {
+        downloadScrapbookPNG();
+      }
+    }
+  });
 }

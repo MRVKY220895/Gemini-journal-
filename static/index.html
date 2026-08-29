@@ -32,6 +32,11 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   
+  <!-- Google Fonts: Handwriting & Modern UI Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Patrick+Hand&family=Kalam:wght@400;700&family=Architects+Daughter&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
   <!-- Firebase App & Auth SDK v10 (Compat) -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
@@ -238,6 +243,12 @@
         </div>
 
         <div class="journal-header-actions flex items-center gap-2">
+          <!-- Aesthetic Scrapbook Social Card Exporter -->
+          <button onclick="openScrapbookModal()" class="btn-secondary text-xs !py-1.5 !px-2.5 flex items-center gap-1.5 hover:border-pink-400 text-pink-300" title="Export Aesthetic Social Journal / Scrapbook Page (Pinterest & Instagram)">
+            <i data-lucide="palette" class="w-3.5 h-3.5 text-pink-400"></i>
+            <span class="hidden sm:inline">Scrapbook Card</span>
+          </button>
+
           <!-- AI Voice Summary -->
           <button onclick="toggleVoiceSummary()" id="btn-voice-summary" class="btn-secondary text-xs !py-1.5 !px-2.5 flex items-center gap-1.5" title="Listen to AI Daily Synthesis">
             <i data-lucide="volume-2" class="w-3.5 h-3.5 text-cyan-400" id="voice-summary-icon"></i>
@@ -339,6 +350,38 @@
       <!-- VIEW 1: CHRONICLE & AGENDA (UNIFIED TIMELINE STREAM) -->
       <!-- =================================================================== -->
       <div id="journal-track-chrono" class="space-y-3">
+        
+        <!-- TODAY'S NORTH STAR GOAL & INTENT BANNER -->
+        <div class="today-goal-card p-3 rounded-2xl bg-gradient-to-r from-amber-950/40 via-black/40 to-cyan-950/30 border border-amber-500/30 shadow-lg" id="today-goal-container">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <button type="button" onclick="toggleTodayGoalComplete()" class="w-6 h-6 rounded-lg border border-amber-500/40 bg-black/40 flex items-center justify-center transition-colors shrink-0 hover:border-amber-400" id="today-goal-check-btn" title="Mark Goal Fulfilled">
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400 hidden" id="today-goal-check-icon"></i>
+              </button>
+              <div class="min-w-0">
+                <div class="flex items-center gap-2 mb-0.5 flex-wrap">
+                  <span class="text-[10px] text-amber-300 font-mono font-bold uppercase tracking-wider flex items-center gap-1">
+                    <i data-lucide="target" class="w-3 h-3 text-amber-400"></i> Today's North Star Goal
+                  </span>
+                  <span id="plan-vs-action-badge" class="text-[10px] px-2 py-0.2 rounded-full bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 font-mono font-semibold" title="Plan vs Action Execution Velocity">
+                    ⚡ 80% Action Velocity
+                  </span>
+                </div>
+                <h4 id="today-goal-text" class="text-xs sm:text-sm font-bold text-white truncate cursor-pointer hover:text-amber-300 transition-colors" onclick="openTodayGoalModal()" title="Click to edit Today's Goal">
+                  Ship Core System Architecture & complete evening 30m mindful walk
+                </h4>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-auto">
+              <button onclick="openTodayGoalModal()" class="btn-secondary !py-1 !px-2.5 text-[11px] flex items-center gap-1" title="Edit Today's Goal">
+                <i data-lucide="edit-2" class="w-3 h-3 text-amber-400"></i> <span>Edit Goal</span>
+              </button>
+              <button onclick="openScrapbookModal()" class="btn-secondary !py-1 !px-2.5 text-[11px] flex items-center gap-1 text-pink-300 hover:border-pink-400" title="Export Scrapbook Card">
+                <i data-lucide="share-2" class="w-3 h-3 text-pink-400"></i> <span>Share</span>
+              </button>
+            </div>
+          </div>
+        </div>
         
         <!-- Unified Master Command Ribbon -->
         <div class="double-bezel">
@@ -548,6 +591,124 @@
             </div>
           </div>
 
+        </div>
+
+        <!-- Row 2: Habit Tracker & Plan vs Action Blocker Analytics -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+          <!-- Daily Habit Tracker -->
+          <div class="double-bezel lg:col-span-7">
+            <div class="double-bezel-inner p-4 flex flex-col justify-between h-full">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                      <i data-lucide="flame" class="w-3.5 h-3.5"></i>
+                    </div>
+                    <h3 class="text-xs font-bold text-white">Daily Habit Tracker & Streaks</h3>
+                  </div>
+                  <span class="text-[10px] text-amber-400 bg-amber-950/60 border border-amber-500/30 px-2 py-0.5 rounded-full font-mono font-bold" id="habit-progress-pill">
+                    🔥 5/6 Done Today
+                  </span>
+                </div>
+                <p class="text-[11px] text-slate-400 mb-3">Micro-habits compounding daily cognitive clarity and vitality.</p>
+
+                <!-- Habit List -->
+                <div class="space-y-2" id="habit-tracker-list">
+                  <!-- Rendered dynamically via JS -->
+                </div>
+              </div>
+
+              <div class="pt-2.5 mt-3 border-t border-white/5 flex items-center justify-between text-[10px] text-slate-400">
+                <span>Consistency: <strong class="text-emerald-400 font-mono">92% Weekly Score</strong></span>
+                <button onclick="openNewHabitModal()" class="text-cyan-400 hover:text-cyan-300 font-semibold">+ Add Habit</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Plan vs Action & Blocker Analysis -->
+          <div class="double-bezel lg:col-span-5">
+            <div class="double-bezel-inner p-4 flex flex-col justify-between h-full">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-lg bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400">
+                      <i data-lucide="pie-chart" class="w-3.5 h-3.5"></i>
+                    </div>
+                    <h3 class="text-xs font-bold text-white">Plan vs. Action Velocity</h3>
+                  </div>
+                  <span class="text-[10px] text-blue-300 font-mono">Friction Log</span>
+                </div>
+                <p class="text-[11px] text-slate-400 mb-3">Analysis of completed commitments vs friction blockers.</p>
+
+                <!-- Velocity Bars -->
+                <div class="space-y-2.5">
+                  <div class="p-2.5 rounded-xl bg-black/40 border border-white/5">
+                    <div class="flex justify-between text-[11px] mb-1">
+                      <span class="text-slate-300">🎯 Execution Velocity</span>
+                      <span class="text-emerald-400 font-mono font-bold" id="plan-vs-action-rate">80% (4/5 done)</span>
+                    </div>
+                    <div class="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                      <div class="h-full bg-gradient-to-r from-cyan-500 to-emerald-400 rounded-full" id="plan-vs-action-bar" style="width: 80%"></div>
+                    </div>
+                  </div>
+
+                  <!-- Friction / Blocker Breakdown -->
+                  <div class="space-y-1.5" id="friction-blocker-list">
+                    <span class="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">What Stopped Us Today</span>
+                    <div class="p-2 rounded-xl bg-rose-950/20 border border-rose-500/20 flex items-center justify-between text-[11px]">
+                      <span class="text-rose-300 flex items-center gap-1.5">
+                        <i data-lucide="shuffle" class="w-3 h-3 text-rose-400"></i>
+                        <span>⚡ Context Switching</span>
+                      </span>
+                      <span class="text-[10px] font-mono text-rose-400">1 task delayed</span>
+                    </div>
+                    <div class="p-2 rounded-xl bg-purple-950/20 border border-purple-500/20 flex items-center justify-between text-[11px]">
+                      <span class="text-purple-300 flex items-center gap-1.5">
+                        <i data-lucide="battery-low" class="w-3 h-3 text-purple-400"></i>
+                        <span>💤 Afternoon Fatigue</span>
+                      </span>
+                      <span class="text-[10px] font-mono text-purple-400">Reframed to Rest</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pt-2.5 mt-2 border-t border-white/5 flex items-center justify-between text-[10px] text-slate-400">
+                <span class="truncate">AI Reframing: <span class="text-slate-300">Protect deep-work blocks from unscheduled calls</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 3: Life Bucket List & Dreams Vault -->
+        <div class="double-bezel">
+          <div class="double-bezel-inner p-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 border-b border-white/5 pb-2.5">
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-lg bg-pink-500/10 border border-pink-500/30 flex items-center justify-center text-pink-400">
+                  <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                </div>
+                <div>
+                  <h3 class="text-xs font-bold text-white flex items-center gap-2">
+                    <span>Life Bucket List & Milestone Dreams</span>
+                    <span class="text-[10px] text-pink-300 bg-pink-950/50 border border-pink-500/30 px-2 py-0.2 rounded-full font-mono" id="bucket-count-badge">
+                      8 Aspirations
+                    </span>
+                  </h3>
+                  <p class="text-[11px] text-slate-400">Long-term life experiences, milestones, and personal quests.</p>
+                </div>
+              </div>
+              <button onclick="openBucketListModal()" class="btn-secondary !py-1 !px-2.5 text-xs flex items-center gap-1 hover:border-pink-400 text-pink-300">
+                <i data-lucide="plus" class="w-3.5 h-3.5 text-pink-400"></i>
+                <span>+ Add Dream</span>
+              </button>
+            </div>
+
+            <!-- Bucket List Grid -->
+            <div id="bucket-list-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5">
+              <!-- Rendered dynamically via JS -->
+            </div>
+          </div>
         </div>
 
         <!-- Saved Longitudinal Journal Vault -->
@@ -1187,6 +1348,309 @@
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: AESTHETIC HANDWRITTEN SCRAPBOOK SOCIAL CARD EXPORTER -->
+  <!-- ===================================================================== -->
+  <div id="scrapbook-modal" class="fixed inset-0 bg-black/85 backdrop-blur-xl z-50 flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
+    <div class="double-bezel max-w-4xl w-full my-auto max-h-[92vh] flex flex-col">
+      <div class="double-bezel-inner p-4 sm:p-6 flex flex-col flex-1 overflow-hidden">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between pb-3 border-b border-white/10 shrink-0">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-xl bg-pink-500/20 text-pink-300 flex items-center justify-center">
+              <i data-lucide="palette" class="w-4 h-4 text-pink-400"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <span>Handwritten Scrapbook Social Card</span>
+                <span class="text-[10px] bg-pink-950/60 border border-pink-500/30 text-pink-300 px-2 py-0.2 rounded-full font-mono">Pinterest & IG Ready</span>
+              </h3>
+              <p class="text-[11px] text-slate-400">Export your day as an aesthetic physical bullet-journal page with stickers & handwritten cursive.</p>
+            </div>
+          </div>
+          <button onclick="closeScrapbookModal()" class="text-slate-400 hover:text-white p-1">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <!-- Body: Controls & Canvas Preview -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 pt-4 flex-1 overflow-y-auto">
+          <!-- Left: Customization Controls -->
+          <div class="lg:col-span-4 space-y-3 text-xs">
+            <!-- Theme Selection -->
+            <div>
+              <label class="text-slate-300 font-semibold block mb-1">Aesthetic Theme</label>
+              <div class="grid grid-cols-2 gap-1.5" id="scrapbook-theme-selector">
+                <button type="button" onclick="setScrapbookTheme('pastel')" class="scrapbook-theme-btn active p-2 rounded-xl border text-left text-xs bg-pink-950/30 border-pink-500/50 text-pink-200">
+                  <span class="block font-bold">🌸 Pastel Cute</span>
+                  <span class="text-[10px] text-pink-300/70">Washi tape & cute doodles</span>
+                </button>
+                <button type="button" onclick="setScrapbookTheme('vintage')" class="scrapbook-theme-btn p-2 rounded-xl border text-left text-xs bg-black/40 border-slate-700 hover:border-amber-500 text-amber-200">
+                  <span class="block font-bold">📜 Vintage Kraft</span>
+                  <span class="text-[10px] text-amber-300/70">Sepia paper & stamps</span>
+                </button>
+                <button type="button" onclick="setScrapbookTheme('notebook')" class="scrapbook-theme-btn p-2 rounded-xl border text-left text-xs bg-black/40 border-slate-700 hover:border-cyan-500 text-cyan-200">
+                  <span class="block font-bold">📓 Spiral Grid</span>
+                  <span class="text-[10px] text-cyan-300/70">Clean bullet journal wire</span>
+                </button>
+                <button type="button" onclick="setScrapbookTheme('cyber')" class="scrapbook-theme-btn p-2 rounded-xl border text-left text-xs bg-black/40 border-slate-700 hover:border-purple-500 text-purple-200">
+                  <span class="block font-bold">🌌 Midnight Neon</span>
+                  <span class="text-[10px] text-purple-300/70">Dark mode handwriting</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Font Family Selection -->
+            <div>
+              <label class="text-slate-300 font-semibold block mb-1">Handwritten Script Font</label>
+              <select id="scrapbook-font-select" onchange="renderScrapbookCard()" class="w-full bg-slate-900 text-slate-200 text-xs p-2 rounded-xl border border-slate-800 focus:outline-none focus:border-pink-500">
+                <option value="'Caveat', cursive" selected>Caveat (Casual Pen)</option>
+                <option value="'Patrick Hand', cursive">Patrick Hand (Clean Doodles)</option>
+                <option value="'Kalam', cursive">Kalam (Warm Journal Handwriting)</option>
+                <option value="'Architects Daughter', cursive">Architects Daughter (Artistic)</option>
+              </select>
+            </div>
+
+            <!-- Content Toggles -->
+            <div class="space-y-1.5 pt-1 border-t border-white/5">
+              <label class="text-slate-300 font-semibold block">Included Elements</label>
+              <label class="flex items-center gap-2 cursor-pointer text-[11px] text-slate-300">
+                <input type="checkbox" id="scrap-toggle-goal" checked onchange="renderScrapbookCard()" class="rounded bg-slate-900 text-pink-500">
+                <span>Today's North Star Goal & Intent</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer text-[11px] text-slate-300">
+                <input type="checkbox" id="scrap-toggle-habits" checked onchange="renderScrapbookCard()" class="rounded bg-slate-900 text-pink-500">
+                <span>Daily Habit Checkmarks & Streaks</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer text-[11px] text-slate-300">
+                <input type="checkbox" id="scrap-toggle-metrics" checked onchange="renderScrapbookCard()" class="rounded bg-slate-900 text-pink-500">
+                <span>Plan vs. Action Execution Score</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer text-[11px] text-slate-300">
+                <input type="checkbox" id="scrap-toggle-polaroid" checked onchange="renderScrapbookCard()" class="rounded bg-slate-900 text-pink-500">
+                <span>Memory Polaroid with Washi Tape</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer text-[11px] text-slate-300">
+                <input type="checkbox" id="scrap-toggle-reflection" checked onchange="renderScrapbookCard()" class="rounded bg-slate-900 text-pink-500">
+                <span>Top Journal Reflection Quote</span>
+              </label>
+            </div>
+
+            <!-- Actions -->
+            <div class="pt-2 space-y-2">
+              <button onclick="downloadScrapbookPNG()" class="w-full btn-island !py-2 justify-center font-bold !bg-gradient-to-r !from-pink-500 !to-purple-600">
+                <i data-lucide="download" class="w-4 h-4 text-white"></i>
+                <span>Download High-Res PNG</span>
+              </button>
+              <button onclick="shareScrapbookImage()" class="w-full btn-secondary !py-2 justify-center font-semibold text-pink-300 hover:border-pink-400">
+                <i data-lucide="share-2" class="w-4 h-4 text-pink-400"></i>
+                <span>Share to Socials (IG / Pinterest / X)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Right: Live Canvas / Card Preview -->
+          <div class="lg:col-span-8 flex flex-col items-center justify-center bg-black/40 rounded-2xl p-3 border border-white/5 min-h-[440px]">
+            <div class="scrapbook-canvas-wrapper shadow-2xl rounded-2xl overflow-hidden max-w-full">
+              <canvas id="scrapbook-render-canvas" width="800" height="1000" class="w-full max-w-[420px] sm:max-w-[480px] h-auto rounded-xl border border-white/10 shadow-2xl"></canvas>
+            </div>
+            <p class="text-[10px] text-slate-500 font-mono mt-2 flex items-center gap-1">
+              <i data-lucide="info" class="w-3 h-3"></i> Real-time generated 4:5 social canvas resolution (800x1000px)
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: TODAY'S GOAL EDITOR -->
+  <!-- ===================================================================== -->
+  <div id="goal-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="double-bezel max-w-md w-full">
+      <div class="double-bezel-inner p-6">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
+              <i data-lucide="target" class="w-4 h-4"></i>
+            </div>
+            <h3 class="text-base font-bold text-white">Today's North Star Goal</h3>
+          </div>
+          <button onclick="closeTodayGoalModal()" class="text-slate-400 hover:text-white">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <p class="text-xs text-slate-400 mb-4">
+          Define your primary intention for today. All hourly tasks and cognitive prompts will anchor around this focus.
+        </p>
+
+        <form onsubmit="submitTodayGoal(event)" class="space-y-3">
+          <div>
+            <label class="text-xs text-slate-300 block mb-1">Primary Goal & Intent</label>
+            <input type="text" id="goal-input-text" required placeholder="e.g. Ship Core System Architecture & walk 30 mins" class="w-full bg-black/60 text-slate-200 text-xs p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-500">
+          </div>
+
+          <div class="pt-2 flex justify-end gap-2">
+            <button type="button" onclick="closeTodayGoalModal()" class="btn-secondary text-xs">Cancel</button>
+            <button type="submit" class="btn-island !bg-gradient-to-r !from-amber-500 !to-yellow-500">
+              <span>Set North Star</span>
+              <div class="btn-island-icon">
+                <i data-lucide="check" class="w-4 h-4 text-white"></i>
+              </div>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: ADD NEW HABIT -->
+  <!-- ===================================================================== -->
+  <div id="habit-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="double-bezel max-w-md w-full">
+      <div class="double-bezel-inner p-6">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
+              <i data-lucide="flame" class="w-4 h-4"></i>
+            </div>
+            <h3 class="text-base font-bold text-white">Add New Micro-Habit</h3>
+          </div>
+          <button onclick="closeNewHabitModal()" class="text-slate-400 hover:text-white">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <form onsubmit="submitNewHabit(event)" class="space-y-3 text-xs">
+          <div>
+            <label class="text-slate-300 block mb-1">Habit Name & Emoji</label>
+            <input type="text" id="habit-title-input" required placeholder="e.g. 💧 Hydrate 2.5 Liters" class="w-full bg-black/60 text-slate-200 text-xs p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-500">
+          </div>
+          <div>
+            <label class="text-slate-300 block mb-1">Target Frequency</label>
+            <select id="habit-freq-select" class="w-full bg-slate-900 text-slate-200 text-xs p-2 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-500">
+              <option value="daily">Daily (Every Day)</option>
+              <option value="weekdays">Weekdays Only</option>
+              <option value="3x_week">3x per Week</option>
+            </select>
+          </div>
+
+          <div class="pt-2 flex justify-end gap-2">
+            <button type="button" onclick="closeNewHabitModal()" class="btn-secondary text-xs">Cancel</button>
+            <button type="submit" class="btn-island !bg-gradient-to-r !from-amber-500 !to-yellow-500">
+              <span>Save Habit</span>
+              <div class="btn-island-icon">
+                <i data-lucide="check" class="w-4 h-4 text-white"></i>
+              </div>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: ADD BUCKET LIST DREAM -->
+  <!-- ===================================================================== -->
+  <div id="bucket-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="double-bezel max-w-md w-full">
+      <div class="double-bezel-inner p-6">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-xl bg-pink-500/20 text-pink-400 flex items-center justify-center">
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+            </div>
+            <h3 class="text-base font-bold text-white">Add to Life Bucket List</h3>
+          </div>
+          <button onclick="closeBucketListModal()" class="text-slate-400 hover:text-white">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <form onsubmit="submitBucketItem(event)" class="space-y-3 text-xs">
+          <div>
+            <label class="text-slate-300 block mb-1">Aspiration / Dream</label>
+            <input type="text" id="bucket-title-input" required placeholder="e.g. Scuba diving in Great Barrier Reef" class="w-full bg-black/60 text-slate-200 text-xs p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-pink-500">
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-slate-300 block mb-1">Category</label>
+              <select id="bucket-category-select" class="w-full bg-slate-900 text-slate-200 text-xs p-2 rounded-xl border border-slate-800 focus:outline-none focus:border-pink-500">
+                <option value="travel">✈️ Travel & World</option>
+                <option value="career">🏆 Mastery & Career</option>
+                <option value="adventure">🧗 Adventure & Sports</option>
+                <option value="wellness">🌿 Wellness & Self</option>
+                <option value="creative">🎨 Art & Creation</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-slate-300 block mb-1">Target Year / Date</label>
+              <input type="text" id="bucket-year-input" placeholder="e.g. 2027" class="w-full bg-slate-900 text-slate-200 text-xs p-2 rounded-xl border border-slate-800 focus:outline-none focus:border-pink-500">
+            </div>
+          </div>
+
+          <div class="pt-2 flex justify-end gap-2">
+            <button type="button" onclick="closeBucketListModal()" class="btn-secondary text-xs">Cancel</button>
+            <button type="submit" class="btn-island !bg-gradient-to-r !from-pink-500 !to-rose-500">
+              <span>Pin to Bucket List</span>
+              <div class="btn-island-icon">
+                <i data-lucide="check" class="w-4 h-4 text-white"></i>
+              </div>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: TASK BLOCKER & FRICTION LOGGING -->
+  <!-- ===================================================================== -->
+  <div id="blocker-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="double-bezel max-w-md w-full">
+      <div class="double-bezel-inner p-6">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center">
+              <i data-lucide="alert-circle" class="w-4 h-4"></i>
+            </div>
+            <h3 class="text-base font-bold text-white">What Stopped Us?</h3>
+          </div>
+          <button onclick="closeBlockerModal()" class="text-slate-400 hover:text-white">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <p class="text-xs text-slate-400 mb-3" id="blocker-task-title-lbl">
+          Tag the friction point that interrupted or delayed this commitment:
+        </p>
+
+        <input type="hidden" id="blocker-task-id-input">
+
+        <div class="space-y-2 text-xs">
+          <button type="button" onclick="setTaskBlockerReason('context_switch')" class="w-full p-2.5 rounded-xl border border-slate-800 hover:border-rose-500 bg-black/40 text-left flex items-center justify-between text-slate-200 transition-colors">
+            <span class="flex items-center gap-2"><span>⚡</span> <span>Context Switching / Multitasking</span></span>
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-500"></i>
+          </button>
+          <button type="button" onclick="setTaskBlockerReason('fatigue')" class="w-full p-2.5 rounded-xl border border-slate-800 hover:border-purple-500 bg-black/40 text-left flex items-center justify-between text-slate-200 transition-colors">
+            <span class="flex items-center gap-2"><span>💤</span> <span>Afternoon Fatigue / Low Energy</span></span>
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-500"></i>
+          </button>
+          <button type="button" onclick="setTaskBlockerReason('urgent_meeting')" class="w-full p-2.5 rounded-xl border border-slate-800 hover:border-blue-500 bg-black/40 text-left flex items-center justify-between text-slate-200 transition-colors">
+            <span class="flex items-center gap-2"><span>🛑</span> <span>Unscheduled Urgent Meeting / Emergency</span></span>
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-500"></i>
+          </button>
+          <button type="button" onclick="setTaskBlockerReason('procrastination')" class="w-full p-2.5 rounded-xl border border-slate-800 hover:border-amber-500 bg-black/40 text-left flex items-center justify-between text-slate-200 transition-colors">
+            <span class="flex items-center gap-2"><span>🌧️</span> <span>Emotional Resistance / Overwhelm</span></span>
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-500"></i>
+          </button>
+        </div>
       </div>
     </div>
   </div>
