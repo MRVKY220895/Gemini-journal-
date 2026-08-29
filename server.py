@@ -483,6 +483,19 @@ async def get_health_telemetry(current_user: UserContext = Depends(get_current_u
     }
 
 
+@app.post("/api/security/reset-all")
+@app.post("/api/user/reset")
+async def factory_reset_all_data(current_user: UserContext = Depends(get_current_user)):
+    """
+    Factory Reset: Permanently wipes all database records, chat sessions, journals, and analytics for the user.
+    """
+    res = firestore_manager.reset_user_data(user_id=current_user.uid)
+    # Also wipe guest / default demo IDs so no residual seed records linger
+    firestore_manager.reset_user_data("user_alice")
+    firestore_manager.reset_user_data("guest_user")
+    return res
+
+
 # =============================================================================
 # STATIC ASSET SERVING
 # =============================================================================

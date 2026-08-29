@@ -74,29 +74,27 @@ class GeminiService:
         return bool(k and not k.startswith("your_") and not k.startswith("mock_") and len(k) > 20)
 
     def _init_client(self):
-        if not self._is_valid_live_key():
-            logger.info("Operating in simulated smart engine mode.")
-            return
+        api_key = secret_manager.get_gemini_api_key() if self._is_valid_live_key() else None
 
-        api_key = secret_manager.get_gemini_api_key()
+        # Attempt 1: Modern google-genai SDK with API Key
+        if api_key:
+            try:
+                from google import genai
+                self._genai_client = genai.Client(api_key=api_key)
+                logger.info("Initialized modern Google GenAI Client with API key.")
+                return
+            except Exception as e:
+                logger.debug(f"GenAI API Key client notice: {e}")
 
-        # Attempt 1: Modern google-genai SDK
+        # Attempt 2: Application Default Credentials (Vertex AI Mode - for Cloud Run / Org Policy environments)
         try:
             from google import genai
-            self._genai_client = genai.Client(api_key=api_key)
-            logger.info("Initialized modern Google GenAI Client.")
+            gcp_project = os.getenv("GCP_PROJECT_ID", "project-eb461b9f-34ae-46e3-b00")
+            self._genai_client = genai.Client(vertexai=True, project=gcp_project, location="us-central1")
+            logger.info("Initialized Google GenAI Client with Application Default Credentials (Vertex AI mode).")
             return
         except Exception as e:
-            logger.debug(f"Could not load modern google.genai client: {e}")
-
-        # Attempt 2: google.generativeai SDK
-        try:
-            import google.generativeai as genai_legacy
-            genai_legacy.configure(api_key=api_key)
-            self._legacy_model = genai_legacy.GenerativeModel("gemini-1.5-flash")
-            logger.info("Initialized google.generativeai legacy client.")
-        except Exception as e:
-            logger.warning(f"Failed to configure Gemini SDK: {e}")
+            logger.debug(f"Vertex AI ADC initialization notice: {e}")
 
     def sanitize_input(self, text: str) -> str:
         """Sanitizes PII and wraps input in security delimiter boundaries."""

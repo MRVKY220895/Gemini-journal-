@@ -1835,21 +1835,21 @@ function appendChatMessage(role, content, authorName, modelTag, cognitiveData = 
             </div>
 
             <span class="text-xs font-bold text-slate-900 dark:text-white">${escapeHtml(authorName)}</span>
-
-            <span class="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 font-mono border border-cyan-500/20 flex items-center gap-1">
-
-              <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
-
-              <span>${modelTag?.includes('gemini') ? 'Reflecting' : 'Reflecting'}</span>
-
-            </span>
-
+            ${(modelTag && (modelTag.includes('3.') || modelTag.includes('2.') || modelTag.includes('1.5')) && !modelTag.includes('fallback') && !modelTag.includes('smart')) ? `
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-mono border border-emerald-500/30 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Gemini 3.5 Live</span>
+              </span>
+            ` : `
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 font-mono border border-amber-500/30 flex items-center gap-1" title="Running in smart cognitive processor (Add AI Studio Key for live neural mode)">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                <span>Smart Processor (Offline)</span>
+              </span>
+            `}
           </div>
 
           <span class="text-[10px] font-mono text-slate-400 bg-black/40 px-2 py-0.5 rounded border border-white/5">
-
             ${escapeHtml(cognitiveData?.primary_emotion || 'Seeking Direction')}
-
           </span>
 
         </div>
@@ -2039,6 +2039,159 @@ function restoreChatHistory() {
     }
   } catch (e) {
     console.warn('Failed to restore chat history:', e);
+  }
+}
+
+function openChatHistoryModal() {
+  renderChatHistorySessions();
+  renderSavedReflections();
+  const modal = document.getElementById('chat-history-modal');
+  if (modal) modal.classList.remove('hidden');
+}
+
+function closeChatHistoryModal() {
+  const modal = document.getElementById('chat-history-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function switchChatHistoryTab(tab) {
+  const sessView = document.getElementById('history-sessions-view');
+  const savedView = document.getElementById('history-saved-view');
+  const sessBtn = document.getElementById('tab-history-sessions');
+  const savedBtn = document.getElementById('tab-history-saved');
+
+  if (tab === 'sessions') {
+    if (sessView) sessView.classList.remove('hidden');
+    if (savedView) savedView.classList.add('hidden');
+    if (sessBtn) {
+      sessBtn.className = 'flex-1 py-1.5 rounded-lg font-semibold bg-white dark:bg-purple-600/30 text-purple-600 dark:text-purple-300 border border-slate-200/80 dark:border-purple-500/40 flex items-center justify-center gap-1.5 transition-all';
+    }
+    if (savedBtn) {
+      savedBtn.className = 'flex-1 py-1.5 rounded-lg font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center justify-center gap-1.5 transition-all';
+    }
+    renderChatHistorySessions();
+  } else {
+    if (sessView) sessView.classList.add('hidden');
+    if (savedView) savedView.classList.remove('hidden');
+    if (savedBtn) {
+      savedBtn.className = 'flex-1 py-1.5 rounded-lg font-semibold bg-white dark:bg-purple-600/30 text-purple-600 dark:text-purple-300 border border-slate-200/80 dark:border-purple-500/40 flex items-center justify-center gap-1.5 transition-all';
+    }
+    if (sessBtn) {
+      sessBtn.className = 'flex-1 py-1.5 rounded-lg font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center justify-center gap-1.5 transition-all';
+    }
+    renderSavedReflections();
+  }
+}
+
+function renderChatHistorySessions() {
+  const container = document.getElementById('history-sessions-view');
+  if (!container) return;
+
+  const userKey = 'mind_cave_chat_history_' + (state.currentUser?.uid || 'guest');
+  const saved = localStorage.getItem(userKey);
+  let history = [];
+  if (saved) {
+    try { history = JSON.parse(saved) || []; } catch(e) {}
+  }
+
+  if (history.length === 0) {
+    container.innerHTML = `
+      <div class="text-center py-10 text-xs text-slate-400">
+        <div class="w-10 h-10 rounded-full bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 mx-auto mb-2.5">
+          <i data-lucide="messages-square" class="w-5 h-5"></i>
+        </div>
+        <p class="font-bold text-slate-200">No Active Conversations Yet</p>
+        <p class="text-[11px] text-slate-500 mt-1">Start chatting in the AI Studio to build your private reflection history.</p>
+      </div>
+    `;
+    lucide.createIcons();
+    return;
+  }
+
+  const userMsgs = history.filter(h => h.role === 'user');
+  const firstMsg = userMsgs[0]?.content || 'Reflection Conversation';
+  const lastMsg = history[history.length - 1]?.content || '';
+  const dateStr = new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+  container.innerHTML = `
+    <div class="p-3.5 rounded-2xl bg-white/5 border border-purple-500/20 hover:border-purple-500/40 transition-all cursor-pointer group" onclick="resumeActiveSession()">
+      <div class="flex items-center justify-between gap-2 mb-1.5">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <h4 class="text-xs font-bold text-slate-900 dark:text-white group-hover:text-purple-300 transition-colors truncate max-w-[260px]">${escapeHtml(firstMsg)}</h4>
+        </div>
+        <span class="text-[10px] font-mono text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded-full border border-purple-500/20">${history.length} turns</span>
+      </div>
+      <p class="text-[11px] text-slate-400 line-clamp-2 leading-snug mb-2">${escapeHtml(lastMsg.substring(0, 140))}</p>
+      <div class="flex items-center justify-between text-[10px] text-slate-500 pt-1.5 border-t border-white/5 font-mono">
+        <span>${dateStr}</span>
+        <span class="text-purple-400 font-semibold flex items-center gap-1 group-hover:underline"><span>Resume Conversation</span> →</span>
+      </div>
+    </div>
+  `;
+  lucide.createIcons();
+}
+
+function renderSavedReflections() {
+  const container = document.getElementById('history-saved-view');
+  if (!container) return;
+
+  fetch('/api/journals', { headers: getAuthHeaders() })
+    .then(r => r.json())
+    .then(data => {
+      const journals = data.journals || [];
+      if (journals.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-10 text-xs text-slate-400">
+            <div class="w-10 h-10 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 mx-auto mb-2.5">
+              <i data-lucide="bookmark" class="w-5 h-5"></i>
+            </div>
+            <p class="font-bold text-slate-200">No Saved Reflections Yet</p>
+            <p class="text-[11px] text-slate-500 mt-1">Click "Save to Journal" on any AI message to bookmark it here.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = journals.map(j => {
+        const dateStr = j.created_at ? new Date(j.created_at * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Recent';
+        return `
+          <div class="p-3 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-500/30 transition-all space-y-1.5">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-xs font-bold text-slate-900 dark:text-white truncate">${escapeHtml(j.title || 'Saved Reflection')}</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">${escapeHtml(j.mood || 'Reflective')}</span>
+            </div>
+            <p class="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">${escapeHtml(j.content || '')}</p>
+            <div class="text-[10px] text-slate-500 font-mono pt-1 border-t border-white/5 flex items-center justify-between">
+              <span>${dateStr}</span>
+              <button onclick="insertPrompt('${escapeHtml(j.title || '').replace(/'/g, "\\'")}') ; closeChatHistoryModal()" class="text-cyan-400 hover:underline">Discuss in AI Studio →</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+      lucide.createIcons();
+    })
+    .catch(() => {
+      container.innerHTML = '<div class="text-center py-6 text-xs text-slate-400">Failed to load saved reflections.</div>';
+    });
+}
+
+function resumeActiveSession() {
+  closeChatHistoryModal();
+  restoreChatHistory();
+  showToast('Resumed active conversation session.');
+}
+
+function clearAllChatHistory() {
+  const proceed = confirm('Are you sure you want to permanently clear your chat history for this session?');
+  if (proceed) {
+    state.chatHistory = [];
+    const userKey = 'mind_cave_chat_history_' + (state.currentUser?.uid || 'guest');
+    localStorage.removeItem(userKey);
+    startNewSession();
+    closeChatHistoryModal();
+    showToast('Chat history cleared.');
   }
 }
 

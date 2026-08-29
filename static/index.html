@@ -187,9 +187,13 @@
 
         <!-- Right: Session Actions & Topic Badge -->
         <div class="flex items-center gap-2">
-          <span id="session-topic-heading" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300 truncate max-w-[180px] sm:max-w-[240px]">
+          <span id="session-topic-heading" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300 truncate max-w-[150px] sm:max-w-[220px]">
             Personal Reflective Space
           </span>
+          <button onclick="openChatHistoryModal()" class="btn-secondary text-xs !py-1 !px-2.5 flex items-center gap-1 hover:border-purple-400 text-purple-300" title="View Past Conversations & Saved Reflections">
+            <i data-lucide="history" class="w-3.5 h-3.5 text-purple-400"></i>
+            <span class="hidden sm:inline">Chat History</span>
+          </button>
           <button onclick="startNewSession()" class="btn-secondary text-xs !py-1 !px-2.5 flex items-center gap-1 hover:border-cyan-400 text-cyan-300" title="Start Clean Chat Session">
             <i data-lucide="plus" class="w-3.5 h-3.5 text-cyan-400"></i>
             <span class="hidden sm:inline">New Session</span>
@@ -1666,6 +1670,63 @@
   </main>
 
   <!-- ===================================================================== -->
+  <!-- MODAL: CHAT HISTORY & SAVED REFLECTIONS -->
+  <!-- ===================================================================== -->
+  <div id="chat-history-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
+    <div class="double-bezel max-w-xl w-full my-auto">
+      <div class="double-bezel-inner p-5 sm:p-6 space-y-4 max-h-[85vh] overflow-y-auto flex flex-col">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-white/10">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-500 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-purple-500/25">
+              <i data-lucide="history" class="w-5 h-5 text-white"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-slate-900 dark:text-white">Chat History & Saved Reflections</h3>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400">All past AI conversations and saved cognitive entries</p>
+            </div>
+          </div>
+          <button onclick="closeChatHistoryModal()" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition-colors">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- Filter Sub-Tabs -->
+        <div class="flex gap-1.5 bg-slate-100 dark:bg-black/50 p-1 rounded-xl border border-slate-200 dark:border-white/10 text-xs">
+          <button type="button" onclick="switchChatHistoryTab('sessions')" id="tab-history-sessions" class="flex-1 py-1.5 rounded-lg font-semibold bg-white dark:bg-purple-600/30 text-purple-600 dark:text-purple-300 border border-slate-200/80 dark:border-purple-500/40 flex items-center justify-center gap-1.5 transition-all">
+            <i data-lucide="messages-square" class="w-3.5 h-3.5"></i>
+            <span>Active Conversations</span>
+          </button>
+          <button type="button" onclick="switchChatHistoryTab('saved')" id="tab-history-saved" class="flex-1 py-1.5 rounded-lg font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center justify-center gap-1.5 transition-all">
+            <i data-lucide="bookmark" class="w-3.5 h-3.5 text-rose-400"></i>
+            <span>Saved Reflections</span>
+          </button>
+        </div>
+
+        <!-- Container: Conversations List -->
+        <div id="history-sessions-view" class="space-y-2.5 flex-1 min-h-[220px]">
+          <!-- Rendered via JS -->
+        </div>
+
+        <!-- Container: Saved Reflections List -->
+        <div id="history-saved-view" class="space-y-2.5 flex-1 min-h-[220px] hidden">
+          <!-- Rendered via JS -->
+        </div>
+
+        <!-- Modal Footer Actions -->
+        <div class="pt-3 border-t border-slate-200 dark:border-white/10 flex items-center justify-between">
+          <button type="button" onclick="clearAllChatHistory()" class="text-xs text-rose-500 hover:text-rose-400 font-semibold flex items-center gap-1 hover:underline">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            <span>Clear Chat History</span>
+          </button>
+          <button type="button" onclick="closeChatHistoryModal()" class="btn-secondary text-xs">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ===================================================================== -->
   <!-- MODAL: AUTHENTICATION & BIOLOGICAL PROFILE -->
   <!-- ===================================================================== -->
