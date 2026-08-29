@@ -58,6 +58,41 @@ const state = {
       gcalSynced: true
     }
   ],
+  todayGoals: JSON.parse(localStorage.getItem('mind_cave_today_goals') || 'null') || [
+    {
+      id: 'g1',
+      title: 'Ship Core System Architecture & Validate Test Boundaries',
+      completed: true,
+      startTime: '09:30',
+      endTime: '12:00',
+      duration: '2h 30m',
+      category: 'north_star',
+      categoryLabel: '🎯 North Star',
+      notes: 'Clean zero-warning build & 7/7 pytest verification'
+    },
+    {
+      id: 'g2',
+      title: '30m Mindful Nature Walk & Somatic Breathing',
+      completed: true,
+      startTime: '13:30',
+      endTime: '14:15',
+      duration: '45m',
+      category: 'wellness',
+      categoryLabel: '🌿 Wellness',
+      notes: 'Zone 2 cardio completed'
+    },
+    {
+      id: 'g3',
+      title: 'Refactor Longitudinal Trajectory & Daily Harmony Engine',
+      completed: false,
+      startTime: '16:00',
+      endTime: '18:00',
+      duration: '2h',
+      category: 'deep_work',
+      categoryLabel: '⚡ Deep Work',
+      notes: 'In progress'
+    }
+  ],
   todayGoal: JSON.parse(localStorage.getItem('mind_cave_today_goal') || 'null') || {
     text: "Ship Core System Architecture & complete evening 30m mindful walk",
     completed: false
@@ -1713,6 +1748,35 @@ function getChronologicalEvents(journals) {
     }
   });
 
+  // 5. Add Today's Achievable Goals & Completion Duration to Timeline Stream
+  if (state.todayGoals && Array.isArray(state.todayGoals) && (state.diaryRangeMode === 'all' || isSelectedToday)) {
+    state.todayGoals.forEach(g => {
+      let goalTime = g.startTime || '09:00';
+      events.push({
+        id: `goal_event_${g.id}`,
+        goalId: g.id,
+        type: 'goal',
+        time: goalTime,
+        rawHour: parseInt(goalTime.substring(0, 2), 10) || 9,
+        entryDate: selectedDate,
+        dateHeader: selectedDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
+        title: g.title,
+        content: `Domain: ${g.categoryLabel || '🎯 North Star'}${g.duration ? ' • Focus Duration: ' + g.duration : ''}${g.notes ? ' • Note: ' + g.notes : ''}`,
+        isCompleted: g.completed,
+        startTime: g.startTime,
+        endTime: g.endTime,
+        duration: g.duration,
+        category: g.category,
+        categoryLabel: g.categoryLabel || '🎯 North Star',
+        mood: g.completed ? '🏆 Completed Goal' : '🎯 Intended Goal',
+        cbtNote: g.notes || null,
+        location: '🎯 Today\'s Goal Plan',
+        energy: g.duration ? `⏱️ ${g.duration}` : '⚡ Focus Block',
+        photoUrl: null
+      });
+    });
+  }
+
   // Sort strictly by Date + Time (Newest / Most Recent at top)
   events.sort((a, b) => {
     if (state.diaryRangeMode !== 'single') {
@@ -1820,9 +1884,10 @@ async function renderChronoTimeline() {
 
     const isGCal = ev.type === 'gcal';
     const isTask = ev.type === 'task';
+    const isGoal = ev.type === 'goal';
 
     html += `
-      <div class="timeline-hour-row has-entry ${isGCal ? 'has-gcal' : ''} ${isTask ? 'has-task' : ''}">
+      <div class="timeline-hour-row has-entry ${isGCal ? 'has-gcal' : ''} ${isTask ? 'has-task' : ''} ${isGoal ? 'has-goal' : ''}">
         <!-- Node Dot & Hour Label -->
         <div class="timeline-hour-node">
           <div class="timeline-node-dot"></div>
@@ -1830,11 +1895,16 @@ async function renderChronoTimeline() {
         </div>
 
         <!-- Editorial Diary Page Card -->
-        <div class="chrono-block-card type-${ev.type}">
+        <div class="chrono-block-card type-${ev.type} ${isGoal ? 'border-amber-500/30 dark:border-amber-500/25' : ''}">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-2.5 pb-2 border-b border-black/5 dark:border-white/5">
             <div class="flex items-center gap-2 flex-wrap">
               <!-- Event Category Pill -->
-              ${isGCal ? `
+              ${isGoal ? `
+                <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full ${ev.isCompleted ? 'bg-amber-50 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-500/30' : 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border-blue-200 dark:border-blue-500/30'} border">
+                  <i data-lucide="${ev.isCompleted ? 'check-circle' : 'target'}" class="w-3.5 h-3.5 text-amber-500"></i>
+                  <span>${escapeHtml(ev.categoryLabel || "Today's Goal")}</span>
+                </span>
+              ` : isGCal ? `
                 <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200 dark:border-blue-500/30">
                   <i data-lucide="calendar" class="w-3.5 h-3.5 text-blue-500"></i>
                   <span>Google Calendar</span>
@@ -1861,15 +1931,19 @@ async function renderChronoTimeline() {
               </span>
 
               ${ev.energy ? `
-                <span class="text-[11px] text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-500/30 px-2 py-0.5 rounded-full font-mono">
-                  ⚡ ${ev.energy}
+                <span class="text-[11px] text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-500/30 px-2 py-0.5 rounded-full font-mono font-semibold">
+                  ${ev.energy}
                 </span>
               ` : ''}
             </div>
 
             <div class="flex items-center gap-2">
               <span class="text-[11px] text-slate-500 dark:text-slate-400 font-mono">${escapeHtml(ev.location)}</span>
-              ${isTask ? `
+              ${isGoal ? `
+                <button onclick="openTodayGoalModal('${ev.goalId}')" class="text-xs font-semibold text-amber-600 dark:text-amber-400 hover:opacity-80 flex items-center gap-1 transition-colors px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30" title="Edit Goal Details">
+                  <i data-lucide="edit-2" class="w-3 h-3"></i> <span>Edit</span>
+                </button>
+              ` : isTask ? `
                 <button onclick="convertTaskToReflection('${ev.taskId}')" class="text-xs font-semibold text-cyan-600 dark:text-cyan-400 hover:opacity-80 flex items-center gap-1 transition-colors px-2.5 py-1 rounded-lg bg-cyan-50 dark:bg-cyan-500/10 border border-cyan-200 dark:border-cyan-500/30" title="Reflect on this task">
                   <i data-lucide="sparkles" class="w-3 h-3"></i> <span>Reflect</span>
                 </button>
@@ -1886,7 +1960,17 @@ async function renderChronoTimeline() {
 
           <!-- Entry Details -->
           <div class="space-y-2 pt-0.5">
-            ${isTask ? `
+            ${isGoal ? `
+              <div class="flex items-center gap-3">
+                <button type="button" onclick="toggleGoalItemComplete('${ev.goalId}')" class="w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all shrink-0 cursor-pointer ${ev.isCompleted ? 'bg-amber-500 border-amber-500 text-white' : 'bg-transparent border-slate-300 dark:border-slate-600 hover:border-amber-500 text-transparent'}" title="Toggle Goal Complete">
+                  <i data-lucide="check" class="w-3.5 h-3.5 ${ev.isCompleted ? 'block' : 'hidden'}"></i>
+                </button>
+                <div>
+                  <h4 class="chrono-card-title text-base font-bold ${ev.isCompleted ? 'line-through opacity-60' : ''}">${escapeHtml(ev.title)}</h4>
+                  ${ev.startTime && ev.endTime ? `<div class="text-[11px] font-mono text-amber-600 dark:text-amber-400 mt-0.5">⏰ ${ev.startTime} - ${ev.endTime} (Duration: ${ev.duration || 'Calculated'})</div>` : ev.duration ? `<div class="text-[11px] font-mono text-amber-600 dark:text-amber-400 mt-0.5">⏱️ Duration: ${ev.duration}</div>` : ''}
+                </div>
+              </div>
+            ` : isTask ? `
               <div class="flex items-center gap-3">
                 <button type="button" onclick="toggleTaskComplete('${ev.taskId}')" class="w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all shrink-0 cursor-pointer ${ev.isCompleted ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-transparent border-slate-300 dark:border-slate-600 hover:border-emerald-500 text-transparent'}" title="Click to mark done/undone">
                   <i data-lucide="check" class="w-3.5 h-3.5 ${ev.isCompleted ? 'block' : 'hidden'}"></i>
@@ -3441,41 +3525,336 @@ function syncGoogleFitData() {
 }
 
 // =============================================================================
-// TODAY'S NORTH STAR GOAL & INTENT
+// TODAY'S ACHIEVABLE GOALS & DIRECTIONAL DURATION TRACKER
 // =============================================================================
 
+function parseDurationMinutes(str) {
+  if (!str) return 0;
+  let totalMins = 0;
+  const hMatch = str.match(/(\d+(?:\.\d+)?)\s*(?:h|hr|hours?)/i);
+  const mMatch = str.match(/(\d+)\s*(?:m|min|mins?|minutes?)/i);
+
+  if (hMatch) totalMins += parseFloat(hMatch[1]) * 60;
+  if (mMatch) totalMins += parseInt(mMatch[1], 10);
+
+  if (!hMatch && !mMatch) {
+    const rawNum = parseFloat(str);
+    if (!isNaN(rawNum)) totalMins += rawNum;
+  }
+  return Math.round(totalMins);
+}
+
+function formatMinutesToDuration(mins) {
+  if (!mins || mins <= 0) return '0m';
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  if (h > 0 && m > 0) return `${h}h ${m}m`;
+  if (h > 0) return `${h}h`;
+  return `${m}m`;
+}
+
+function autoCalcGoalDuration() {
+  const startEl = document.getElementById('goal-start-time');
+  const endEl = document.getElementById('goal-end-time');
+  const durEl = document.getElementById('goal-duration-input');
+
+  if (!startEl || !endEl || !durEl) return;
+  const start = startEl.value;
+  const end = endEl.value;
+
+  if (start && end) {
+    const [sh, sm] = start.split(':').map(Number);
+    const [eh, em] = end.split(':').map(Number);
+    let startTotal = sh * 60 + sm;
+    let endTotal = eh * 60 + em;
+
+    if (endTotal < startTotal) {
+      endTotal += 24 * 60; // Crosses midnight
+    }
+
+    const diff = endTotal - startTotal;
+    if (diff > 0) {
+      durEl.value = formatMinutesToDuration(diff);
+    }
+  }
+}
+
 function initTodayGoal() {
+  if (!state.todayGoals || !Array.isArray(state.todayGoals)) {
+    state.todayGoals = [
+      {
+        id: 'g1',
+        title: 'Ship Core System Architecture & Validate Test Boundaries',
+        completed: true,
+        startTime: '09:30',
+        endTime: '12:00',
+        duration: '2h 30m',
+        category: 'north_star',
+        categoryLabel: '🎯 North Star',
+        notes: 'Clean zero-warning build & 7/7 pytest verification'
+      },
+      {
+        id: 'g2',
+        title: '30m Mindful Nature Walk & Somatic Breathing',
+        completed: true,
+        startTime: '13:30',
+        endTime: '14:15',
+        duration: '45m',
+        category: 'wellness',
+        categoryLabel: '🌿 Wellness',
+        notes: 'Zone 2 cardio completed'
+      },
+      {
+        id: 'g3',
+        title: 'Refactor Longitudinal Trajectory & Daily Harmony Engine',
+        completed: false,
+        startTime: '16:00',
+        endTime: '18:00',
+        duration: '2h',
+        category: 'deep_work',
+        categoryLabel: '⚡ Deep Work',
+        notes: 'In progress'
+      }
+    ];
+  }
   renderTodayGoal();
 }
 
 function renderTodayGoal() {
-  const textEl = document.getElementById('today-goal-text');
-  const checkBtn = document.getElementById('today-goal-check-btn');
-  const checkIcon = document.getElementById('today-goal-check-icon');
+  const container = document.getElementById('today-goals-list');
+  const completedBadge = document.getElementById('goals-completed-badge');
+  const durationBadge = document.getElementById('goals-duration-badge');
+  const velocityText = document.getElementById('goals-velocity-text');
+  const progressBar = document.getElementById('goals-progress-bar');
+  const breakdownPills = document.getElementById('goals-breakdown-pills');
 
-  if (textEl) {
-    textEl.textContent = state.todayGoal.text || "Click to set today's primary focus & intent...";
-    if (state.todayGoal.completed) {
-      textEl.classList.add('line-through', 'text-slate-400');
+  if (!state.todayGoals) state.todayGoals = [];
+
+  const totalGoals = state.todayGoals.length;
+  const completedGoals = state.todayGoals.filter(g => g.completed).length;
+  const velocityPct = totalGoals > 0 ? Math.round((completedGoals / totalGoals) * 100) : 0;
+
+  // Compute completed durations & category durations
+  let completedDurationMins = 0;
+  let totalDurationMins = 0;
+  const categoryTimeMap = {};
+
+  state.todayGoals.forEach(g => {
+    const mins = parseDurationMinutes(g.duration);
+    totalDurationMins += mins;
+    if (g.completed) {
+      completedDurationMins += mins;
+      const cat = g.categoryLabel || '🎯 North Star';
+      categoryTimeMap[cat] = (categoryTimeMap[cat] || 0) + mins;
+    }
+  });
+
+  // Keep state.todayGoal in sync for Scrapbook
+  if (state.todayGoals.length > 0) {
+    const firstActive = state.todayGoals.find(g => !g.completed) || state.todayGoals[0];
+    state.todayGoal = { text: firstActive.title, completed: firstActive.completed };
+  } else {
+    state.todayGoal = { text: "No active goals set", completed: false };
+  }
+
+  // Update Badges & Progress Bar
+  if (completedBadge) {
+    completedBadge.textContent = `⚡ ${completedGoals}/${totalGoals} Done (${velocityPct}%)`;
+  }
+  if (durationBadge) {
+    durationBadge.textContent = `⏱️ ${formatMinutesToDuration(completedDurationMins)} Invested`;
+  }
+  if (velocityText) {
+    velocityText.textContent = `${velocityPct}% Daily Goal Velocity • ${completedGoals} Achieved`;
+  }
+  if (progressBar) {
+    progressBar.style.width = `${velocityPct}%`;
+  }
+
+  // Update Breakdown Pills
+  if (breakdownPills) {
+    if (Object.keys(categoryTimeMap).length > 0) {
+      breakdownPills.innerHTML = Object.keys(categoryTimeMap).map(cat => `
+        <span class="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 font-mono">
+          ${cat}: <strong>${formatMinutesToDuration(categoryTimeMap[cat])}</strong>
+        </span>
+      `).join('');
     } else {
-      textEl.classList.remove('line-through', 'text-slate-400');
+      breakdownPills.innerHTML = `<span class="text-slate-400 italic">No completed goal focus recorded yet today. Check off a goal to track duration!</span>`;
     }
   }
 
-  if (checkBtn && checkIcon) {
-    if (state.todayGoal.completed) {
-      checkBtn.classList.add('bg-emerald-500/20', 'border-emerald-500');
-      checkIcon.classList.remove('hidden');
+  // Render Goals List
+  if (container) {
+    if (state.todayGoals.length === 0) {
+      container.innerHTML = `
+        <div class="p-4 rounded-xl bg-slate-50 dark:bg-black/30 border border-dashed border-slate-300 dark:border-white/10 text-center text-xs text-slate-400">
+          <p class="mb-2">No daily goals recorded yet today.</p>
+          <button type="button" onclick="openNewGoalModal()" class="text-amber-500 hover:underline font-semibold font-mono text-[11px]">+ Add Your First Goal for Today</button>
+        </div>
+      `;
     } else {
-      checkBtn.classList.remove('bg-emerald-500/20', 'border-emerald-500');
-      checkIcon.classList.add('hidden');
+      container.innerHTML = state.todayGoals.map(g => `
+        <div class="p-2.5 sm:p-3 rounded-xl border transition-all ${g.completed ? 'bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-500/30' : 'bg-slate-50 dark:bg-black/40 border-slate-200 dark:border-white/10 hover:border-amber-500/40'} flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          <div class="flex items-start sm:items-center gap-2.5 min-w-0 flex-1">
+            <!-- 1-Click Checkbox -->
+            <button type="button" onclick="toggleGoalItemComplete('${g.id}')" class="w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all shrink-0 cursor-pointer mt-0.5 sm:mt-0 ${g.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-transparent border-slate-300 dark:border-slate-600 hover:border-emerald-500 text-transparent'}" title="Toggle Goal Complete">
+              <i data-lucide="check" class="w-3.5 h-3.5 ${g.completed ? 'block' : 'hidden'}"></i>
+            </button>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-1.5 flex-wrap mb-0.5">
+                <span class="text-[10px] font-mono px-2 py-0.2 rounded-full ${g.completed ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300' : 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300'} font-semibold">
+                  ${escapeHtml(g.categoryLabel || '🎯 North Star')}
+                </span>
+                ${g.startTime && g.endTime ? `
+                  <span class="text-[10px] font-mono text-slate-500 dark:text-slate-400">
+                    ⏰ ${g.startTime} - ${g.endTime}
+                  </span>
+                ` : ''}
+                ${g.duration ? `
+                  <span class="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                    ⏱️ ${g.duration}
+                  </span>
+                ` : ''}
+              </div>
+              <h5 class="text-xs font-bold text-slate-900 dark:text-white leading-snug cursor-pointer ${g.completed ? 'line-through opacity-60' : ''}" onclick="openTodayGoalModal('${g.id}')" title="Click to edit goal">
+                ${escapeHtml(g.title)}
+              </h5>
+              ${g.notes ? `<p class="text-[10px] text-slate-500 dark:text-slate-400 italic mt-0.5 truncate">${escapeHtml(g.notes)}</p>` : ''}
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1 shrink-0 self-end sm:self-auto">
+            <button type="button" onclick="openTodayGoalModal('${g.id}')" class="p-1 rounded-lg text-slate-400 hover:text-amber-500 transition-colors" title="Edit Goal">
+              <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+            </button>
+            <button type="button" onclick="deleteGoalItem('${g.id}')" class="p-1 rounded-lg text-slate-400 hover:text-rose-500 transition-colors" title="Delete Goal">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+    lucide.createIcons();
+  }
+
+  // Update Daily Harmony Directional Summary Card
+  updateHarmonyGoalsSummary(completedGoals, totalGoals, velocityPct, completedDurationMins, categoryTimeMap);
+}
+
+function updateHarmonyGoalsSummary(completedCount, totalCount, velocityPct, totalMins, catMap) {
+  const totBadge = document.getElementById('harmony-total-duration-badge');
+  const velBadge = document.getElementById('harmony-velocity-badge');
+  const catGrid = document.getElementById('harmony-goals-category-grid');
+  const narrative = document.getElementById('harmony-goals-narrative');
+
+  if (totBadge) totBadge.textContent = `⏱️ ${formatMinutesToDuration(totalMins)} Total Time`;
+  if (velBadge) velBadge.textContent = `🎯 ${velocityPct}% Velocity`;
+
+  if (catGrid) {
+    const cats = Object.keys(catMap);
+    if (cats.length > 0) {
+      catGrid.innerHTML = cats.map(c => {
+        const cMins = catMap[c];
+        const pct = totalMins > 0 ? Math.round((cMins / totalMins) * 100) : 0;
+        return `
+          <div class="p-3 rounded-xl bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/5 space-y-1">
+            <div class="flex items-center justify-between text-xs font-bold text-slate-800 dark:text-slate-200">
+              <span>${c}</span>
+              <span class="font-mono text-cyan-600 dark:text-cyan-400">${pct}%</span>
+            </div>
+            <div class="text-[11px] font-mono text-slate-500 dark:text-slate-400">${formatMinutesToDuration(cMins)} Completed Focus</div>
+          </div>
+        `;
+      }).join('');
+    } else {
+      catGrid.innerHTML = `
+        <div class="col-span-3 p-3 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5 text-center text-xs text-slate-400">
+          Complete your daily goals to populate directional time distribution.
+        </div>
+      `;
+    }
+  }
+
+  if (narrative) {
+    if (completedCount > 0) {
+      narrative.innerHTML = `
+        <strong class="text-amber-500 block mb-1">🧭 Directional Focus Insight:</strong>
+        You fulfilled <strong>${completedCount} of ${totalCount}</strong> daily goals today, investing a cumulative <strong>${formatMinutesToDuration(totalMins)}</strong> of structured execution. Your time distribution demonstrates high cognitive momentum and grounded daily agency.
+      `;
+    } else {
+      narrative.innerHTML = `
+        <strong class="text-amber-500 block mb-1">🧭 Daily Goal Direction:</strong>
+        ${totalCount} goal${totalCount === 1 ? '' : 's'} staged for execution today. Start with your primary North Star block to anchor circadian focus.
+      `;
     }
   }
 }
 
-function openTodayGoalModal() {
-  const input = document.getElementById('goal-input-text');
-  if (input) input.value = state.todayGoal.text || '';
+function openNewGoalModal() {
+  const editIdEl = document.getElementById('goal-edit-id');
+  const inputEl = document.getElementById('goal-input-text');
+  const catEl = document.getElementById('goal-category-select');
+  const startEl = document.getElementById('goal-start-time');
+  const endEl = document.getElementById('goal-end-time');
+  const durEl = document.getElementById('goal-duration-input');
+  const compEl = document.getElementById('goal-completed-check');
+  const noteEl = document.getElementById('goal-notes-input');
+  const titleEl = document.getElementById('goal-modal-title');
+  const delBtn = document.getElementById('goal-delete-btn');
+  const subBtnText = document.getElementById('goal-submit-btn-text');
+
+  if (editIdEl) editIdEl.value = '';
+  if (inputEl) inputEl.value = '';
+  if (catEl) catEl.value = 'deep_work';
+  if (startEl) startEl.value = '';
+  if (endEl) endEl.value = '';
+  if (durEl) durEl.value = '';
+  if (compEl) compEl.checked = false;
+  if (noteEl) noteEl.value = '';
+  if (titleEl) titleEl.textContent = 'Add Achievable Goal';
+  if (delBtn) delBtn.classList.add('hidden');
+  if (subBtnText) subBtnText.textContent = 'Save Goal';
+
+  document.getElementById('goal-modal')?.classList.remove('hidden');
+}
+
+function openTodayGoalModal(goalId = null) {
+  if (!goalId) {
+    openNewGoalModal();
+    return;
+  }
+
+  const goal = (state.todayGoals || []).find(g => g.id === goalId);
+  if (!goal) {
+    openNewGoalModal();
+    return;
+  }
+
+  const editIdEl = document.getElementById('goal-edit-id');
+  const inputEl = document.getElementById('goal-input-text');
+  const catEl = document.getElementById('goal-category-select');
+  const startEl = document.getElementById('goal-start-time');
+  const endEl = document.getElementById('goal-end-time');
+  const durEl = document.getElementById('goal-duration-input');
+  const compEl = document.getElementById('goal-completed-check');
+  const noteEl = document.getElementById('goal-notes-input');
+  const titleEl = document.getElementById('goal-modal-title');
+  const delBtn = document.getElementById('goal-delete-btn');
+  const subBtnText = document.getElementById('goal-submit-btn-text');
+
+  if (editIdEl) editIdEl.value = goal.id;
+  if (inputEl) inputEl.value = goal.title;
+  if (catEl) catEl.value = goal.category || 'deep_work';
+  if (startEl) startEl.value = goal.startTime || '';
+  if (endEl) endEl.value = goal.endTime || '';
+  if (durEl) durEl.value = goal.duration || '';
+  if (compEl) compEl.checked = !!goal.completed;
+  if (noteEl) noteEl.value = goal.notes || '';
+  if (titleEl) titleEl.textContent = 'Edit Achievable Goal';
+  if (delBtn) delBtn.classList.remove('hidden');
+  if (subBtnText) subBtnText.textContent = 'Update Goal';
+
   document.getElementById('goal-modal')?.classList.remove('hidden');
 }
 
@@ -3485,23 +3864,107 @@ function closeTodayGoalModal() {
 
 function submitTodayGoal(event) {
   event.preventDefault();
-  const input = document.getElementById('goal-input-text');
-  if (!input || !input.value.trim()) return;
+  const editId = document.getElementById('goal-edit-id')?.value;
+  const title = document.getElementById('goal-input-text')?.value.trim();
+  const category = document.getElementById('goal-category-select')?.value || 'deep_work';
+  const startTime = document.getElementById('goal-start-time')?.value || '';
+  const endTime = document.getElementById('goal-end-time')?.value || '';
+  const duration = document.getElementById('goal-duration-input')?.value.trim() || '';
+  const completed = document.getElementById('goal-completed-check')?.checked || false;
+  const notes = document.getElementById('goal-notes-input')?.value.trim() || '';
 
-  state.todayGoal.text = input.value.trim();
-  state.todayGoal.completed = false;
+  if (!title) return;
+
+  const catLabelMap = {
+    north_star: '🎯 North Star',
+    deep_work: '⚡ Deep Work',
+    wellness: '🌿 Wellness',
+    learning: '📚 Learning',
+    team: '🤝 Collaboration',
+    admin: '📋 Admin'
+  };
+  const categoryLabel = catLabelMap[category] || '🎯 North Star';
+
+  if (!state.todayGoals) state.todayGoals = [];
+
+  if (editId) {
+    const idx = state.todayGoals.findIndex(g => g.id === editId);
+    if (idx !== -1) {
+      state.todayGoals[idx] = {
+        ...state.todayGoals[idx],
+        title,
+        category,
+        categoryLabel,
+        startTime,
+        endTime,
+        duration,
+        completed,
+        notes
+      };
+    }
+  } else {
+    const newGoal = {
+      id: `g_${Date.now()}`,
+      title,
+      category,
+      categoryLabel,
+      startTime,
+      endTime,
+      duration,
+      completed,
+      notes
+    };
+    state.todayGoals.unshift(newGoal);
+  }
+
+  localStorage.setItem('mind_cave_today_goals', JSON.stringify(state.todayGoals));
   localStorage.setItem('mind_cave_today_goal', JSON.stringify(state.todayGoal));
 
   closeTodayGoalModal();
   renderTodayGoal();
-  showToast('🎯 Today\'s North Star Goal updated!');
+  renderChronoTimeline();
+  showToast(editId ? '🎯 Goal updated!' : '🎯 New goal added to today!');
+}
+
+function toggleGoalItemComplete(goalId) {
+  if (!state.todayGoals) return;
+  const goal = state.todayGoals.find(g => g.id === goalId);
+  if (!goal) return;
+
+  goal.completed = !goal.completed;
+  localStorage.setItem('mind_cave_today_goals', JSON.stringify(state.todayGoals));
+  localStorage.setItem('mind_cave_today_goal', JSON.stringify(state.todayGoal));
+
+  renderTodayGoal();
+  renderChronoTimeline();
+  showToast(goal.completed ? `🎉 Goal Achieved: "${goal.title}" (${goal.duration || 'Done'})` : `Goal marked in progress.`);
+}
+
+function deleteGoalItem(goalId) {
+  if (!state.todayGoals) return;
+  state.todayGoals = state.todayGoals.filter(g => g.id !== goalId);
+  localStorage.setItem('mind_cave_today_goals', JSON.stringify(state.todayGoals));
+  localStorage.setItem('mind_cave_today_goal', JSON.stringify(state.todayGoal));
+
+  renderTodayGoal();
+  renderChronoTimeline();
+  showToast('Goal removed.');
+}
+
+function deleteGoalFromModal() {
+  const editId = document.getElementById('goal-edit-id')?.value;
+  if (editId) {
+    deleteGoalItem(editId);
+    closeTodayGoalModal();
+  }
 }
 
 function toggleTodayGoalComplete() {
-  state.todayGoal.completed = !state.todayGoal.completed;
-  localStorage.setItem('mind_cave_today_goal', JSON.stringify(state.todayGoal));
-  renderTodayGoal();
-  showToast(state.todayGoal.completed ? '🎉 North Star Goal Achieved!' : 'Goal marked in progress.');
+  if (!state.todayGoals || state.todayGoals.length === 0) {
+    openNewGoalModal();
+    return;
+  }
+  toggleGoalItemComplete(state.todayGoals[0].id);
 }
 
 // =============================================================================

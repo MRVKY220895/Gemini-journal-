@@ -2381,5 +2381,51 @@ html:not(.dark) #auth-modal h3 {
   color: #0f172a !important;
 }
 
+/* =============================================================================
+   ACHIEVABLE GOALS & DURATION TRACKER STYLING
+   ============================================================================= */
+
+/* Goal Cards in Timeline */
+.chrono-block-card.type-goal {
+  border-left: 3px solid #f59e0b;
+}
+
+html.dark .chrono-block-card.type-goal {
+  background: rgba(15, 23, 42, 0.75);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+html.light .chrono-block-card.type-goal,
+html:not(.dark) .chrono-block-card.type-goal {
+  background: #ffffff;
+  border-color: rgba(245, 158, 11, 0.4);
+  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.06);
+}
+
+/* Goal Modal Inputs in Light Mode */
+html.light #goal-modal input,
+html.light #goal-modal select,
+html:not(.dark) #goal-modal input,
+html:not(.dark) #goal-modal select {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+html.light #goal-modal input:focus,
+html.light #goal-modal select:focus,
+html:not(.dark) #goal-modal input:focus,
+html:not(.dark) #goal-modal select:focus {
+  background: #ffffff !important;
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15) !important;
+}
+
+html.light #goal-modal label,
+html:not(.dark) #goal-modal label {
+  color: #334155 !important;
+}
+
+
 
 

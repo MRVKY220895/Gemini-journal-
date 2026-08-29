@@ -317,34 +317,60 @@
       <!-- =================================================================== -->
       <div id="journal-track-chrono" class="space-y-3">
         
-        <!-- COMPACT TODAY'S NORTH STAR & 1-TAP HABIT PULSE BAR -->
-        <div class="today-goal-card p-3 rounded-2xl bg-gradient-to-r from-amber-950/40 via-black/40 to-cyan-950/30 border border-amber-500/30 shadow-lg" id="today-goal-container">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-            <div class="flex items-center gap-2.5 min-w-0">
-              <button type="button" onclick="toggleTodayGoalComplete()" class="w-6 h-6 rounded-lg border border-amber-500/40 bg-black/40 flex items-center justify-center transition-colors shrink-0 hover:border-amber-400" id="today-goal-check-btn" title="Mark Goal Fulfilled">
-                <i data-lucide="check" class="w-4 h-4 text-emerald-400 hidden" id="today-goal-check-icon"></i>
-              </button>
-              <div class="min-w-0">
-                <div class="flex items-center gap-2 mb-0.5 flex-wrap">
-                  <span class="text-[10px] text-amber-300 font-mono font-bold uppercase tracking-wider flex items-center gap-1">
-                    <i data-lucide="target" class="w-3 h-3 text-amber-400"></i> Today's Goal
+        <!-- DYNAMIC TODAY'S GOALS LIST & DIRECTIONAL DURATION TRACKER -->
+        <div class="today-goal-card p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-900/90 border border-amber-500/30 dark:border-amber-500/25 shadow-md flex flex-col gap-3" id="today-goal-container">
+          <!-- Header Bar: Title, Summary Metrics & Actions -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-slate-100 dark:border-white/5">
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-500 dark:text-amber-400 flex items-center justify-center font-bold shrink-0">
+                <i data-lucide="target" class="w-4 h-4 text-amber-500 dark:text-amber-400"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">Today's Achievable Goals</h4>
+                  <span id="goals-completed-badge" class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-300 font-mono font-bold">
+                    ⚡ 2/3 Done (67%)
                   </span>
-                  <span id="plan-vs-action-badge" class="text-[10px] px-2 py-0.2 rounded-full bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 font-mono font-semibold" title="Plan vs Action Execution Velocity">
-                    ⚡ 80% Velocity
+                  <span id="goals-duration-badge" class="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-500/30 text-amber-700 dark:text-amber-300 font-mono font-bold">
+                    ⏱️ 3h 15m Invested
                   </span>
                 </div>
-                <h4 id="today-goal-text" class="text-xs sm:text-sm font-bold text-white truncate cursor-pointer hover:text-amber-300 transition-colors" onclick="openTodayGoalModal()" title="Click to edit Today's Goal">
-                  Ship Core System Architecture & complete evening 30m mindful walk
-                </h4>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400">Track start & end times, actual completion duration, and plot directly into your timeline.</p>
               </div>
             </div>
+
             <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-auto">
-              <button onclick="openTodayGoalModal()" class="btn-secondary !py-1 !px-2.5 text-[11px] flex items-center gap-1" title="Edit Today's Goal">
-                <i data-lucide="edit-2" class="w-3 h-3 text-amber-400"></i> <span>Edit</span>
+              <button type="button" onclick="openNewGoalModal()" class="btn-secondary !py-1 !px-2.5 text-[11px] flex items-center gap-1 text-amber-600 dark:text-amber-300 hover:border-amber-400 font-semibold" title="Add New Achievable Goal">
+                <i data-lucide="plus" class="w-3 h-3 text-amber-500"></i> <span>+ Add Goal</span>
               </button>
-              <button onclick="openScrapbookModal()" class="btn-secondary !py-1 !px-2.5 text-[11px] flex items-center gap-1 text-pink-300 hover:border-pink-400" title="Export Scrapbook Card">
-                <i data-lucide="share-2" class="w-3 h-3 text-pink-400"></i> <span>Share</span>
+              <button type="button" onclick="openScrapbookModal()" class="btn-secondary !py-1 !px-2.5 text-[11px] flex items-center gap-1 text-pink-600 dark:text-pink-300 hover:border-pink-400 font-semibold" title="Export Scrapbook Card">
+                <i data-lucide="share-2" class="w-3 h-3 text-pink-500"></i> <span>Share</span>
               </button>
+            </div>
+          </div>
+
+          <!-- Dynamic List of Achievable Goals -->
+          <div id="today-goals-list" class="space-y-2">
+            <!-- Dynamically populated via renderTodayGoal() -->
+          </div>
+
+          <!-- Directional Summary of Completed Tasks & Duration -->
+          <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-black/40 border border-slate-200/80 dark:border-white/5 space-y-1.5" id="goals-summary-footer">
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                <i data-lucide="pie-chart" class="w-3 h-3 text-cyan-500"></i>
+                <span>Directional Focus Summary:</span>
+              </span>
+              <span class="font-mono text-cyan-600 dark:text-cyan-400 font-bold" id="goals-velocity-text">75% Daily Goal Velocity</span>
+            </div>
+            
+            <!-- Visual Progress Bar -->
+            <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden flex">
+              <div id="goals-progress-bar" class="h-full bg-gradient-to-r from-amber-500 to-emerald-500 rounded-full transition-all duration-500" style="width: 67%;"></div>
+            </div>
+
+            <div class="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 pt-0.5 flex-wrap gap-1" id="goals-breakdown-pills">
+              <!-- Dynamically populated category time pills -->
             </div>
           </div>
         </div>
@@ -546,6 +572,39 @@
             <p id="cross-track-synthesis-text" class="text-xs leading-relaxed text-slate-700 dark:text-slate-300">
               Your afternoon energy aligns with deep work execution. Morning deadlines showed minor catastrophizing, which was reframed through your reflective prompt. Physical stamina, Google Fit recovery, and calendar commitments remain in full equilibrium.
             </p>
+          </div>
+        </div>
+
+        <!-- Directional Summary of Completed Tasks & Execution Duration -->
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 shadow-sm flex flex-col gap-3.5" id="harmony-goals-directional-card">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-500 dark:text-amber-400 flex items-center justify-center font-bold">
+                <i data-lucide="compass" class="w-4 h-4 text-amber-500 dark:text-amber-400"></i>
+              </div>
+              <div>
+                <h4 class="text-sm font-bold text-slate-900 dark:text-white">Directional Task & Goal Completion Summary</h4>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Time invested across North Star, Deep Work, and Wellness domains</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span id="harmony-total-duration-badge" class="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30">
+                ⏱️ 3h 15m Total Time
+              </span>
+              <span id="harmony-velocity-badge" class="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30">
+                🎯 75% Velocity
+              </span>
+            </div>
+          </div>
+
+          <!-- Dynamic Directional Breakdown Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5" id="harmony-goals-category-grid">
+            <!-- Dynamically populated via renderTodayGoal() -->
+          </div>
+
+          <!-- Directional Synthesis Statement -->
+          <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5 text-xs text-slate-700 dark:text-slate-300 leading-relaxed" id="harmony-goals-narrative">
+            <!-- Dynamically populated narrative -->
           </div>
         </div>
 
@@ -2097,41 +2156,98 @@
   </div>
 
   <!-- ===================================================================== -->
-  <!-- MODAL: TODAY'S GOAL EDITOR -->
+  <!-- MODAL: TODAY'S ACHIEVABLE GOAL EDITOR -->
   <!-- ===================================================================== -->
-  <div id="goal-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-    <div class="double-bezel max-w-md w-full">
-      <div class="double-bezel-inner p-6">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
-              <i data-lucide="target" class="w-4 h-4"></i>
+  <div id="goal-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
+    <div class="double-bezel max-w-lg w-full my-auto">
+      <div class="double-bezel-inner p-5 sm:p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-white/10">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-500 dark:text-amber-400 flex items-center justify-center font-bold shadow-md shadow-amber-500/20">
+              <i data-lucide="target" class="w-5 h-5 text-amber-500 dark:text-amber-400"></i>
             </div>
-            <h3 class="text-base font-bold text-white">Today's North Star Goal</h3>
+            <div>
+              <h3 class="text-base font-bold text-slate-900 dark:text-white" id="goal-modal-title">Achievable Goal & Intention</h3>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400">Capture time bounds, duration, and plot directly into your timeline</p>
+            </div>
           </div>
-          <button onclick="closeTodayGoalModal()" class="text-slate-400 hover:text-white">
-            <i data-lucide="x" class="w-5 h-5"></i>
+          <button onclick="closeTodayGoalModal()" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition-colors">
+            <i data-lucide="x" class="w-4 h-4"></i>
           </button>
         </div>
 
-        <p class="text-xs text-slate-400 mb-4">
-          Define your primary intention for today. All hourly tasks and cognitive prompts will anchor around this focus.
-        </p>
+        <form onsubmit="submitTodayGoal(event)" class="space-y-3.5 text-xs">
+          <input type="hidden" id="goal-edit-id" value="">
 
-        <form onsubmit="submitTodayGoal(event)" class="space-y-3">
+          <!-- Goal Title -->
           <div>
-            <label class="text-xs text-slate-300 block mb-1">Primary Goal & Intent</label>
-            <input type="text" id="goal-input-text" required placeholder="e.g. Ship Core System Architecture & walk 30 mins" class="w-full bg-black/60 text-slate-200 text-xs p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-500">
+            <label class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 block mb-1">Goal / Intent Statement *</label>
+            <input type="text" id="goal-input-text" required placeholder="e.g. Ship Core Architecture & validate test boundaries" class="w-full bg-slate-50 dark:bg-slate-900/90 text-slate-900 dark:text-slate-100 text-xs p-2.5 rounded-xl border border-slate-300 dark:border-white/10 focus:outline-none focus:border-amber-500 font-sans">
           </div>
 
-          <div class="pt-2 flex justify-end gap-2">
-            <button type="button" onclick="closeTodayGoalModal()" class="btn-secondary text-xs">Cancel</button>
-            <button type="submit" class="btn-island !bg-gradient-to-r !from-amber-500 !to-yellow-500">
-              <span>Set North Star</span>
-              <div class="btn-island-icon">
-                <i data-lucide="check" class="w-4 h-4 text-white"></i>
+          <!-- Focus Category Domain -->
+          <div>
+            <label class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 block mb-1">Focus Domain / Tag</label>
+            <select id="goal-category-select" class="w-full bg-slate-50 dark:bg-slate-900/90 text-slate-900 dark:text-slate-100 text-xs p-2.5 rounded-xl border border-slate-300 dark:border-white/10 focus:outline-none focus:border-amber-500">
+              <option value="north_star">🎯 North Star Priority</option>
+              <option value="deep_work" selected>⚡ Deep Work Sprint</option>
+              <option value="wellness">🌿 Health, Movement & Mindfulness</option>
+              <option value="learning">📚 Learning & Skill Mastery</option>
+              <option value="team">🤝 Collaboration & Connection</option>
+              <option value="admin">📋 Daily Operations / Admin</option>
+            </select>
+          </div>
+
+          <!-- Time Capture & Duration Grid -->
+          <div class="p-3 rounded-2xl bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/5 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                <i data-lucide="clock" class="w-3.5 h-3.5 text-amber-500"></i> Time Bounds & Duration
+              </span>
+              <span class="text-[10px] text-slate-500 dark:text-slate-400 font-mono">Optional • Plot on Timeline</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div>
+                <label class="text-[10px] text-slate-600 dark:text-slate-400 block mb-1">Start Time</label>
+                <input type="time" id="goal-start-time" onchange="autoCalcGoalDuration()" class="w-full bg-white dark:bg-slate-950 text-slate-900 dark:text-white p-2 rounded-lg text-xs border border-slate-300 dark:border-slate-800 font-mono focus:border-amber-500">
               </div>
+              <div>
+                <label class="text-[10px] text-slate-600 dark:text-slate-400 block mb-1">End Time</label>
+                <input type="time" id="goal-end-time" onchange="autoCalcGoalDuration()" class="w-full bg-white dark:bg-slate-950 text-slate-900 dark:text-white p-2 rounded-lg text-xs border border-slate-300 dark:border-slate-800 font-mono focus:border-amber-500">
+              </div>
+              <div>
+                <label class="text-[10px] text-slate-600 dark:text-slate-400 block mb-1">How Long Took (Manual / Auto)</label>
+                <input type="text" id="goal-duration-input" placeholder="e.g. 2h 30m, 45m" class="w-full bg-white dark:bg-slate-950 text-slate-900 dark:text-white p-2 rounded-lg text-xs border border-slate-300 dark:border-slate-800 font-mono focus:border-amber-500">
+              </div>
+            </div>
+            <p class="text-[10px] text-slate-500 dark:text-slate-400">Duration auto-computes from start/end times, or you can manually enter any duration anytime.</p>
+          </div>
+
+          <!-- Completed State & Notes -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+            <label class="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5 cursor-pointer">
+              <input type="checkbox" id="goal-completed-check" class="accent-emerald-500 w-4 h-4 rounded">
+              <span class="font-semibold text-slate-800 dark:text-slate-200 text-xs">Mark as Completed</span>
+            </label>
+            <div>
+              <input type="text" id="goal-notes-input" placeholder="Optional notes / achievements" class="w-full bg-slate-50 dark:bg-slate-900/90 text-slate-900 dark:text-slate-100 text-xs p-2.5 rounded-xl border border-slate-300 dark:border-white/10 focus:outline-none focus:border-amber-500">
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-slate-200 dark:border-white/10 flex justify-between items-center">
+            <button type="button" onclick="deleteGoalFromModal()" id="goal-delete-btn" class="hidden px-2.5 py-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/30 text-xs font-semibold hover:bg-rose-100 dark:hover:bg-rose-900/50 transition-colors">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5 inline mr-1"></i> Delete
             </button>
+            <div class="flex items-center gap-2 ml-auto">
+              <button type="button" onclick="closeTodayGoalModal()" class="btn-secondary text-xs">Cancel</button>
+              <button type="submit" class="btn-island !bg-gradient-to-r !from-amber-500 !to-yellow-500 font-semibold text-xs">
+                <span id="goal-submit-btn-text">Save Goal</span>
+                <div class="btn-island-icon">
+                  <i data-lucide="check" class="w-4 h-4 text-white"></i>
+                </div>
+              </button>
+            </div>
           </div>
         </form>
       </div>
