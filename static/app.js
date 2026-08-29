@@ -1421,7 +1421,7 @@ function syncExactTimeFromHour(hourVal) {
 }
 
 function switchJournalTrack(trackId) {
-  const tracks = ['chrono', 'sanctuary', 'memory', 'cbt', 'cycle', 'circadian'];
+  const tracks = ['chrono', 'harmony', 'memory_lane', 'memory', 'sanctuary', 'cbt', 'cycle', 'circadian'];
   tracks.forEach(t => {
     const el = document.getElementById(`journal-track-${t}`);
     const btn = document.getElementById(`track-btn-${t}`);
