@@ -167,7 +167,67 @@ class GeminiService:
                 "is_injection_blocked": True
             }
 
-        # 2. If Gemini API is configured, call live API
+        # 2. Multi-Protocol Live Gemini Invocation (Supports AIza... Keys, AQ... Tokens, and Vertex AI)
+        k = secret_manager.get_gemini_api_key()
+        api_key = k if (k and not k.startswith("your_") and not k.startswith("mock_") and len(k) > 10) else None
+
+        last_api_error = None
+
+        # Protocol A: Direct REST with Bearer / Key authentication (Universal for AQ... and AIza...)
+        if api_key:
+            try:
+                import urllib.request
+                import json
+
+                final_user_content = f"{system_instruction}\n\n<user_journal_entry>\n{self.sanitize_input(last_user_msg)}\n</user_journal_entry>"
+                
+                rest_models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"]
+                for m_name in rest_models:
+                    # If token starts with AQ., use Bearer header; otherwise query param
+                    headers = {"Content-Type": "application/json"}
+                    if api_key.startswith("AQ."):
+                        headers["Authorization"] = f"Bearer {api_key}"
+                        url = f"https://generativelanguage.googleapis.com/v1beta/models/{m_name}:generateContent"
+                    else:
+                        url = f"https://generativelanguage.googleapis.com/v1beta/models/{m_name}:generateContent?key={api_key}"
+
+                    payload = {
+                        "contents": [{
+                            "role": "user",
+                            "parts": [{"text": final_user_content}]
+                        }],
+                        "generationConfig": {
+                            "temperature": 0.7,
+                            "maxOutputTokens": 4096
+                        }
+                    }
+
+                    try:
+                        req = urllib.request.Request(
+                            url,
+                            data=json.dumps(payload).encode("utf-8"),
+                            headers=headers
+                        )
+                        with urllib.request.urlopen(req, timeout=20) as resp:
+                            if resp.status == 200:
+                                res_json = json.loads(resp.read().decode("utf-8"))
+                                text_out = res_json["candidates"][0]["content"]["parts"][0]["text"]
+                                if text_out:
+                                    return {
+                                        "role": "model",
+                                        "content": text_out.strip(),
+                                        "model_used": m_name,
+                                        "is_live_gemini": True
+                                    }
+                    except Exception as rest_err:
+                        last_api_error = str(rest_err)
+                        logger.debug(f"REST attempt {m_name} notice: {rest_err}")
+                        continue
+            except Exception as outer_rest_err:
+                last_api_error = str(outer_rest_err)
+                logger.debug(f"Direct REST notice: {outer_rest_err}")
+
+        # Protocol B: Modern Google GenAI Client
         if self._genai_client and self._is_valid_live_key():
             try:
                 formatted_contents = []
@@ -191,7 +251,6 @@ class GeminiService:
                     "gemini-2.5-flash",
                     "gemini-flash-latest"
                 ]
-                last_api_error = None
                 for model_name in candidate_models:
                     try:
                         response = self._genai_client.models.generate_content(
@@ -216,22 +275,9 @@ class GeminiService:
                         continue
             except Exception as e:
                 err_str = str(e)
-                logger.warning(f"Error calling modern Gemini SDK: {err_str}. Falling back to smart processor.")
-                if "RESOURCE_EXHAUSTED" in err_str or (last_api_error and "RESOURCE_EXHAUSTED" in last_api_error):
-                    return {
-                        "role": "model",
-                        "content": (
-                            "⚠️ **Google Gemini Billing / Free Tier Notice**\n\n"
-                            "Google accepted your API key, but returned: `429 RESOURCE_EXHAUSTED (Prepayment credits depleted on this GCP Project)`.\n\n"
-                            "**How to get 100% free unlimited calls:**\n"
-                            "1. Go to [Google AI Studio (aistudio.google.com/app/apikey)](https://aistudio.google.com/app/apikey).\n"
-                            "2. Create a key under a standard personal Google account (which gives **15 free requests per minute forever** without requiring prepayment/credit card).\n\n"
-                            "---\n\n" + self._generate_simulated_reflective_response(last_user_msg, persona)["content"]
-                        ),
-                        "model_used": "gemini-fallback-quota-exhausted",
-                        "is_live_gemini": False
-                    }
+                logger.warning(f"Error calling modern Gemini SDK: {err_str}.")
 
+        # Protocol C: Legacy google.generativeai SDK
         if self._legacy_model and self._is_valid_live_key():
             try:
                 chat = self._legacy_model.start_chat(history=[])
@@ -296,7 +342,7 @@ class GeminiService:
         )
 
         if self._genai_client and self._is_valid_live_key():
-            candidate_models = ["gemini-3.6-flash", "gemini-3.5-flash", "gemini-flash-latest"]
+            candidate_models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"]
             for model_name in candidate_models:
                 try:
                     response = self._genai_client.models.generate_content(

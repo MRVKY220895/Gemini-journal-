@@ -121,13 +121,37 @@ async def get_firebase_public_config():
 async def check_gemini_health():
     """Live health probe for Google Gemini API Key and Quota status."""
     key = secret_manager.get_gemini_api_key()
-    if not key or key.startswith("your_") or key.startswith("mock_") or len(key) < 15:
+    if not key or key.startswith("your_") or key.startswith("mock_") or len(key) < 10:
         return {"status": "unconfigured", "message": "Connect Gemini API"}
+    
+    # Try Direct REST / Bearer token
+    try:
+        import urllib.request
+        import json
+        
+        headers = {"Content-Type": "application/json"}
+        if key.startswith("AQ."):
+            headers["Authorization"] = f"Bearer {key}"
+            url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
+        else:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={key}"
+            
+        payload = {"contents": [{"role": "user", "parts": [{"text": "ping"}]}]}
+        req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"), headers=headers)
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            if resp.status == 200:
+                return {"status": "live", "message": "Gemini 2.0 (Live)", "model": "gemini-2.0-flash"}
+    except Exception as rest_e:
+        err_s = str(rest_e)
+        if "429" in err_s or "RESOURCE_EXHAUSTED" in err_s:
+            return {"status": "quota_exhausted", "message": "Quota Exhausted (429)"}
+        if "403" in err_s or "PERMISSION_DENIED" in err_s:
+            return {"status": "blocked", "message": "Key Blocked (403)"}
     
     try:
         from google import genai
         client = genai.Client(api_key=key)
-        for model_name in ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.0-flash-lite", "gemini-2.5-flash"]:
+        for model_name in ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"]:
             try:
                 resp = client.models.generate_content(
                     model=model_name,
