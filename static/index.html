@@ -5,8 +5,38 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mind Cave — Cognitive Sanctuary & Reflective Studio</title>
   
-  <!-- Tailwind CSS -->
+  <!-- Tailwind CSS & Global Exception Shield -->
   <script>
+    // Global Error & Promise Rejection Shield (Catches browser extension message channel teardowns)
+    window.addEventListener('unhandledrejection', function(event) {
+      if (event && event.reason) {
+        const msg = typeof event.reason === 'string' ? event.reason : (event.reason.message || '');
+        if (
+          msg.includes('message channel closed') ||
+          msg.includes('asynchronous response') ||
+          msg.includes('Extension context invalidated') ||
+          msg.includes('ResizeObserver loop')
+        ) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          return;
+        }
+      }
+    });
+
+    window.addEventListener('error', function(event) {
+      if (event && event.message) {
+        if (
+          event.message.includes('message channel closed') ||
+          event.message.includes('ResizeObserver loop')
+        ) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          return;
+        }
+      }
+    });
+
     // Suppress CDN dev warning in browser console
     const _origWarn = console.warn;
     console.warn = function(...args) {
