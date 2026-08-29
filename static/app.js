@@ -19,12 +19,14 @@ const state = {
   firebaseApp: null,
   firebaseAuth: null,
   timelineRange: localStorage.getItem('mind_cave_timeline_range') || 'day_standard',
-  selectedDiaryDate: new Date()
+  selectedDiaryDate: new Date(),
+  mediaMode: localStorage.getItem('mind_cave_media_mode') || 'photos'
 };
 
 // Initialize Application on DOM Ready
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
+  initMediaMode();
   initFirebaseAuth();
   checkGeminiKeyStatus();
   updateUserUI();
@@ -1032,6 +1034,7 @@ function initDiarySpace() {
   if (liveDiaryClockInterval) clearInterval(liveDiaryClockInterval);
   liveDiaryClockInterval = setInterval(updateLiveDiaryClock, 10000);
 
+  updateMediaModeUI();
   renderDiaryWeeklyRibbon();
   applyGenderTrackVisibility(state.currentUser.gender);
 
@@ -1050,9 +1053,6 @@ function initDiarySpace() {
 
 function updateLiveDiaryClock() {
   const now = new Date();
-  const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
-  const dateStr = now.toLocaleDateString('en-US', options);
-  
   let hours = now.getHours();
   const minutes = String(now.getMinutes()).padStart(2, '0');
   const ampm = hours >= 12 ? 'PM' : 'AM';
@@ -1070,51 +1070,140 @@ function updateLiveDiaryClock() {
 
   const tzEl = document.getElementById('chrono-user-tz-badge');
   if (tzEl) tzEl.textContent = `📍 ${tzName}`;
-
-  const titleEl = document.getElementById('diary-current-date-title');
-  if (titleEl) {
-    titleEl.innerHTML = `<i data-lucide="book-marked" class="w-4 h-4 text-cyan-400"></i> <span>${dateStr}</span>`;
-    lucide.createIcons();
-  }
 }
 
 function renderDiaryWeeklyRibbon() {
   const container = document.getElementById('diary-week-ribbon-container');
   if (!container) return;
 
+  const selected = state.selectedDiaryDate || new Date();
   const now = new Date();
-  const dayOfWeek = now.getDay(); // 0 is Sunday
+  const dayOfWeek = selected.getDay(); // 0 is Sunday
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   
-  // Find Monday of current week
-  const monday = new Date(now);
-  const diff = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+  // Find Monday of the selected date's week
+  const monday = new Date(selected);
+  const diff = selected.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
   monday.setDate(diff);
+
+  // Sync date picker input value (YYYY-MM-DD)
+  const datePicker = document.getElementById('chrono-date-picker');
+  if (datePicker) {
+    const y = selected.getFullYear();
+    const m = String(selected.getMonth() + 1).padStart(2, '0');
+    const day = String(selected.getDate()).padStart(2, '0');
+    datePicker.value = `${y}-${m}-${day}`;
+  }
 
   let html = '';
   for (let i = 0; i < 7; i++) {
     const d = new Date(monday);
     d.setDate(monday.getDate() + i);
+    const isSelected = d.toDateString() === selected.toDateString();
     const isToday = d.toDateString() === now.toDateString();
     const dayName = days[d.getDay()];
     const dayNum = d.getDate();
 
     html += `
-      <div class="diary-day-pill ${isToday ? 'active' : ''}" onclick="selectDiaryDate('${d.toISOString()}')">
+      <div class="diary-day-pill ${isSelected ? 'active' : ''}" onclick="selectDiaryDate('${d.toISOString()}')" title="${d.toLocaleDateString()}">
         <span class="day-name text-[10px] text-slate-400 uppercase tracking-wider">${dayName}</span>
         <span class="day-number text-sm font-bold text-slate-200 mt-0.5">${dayNum}</span>
-        ${isToday ? '<span class="w-1 h-1 rounded-full bg-cyan-400 mt-1"></span>' : ''}
+        ${isToday ? '<span class="w-1.5 h-1.5 rounded-full bg-cyan-400 mt-1" title="Today"></span>' : ''}
       </div>
     `;
   }
 
   container.innerHTML = html;
+
+  // Update Chronicle Title
+  const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+  const isToday = selected.toDateString() === now.toDateString();
+  const titleEl = document.getElementById('diary-current-date-title');
+  if (titleEl) {
+    titleEl.innerHTML = `<i data-lucide="book-marked" class="w-4 h-4 text-cyan-400"></i> <span>${isToday ? "Today's Daily Chronicle" : selected.toLocaleDateString('en-US', options)}</span>`;
+    lucide.createIcons();
+  }
 }
 
 function selectDiaryDate(isoDateStr) {
   state.selectedDiaryDate = new Date(isoDateStr);
-  showToast(`Viewing Chronicle for ${state.selectedDiaryDate.toLocaleDateString()}`);
+  renderDiaryWeeklyRibbon();
   renderChronoTimeline();
+  showToast(`Chronicle loaded: ${state.selectedDiaryDate.toLocaleDateString()}`);
+}
+
+function onDiaryDatePickerChange(dateVal) {
+  if (!dateVal) return;
+  const parts = dateVal.split('-');
+  if (parts.length === 3) {
+    state.selectedDiaryDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    renderDiaryWeeklyRibbon();
+    renderChronoTimeline();
+    showToast(`Chronicle loaded: ${state.selectedDiaryDate.toLocaleDateString()}`);
+  }
+}
+
+function stepDiaryDay(offset) {
+  const current = state.selectedDiaryDate || new Date();
+  const next = new Date(current);
+  next.setDate(current.getDate() + offset);
+  state.selectedDiaryDate = next;
+  renderDiaryWeeklyRibbon();
+  renderChronoTimeline();
+  showToast(`Viewing: ${next.toLocaleDateString()}`);
+}
+
+function jumpToToday() {
+  state.selectedDiaryDate = new Date();
+  renderDiaryWeeklyRibbon();
+  renderChronoTimeline();
+  scrollToCurrentHour();
+  showToast("Jumped to Today's Chronicle");
+}
+
+function initMediaMode() {
+  const saved = localStorage.getItem('mind_cave_media_mode') || 'photos';
+  state.mediaMode = saved;
+  updateMediaModeUI();
+}
+
+function updateMediaModeUI() {
+  const btn = document.getElementById('media-mode-toggle-btn');
+  const icon = document.getElementById('media-mode-icon');
+  const label = document.getElementById('media-mode-label');
+
+  const isPhotos = state.mediaMode === 'photos';
+  if (icon) {
+    icon.setAttribute('data-lucide', isPhotos ? 'image' : 'file-text');
+    icon.className = `w-3.5 h-3.5 ${isPhotos ? 'text-amber-400' : 'text-slate-400'}`;
+  }
+  if (label) {
+    label.textContent = isPhotos ? 'Photos: On' : 'Light Text';
+  }
+  if (btn) {
+    btn.title = isPhotos ? 'Photos are visible globally (Click for Lightweight Mode)' : 'Lightweight text mode active (Click to show Photos)';
+  }
+  lucide.createIcons();
+}
+
+function toggleMediaMode() {
+  state.mediaMode = state.mediaMode === 'photos' ? 'compact' : 'photos';
+  localStorage.setItem('mind_cave_media_mode', state.mediaMode);
+  updateMediaModeUI();
+  renderChronoTimeline();
+  renderMemoryPhotos();
+  showToast(state.mediaMode === 'compact' ? '📄 Lightweight Mode: Photos collapsed for fast reading.' : '📷 Rich Media Mode: Photos enabled across journal.');
+}
+
+function toggleSingleMomentPhoto(btn) {
+  const card = btn.closest('.chrono-block-card');
+  if (!card) return;
+  const img = card.querySelector('.chrono-photo-preview');
+  if (img) {
+    const isHidden = img.classList.contains('hidden');
+    img.classList.toggle('hidden', !isHidden);
+    btn.textContent = isHidden ? 'Hide' : 'Preview';
+  }
 }
 
 function getTrackPreferences(gender) {
@@ -1381,52 +1470,67 @@ function setTimelineViewMode(mode) {
 
 function getChronologicalEvents(journals) {
   const events = [];
+  const selectedDate = state.selectedDiaryDate || new Date();
+  const selectedDateStr = selectedDate.toDateString();
+  const isSelectedToday = selectedDateStr === (new Date()).toDateString();
 
-  // 1. Add Journal Entries (only actual logged data)
+  // 1. Add Journal Entries (filtered for selected date)
   journals.forEach((j, idx) => {
-    let timeStr = '12:00';
-    const timeMatch = j.title && j.title.match(/\[(\d{1,2}:\d{2})\]/);
-    if (timeMatch) {
-      timeStr = timeMatch[1];
-    } else {
-      const hoursMap = ['08:15', '11:30', '14:45', '17:30', '20:00'];
-      timeStr = hoursMap[idx % hoursMap.length];
+    let entryDate = new Date();
+    if (j.created_at) {
+      entryDate = typeof j.created_at === 'number' ? new Date(j.created_at * 1000) : new Date(j.created_at);
     }
+    
+    // Match date or include if on today
+    const matchesDate = isSelectedToday || (entryDate.toDateString() === selectedDateStr);
 
-    events.push({
-      id: `journal_${j.id || idx}`,
-      type: 'journal',
-      time: timeStr,
-      rawHour: parseInt(timeStr.substring(0, 2), 10) || 12,
-      title: j.title.replace(/\[\d{1,2}:\d{2}\]\s*/, '') || 'Reflective Journal Turn',
-      content: j.content,
-      mood: j.mood || 'Reflective',
-      cbtNote: j.insights?.cognitive_reframing || null,
-      location: '📍 Connaught Place, New Delhi',
-      energy: '8/10',
-      photoUrl: null
-    });
+    if (matchesDate) {
+      let timeStr = '12:00';
+      const timeMatch = j.title && j.title.match(/\[(\d{1,2}:\d{2})\]/);
+      if (timeMatch) {
+        timeStr = timeMatch[1];
+      } else {
+        const hoursMap = ['08:15', '11:30', '14:45', '17:30', '20:00'];
+        timeStr = hoursMap[idx % hoursMap.length];
+      }
+
+      events.push({
+        id: `journal_${j.id || idx}`,
+        type: 'journal',
+        time: timeStr,
+        rawHour: parseInt(timeStr.substring(0, 2), 10) || 12,
+        title: j.title.replace(/\[\d{1,2}:\d{2}\]\s*/, '') || 'Reflective Journal Turn',
+        content: j.content,
+        mood: j.mood || 'Reflective',
+        cbtNote: j.insights?.cognitive_reframing || null,
+        location: '📍 Connaught Place, New Delhi',
+        energy: '8/10',
+        photoUrl: null
+      });
+    }
   });
 
-  // 2. Add Memory Photos
-  memoryPhotosList.forEach(p => {
-    events.push({
-      id: p.id,
-      type: 'photo',
-      time: p.hour,
-      rawHour: parseInt(p.hour.substring(0, 2), 10) || 12,
-      title: p.caption,
-      content: p.caption,
-      mood: p.mood,
-      cbtNote: null,
-      location: p.location,
-      energy: p.energy,
-      photoUrl: p.url
+  // 2. Add Memory Photos (if on today)
+  if (isSelectedToday) {
+    memoryPhotosList.forEach(p => {
+      events.push({
+        id: p.id,
+        type: 'photo',
+        time: p.hour,
+        rawHour: parseInt(p.hour.substring(0, 2), 10) || 12,
+        title: p.caption,
+        content: p.caption,
+        mood: p.mood,
+        cbtNote: null,
+        location: p.location,
+        energy: p.energy,
+        photoUrl: p.url
+      });
     });
-  });
+  }
 
-  // 3. Add Google Calendar Events if synced
-  if (isGCalSynced) {
+  // 3. Add Google Calendar Events if synced and viewing today
+  if (isGCalSynced && isSelectedToday) {
     Object.keys(mockGCalSchedule).forEach(h => {
       const g = mockGCalSchedule[h];
       events.push({
@@ -1474,19 +1578,22 @@ async function renderChronoTimeline() {
   const displayAmpm = currentHourInt >= 12 ? 'PM' : 'AM';
   const display12H = (currentHourInt % 12 || 12) + ':' + currentMinStr + ' ' + displayAmpm;
 
-  // If NO logged entries exist for today
+  const isSelectedToday = (state.selectedDiaryDate || new Date()).toDateString() === now.toDateString();
+  const dateFormatted = (state.selectedDiaryDate || new Date()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+  // If NO logged entries exist for selected date
   if (events.length === 0) {
     container.innerHTML = `
       <div class="p-8 text-center bg-black/30 rounded-3xl border border-white/5 space-y-3 my-4">
         <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-300 mx-auto shadow-lg shadow-cyan-500/10">
           <i data-lucide="feather" class="w-6 h-6"></i>
         </div>
-        <h4 class="text-base font-bold text-white">Your Daily Chronicle is Open</h4>
+        <h4 class="text-base font-bold text-white">${isSelectedToday ? "Your Daily Chronicle is Open" : `No Moments Recorded for ${dateFormatted}`}</h4>
         <p class="text-xs text-slate-400 max-w-sm mx-auto">
-          No entries recorded for this day yet. Every thought, mood pulse, and photo you capture will appear here in chronological order.
+          ${isSelectedToday ? "No entries recorded for today yet. Every thought, mood pulse, and photo you capture will appear here in chronological order." : `No reflections were captured on ${dateFormatted}. You can log a moment or reflection for this date.`}
         </p>
         <button onclick="openNewJournalModal()" class="btn-island mx-auto mt-2 !py-2 !px-4">
-          <span>+ Write First Life Moment</span>
+          <span>+ Log Moment for ${dateFormatted}</span>
           <div class="btn-island-icon !w-5 !h-5">
             <i data-lucide="plus" class="w-3.5 h-3.5 text-white"></i>
           </div>
@@ -1511,8 +1618,8 @@ async function renderChronoTimeline() {
     else if (ev.rawHour >= 20) weatherBadge = '🌌 Night Sanctuary';
     else weatherBadge = '🌙 Deep Rest';
 
-    // Insert LIVE NOW laser needle at appropriate chronological spot
-    if (!nowMarkerInserted && ev.rawHour >= currentHourInt) {
+    // Insert LIVE NOW laser needle if viewing today
+    if (isSelectedToday && !nowMarkerInserted && ev.rawHour >= currentHourInt) {
       html += `
         <div class="timeline-now-marker">
           <div class="timeline-now-badge">
@@ -1526,7 +1633,6 @@ async function renderChronoTimeline() {
     }
 
     const isGCal = ev.type === 'gcal';
-    const isPhoto = ev.type === 'photo';
 
     html += `
       <div class="timeline-hour-row has-entry ${isGCal ? 'has-gcal' : ''}">
@@ -1583,19 +1689,34 @@ async function renderChronoTimeline() {
             ` : ''}
           </div>
 
-          <!-- Photo Attachment Preview if present -->
-          ${ev.photoUrl ? `
-            <div class="mt-3 rounded-2xl overflow-hidden border border-white/10 max-w-md shadow-lg group">
-              <img src="${ev.photoUrl}" alt="${escapeHtml(ev.title)}" class="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-500">
-            </div>
-          ` : ''}
+          <!-- Photo Attachment Preview (Respecting Global Media Mode) -->
+          ${ev.photoUrl ? (
+            state.mediaMode === 'compact' ? `
+              <div class="mt-2.5 p-2.5 rounded-xl bg-black/40 border border-white/10 flex flex-col gap-2">
+                <div class="flex items-center justify-between">
+                  <span class="flex items-center gap-1.5 text-[11px] text-amber-300 font-mono">
+                    <i data-lucide="image" class="w-3.5 h-3.5 text-amber-400"></i>
+                    <span>Photo Attached (Lightweight Mode)</span>
+                  </span>
+                  <button type="button" onclick="toggleSingleMomentPhoto(this)" class="text-[10px] px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 font-semibold transition-colors">
+                    Preview
+                  </button>
+                </div>
+                <img src="${ev.photoUrl}" alt="${escapeHtml(ev.title)}" class="chrono-photo-preview hidden w-full h-44 object-cover rounded-xl border border-white/10 mt-1">
+              </div>
+            ` : `
+              <div class="mt-3 rounded-2xl overflow-hidden border border-white/10 max-w-md shadow-lg group">
+                <img src="${ev.photoUrl}" alt="${escapeHtml(ev.title)}" class="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-500">
+              </div>
+            `
+          ) : ''}
         </div>
       </div>
     `;
   });
 
-  // If NOW laser needle was not inserted (e.g. past all logged events)
-  if (!nowMarkerInserted) {
+  // If NOW laser needle was not inserted and viewing today
+  if (isSelectedToday && !nowMarkerInserted) {
     html += `
       <div class="timeline-now-marker">
         <div class="timeline-now-badge">
@@ -1612,7 +1733,7 @@ async function renderChronoTimeline() {
     <div class="pt-2 text-center">
       <button onclick="openNewJournalModal()" class="btn-secondary !py-2 !px-4 text-xs mx-auto flex items-center gap-2 hover:border-cyan-400">
         <i data-lucide="plus-circle" class="w-4 h-4 text-cyan-400"></i>
-        <span>+ Log Another Life Moment for Today</span>
+        <span>+ Log Another Life Moment for ${dateFormatted}</span>
       </button>
     </div>
   `;
@@ -1634,14 +1755,16 @@ function renderStoryCarousel(events) {
   const indicator = document.getElementById('story-progress-indicator');
   if (!track || !dots) return;
 
+  const dateFormatted = (state.selectedDiaryDate || new Date()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
   if (events.length === 0) {
     track.innerHTML = `
       <div class="story-slide-card text-center justify-center items-center py-12">
         <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-300 mx-auto mb-3">
           <i data-lucide="book-open" class="w-6 h-6"></i>
         </div>
-        <h4 class="text-base font-bold text-white">No Story Slides for Today</h4>
-        <p class="text-xs text-slate-400 max-w-xs mt-1">Capture a moment to begin your interactive daily story review.</p>
+        <h4 class="text-base font-bold text-white">No Story Slides for ${dateFormatted}</h4>
+        <p class="text-xs text-slate-400 max-w-xs mt-1">Capture a moment to begin your interactive story review.</p>
       </div>
     `;
     dots.innerHTML = '';
@@ -1681,13 +1804,20 @@ function renderStoryCarousel(events) {
         ` : ''}
       </div>
 
-      <!-- Slide Image & Footer -->
+      <!-- Slide Image & Footer (Respecting Global Media Mode) -->
       <div class="mt-4 pt-3 border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        ${ev.photoUrl ? `
-          <div class="rounded-xl overflow-hidden border border-white/10 max-h-36 w-full sm:w-64">
-            <img src="${ev.photoUrl}" alt="${escapeHtml(ev.title)}" class="w-full h-full object-cover">
-          </div>
-        ` : '<div></div>'}
+        ${ev.photoUrl ? (
+          state.mediaMode === 'compact' ? `
+            <div class="flex items-center gap-2 p-2 rounded-xl bg-black/40 border border-white/10 text-xs text-amber-300">
+              <i data-lucide="image" class="w-4 h-4 text-amber-400"></i>
+              <span class="font-mono text-[11px]">1 Media Moment Stamped</span>
+            </div>
+          ` : `
+            <div class="rounded-xl overflow-hidden border border-white/10 max-h-36 w-full sm:w-64">
+              <img src="${ev.photoUrl}" alt="${escapeHtml(ev.title)}" class="w-full h-full object-cover">
+            </div>
+          `
+        ) : '<div></div>'}
 
         <div class="flex items-center gap-3 text-xs text-slate-400 self-end sm:self-auto">
           <span>Energy: <strong class="text-amber-400 font-mono">${ev.energy || '8/10'}</strong></span>
@@ -1849,19 +1979,40 @@ function renderMemoryPhotos() {
   const container = document.getElementById('memory-photos-grid');
   if (!container) return;
 
-  container.innerHTML = memoryPhotosList.map(p => `
-    <div class="memory-photo-card group">
-      <img src="${p.url}" alt="${escapeHtml(p.caption)}">
-      <div class="memory-photo-overlay">
-        <span class="text-[10px] text-amber-300 font-mono mb-0.5">${p.hour} • ${escapeHtml(p.location)}</span>
-        <p class="text-xs font-semibold text-white line-clamp-2">${escapeHtml(p.caption)}</p>
-        <div class="flex items-center justify-between mt-1 text-[10px] text-slate-300">
-          <span>${p.mood}</span>
-          <span class="font-mono text-cyan-300">⚡ ${p.energy}</span>
+  if (state.mediaMode === 'compact') {
+    container.innerHTML = memoryPhotosList.map(p => `
+      <div class="p-3.5 rounded-2xl bg-black/40 border border-white/10 flex items-center justify-between gap-3 hover:border-amber-500/30 transition-colors">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl overflow-hidden shrink-0 border border-white/10">
+            <img src="${p.url}" alt="${escapeHtml(p.caption)}" class="w-full h-full object-cover">
+          </div>
+          <div>
+            <span class="text-[10px] text-amber-300 font-mono block">${p.hour} • ${escapeHtml(p.location)}</span>
+            <h5 class="text-xs font-bold text-white">${escapeHtml(p.caption)}</h5>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 shrink-0 text-[11px]">
+          <span class="eyebrow-badge !text-cyan-300 !bg-cyan-950/40">${p.mood}</span>
+          <span class="font-mono text-amber-400 font-bold">⚡ ${p.energy}</span>
         </div>
       </div>
-    </div>
-  `).join('');
+    `).join('');
+  } else {
+    container.innerHTML = memoryPhotosList.map(p => `
+      <div class="memory-photo-card group">
+        <img src="${p.url}" alt="${escapeHtml(p.caption)}">
+        <div class="memory-photo-overlay">
+          <span class="text-[10px] text-amber-300 font-mono mb-0.5">${p.hour} • ${escapeHtml(p.location)}</span>
+          <p class="text-xs font-semibold text-white line-clamp-2">${escapeHtml(p.caption)}</p>
+          <div class="flex items-center justify-between mt-1 text-[10px] text-slate-300">
+            <span>${p.mood}</span>
+            <span class="font-mono text-cyan-300">⚡ ${p.energy}</span>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+  lucide.createIcons();
 }
 
 async function submitNewJournal(event) {

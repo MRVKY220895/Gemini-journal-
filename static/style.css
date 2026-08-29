@@ -1623,3 +1623,64 @@ html:not(.dark) .track-tab-btn:hover {
   color: #0f172a !important;
   background: rgba(15, 23, 42, 0.06) !important;
 }
+
+/* ==========================================================================
+   DATE PICKER, LIGHTWEIGHT MEDIA MODE & TYPOGRAPHY CLARITY (EXPERT UI)
+   ========================================================================== */
+
+/* ─── Date Picker Input Styling ─── */
+#chrono-date-picker {
+  color-scheme: dark;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 0.15rem 0.35rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+#chrono-date-picker:focus {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.3);
+}
+
+html.light #chrono-date-picker,
+html:not(.dark) #chrono-date-picker {
+  color-scheme: light;
+  background: rgba(241, 245, 249, 0.9) !important;
+  border-color: rgba(15, 23, 42, 0.12) !important;
+  color: #0f172a !important;
+}
+
+/* ─── Crisp Icon Geometry & Global Font Sharpening ─── */
+svg.lucide {
+  display: inline-block;
+  vertical-align: middle;
+  shape-rendering: geometricPrecision;
+  stroke-width: 1.85;
+}
+
+body, button, input, select, textarea {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ─── Photo Preview Transitions ─── */
+.chrono-photo-preview {
+  animation: photo-expand-in 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes photo-expand-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ─── Media Mode Button State ─── */
+html.light #media-mode-toggle-btn,
+html:not(.dark) #media-mode-toggle-btn {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(15, 23, 42, 0.12) !important;
+  color: #0f172a !important;
+}

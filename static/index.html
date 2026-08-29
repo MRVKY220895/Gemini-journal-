@@ -315,22 +315,39 @@
         
         <!-- Diary Weekly Ribbon & Date Navigator -->
         <div class="double-bezel">
-          <div class="double-bezel-inner p-4 flex flex-col gap-3">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-2.5">
+          <div class="double-bezel-inner p-3.5 sm:p-4 flex flex-col gap-3">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-white/5 pb-3">
               <div>
                 <h3 id="diary-current-date-title" class="text-base font-bold text-white tracking-tight flex items-center gap-2">
                   <i data-lucide="book-marked" class="w-4 h-4 text-cyan-400"></i>
                   <span>Today's Daily Chronicle</span>
                 </h3>
-                <div class="flex items-center gap-2 text-xs text-slate-400 mt-0.5">
+                <div class="flex items-center gap-2 text-xs text-slate-400 mt-0.5 flex-wrap">
                   <span id="chrono-live-clock" class="font-mono text-cyan-300">● LIVE: Detecting local time...</span>
                   <span>•</span>
                   <span id="chrono-user-tz-badge" class="font-mono text-[11px] text-slate-400">Local Timezone</span>
                 </div>
               </div>
 
-              <!-- View Switcher (Stream vs. Story Flow) & Jump to Now -->
+              <!-- View Switcher, Date Picker & Media Mode Toggle -->
               <div class="flex items-center gap-2 flex-wrap">
+                <!-- Direct Date Picker Jump -->
+                <div class="flex items-center bg-black/50 p-1 rounded-xl border border-white/10 text-xs" title="Select Specific Date">
+                  <button onclick="stepDiaryDay(-1)" class="p-1 text-slate-400 hover:text-white rounded-lg transition-colors" title="Previous Day">
+                    <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+                  </button>
+                  <input type="date" id="chrono-date-picker" onchange="onDiaryDatePickerChange(this.value)" class="bg-transparent text-slate-200 text-xs px-1.5 py-0.5 font-mono focus:outline-none cursor-pointer">
+                  <button onclick="stepDiaryDay(1)" class="p-1 text-slate-400 hover:text-white rounded-lg transition-colors" title="Next Day">
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                  </button>
+                </div>
+
+                <!-- Global Media Visibility Toggle (Photos vs Lightweight Text) -->
+                <button onclick="toggleMediaMode()" id="media-mode-toggle-btn" class="btn-secondary !py-1.5 !px-2.5 text-xs flex items-center gap-1.5" title="Toggle Global Photos/Media (Make Journal Lightweight)">
+                  <i id="media-mode-icon" data-lucide="image" class="w-3.5 h-3.5 text-amber-400"></i>
+                  <span id="media-mode-label" class="hidden sm:inline">Photos: On</span>
+                </button>
+
                 <!-- Stream / Story Slider Toggle -->
                 <div class="flex items-center bg-black/60 p-1 rounded-xl border border-white/10 text-xs">
                   <button id="view-mode-stream-btn" onclick="setTimelineViewMode('stream')" class="px-2.5 py-1 rounded-lg font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 flex items-center gap-1">
@@ -341,9 +358,9 @@
                   </button>
                 </div>
 
-                <button onclick="scrollToCurrentHour()" class="btn-secondary text-xs !py-1.5 !px-2.5 flex items-center gap-1.5" title="Jump to Current Time">
+                <button onclick="jumpToToday()" class="btn-secondary text-xs !py-1.5 !px-2.5 flex items-center gap-1.5" title="Jump to Today's Local Time">
                   <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
-                  <span>Now</span>
+                  <span>Today</span>
                 </button>
               </div>
             </div>
