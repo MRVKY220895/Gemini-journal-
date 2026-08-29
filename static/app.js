@@ -1379,7 +1379,7 @@ function syncExactTimeFromHour(hourVal) {
 }
 
 function switchJournalTrack(trackId) {
-  const tracks = ['chrono', 'cbt', 'cycle', 'circadian', 'memory'];
+  const tracks = ['chrono', 'sanctuary', 'memory', 'cbt', 'cycle', 'circadian'];
   tracks.forEach(t => {
     const el = document.getElementById(`journal-track-${t}`);
     const btn = document.getElementById(`track-btn-${t}`);
@@ -1393,7 +1393,7 @@ function switchJournalTrack(trackId) {
   if (activeBtn) activeBtn.className = `track-tab-btn active-${trackId}`;
 
   if (trackId === 'chrono') renderChronoTimeline();
-  if (trackId === 'cbt') renderCBTHeatmap();
+  if (trackId === 'sanctuary' || trackId === 'cbt') renderCBTHeatmap();
   if (trackId === 'memory') renderMemoryPhotos();
 }
 
@@ -1653,13 +1653,16 @@ function getChronologicalEvents(journals) {
     if (taskMatches) {
       events.push({
         id: `task_item_${t.id}`,
+        taskId: t.id,
         type: 'task',
         time: t.time,
         rawHour: parseInt(t.time.substring(0, 2), 10) || 12,
         entryDate: taskDate,
         dateHeader: taskDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
-        title: `${t.type === 'milestone' ? '⭐ Milestone' : t.type === 'reminder' ? '⏰ Reminder' : '☑️ Task'}: ${t.title}`,
-        content: `Priority: ${t.priority.toUpperCase()} • Status: ${t.completed ? '✅ Completed' : '⏳ In Progress'} • 2-Way Google Calendar Synced`,
+        title: t.title,
+        content: `Priority: ${t.priority.toUpperCase()} • 2-Way Google Calendar Synced`,
+        isCompleted: t.completed,
+        taskType: t.type,
         mood: t.completed ? '✨ Fulfilled' : '🎯 Actionable',
         cbtNote: null,
         location: '📍 Google Calendar Task',
@@ -1718,7 +1721,7 @@ async function renderChronoTimeline() {
         </div>
         <h4 class="text-base font-bold text-white">${isSelectedToday ? "Your Daily Chronicle is Open" : `No Moments Recorded for ${dateFormatted}`}</h4>
         <p class="text-xs text-slate-400 max-w-sm mx-auto">
-          ${isSelectedToday ? "No entries recorded for today yet. Every thought, mood pulse, and photo you capture will appear here in chronological order." : `No reflections were captured on ${dateFormatted}. You can log a moment or reflection for this date.`}
+          ${isSelectedToday ? "No entries recorded for today yet. Every thought, mood pulse, and task you capture will appear here in chronological order." : `No reflections were captured on ${dateFormatted}. You can log a moment or reflection for this date.`}
         </p>
         <button onclick="openNewJournalModal()" class="btn-island mx-auto mt-2 !py-2 !px-4">
           <span>+ Log Moment for ${dateFormatted}</span>
@@ -1787,7 +1790,7 @@ async function renderChronoTimeline() {
 
         <!-- Editorial Diary Page Card -->
         <div class="chrono-block-card">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2.5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
             <div class="flex items-center gap-2 flex-wrap">
               <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-black/40 border border-white/10 text-slate-300">
                 ${weatherBadge}
@@ -1799,8 +1802,8 @@ async function renderChronoTimeline() {
                   <span>GCal Sync</span>
                 </span>
               ` : isTask ? `
-                <span class="text-[10px] px-2 py-0.5 rounded-full bg-blue-950/50 border border-blue-500/30 text-blue-300 font-semibold font-mono">
-                  Life Agenda
+                <span class="text-[10px] px-2 py-0.5 rounded-full ${ev.taskType === 'milestone' ? 'bg-amber-950/50 border-amber-500/30 text-amber-300' : ev.taskType === 'reminder' ? 'bg-purple-950/50 border-purple-500/30 text-purple-300' : 'bg-blue-950/50 border-blue-500/30 text-blue-300'} border font-semibold font-mono">
+                  ${ev.taskType === 'milestone' ? '⭐ Milestone' : ev.taskType === 'reminder' ? '⏰ Reminder' : '☑️ Task'}
                 </span>
               ` : `
                 <span class="eyebrow-badge !text-cyan-300 !bg-cyan-950/40 !border-cyan-500/30">
@@ -1817,15 +1820,34 @@ async function renderChronoTimeline() {
 
             <div class="flex items-center gap-2">
               <span class="text-[10px] text-slate-400 font-mono">${escapeHtml(ev.location)}</span>
-              <button onclick="openNewJournalModal('${ev.time}')" class="text-xs font-semibold text-cyan-400 hover:text-cyan-300 flex items-center gap-1 transition-colors px-2 py-1 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30">
-                <i data-lucide="edit-3" class="w-3 h-3"></i> <span>Add Note</span>
-              </button>
+              ${isTask ? `
+                <button onclick="convertTaskToReflection('${ev.taskId}')" class="text-xs font-semibold text-cyan-400 hover:text-cyan-300 flex items-center gap-1 transition-colors px-2 py-0.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30" title="Reflect on this task">
+                  <i data-lucide="feather" class="w-3 h-3"></i> <span>Reflect</span>
+                </button>
+                <button onclick="deleteTask('${ev.taskId}')" class="text-xs text-slate-500 hover:text-rose-400 transition-colors p-1" title="Delete Task">
+                  <i data-lucide="trash-2" class="w-3 h-3"></i>
+                </button>
+              ` : `
+                <button onclick="openNewJournalModal('${ev.time}')" class="text-xs font-semibold text-cyan-400 hover:text-cyan-300 flex items-center gap-1 transition-colors px-2 py-0.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30">
+                  <i data-lucide="edit-3" class="w-3 h-3"></i> <span>Add Note</span>
+                </button>
+              `}
             </div>
           </div>
 
           <!-- Entry Details -->
-          <div class="space-y-1.5 pt-1">
-            <h4 class="text-sm font-bold text-white tracking-tight">${escapeHtml(ev.title)}</h4>
+          <div class="space-y-1.5 pt-0.5">
+            ${isTask ? `
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="toggleTaskComplete('${ev.taskId}')" class="w-4 h-4 rounded-md border flex items-center justify-center transition-colors shrink-0 ${ev.isCompleted ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400' : 'bg-black/40 border-slate-700 hover:border-cyan-400 text-transparent'}" title="Toggle Completion">
+                  <i data-lucide="check" class="w-3 h-3 ${ev.isCompleted ? 'block' : 'hidden'}"></i>
+                </button>
+                <h4 class="text-sm font-bold ${ev.isCompleted ? 'line-through text-slate-400' : 'text-white'} tracking-tight">${escapeHtml(ev.title)}</h4>
+              </div>
+            ` : `
+              <h4 class="text-sm font-bold text-white tracking-tight">${escapeHtml(ev.title)}</h4>
+            `}
+            
             <p class="text-xs text-slate-300 leading-relaxed font-sans">${escapeHtml(ev.content)}</p>
             
             ${ev.cbtNote ? `

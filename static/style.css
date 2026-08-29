@@ -487,6 +487,13 @@ body {
   box-shadow: 0 0 16px -4px rgba(244, 63, 94, 0.4);
 }
 
+.track-tab-btn.active-sanctuary {
+  color: #d1fae5;
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.35);
+  box-shadow: 0 0 16px -4px rgba(16, 185, 129, 0.4);
+}
+
 .track-tab-btn.active-memory {
   color: #fef3c7;
   background: var(--memory-bg);

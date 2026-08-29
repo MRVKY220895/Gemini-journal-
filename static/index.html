@@ -226,66 +226,71 @@
     </section>
 
     <!-- ===================================================================== -->
-    <!-- TAB 2: MULTI-TRACK LIFE JOURNAL (CHRONO, CBT, CYCLE, MEMORY) -->
+    <!-- TAB 2: CONSOLIDATED LIFE INTELLIGENCE JOURNAL -->
     <!-- ===================================================================== -->
-    <section id="view-journals" class="hidden flex-1 flex flex-col gap-4">
+    <section id="view-journals" class="hidden flex-1 flex flex-col gap-3">
 
-      <!-- ─── Journal Page Header (compact editorial) ─── -->
+      <!-- ─── Master Journal Page Header & Actions ─── -->
       <div class="journal-page-header">
         <div class="journal-header-title">
-          <span class="eyebrow-badge">Multi-Track Sync</span>
-          <h2 class="text-lg font-bold tracking-tight mt-1" style="color: var(--text-primary)">Life Intelligence Journal</h2>
+          <span class="eyebrow-badge">Life Intelligence System</span>
+          <h2 class="text-lg font-bold tracking-tight mt-0.5" style="color: var(--text-primary)">Mind Cave Journal</h2>
         </div>
-        <div class="journal-header-actions">
-          <button onclick="toggleGCalSync()" id="btn-gcal-sync" class="btn-secondary text-xs !py-1.5 !px-3 flex items-center gap-1.5">
-            <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
-            <span id="gcal-btn-text" class="hidden sm:inline">Calendar</span>
+
+        <div class="journal-header-actions flex items-center gap-2">
+          <!-- AI Voice Summary -->
+          <button onclick="toggleVoiceSummary()" id="btn-voice-summary" class="btn-secondary text-xs !py-1.5 !px-2.5 flex items-center gap-1.5" title="Listen to AI Daily Synthesis">
+            <i data-lucide="volume-2" class="w-3.5 h-3.5 text-cyan-400" id="voice-summary-icon"></i>
+            <span id="voice-summary-label" class="hidden sm:inline">Voice Summary</span>
           </button>
-          <button onclick="openNewJournalModal()" class="btn-island !py-1.5 !px-3.5 text-xs">
-            <span>Log Moment</span>
-            <div class="btn-island-icon !w-5 !h-5">
-              <i data-lucide="plus" class="w-3.5 h-3.5 text-white"></i>
+          
+          <!-- 2-Way GCal Sync Badge -->
+          <button onclick="toggleGCalSync()" id="btn-gcal-sync" class="btn-secondary text-xs !py-1.5 !px-2.5 flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+            <span id="gcal-btn-text" class="hidden md:inline">GCal Sync</span>
+          </button>
+
+          <!-- Quick Action Buttons -->
+          <button onclick="openNewTaskModal()" class="btn-secondary text-xs !py-1.5 !px-2.5 flex items-center gap-1 hover:border-blue-400">
+            <i data-lucide="check-square" class="w-3.5 h-3.5 text-blue-400"></i>
+            <span class="hidden sm:inline">+ Task</span>
+          </button>
+          
+          <button onclick="openNewJournalModal()" class="btn-island !py-1.5 !px-3 text-xs">
+            <span>+ Moment</span>
+            <div class="btn-island-icon !w-4 !h-4">
+              <i data-lucide="plus" class="w-3 h-3 text-white"></i>
             </div>
           </button>
         </div>
       </div>
 
-      <!-- ─── Track Navigation (refined pill bar) ─── -->
+      <!-- ─── Consolidated 3-Tab Architecture ─── -->
       <div id="journal-tracks-nav" class="journal-track-nav">
         <button onclick="switchJournalTrack('chrono')" id="track-btn-chrono" class="track-tab-btn active-chrono">
-          <span class="track-emoji">📅</span><span>Chrono</span>
+          <span class="track-emoji">📅</span><span>Chronicle & Agenda</span>
         </button>
-        <button onclick="switchJournalTrack('cbt')" id="track-btn-cbt" class="track-tab-btn">
-          <span class="track-emoji">🧠</span><span>Mental</span>
-        </button>
-        <!-- Cycle Track — shown for Female / Non-binary profile -->
-        <button onclick="switchJournalTrack('cycle')" id="track-btn-cycle" class="track-tab-btn">
-          <span class="track-emoji">🌙</span><span>Cycle</span>
-        </button>
-        <!-- Circadian Track — shown for Male / Non-binary profile -->
-        <button onclick="switchJournalTrack('circadian')" id="track-btn-circadian" class="track-tab-btn hidden">
-          <span class="track-emoji">⚡</span><span>Energy</span>
+        <button onclick="switchJournalTrack('sanctuary')" id="track-btn-sanctuary" class="track-tab-btn">
+          <span class="track-emoji">🌿</span><span>Mind & Body Sanctuary</span>
         </button>
         <button onclick="switchJournalTrack('memory')" id="track-btn-memory" class="track-tab-btn">
-          <span class="track-emoji">📸</span><span>Memory</span>
+          <span class="track-emoji">📸</span><span>Visual Memories</span>
         </button>
       </div>
 
-      <!-- ═══════════════════════════════════════════════════════════════════ -->
-      <!-- AI SYNTHESIS STRIP — Compact inline collapsible                    -->
-      <!-- ═══════════════════════════════════════════════════════════════════ -->
+      <!-- ─── Slim AI Synthesis Strip ─── -->
       <div class="synthesis-strip" id="ai-synthesis-strip">
         <div class="synthesis-strip-left">
           <div class="synthesis-strip-icon">
             <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
           </div>
-          <span class="synthesis-strip-title">AI Synthesis</span>
-          <span class="synthesis-harmony-badge" id="synthesis-harmony-badge">🌿 94%</span>
+          <span class="synthesis-strip-title">Daily Harmony</span>
+          <span class="synthesis-harmony-badge" id="synthesis-harmony-badge">🌿 96%</span>
         </div>
         <div class="synthesis-strip-chips">
           <div class="synthesis-mini-chip">
             <span style="color:var(--chrono-accent)">📅</span>
-            <span id="synth-time-chip">3 Deep Focus</span>
+            <span id="synth-time-chip">3 Focus Blocks</span>
           </div>
           <div class="synthesis-mini-chip">
             <span style="color:var(--cbt-accent)">🧠</span>
@@ -293,19 +298,14 @@
           </div>
           <div class="synthesis-mini-chip" id="synthesis-bio-chip">
             <span style="color:var(--cycle-accent)">🌙</span>
-            <span id="synth-bio-chip">Luteal Phase</span>
+            <span id="synth-bio-chip">Peak Stamina</span>
           </div>
           <div class="synthesis-mini-chip">
-            <span style="color:var(--memory-accent)">📸</span>
-            <span id="synth-photos-chip">3 Memories</span>
+            <span style="color:var(--memory-accent)">🏃</span>
+            <span id="synth-fit-chip">8.4k Steps</span>
           </div>
         </div>
         <div class="synthesis-strip-right flex items-center gap-1.5">
-          <!-- Voice Summary (Text-to-Speech) Audio Narration -->
-          <button onclick="toggleVoiceSummary()" id="btn-voice-summary" class="synthesis-refresh-btn !w-auto !px-2.5 gap-1.5 text-[11px] font-semibold flex items-center" title="Listen to AI Daily Synthesis (Voice Summary)">
-            <i data-lucide="volume-2" class="w-3.5 h-3.5 text-cyan-400" id="voice-summary-icon"></i>
-            <span id="voice-summary-label" class="hidden sm:inline">Voice Summary</span>
-          </button>
           <button onclick="regenerateDailySynthesis()" class="synthesis-refresh-btn" title="Refresh AI Synthesis">
             <i data-lucide="refresh-cw" class="w-3 h-3"></i>
           </button>
@@ -314,7 +314,8 @@
           </button>
         </div>
       </div>
-      <!-- Expandable synthesis body (collapsed by default) -->
+
+      <!-- Expandable synthesis body -->
       <div id="synthesis-expanded-body" class="synthesis-expanded-body hidden">
         <div class="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-white/5">
           <span class="text-[11px] font-semibold text-cyan-300 flex items-center gap-1.5">
@@ -330,119 +331,82 @@
           </div>
         </div>
         <p id="cross-track-synthesis-text" class="text-xs leading-relaxed" style="color: var(--text-secondary)">
-          Your afternoon energy aligns with deep work execution. Morning deadlines showed minor catastrophizing, which was reframed through your reflective prompt. Physical stamina and calendar commitments remain in full equilibrium.
+          Your afternoon energy aligns with deep work execution. Morning deadlines showed minor catastrophizing, which was reframed through your reflective prompt. Physical stamina, Google Fit recovery, and calendar commitments remain in full equilibrium.
         </p>
       </div>
 
       <!-- =================================================================== -->
-      <!-- SUB-TRACK 1: CHRONO EDITORIAL DAILY DIARY (REAL PHYSICAL DIARY SPACE) -->
+      <!-- VIEW 1: CHRONICLE & AGENDA (UNIFIED TIMELINE STREAM) -->
       <!-- =================================================================== -->
-      <div id="journal-track-chrono" class="space-y-4">
+      <div id="journal-track-chrono" class="space-y-3">
         
-        <!-- Diary Weekly Ribbon & Date Navigator -->
+        <!-- Unified Master Command Ribbon -->
         <div class="double-bezel">
-          <div class="double-bezel-inner p-3.5 sm:p-4 flex flex-col gap-3">
-            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-white/5 pb-3">
-              <div>
-                <h3 id="diary-current-date-title" class="text-base font-bold text-white tracking-tight flex items-center gap-2">
-                  <i data-lucide="book-marked" class="w-4 h-4 text-cyan-400"></i>
-                  <span>Today's Daily Chronicle</span>
-                </h3>
-                <div class="flex items-center gap-2 text-xs text-slate-400 mt-0.5 flex-wrap">
-                  <span id="chrono-live-clock" class="font-mono text-cyan-300">● LIVE: Detecting local time...</span>
-                  <span>•</span>
-                  <span id="chrono-user-tz-badge" class="font-mono text-[11px] text-slate-400">Local Timezone</span>
-                </div>
-              </div>
-
-              <!-- View Switcher, Date Picker, Multi-Date Range & Media Mode Toggle -->
-              <div class="flex items-center gap-2 flex-wrap">
-                <!-- Consolidated Multi-Date View Switcher -->
-                <div class="flex items-center bg-black/60 p-1 rounded-xl border border-white/10 text-xs" title="Select Timeline Range View">
-                  <button onclick="setDiaryRangeMode('single')" id="range-mode-single-btn" class="px-2 py-0.5 rounded-lg font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-[11px]">Day</button>
-                  <button onclick="setDiaryRangeMode('week')" id="range-mode-week-btn" class="px-2 py-0.5 rounded-lg font-semibold text-slate-400 hover:text-white text-[11px]">7-Day Digest</button>
-                  <button onclick="setDiaryRangeMode('all')" id="range-mode-all-btn" class="px-2 py-0.5 rounded-lg font-semibold text-slate-400 hover:text-white text-[11px]">All Moments</button>
+          <div class="double-bezel-inner p-3 sm:p-3.5 flex flex-col gap-2.5">
+            <!-- Command Top Bar -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-2.5">
+              <!-- Left: Date Navigator & Stepper -->
+              <div class="flex items-center gap-1.5">
+                <button onclick="stepDiaryDay(-1)" class="w-7 h-7 rounded-lg bg-black/40 hover:bg-white/10 border border-white/10 text-slate-300 flex items-center justify-center transition-colors" title="Previous Day">
+                  <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+                </button>
+                
+                <div class="flex items-center gap-1.5 bg-black/40 px-2.5 py-1 rounded-lg border border-white/10">
+                  <h3 id="diary-current-date-title" class="text-xs font-bold text-white tracking-tight flex items-center gap-1.5 whitespace-nowrap">
+                    <i data-lucide="book-marked" class="w-3.5 h-3.5 text-cyan-400"></i>
+                    <span>Today's Chronicle</span>
+                  </h3>
+                  <input type="date" id="chrono-date-picker" onchange="onDiaryDatePickerChange(this.value)" class="bg-transparent text-cyan-300 text-xs font-mono focus:outline-none cursor-pointer">
                 </div>
 
-                <!-- Direct Date Picker Jump -->
-                <div class="flex items-center bg-black/50 p-1 rounded-xl border border-white/10 text-xs" title="Select Specific Date">
-                  <button onclick="stepDiaryDay(-1)" class="p-1 text-slate-400 hover:text-white rounded-lg transition-colors" title="Previous Day">
-                    <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
-                  </button>
-                  <input type="date" id="chrono-date-picker" onchange="onDiaryDatePickerChange(this.value)" class="bg-transparent text-slate-200 text-xs px-1.5 py-0.5 font-mono focus:outline-none cursor-pointer">
-                  <button onclick="stepDiaryDay(1)" class="p-1 text-slate-400 hover:text-white rounded-lg transition-colors" title="Next Day">
-                    <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-                  </button>
-                </div>
-
-                <!-- Global Media Visibility Toggle (Photos vs Lightweight Text) -->
-                <button onclick="toggleMediaMode()" id="media-mode-toggle-btn" class="btn-secondary !py-1.5 !px-2.5 text-xs flex items-center gap-1.5" title="Toggle Global Photos/Media (Make Journal Lightweight)">
-                  <i id="media-mode-icon" data-lucide="image" class="w-3.5 h-3.5 text-amber-400"></i>
-                  <span id="media-mode-label" class="hidden sm:inline">Photos: On</span>
+                <button onclick="stepDiaryDay(1)" class="w-7 h-7 rounded-lg bg-black/40 hover:bg-white/10 border border-white/10 text-slate-300 flex items-center justify-center transition-colors" title="Next Day">
+                  <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
                 </button>
 
-                <!-- Stream / Story Slider Toggle -->
-                <div class="flex items-center bg-black/60 p-1 rounded-xl border border-white/10 text-xs">
-                  <button id="view-mode-stream-btn" onclick="setTimelineViewMode('stream')" class="px-2.5 py-1 rounded-lg font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 flex items-center gap-1">
-                    <i data-lucide="list" class="w-3 h-3"></i> <span>Feed</span>
-                  </button>
-                  <button id="view-mode-story-btn" onclick="setTimelineViewMode('story')" class="px-2.5 py-1 rounded-lg font-semibold text-slate-400 hover:text-white flex items-center gap-1">
-                    <i data-lucide="play-circle" class="w-3 h-3"></i> <span>Story Flow</span>
-                  </button>
-                </div>
-
-                <button onclick="jumpToToday()" class="btn-secondary text-xs !py-1.5 !px-2.5 flex items-center gap-1.5" title="Jump to Today's Local Time">
-                  <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                <button onclick="jumpToToday()" class="btn-secondary !py-1 !px-2 text-xs flex items-center gap-1 font-mono" title="Jump to Today">
+                  <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
                   <span>Today</span>
                 </button>
               </div>
+
+              <!-- Right: View Controls -->
+              <div class="flex items-center gap-1.5 flex-wrap self-end md:self-auto">
+                <!-- Range Switcher -->
+                <div class="flex items-center bg-black/60 p-0.5 rounded-lg border border-white/10 text-xs">
+                  <button onclick="setDiaryRangeMode('single')" id="range-mode-single-btn" class="px-2 py-0.5 rounded-md font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-[11px]">Day</button>
+                  <button onclick="setDiaryRangeMode('week')" id="range-mode-week-btn" class="px-2 py-0.5 rounded-md font-semibold text-slate-400 hover:text-white text-[11px]">7-Day Digest</button>
+                  <button onclick="setDiaryRangeMode('all')" id="range-mode-all-btn" class="px-2 py-0.5 rounded-md font-semibold text-slate-400 hover:text-white text-[11px]">All</button>
+                </div>
+
+                <!-- Media Mode Toggle -->
+                <button onclick="toggleMediaMode()" id="media-mode-toggle-btn" class="btn-secondary !py-1 !px-2 text-xs flex items-center gap-1" title="Toggle Photos/Text Mode">
+                  <i id="media-mode-icon" data-lucide="image" class="w-3.5 h-3.5 text-amber-400"></i>
+                  <span id="media-mode-label" class="hidden sm:inline">Photos</span>
+                </button>
+
+                <!-- Feed / Story Slider Toggle -->
+                <div class="flex items-center bg-black/60 p-0.5 rounded-lg border border-white/10 text-xs">
+                  <button id="view-mode-stream-btn" onclick="setTimelineViewMode('stream')" class="px-2 py-0.5 rounded-md font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 flex items-center gap-1" title="Feed Stream">
+                    <i data-lucide="list" class="w-3 h-3"></i>
+                  </button>
+                  <button id="view-mode-story-btn" onclick="setTimelineViewMode('story')" class="px-2 py-0.5 rounded-md font-semibold text-slate-400 hover:text-white flex items-center gap-1" title="Story Flow Carousel">
+                    <i data-lucide="play-circle" class="w-3 h-3"></i>
+                  </button>
+                </div>
+              </div>
             </div>
 
-            <!-- 7-Day Diary Ribbon -->
-            <div class="diary-week-ribbon" id="diary-week-ribbon-container">
+            <!-- 7-Day Weekly Ribbon -->
+            <div class="diary-week-ribbon pt-1 border-t border-white/5" id="diary-week-ribbon-container">
               <!-- Dynamically populated via JS -->
             </div>
           </div>
         </div>
 
-        <!-- TWO-WAY GOOGLE CALENDAR TO-DOS, REMINDERS & MILESTONE AGENDA HUB -->
-        <div class="double-bezel">
-          <div class="double-bezel-inner p-3.5 sm:p-4 flex flex-col gap-3">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-2.5">
-              <div class="flex items-center gap-2">
-                <div class="w-7 h-7 rounded-lg bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400">
-                  <i data-lucide="check-square" class="w-4 h-4"></i>
-                </div>
-                <div>
-                  <h4 class="text-xs font-bold text-white flex items-center gap-2">
-                    <span>Life Agenda: To-Dos, Reminders & Dates</span>
-                    <span class="text-[10px] text-blue-300 bg-blue-950/40 border border-blue-500/30 px-2 py-0.5 rounded-full font-mono">
-                      2-Way GCal Synced
-                    </span>
-                  </h4>
-                  <p class="text-[11px] text-slate-400">Tasks and reminders synced bi-directionally with Google Calendar.</p>
-                </div>
-              </div>
-              
-              <div class="flex items-center gap-2">
-                <button onclick="openNewTaskModal()" class="btn-secondary !py-1 !px-2.5 text-xs flex items-center gap-1 hover:border-blue-400">
-                  <i data-lucide="plus" class="w-3.5 h-3.5 text-blue-400"></i>
-                  <span>+ Add To-Do / Reminder</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- Agenda Items List -->
-            <div id="chrono-agenda-list" class="grid grid-cols-1 md:grid-cols-2 gap-2">
-              <!-- Rendered dynamically via JS -->
-            </div>
-          </div>
-        </div>
-
-        <!-- VIEW MODE 1: Vertical Timeline Stream (SHOWS ONLY LOGGED DATA) -->
+        <!-- VIEW MODE 1: Vertical Timeline Stream (REFLECTIONS + TASKS + GCAL + PHOTOS INLINE) -->
         <div class="timeline-container" id="chrono-timeline-list">
           <div class="timeline-spine"></div>
-          <!-- Only actual logged entries rendered via JS -->
+          <!-- Only actual logged entries & tasks rendered via JS -->
         </div>
 
         <!-- VIEW MODE 2: Story Flow Carousel (SWIPE & DRAG REVISIT) -->
@@ -450,7 +414,7 @@
           <div class="flex items-center justify-between text-xs px-2 text-slate-400">
             <span class="font-semibold text-slate-300 flex items-center gap-1.5">
               <i data-lucide="sparkles" class="w-3.5 h-3.5 text-cyan-400"></i>
-              <span>Revisit Today's Events (Swipe, Drag or use Arrow Keys)</span>
+              <span>Revisit Moments (Swipe, Drag or use Arrow Keys)</span>
             </span>
             <span id="story-progress-indicator" class="font-mono text-cyan-300">Moment 1 of 3</span>
           </div>
@@ -468,7 +432,6 @@
                 <i data-lucide="chevron-left" class="w-4 h-4"></i>
               </button>
               
-              <!-- Pagination Dots -->
               <div id="story-dots-container" class="flex items-center gap-1.5">
                 <!-- Dots populated via JS -->
               </div>
@@ -483,296 +446,156 @@
       </div>
 
       <!-- =================================================================== -->
-      <!-- SUB-TRACK 2: CBT MENTAL HEALTH LONGITUDINAL TRACK -->
+      <!-- VIEW 2: MIND & BODY SANCTUARY (CBT + BIO CURVE + GOOGLE FIT BENTO) -->
       <!-- =================================================================== -->
-      <div id="journal-track-cbt" class="hidden space-y-6">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-          <!-- 30-Day Mood Heatmap -->
-          <div class="double-bezel lg:col-span-6">
-            <div class="double-bezel-inner p-5">
-              <div class="flex items-center justify-between mb-3">
-                <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                  <i data-lucide="calendar" class="w-4 h-4 text-purple-400"></i> Emotional Resilience Heatmap
-                </h3>
-                <span class="text-[11px] text-slate-400 font-mono">Past 30 Days</span>
-              </div>
-              <p class="text-xs text-slate-400 mb-4">Longitudinal tracking of emotional stability, recovery velocity, and daily mood spikes.</p>
-              <div id="cbt-heatmap-container" class="cbt-heatmap-grid mb-3">
-                <!-- 28-30 Heat cells rendered via JS -->
-              </div>
-              <div class="flex items-center justify-between text-[10px] text-slate-400 pt-2 border-t border-white/5">
-                <span>Lower Stress</span>
-                <div class="flex items-center gap-1">
-                  <span class="w-2.5 h-2.5 rounded bg-purple-950 border border-purple-800"></span>
-                  <span class="w-2.5 h-2.5 rounded bg-purple-800"></span>
-                  <span class="w-2.5 h-2.5 rounded bg-purple-600"></span>
-                  <span class="w-2.5 h-2.5 rounded bg-purple-400"></span>
+      <div id="journal-track-sanctuary" class="hidden space-y-4">
+        
+        <!-- Sanctuary Master 3-Bento Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          
+          <!-- Bento 1: CBT Cognitive Resilience Heatmap -->
+          <div class="double-bezel">
+            <div class="double-bezel-inner p-4 flex flex-col justify-between h-full">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                    <i data-lucide="brain" class="w-4 h-4 text-purple-400"></i> CBT Emotional Resilience
+                  </h3>
+                  <span class="text-[10px] text-purple-300 font-mono">30 Days</span>
                 </div>
-                <span>High Clarity</span>
+                <p class="text-[11px] text-slate-400 mb-3">Longitudinal clarity & cognitive distortion reduction.</p>
+                <div id="cbt-heatmap-container" class="cbt-heatmap-grid mb-3"></div>
+              </div>
+
+              <div class="pt-2 border-t border-white/5 text-[10px] text-slate-400 flex justify-between">
+                <span>Lower Stress</span>
+                <span class="text-purple-400 font-semibold">-34% Distortion Rate</span>
               </div>
             </div>
           </div>
 
-          <!-- Distortion Trend Bars -->
-          <div class="double-bezel lg:col-span-6">
-            <div class="double-bezel-inner p-5">
-              <div class="flex items-center justify-between mb-3">
-                <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                  <i data-lucide="trending-down" class="w-4 h-4 text-emerald-400"></i> Cognitive Bias Reduction Trajectory
-                </h3>
-                <span class="text-[11px] text-emerald-400 font-semibold">-34% this month</span>
+          <!-- Bento 2: Biological & Circadian Stamina Rhythm -->
+          <div class="double-bezel">
+            <div class="double-bezel-inner p-4 flex flex-col justify-between h-full">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                    <i data-lucide="zap" class="w-4 h-4 text-amber-400"></i> Diurnal Stamina Curve
+                  </h3>
+                  <span class="text-[10px] text-amber-300 font-mono">Bio Sync</span>
+                </div>
+                <p class="text-[11px] text-slate-400 mb-3">Peak cognitive focus and hormonal stamina windows.</p>
+                
+                <div class="space-y-2">
+                  <div class="p-2 rounded-xl bg-black/40 border border-white/5 flex items-center justify-between text-[11px]">
+                    <span class="text-cyan-300 font-mono font-semibold">08:30 – 11:30 AM</span>
+                    <span class="text-slate-200">⚡ Peak Analytical Flow</span>
+                  </div>
+                  <div class="p-2 rounded-xl bg-black/40 border border-white/5 flex items-center justify-between text-[11px]">
+                    <span class="text-amber-300 font-mono font-semibold">02:00 – 05:00 PM</span>
+                    <span class="text-slate-200">🎯 Creative & Execution</span>
+                  </div>
+                  <div class="p-2 rounded-xl bg-black/40 border border-white/5 flex items-center justify-between text-[11px]">
+                    <span class="text-purple-300 font-mono font-semibold">08:00 – 10:30 PM</span>
+                    <span class="text-slate-200">🌙 Neural Wind-down</span>
+                  </div>
+                </div>
               </div>
-              <p class="text-xs text-slate-400 mb-4">CBT distortions actively reframed through journal prompts.</p>
-              <div class="space-y-3">
-                <div>
-                  <div class="flex justify-between text-xs mb-1">
-                    <span class="text-slate-300">⚡ Catastrophizing</span>
-                    <span class="text-emerald-400 font-mono text-[11px]">↓ 60% reframed</span>
-                  </div>
-                  <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
-                    <div class="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full" style="width: 40%"></div>
-                  </div>
-                </div>
-                <div>
-                  <div class="flex justify-between text-xs mb-1">
-                    <span class="text-slate-300">🔄 Mind Reading</span>
-                    <span class="text-emerald-400 font-mono text-[11px]">↓ 45% reframed</span>
-                  </div>
-                  <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
-                    <div class="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full" style="width: 55%"></div>
-                  </div>
-                </div>
-                <div>
-                  <div class="flex justify-between text-xs mb-1">
-                    <span class="text-slate-300">🔲 All-or-Nothing Thinking</span>
-                    <span class="text-emerald-400 font-mono text-[11px]">↓ 70% reframed</span>
-                  </div>
-                  <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
-                    <div class="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full" style="width: 30%"></div>
-                  </div>
-                </div>
+
+              <div class="pt-2 border-t border-white/5 text-[10px] text-slate-400 flex justify-between">
+                <span>Optimal Window</span>
+                <span class="text-cyan-400 font-semibold">Morning Biological Peak</span>
               </div>
             </div>
           </div>
+
+          <!-- Bento 3: Google Fit & Health Connect Vitality -->
+          <div class="double-bezel">
+            <div class="double-bezel-inner p-4 flex flex-col justify-between h-full">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                    <i data-lucide="activity" class="w-4 h-4 text-emerald-400"></i> Google Fit & Health Connect
+                  </h3>
+                  <button onclick="syncGoogleFitData()" class="text-[10px] text-emerald-400 hover:underline font-mono">Sync</button>
+                </div>
+                <p class="text-[11px] text-slate-400 mb-3">Live physiological vitality and recovery telemetry.</p>
+
+                <div class="grid grid-cols-2 gap-2 pt-0.5">
+                  <div class="p-2 rounded-xl bg-white/5 border border-white/5 text-center">
+                    <span class="text-[10px] text-slate-400 font-mono block">Daily Steps</span>
+                    <span class="text-xs font-bold text-emerald-400 font-mono" id="fit-steps-val">8,420 / 10k</span>
+                  </div>
+                  <div class="p-2 rounded-xl bg-white/5 border border-white/5 text-center">
+                    <span class="text-[10px] text-slate-400 font-mono block">Sleep Score</span>
+                    <span class="text-xs font-bold text-purple-400 font-mono" id="fit-sleep-val">7.8h (88%)</span>
+                  </div>
+                  <div class="p-2 rounded-xl bg-white/5 border border-white/5 text-center">
+                    <span class="text-[10px] text-slate-400 font-mono block">Resting HR</span>
+                    <span class="text-xs font-bold text-rose-400 font-mono" id="fit-hr-val">62 bpm</span>
+                  </div>
+                  <div class="p-2 rounded-xl bg-white/5 border border-white/5 text-center">
+                    <span class="text-[10px] text-slate-400 font-mono block">Focus Cardio</span>
+                    <span class="text-xs font-bold text-cyan-400 font-mono" id="fit-active-val">52 mins</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pt-2 border-t border-white/5 text-[10px] text-slate-400 flex justify-between">
+                <span>Recovery State</span>
+                <span class="text-emerald-400 font-semibold">Optimal (94%)</span>
+              </div>
+            </div>
+          </div>
+
         </div>
 
-        <!-- Saved Longitudinal Journal Cards -->
+        <!-- Saved Longitudinal Journal Vault -->
         <div>
-          <h3 class="text-sm font-bold text-white mb-3">Longitudinal CBT Journal Vault</h3>
-          <div id="journals-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <h3 class="text-xs font-bold text-white mb-2.5">Cognitive Reflections Vault</h3>
+          <div id="journals-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             <!-- Rendered via JS -->
           </div>
         </div>
+
       </div>
 
       <!-- =================================================================== -->
-      <!-- SUB-TRACK 3: WOMEN'S CYCLE & HORMONAL INTELLIGENCE -->
+      <!-- VIEW 3: VISUAL LIFE LOG & GOOGLE PHOTOS -->
       <!-- =================================================================== -->
-      <div id="journal-track-cycle" class="hidden space-y-6">
-        <div class="double-bezel">
-          <div class="double-bezel-inner p-6">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 border-b border-white/5 pb-4">
-              <div>
-                <h3 class="text-base font-bold text-white flex items-center gap-2">
-                  <i data-lucide="moon" class="w-4 h-4 text-rose-400"></i> Cycle & Hormonal Wellness Intelligence
-                </h3>
-                <p class="text-xs text-slate-400 mt-1">
-                  Private, encrypted biological context that explains mood fluctuations, energy cycles, and mental resilience.
-                </p>
-              </div>
-              
-              <div class="flex items-center gap-2">
-                <span class="text-xs text-slate-400">Opt-In Privacy Track:</span>
-                <button onclick="toggleCycleOptIn()" id="cycle-optin-btn" class="text-xs font-semibold px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40">
-                  ✓ Active (Encrypted)
-                </button>
-              </div>
-            </div>
-
-            <!-- Current Phase Visualizer -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
-              <div class="p-3.5 rounded-2xl bg-rose-950/20 border border-rose-500/20">
-                <span class="text-[10px] text-rose-400 font-semibold uppercase tracking-wider block">Phase 1 (Days 1–5)</span>
-                <div class="text-sm font-bold text-white mt-0.5">Menstrual</div>
-                <p class="text-[11px] text-slate-400 mt-1">Lower physical energy. Rest & reflective journaling recommended.</p>
-              </div>
-              <div class="p-3.5 rounded-2xl bg-emerald-950/20 border border-emerald-500/20">
-                <span class="text-[10px] text-emerald-400 font-semibold uppercase tracking-wider block">Phase 2 (Days 6–13)</span>
-                <div class="text-sm font-bold text-white mt-0.5">Follicular</div>
-                <p class="text-[11px] text-slate-400 mt-1">Estrogen rising. High cognitive stamina, ideal for strategic planning.</p>
-              </div>
-              <div class="p-3.5 rounded-2xl bg-amber-950/20 border border-amber-500/20">
-                <span class="text-[10px] text-amber-400 font-semibold uppercase tracking-wider block">Phase 3 (Days 14–16)</span>
-                <div class="text-sm font-bold text-white mt-0.5">Ovulation</div>
-                <p class="text-[11px] text-slate-400 mt-1">Peak confidence and verbal fluidity. High collaborative output.</p>
-              </div>
-              <div class="p-3.5 rounded-2xl bg-purple-950/40 border border-purple-500/40 shadow-md shadow-purple-500/20">
-                <div class="flex items-center justify-between">
-                  <span class="text-[10px] text-purple-300 font-semibold uppercase tracking-wider block">Phase 4 (Days 17–28)</span>
-                  <span class="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
-                </div>
-                <div class="text-sm font-bold text-white mt-0.5">Luteal (Current: Day 21)</div>
-                <p class="text-[11px] text-purple-200 mt-1">Progesterone peak. CBT distortions increase ~20%; self-compassion focus.</p>
-              </div>
-            </div>
-
-            <!-- AI Cross-Correlation Insight -->
-            <div class="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-2">
-              <div class="flex items-center gap-2 text-xs font-semibold text-rose-300">
-                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-                <span>AI Biological & Cognitive Cross-Analysis</span>
-              </div>
-              <p class="text-xs text-slate-300 leading-relaxed">
-                Over the last 3 cycles, your self-criticism scores increase by <strong>22% during late Luteal phase</strong>. Your calendar scheduled 4 heavy presentations during this window. Mind Cave recommends scheduling buffer recovery time.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- =================================================================== -->
-      <!-- SUB-TRACK 3B: CIRCADIAN & MEN'S ENERGY RECOVERY TRACK -->
-      <!-- =================================================================== -->
-      <div id="journal-track-circadian" class="hidden space-y-6">
-        <div class="double-bezel">
-          <div class="double-bezel-inner p-6">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 border-b border-white/5 pb-4">
-              <div>
-                <h3 class="text-base font-bold text-white flex items-center gap-2">
-                  <i data-lucide="zap" class="w-4 h-4 text-cyan-400"></i> Circadian Rhythm & Hormonal Stamina
-                </h3>
-                <p class="text-xs text-slate-400 mt-1">
-                  24-hour diurnal testosterone & cortisol curve tracking, sleep recovery debt, and peak cognitive stamina windows.
-                </p>
-              </div>
-              
-              <div class="flex items-center gap-2">
-                <span class="text-xs text-slate-400">Circadian Optimization:</span>
-                <span class="text-xs font-semibold px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
-                  ⚡ Peak Flow (Morning)
-                </span>
-              </div>
-            </div>
-
-            <!-- Diurnal Rhythm Curve Visualizer -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
-              <div class="p-3.5 rounded-2xl bg-cyan-950/30 border border-cyan-500/30">
-                <span class="text-[10px] text-cyan-400 font-semibold uppercase tracking-wider block">06:00 – 10:00 AM</span>
-                <div class="text-sm font-bold text-white mt-0.5">Testosterone Peak</div>
-                <p class="text-[11px] text-slate-300 mt-1">Maximum willpower, analytical precision & highest stress tolerance.</p>
-              </div>
-              <div class="p-3.5 rounded-2xl bg-blue-950/20 border border-blue-500/20">
-                <span class="text-[10px] text-blue-400 font-semibold uppercase tracking-wider block">10:00 AM – 02:00 PM</span>
-                <div class="text-sm font-bold text-white mt-0.5">High Cognitive Stamina</div>
-                <p class="text-[11px] text-slate-400 mt-1">Strategic synthesis, architecture design & decisive execution.</p>
-              </div>
-              <div class="p-3.5 rounded-2xl bg-amber-950/20 border border-amber-500/20">
-                <span class="text-[10px] text-amber-400 font-semibold uppercase tracking-wider block">02:00 – 06:00 PM</span>
-                <div class="text-sm font-bold text-white mt-0.5">Physical Coordination</div>
-                <p class="text-[11px] text-slate-400 mt-1">Cardiovascular peak, brainstorming & collaborative discussions.</p>
-              </div>
-              <div class="p-3.5 rounded-2xl bg-purple-950/20 border border-purple-500/20">
-                <span class="text-[10px] text-purple-300 font-semibold uppercase tracking-wider block">08:00 – 11:00 PM</span>
-                <div class="text-sm font-bold text-white mt-0.5">Melatonin & Recovery</div>
-                <p class="text-[11px] text-slate-400 mt-1">Cortisol decline, reflective wind-down & neural consolidation.</p>
-              </div>
-            </div>
-
-            <!-- Google Fitness & Vitality Metrics Card -->
-            <div class="p-4 rounded-2xl bg-black/40 border border-white/10 flex flex-col gap-3">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <div class="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-                    <i data-lucide="activity" class="w-4 h-4"></i>
-                  </div>
-                  <div>
-                    <h4 class="text-xs font-bold text-white flex items-center gap-1.5">
-                      <span>Google Fit & Vitality Sync</span>
-                      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    </h4>
-                    <span class="text-[10px] text-slate-400 font-mono">Diurnal Stamina & Recovery Curve</span>
-                  </div>
-                </div>
-                <button onclick="syncGoogleFitData()" class="btn-secondary !py-1 !px-2.5 text-[11px] flex items-center gap-1 hover:border-emerald-400">
-                  <i data-lucide="refresh-cw" class="w-3 h-3 text-emerald-400"></i>
-                  <span>Sync Google Fit</span>
-                </button>
-              </div>
-
-              <!-- Health Metrics Bento -->
-              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1" id="google-fit-metrics-grid">
-                <div class="p-2.5 rounded-xl bg-white/5 border border-white/5 text-center">
-                  <span class="text-[10px] text-slate-400 font-mono block">Daily Steps</span>
-                  <span class="text-sm font-bold text-emerald-400 font-mono" id="fit-steps-val">8,420 / 10k</span>
-                </div>
-                <div class="p-2.5 rounded-xl bg-white/5 border border-white/5 text-center">
-                  <span class="text-[10px] text-slate-400 font-mono block">Sleep Recovery</span>
-                  <span class="text-sm font-bold text-purple-400 font-mono" id="fit-sleep-val">7.8h (88% REM)</span>
-                </div>
-                <div class="p-2.5 rounded-xl bg-white/5 border border-white/5 text-center">
-                  <span class="text-[10px] text-slate-400 font-mono block">Resting HR</span>
-                  <span class="text-sm font-bold text-rose-400 font-mono" id="fit-hr-val">62 bpm</span>
-                </div>
-                <div class="p-2.5 rounded-xl bg-white/5 border border-white/5 text-center">
-                  <span class="text-[10px] text-slate-400 font-mono block">Active Focus Zone</span>
-                  <span class="text-sm font-bold text-cyan-400 font-mono" id="fit-active-val">52 mins</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- AI Recovery Recommendation -->
-            <div class="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-2">
-              <div class="flex items-center gap-2 text-xs font-semibold text-cyan-300">
-                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-                <span>AI Circadian Stamina Analysis</span>
-              </div>
-              <p class="text-xs text-slate-300 leading-relaxed">
-                Your afternoon dip logged at <strong>02:30 PM</strong> correlates with heavy morning context-switching. Mind Cave scheduled your deep work blocks for the 08:30–11:00 AM biological peak window tomorrow.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- =================================================================== -->
-      <!-- SUB-TRACK 4: MEMORY & PHOTO VISUAL LIFE LOG -->
-      <!-- =================================================================== -->
-      <div id="journal-track-memory" class="space-y-4">
-        <!-- Google Photos Sync Hub Banner -->
-        <div class="p-3.5 rounded-2xl bg-gradient-to-r from-amber-950/30 via-black/40 to-black/40 border border-amber-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div id="journal-track-memory" class="hidden space-y-4">
+        <!-- Google Photos Sync Banner -->
+        <div class="p-3 rounded-2xl bg-gradient-to-r from-amber-950/30 via-black/40 to-black/40 border border-amber-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div class="flex items-center gap-2.5">
             <div class="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
               <i data-lucide="image" class="w-4 h-4"></i>
             </div>
             <div>
               <h4 class="text-xs font-bold text-white flex items-center gap-2">
-                <span>Google Photos Sync & Timeline Pinning</span>
+                <span>Google Photos Memory Stream</span>
                 <span class="text-[10px] text-amber-300 bg-amber-950/50 border border-amber-500/30 px-2 py-0.5 rounded-full font-mono">Cloud Active</span>
               </h4>
-              <p class="text-[11px] text-slate-400">Read photos by day or hour and automatically attach memories to timeline blocks.</p>
+              <p class="text-[11px] text-slate-400">Photographic memories pinned directly to timeline hour blocks.</p>
             </div>
           </div>
-          <button onclick="syncGooglePhotosForDate()" class="btn-secondary !py-1.5 !px-3 text-xs flex items-center gap-1.5 self-start sm:self-auto hover:border-amber-400">
-            <i data-lucide="cloud-lightning" class="w-3.5 h-3.5 text-amber-400"></i>
-            <span>Sync Google Photos for Date</span>
-          </button>
-        </div>
-
-        <div class="flex items-center justify-between">
-          <div>
-            <h3 class="text-sm font-bold text-white">Visual Moments & Location Anchors</h3>
-            <p class="text-xs text-slate-400">Photographic memories paired with cognitive reflections and spatial tags.</p>
+          <div class="flex items-center gap-2">
+            <button onclick="syncGooglePhotosForDate()" class="btn-secondary !py-1.5 !px-3 text-xs flex items-center gap-1.5 hover:border-amber-400">
+              <i data-lucide="cloud-lightning" class="w-3.5 h-3.5 text-amber-400"></i>
+              <span>Sync Photos for Date</span>
+            </button>
+            <button onclick="triggerPhotoUpload()" class="btn-island !py-1.5 !px-3 text-xs">
+              <span>+ Upload</span>
+            </button>
           </div>
-          <button onclick="triggerPhotoUpload()" class="btn-secondary text-xs">
-            <i data-lucide="camera" class="w-3.5 h-3.5 text-amber-400"></i> Add Photo Memory
-          </button>
         </div>
 
         <!-- Grid of Photo Memory Cards -->
-        <div id="memory-photos-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div id="memory-photos-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
           <!-- Rendered via JS -->
         </div>
       </div>
+
+    </section>
 
     </section>
 
