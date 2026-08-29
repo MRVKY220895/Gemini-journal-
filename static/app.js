@@ -805,6 +805,8 @@ async function saveAndFeedback(title, content, mood, btnElement) {
     }
     showToast('Saved to your private Journal Vault!');
   } catch (e) {
+    showToast('Failed to save reflection');
+  }
 }
 
 function toggleReasoningAccordion(turnId) {
