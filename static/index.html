@@ -76,22 +76,21 @@
       </div>
     </div>
 
-    <!-- Master Navigation Tabs (Mobile, Tablet, Desktop Responsive) -->
-    <nav class="flex items-center gap-0.5 sm:gap-1 bg-black/50 p-1 rounded-full border border-white/5 shrink-0 overflow-x-auto max-w-[calc(100vw-220px)] sm:max-w-none">
+    <!-- Master Navigation Tabs (Clean Global Bar with Menu Icon) -->
+    <nav class="flex items-center gap-0.5 sm:gap-1 bg-black/50 p-1 rounded-full border border-white/5 shrink-0">
+      <!-- Master Hierarchical Menu Button -->
+      <button onclick="openMasterMenuModal()" id="btn-master-menu" class="px-2.5 py-1.5 rounded-full text-xs font-semibold text-cyan-300 hover:text-white hover:bg-white/10 flex items-center gap-1.5 transition-colors" title="Open All Sections & Directory">
+        <i data-lucide="menu" class="w-3.5 h-3.5 text-cyan-400"></i>
+        <span>Menu</span>
+      </button>
+
+      <span class="w-[1px] h-3.5 bg-white/10 mx-0.5"></span>
+
       <button onclick="switchTab('studio')" id="tab-btn-studio" class="tab-btn active flex items-center gap-1.5 whitespace-nowrap">
-        <i data-lucide="message-square" class="w-3.5 h-3.5"></i> <span>Studio</span>
+        <i data-lucide="message-square" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Studio</span>
       </button>
-      <button onclick="switchTab('chrono')" id="tab-btn-chrono" class="tab-btn flex items-center gap-1.5 whitespace-nowrap">
-        <i data-lucide="calendar" class="w-3.5 h-3.5"></i> <span>Timeline</span>
-      </button>
-      <button onclick="switchTab('harmony')" id="tab-btn-harmony" class="tab-btn flex items-center gap-1.5 whitespace-nowrap">
-        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-emerald-400"></i> <span class="hidden sm:inline">Harmony</span>
-      </button>
-      <button onclick="switchTab('memory_lane')" id="tab-btn-memory_lane" class="tab-btn flex items-center gap-1.5 whitespace-nowrap">
-        <i data-lucide="history" class="w-3.5 h-3.5 text-purple-400"></i> <span class="hidden sm:inline">Memory Lane</span>
-      </button>
-      <button onclick="switchTab('memory')" id="tab-btn-memory" class="tab-btn flex items-center gap-1.5 whitespace-nowrap">
-        <i data-lucide="image" class="w-3.5 h-3.5 text-amber-400"></i> <span class="hidden md:inline">Photos</span>
+      <button onclick="switchTab('journals')" id="tab-btn-journals" class="tab-btn flex items-center gap-1.5 whitespace-nowrap">
+        <i data-lucide="book-open" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Journal</span>
       </button>
       <button onclick="switchTab('analytics')" id="tab-btn-analytics" class="tab-btn flex items-center gap-1.5 whitespace-nowrap">
         <i data-lucide="brain-circuit" class="w-3.5 h-3.5"></i> <span class="hidden md:inline">MindPulse</span>
@@ -297,7 +296,7 @@
       <!-- ─── Master 5-Page Journal Sub-Navigation Architecture ─── -->
       <div id="journal-tracks-nav" class="journal-track-nav">
         <button onclick="switchJournalTrack('chrono')" id="track-btn-chrono" class="track-tab-btn active-chrono">
-          <span class="track-emoji">📅</span><span>Timeline</span>
+          <span class="track-emoji">📅</span><span>Living Timeline</span>
         </button>
         <button onclick="switchJournalTrack('harmony')" id="track-btn-harmony" class="track-tab-btn">
           <span class="track-emoji">🌿</span><span>Daily Harmony</span>
@@ -306,10 +305,10 @@
           <span class="track-emoji">💭</span><span>Memory Lane</span>
         </button>
         <button onclick="switchJournalTrack('memory')" id="track-btn-memory" class="track-tab-btn">
-          <span class="track-emoji">📸</span><span>Visual Memories</span>
+          <span class="track-emoji">📸</span><span>Photo Stream</span>
         </button>
         <button onclick="switchJournalTrack('sanctuary')" id="track-btn-sanctuary" class="track-tab-btn">
-          <span class="track-emoji">🧘</span><span>Sanctuary</span>
+          <span class="track-emoji">🧘</span><span>Bio Sanctuary</span>
         </button>
       </div>
 
@@ -2300,6 +2299,161 @@
             <span>Save Preferences</span>
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MASTER NAVIGATION & HIERARCHICAL SECTION DIRECTORY MODAL -->
+  <!-- ===================================================================== -->
+  <div id="master-menu-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/70 backdrop-blur-md hidden">
+    <div class="glass-modal max-w-2xl w-full p-5 sm:p-6 rounded-3xl border border-white/15 bg-slate-950/95 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-3 border-b border-white/10 shrink-0">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-400 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-cyan-500/25">
+            <i data-lucide="compass" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-white">Mind Cave Navigation Directory</h3>
+            <p class="text-[11px] text-slate-400">All application sections, cognitive tracks & child features</p>
+          </div>
+        </div>
+        <button onclick="closeMasterMenuModal()" class="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Hierarchical Tree Grid -->
+      <div class="overflow-y-auto py-4 space-y-4 pr-1">
+        
+        <!-- Section 1: Studio (AI Sanctuary) -->
+        <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-500/30 transition-colors">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="navigateToSection('studio')">
+              <span class="text-lg">💬</span>
+              <h4 class="text-xs sm:text-sm font-bold text-white hover:text-cyan-300 transition-colors">1. Studio — AI Cognitive Sanctuary</h4>
+            </div>
+            <button onclick="navigateToSection('studio')" class="text-[11px] px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-semibold">Open Studio →</button>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs pt-1">
+            <button onclick="navigateToStudioPersona('cbt_reflector')" class="p-2 rounded-xl bg-black/40 border border-white/5 hover:border-emerald-400/40 text-left transition-colors">
+              <div class="font-bold text-emerald-400">🌿 Reflect</div>
+              <div class="text-[10px] text-slate-400">CBT Reframing</div>
+            </button>
+            <button onclick="navigateToStudioPersona('socratic_brainstormer')" class="p-2 rounded-xl bg-black/40 border border-white/5 hover:border-amber-400/40 text-left transition-colors">
+              <div class="font-bold text-amber-300">💡 Brainstorm</div>
+              <div class="text-[10px] text-slate-400">Socratic Ideation</div>
+            </button>
+            <button onclick="navigateToStudioPersona('executive_strategist')" class="p-2 rounded-xl bg-black/40 border border-white/5 hover:border-cyan-400/40 text-left transition-colors">
+              <div class="font-bold text-cyan-300">🎯 Strategize</div>
+              <div class="text-[10px] text-slate-400">Execution Velocity</div>
+            </button>
+            <button onclick="navigateToStudioPersona('shadow_work_analyst')" class="p-2 rounded-xl bg-black/40 border border-white/5 hover:border-purple-400/40 text-left transition-colors">
+              <div class="font-bold text-purple-300">🌌 Shadow Work</div>
+              <div class="text-[10px] text-slate-400">Blindspot Analysis</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Section 2: Journal & Life Intelligence -->
+        <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-500/30 transition-colors">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="navigateToSection('journals', 'chrono')">
+              <span class="text-lg">📖</span>
+              <h4 class="text-xs sm:text-sm font-bold text-white hover:text-cyan-300 transition-colors">2. Journal — Life Intelligence System</h4>
+            </div>
+            <button onclick="navigateToSection('journals', 'chrono')" class="text-[11px] px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-semibold">Open Journal →</button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-xs pt-1">
+            <button onclick="navigateToSection('journals', 'chrono')" class="p-2.5 rounded-xl bg-black/40 border border-white/5 hover:border-cyan-400/40 text-left transition-colors flex items-center justify-between">
+              <div>
+                <div class="font-bold text-slate-200 flex items-center gap-1">📅 Living Timeline</div>
+                <div class="text-[10px] text-slate-400">Chronicle & 1-Tap Habits</div>
+              </div>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-500"></i>
+            </button>
+            <button onclick="navigateToSection('journals', 'harmony')" class="p-2.5 rounded-xl bg-black/40 border border-white/5 hover:border-emerald-400/40 text-left transition-colors flex items-center justify-between">
+              <div>
+                <div class="font-bold text-emerald-400 flex items-center gap-1">🌿 Daily Harmony</div>
+                <div class="text-[10px] text-slate-400">96% Equilibrium & Audio</div>
+              </div>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-500"></i>
+            </button>
+            <button onclick="navigateToSection('journals', 'memory_lane')" class="p-2.5 rounded-xl bg-black/40 border border-white/5 hover:border-purple-400/40 text-left transition-colors flex items-center justify-between">
+              <div>
+                <div class="font-bold text-purple-300 flex items-center gap-1">💭 Memory Lane</div>
+                <div class="text-[10px] text-slate-400">30-Day Decision Recall</div>
+              </div>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-500"></i>
+            </button>
+            <button onclick="navigateToSection('journals', 'memory')" class="p-2.5 rounded-xl bg-black/40 border border-white/5 hover:border-amber-400/40 text-left transition-colors flex items-center justify-between">
+              <div>
+                <div class="font-bold text-amber-300 flex items-center gap-1">📸 Photo Stream</div>
+                <div class="text-[10px] text-slate-400">Google Photos & Scrapbook</div>
+              </div>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-500"></i>
+            </button>
+            <button onclick="navigateToSection('journals', 'sanctuary')" class="p-2.5 rounded-xl bg-black/40 border border-white/5 hover:border-indigo-400/40 text-left transition-colors flex items-center justify-between">
+              <div>
+                <div class="font-bold text-indigo-300 flex items-center gap-1">🧘 Bio Sanctuary</div>
+                <div class="text-[10px] text-slate-400">CBT Heatmaps & Diurnal Bio</div>
+              </div>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-500"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Section 3: MindPulse Cognitive Intelligence -->
+        <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-500/30 transition-colors">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="navigateToSection('analytics')">
+              <span class="text-lg">📊</span>
+              <h4 class="text-xs sm:text-sm font-bold text-white hover:text-cyan-300 transition-colors">3. MindPulse — Cognitive Intelligence</h4>
+            </div>
+            <button onclick="navigateToSection('analytics')" class="text-[11px] px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-semibold">Open MindPulse →</button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs pt-1">
+            <div class="p-2 rounded-xl bg-black/40 border border-white/5">
+              <div class="font-bold text-cyan-400">🧠 8 CBT Distortion Patterns</div>
+              <div class="text-[10px] text-slate-400">Real-time cognitive bias analysis</div>
+            </div>
+            <div class="p-2 rounded-xl bg-black/40 border border-white/5">
+              <div class="font-bold text-blue-400">🕸️ 6-Factor Emotion Radar</div>
+              <div class="text-[10px] text-slate-400">Joy, Clarity, Resilience, Focus, Calm</div>
+            </div>
+            <div class="p-2 rounded-xl bg-black/40 border border-white/5">
+              <div class="font-bold text-emerald-400">🚀 1-Click Guided CBT</div>
+              <div class="text-[10px] text-slate-400">Decatastrophizing & Continuum steps</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 4: Vault & Security -->
+        <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-500/30 transition-colors">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="navigateToSection('security')">
+              <span class="text-lg">🔒</span>
+              <h4 class="text-xs sm:text-sm font-bold text-white hover:text-cyan-300 transition-colors">4. Vault — Privacy & Security Hardening</h4>
+            </div>
+            <button onclick="navigateToSection('security')" class="text-[11px] px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-semibold">Open Vault →</button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs pt-1">
+            <div class="p-2 rounded-xl bg-black/40 border border-white/5">
+              <div class="font-bold text-emerald-400">🛡️ Client AES-256 Vault</div>
+              <div class="text-[10px] text-slate-400">Zero-knowledge local encryption</div>
+            </div>
+            <div class="p-2 rounded-xl bg-black/40 border border-white/5">
+              <div class="font-bold text-indigo-400">🏢 Multi-Tenant Isolation</div>
+              <div class="text-[10px] text-slate-400">Strict Firestore UID boundaries</div>
+            </div>
+            <div class="p-2 rounded-xl bg-black/40 border border-white/5">
+              <div class="font-bold text-amber-400">🔍 Live Security Audit</div>
+              <div class="text-[10px] text-slate-400">Automated credential checks</div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>

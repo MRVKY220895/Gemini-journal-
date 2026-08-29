@@ -562,6 +562,34 @@ function signOutUser() {
 }
 
 // =============================================================================
+// MASTER HIERARCHICAL MENU & DIRECTORY
+// =============================================================================
+
+function openMasterMenuModal() {
+  const modal = document.getElementById('master-menu-modal');
+  if (modal) modal.classList.remove('hidden');
+}
+
+function closeMasterMenuModal() {
+  const modal = document.getElementById('master-menu-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function navigateToSection(tabId, subTrack = null) {
+  closeMasterMenuModal();
+  switchTab(tabId);
+  if (subTrack && tabId === 'journals') {
+    switchJournalTrack(subTrack);
+  }
+}
+
+function navigateToStudioPersona(personaId) {
+  closeMasterMenuModal();
+  switchTab('studio');
+  selectPersona(personaId);
+}
+
+// =============================================================================
 // TAB NAVIGATION
 // =============================================================================
 
