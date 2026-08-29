@@ -2238,12 +2238,66 @@ function copyToClipboard(text, btnElement) {
 
 let currentAppLanguage = localStorage.getItem('mind_cave_language') || 'auto';
 
+const langMetadata = {
+  'auto': { flag: '🌐', code: 'Auto', name: 'Auto-Detect' },
+  'en': { flag: '🇬🇧', code: 'EN', name: 'English' },
+  'ta': { flag: '🇮🇳', code: 'தமிழ்', name: 'Tamil (தமிழ்)' },
+  'hi': { flag: '🇮🇳', code: 'हिंदी', name: 'Hindi (हिंदी)' },
+  'te': { flag: '🇮🇳', code: 'తెలుగు', name: 'Telugu (తెలుగు)' },
+  'es': { flag: '🇪🇸', code: 'ES', name: 'Español' },
+  'fr': { flag: '🇫🇷', code: 'FR', name: 'Français' },
+  'de': { flag: '🇩🇪', code: 'DE', name: 'Deutsch' },
+  'ja': { flag: '🇯🇵', code: 'JA', name: '日本語' },
+  'zh': { flag: '🇨🇳', code: '中文', name: '中文' },
+  'ar': { flag: '🇸🇦', code: 'العربية', name: 'العربية' },
+  'pt': { flag: '🇧🇷', code: 'PT', name: 'Português' }
+};
+
+function toggleLanguageDropdown(event) {
+  if (event) event.stopPropagation();
+  const menu = document.getElementById('language-dropdown-menu');
+  if (!menu) return;
+  menu.classList.toggle('hidden');
+}
+
+function closeLanguageDropdown() {
+  const menu = document.getElementById('language-dropdown-menu');
+  if (menu && !menu.classList.contains('hidden')) {
+    menu.classList.add('hidden');
+  }
+}
+
+// Close language dropdown on outside click
+document.addEventListener('click', (e) => {
+  const container = document.getElementById('language-picker-container');
+  if (container && !container.contains(e.target)) {
+    closeLanguageDropdown();
+  }
+});
+
+function selectLanguageOption(langCode) {
+  closeLanguageDropdown();
+  changeAppLanguage(langCode);
+}
+
 function changeAppLanguage(langCode) {
   currentAppLanguage = langCode;
   localStorage.setItem('mind_cave_language', langCode);
-  
-  const select = document.getElementById('global-language-select');
-  if (select) select.value = langCode;
+
+  const meta = langMetadata[langCode] || { flag: '🌐', code: langCode.toUpperCase(), name: langCode };
+  const flagEl = document.getElementById('current-lang-flag');
+  const codeEl = document.getElementById('current-lang-code');
+  if (flagEl) flagEl.textContent = meta.flag;
+  if (codeEl) codeEl.textContent = meta.code;
+
+  // Update checkmarks in dropdown
+  document.querySelectorAll('.lang-check').forEach(el => {
+    if (el.getAttribute('data-check') === langCode) {
+      el.classList.remove('hidden');
+    } else {
+      el.classList.add('hidden');
+    }
+  });
 
   // Configure SpeechRecognition language dynamically
   if (state && state.speechRecognition) {
@@ -2263,21 +2317,7 @@ function changeAppLanguage(langCode) {
     state.speechRecognition.lang = speechLangMap[langCode] || 'en-US';
   }
 
-  const langNames = {
-    'auto': 'Auto-Detect',
-    'en': 'English',
-    'ta': 'Tamil (தமிழ்)',
-    'hi': 'Hindi (हिंदी)',
-    'te': 'Telugu (తెలుగు)',
-    'es': 'Spanish (Español)',
-    'fr': 'French (Français)',
-    'de': 'German (Deutsch)',
-    'ja': 'Japanese (日本語)',
-    'zh': 'Chinese (中文)',
-    'ar': 'Arabic (العربية)',
-    'pt': 'Portuguese (Português)'
-  };
-  showToast(`Language set to: ${langNames[langCode] || langCode}`);
+  showToast(`Language set to: ${meta.name}`);
 }
 
 async function translateCardMessage(turnId, btnElement) {

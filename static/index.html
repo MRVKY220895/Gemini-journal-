@@ -141,24 +141,107 @@
       </button>
     </nav>
 
-    <!-- Right Area: Multi-Language + Theme Toggle Shortcut + Consolidated User Profile Trigger -->
-    <div class="flex items-center gap-1 sm:gap-1.5 shrink-0">
-      <!-- Multi-Language Selector Dropdown -->
-      <div class="relative inline-block">
-        <select id="global-language-select" onchange="changeAppLanguage(this.value)" class="bg-slate-900/90 dark:bg-white/5 hover:bg-slate-800 dark:hover:bg-white/10 border border-slate-700/50 dark:border-white/10 text-slate-200 text-[11px] sm:text-xs rounded-full px-1.5 sm:px-2 py-1 cursor-pointer outline-none transition-all shadow-sm font-medium max-w-[76px] sm:max-w-none truncate" title="Choose Native Language / Auto-Detect">
-          <option value="auto">🌐 Auto</option>
-          <option value="en">🇬🇧 EN</option>
-          <option value="ta">🇮🇳 தமிழ்</option>
-          <option value="hi">🇮🇳 हिंदी</option>
-          <option value="te">🇮🇳 తెలుగు</option>
-          <option value="es">🇪🇸 ES</option>
-          <option value="fr">🇫🇷 FR</option>
-          <option value="de">🇩🇪 DE</option>
-          <option value="ja">🇯🇵 JA</option>
-          <option value="zh">🇨🇳 中文</option>
-          <option value="ar">🇸🇦 العربية</option>
-          <option value="pt">🇧🇷 PT</option>
-        </select>
+    <!-- Right Area: Custom Multi-Language + Theme Toggle Shortcut + Consolidated User Profile Trigger -->
+    <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+      <!-- Custom Multi-Language Selector Trigger -->
+      <div class="relative inline-block" id="language-picker-container">
+        <button type="button" onclick="toggleLanguageDropdown(event)" id="btn-language-picker" class="flex items-center gap-1 bg-slate-900/90 dark:bg-white/5 hover:bg-slate-800 dark:hover:bg-white/10 border border-slate-700/50 dark:border-white/10 text-slate-200 text-xs rounded-full px-2 sm:px-2.5 py-1 sm:py-1.5 cursor-pointer outline-none transition-all shadow-sm font-semibold shrink-0" title="Change Language / Auto-Detect">
+          <span id="current-lang-flag" class="text-xs">🌐</span>
+          <span id="current-lang-code" class="text-[11px] sm:text-xs text-slate-200">Auto</span>
+          <i data-lucide="chevron-down" class="w-2.5 h-2.5 sm:w-3 sm:h-3 text-slate-400"></i>
+        </button>
+
+        <!-- Custom Dropdown Menu (Glass Popover with Dark High-Contrast Background) -->
+        <div id="language-dropdown-menu" class="hidden absolute right-0 mt-2 w-52 sm:w-56 rounded-2xl bg-slate-950 border border-slate-700 shadow-2xl backdrop-blur-2xl p-1.5 z-50 text-xs divide-y divide-white/5 max-h-80 overflow-y-auto">
+          <div class="py-1">
+            <button onclick="selectLanguageOption('auto')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-white/10 text-slate-100 transition-colors font-medium cursor-pointer">
+              <div class="flex items-center gap-2">
+                <span class="text-sm">🌐</span>
+                <span class="text-slate-100 font-semibold">Auto-Detect</span>
+              </div>
+              <i data-lucide="check" class="w-3.5 h-3.5 text-cyan-400 hidden lang-check" data-check="auto"></i>
+            </button>
+          </div>
+          <div class="py-1 space-y-0.5">
+            <button onclick="selectLanguageOption('en')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-white/10 text-slate-100 transition-colors font-medium cursor-pointer">
+              <div class="flex items-center gap-2">
+                <span class="text-sm">🇬🇧</span>
+                <span class="text-slate-100">English</span>
+              </div>
+              <i data-lucide="check" class="w-3.5 h-3.5 text-cyan-400 hidden lang-check" data-check="en"></i>
+            </button>
+            <button onclick="selectLanguageOption('ta')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-white/10 text-slate-100 transition-colors font-medium cursor-pointer">
+              <div class="flex items-center gap-2">
+                <span class="text-sm">🇮🇳</span>
+                <span class="text-slate-100">தமிழ் (Tamil)</span>
+              </div>
+              <i data-lucide="check" class="w-3.5 h-3.5 text-cyan-400 hidden lang-check" data-check="ta"></i>
+            </button>
+            <button onclick="selectLanguageOption('hi')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-white/10 text-slate-100 transition-colors font-medium cursor-pointer">
+              <div class="flex items-center gap-2">
+                <span class="text-sm">🇮🇳</span>
+                <span class="text-slate-100">हिंदी (Hindi)</span>
+              </div>
+              <i data-lucide="check" class="w-3.5 h-3.5 text-cyan-400 hidden lang-check" data-check="hi"></i>
+            </button>
+            <button onclick="selectLanguageOption('te')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-white/10 text-slate-100 transition-colors font-medium cursor-pointer">
+              <div class="flex items-center gap-2">
+                <span class="text-sm">🇮🇳</span>
+                <span class="text-slate-100">తెలుగు (Telugu)</span>
+              </div>
+              <i data-lucide="check" class="w-3.5 h-3.5 text-cyan-400 hidden lang-check" data-check="te"></i>
+            </button>
+            <button onclick="selectLanguageOption('es')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-white/10 text-slate-100 transition-colors font-medium cursor-pointer">
+              <div class="flex items-center gap-2">
+                <span class="text-sm">🇪🇸</span>
+                <span class="text-slate-100">Español (Spanish)</span>
+              </div>
+              <i data-lucide="check" class="w-3.5 h-3.5 text-cyan-400 hidden lang-check" data-check="es"></i>
+            </button>
+            <button onclick="selectLanguageOption('fr')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-white/10 text-slate-100 transition-colors font-medium cursor-pointer">
+              <div class="flex items-center gap-2">
+                <span class="text-sm">🇫🇷</span>
+                <span class="text-slate-100">Français (French)</span>
+              </div>
+              <i data-lucide="check" class="w-3.5 h-3.5 text-cyan-400 hidden lang-check" data-check="fr"></i>
+            </button>
+            <button onclick="selectLanguageOption('de')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-white/10 text-slate-100 transition-colors font-medium cursor-pointer">
+              <div class="flex items-center gap-2">
+                <span class="text-sm">🇩🇪</span>
+                <span class="text-slate-100">Deutsch (German)</span>
+              </div>
+              <i data-lucide="check" class="w-3.5 h-3.5 text-cyan-400 hidden lang-check" data-check="de"></i>
+            </button>
+            <button onclick="selectLanguageOption('ja')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-white/10 text-slate-100 transition-colors font-medium cursor-pointer">
+              <div class="flex items-center gap-2">
+                <span class="text-sm">🇯🇵</span>
+                <span class="text-slate-100">日本語 (Japanese)</span>
+              </div>
+              <i data-lucide="check" class="w-3.5 h-3.5 text-cyan-400 hidden lang-check" data-check="ja"></i>
+            </button>
+            <button onclick="selectLanguageOption('zh')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-white/10 text-slate-100 transition-colors font-medium cursor-pointer">
+              <div class="flex items-center gap-2">
+                <span class="text-sm">🇨🇳</span>
+                <span class="text-slate-100">中文 (Chinese)</span>
+              </div>
+              <i data-lucide="check" class="w-3.5 h-3.5 text-cyan-400 hidden lang-check" data-check="zh"></i>
+            </button>
+            <button onclick="selectLanguageOption('ar')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-white/10 text-slate-100 transition-colors font-medium cursor-pointer">
+              <div class="flex items-center gap-2">
+                <span class="text-sm">🇸🇦</span>
+                <span class="text-slate-100">العربية (Arabic)</span>
+              </div>
+              <i data-lucide="check" class="w-3.5 h-3.5 text-cyan-400 hidden lang-check" data-check="ar"></i>
+            </button>
+            <button onclick="selectLanguageOption('pt')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-white/10 text-slate-100 transition-colors font-medium cursor-pointer">
+              <div class="flex items-center gap-2">
+                <span class="text-sm">🇧🇷</span>
+                <span class="text-slate-100">Português</span>
+              </div>
+              <i data-lucide="check" class="w-3.5 h-3.5 text-cyan-400 hidden lang-check" data-check="pt"></i>
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- 1-Tap Theme Mode Switcher in Global Bar -->
@@ -169,7 +252,7 @@
       <!-- Consolidated User Profile & Settings Trigger -->
       <button onclick="openAuthModal()" id="user-pill" class="flex items-center gap-1 sm:gap-1.5 bg-slate-900/90 hover:bg-slate-800 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-full border border-slate-800 text-[11px] sm:text-xs whitespace-nowrap cursor-pointer transition-colors shadow-sm shrink-0" title="Account & Biological Profile Settings">
         <div id="user-avatar-indicator" class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></div>
-        <span id="user-display-name" class="font-medium text-slate-200 truncate max-w-[55px] sm:max-w-[120px] whitespace-nowrap text-[11px] sm:text-xs">Guest</span>
+        <span id="user-display-name" class="font-medium text-slate-200 truncate max-w-[65px] sm:max-w-[120px] whitespace-nowrap text-[11px] sm:text-xs">Guest</span>
         <i data-lucide="chevron-down" class="w-2.5 h-2.5 sm:w-3 sm:h-3 text-slate-400 shrink-0"></i>
       </button>
     </div>
