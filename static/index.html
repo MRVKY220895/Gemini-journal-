@@ -324,17 +324,17 @@
       <!-- =================================================================== -->
       <div id="journal-track-chrono" class="space-y-3">
         
-        <!-- DYNAMIC TODAY'S GOALS LIST & DIRECTIONAL DURATION TRACKER -->
-        <div class="today-goal-card p-3 sm:p-4 rounded-2xl bg-white dark:bg-slate-900/90 border border-amber-500/30 dark:border-amber-500/25 shadow-md flex flex-col gap-3" id="today-goal-container">
-          <!-- Header Bar: Title, Summary Metrics & Actions -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-100 dark:border-white/5">
-            <div class="flex items-start sm:items-center gap-2.5">
-              <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-500 dark:text-amber-400 flex items-center justify-center font-bold shrink-0 mt-0.5 sm:mt-0">
+        <!-- DYNAMIC FOCUS & HABITS HUB: COLLAPSIBLE 2-TILE DECK -->
+        <div class="today-goal-card p-3 sm:p-4 rounded-2xl bg-white dark:bg-slate-900/90 border border-amber-500/30 dark:border-amber-500/25 shadow-md flex flex-col gap-3" id="today-focus-habits-hub">
+          <!-- Hub Master Header Bar -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-2.5 pb-2.5 border-b border-slate-100 dark:border-white/5">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-500 dark:text-amber-400 flex items-center justify-center font-bold shrink-0">
                 <i data-lucide="target" class="w-4 h-4 text-amber-500 dark:text-amber-400"></i>
               </div>
               <div class="min-w-0">
-                <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap mb-0.5">
-                  <h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">Today's Achievable Goals</h4>
+                <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                  <h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">Daily Focus & Habits Hub</h4>
                   <span id="goals-completed-badge" class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-300 font-mono font-bold flex items-center gap-1">
                     <i data-lucide="check-circle" class="w-3 h-3 text-emerald-500"></i>
                     <span>2/3 Done (67%)</span>
@@ -343,74 +343,101 @@
                     <i data-lucide="clock" class="w-3 h-3 text-amber-500"></i>
                     <span>3h 15m</span>
                   </span>
+                  <span id="habit-streak-badge" class="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-bold border border-amber-200 dark:border-amber-500/30 flex items-center gap-1">
+                    <i data-lucide="flame" class="w-3 h-3 text-amber-500"></i>
+                    <span>12 Days Streak</span>
+                  </span>
                 </div>
-                <p class="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1 sm:line-clamp-none">Track start & end times, duration, and plot directly into timeline.</p>
               </div>
             </div>
 
-            <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-auto">
+            <!-- Action Buttons & Collapse Controls -->
+            <div class="flex items-center gap-1.5 shrink-0 self-end md:self-auto">
               <button type="button" onclick="openNewGoalModal()" class="btn-secondary !py-1 !px-2.5 text-[11px] flex items-center gap-1 text-amber-600 dark:text-amber-300 hover:border-amber-400 font-semibold" title="Add New Achievable Goal">
                 <i data-lucide="plus" class="w-3 h-3 text-amber-500"></i> <span>+ Goal</span>
               </button>
-              <button type="button" onclick="openScrapbookModal()" class="btn-secondary !py-1 !px-2.5 text-[11px] flex items-center gap-1 text-pink-600 dark:text-pink-300 hover:border-pink-400 font-semibold" title="Export Scrapbook Card">
-                <i data-lucide="share-2" class="w-3 h-3 text-pink-500"></i> <span>Share</span>
+              <button type="button" onclick="openNewHabitModal()" class="btn-secondary !py-1 !px-2.5 text-[11px] flex items-center gap-1 text-cyan-600 dark:text-cyan-300 hover:border-cyan-400 font-semibold" title="Add New Habit">
+                <i data-lucide="plus" class="w-3 h-3 text-cyan-400"></i> <span>+ Habit</span>
+              </button>
+              <button type="button" onclick="openGoalsHabitsModal()" class="px-2.5 py-1 rounded-xl bg-gradient-to-r from-amber-500/20 to-cyan-500/20 hover:from-amber-500/30 hover:to-cyan-500/30 text-amber-600 dark:text-amber-300 border border-amber-500/30 text-[11px] font-bold flex items-center gap-1.5 transition-all shadow-sm" title="Open Fullscreen 2-Tile Popup Modal">
+                <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
+                <span class="hidden sm:inline">Popup Modal</span>
+              </button>
+              <button type="button" id="toggle-goals-tiles-btn" onclick="toggleGoalsTilesCollapse()" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-colors" title="Collapse / Expand Deck">
+                <i data-lucide="chevron-up" id="goals-tiles-chevron" class="w-4 h-4 transition-transform duration-300"></i>
               </button>
             </div>
           </div>
 
-          <!-- Dynamic List of Achievable Goals -->
-          <div id="today-goals-list" class="space-y-2">
-            <!-- Dynamically populated via renderTodayGoal() -->
-          </div>
-
-          <!-- Directional Summary of Completed Tasks & Duration -->
-          <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-black/40 border border-slate-200/80 dark:border-white/5 space-y-1.5" id="goals-summary-footer">
-            <div class="flex items-center justify-between text-[11px] gap-2">
-              <span class="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1 truncate">
-                <i data-lucide="pie-chart" class="w-3 h-3 text-cyan-500 shrink-0"></i>
-                <span class="truncate">Directional Focus:</span>
-              </span>
-              <span class="font-mono text-cyan-600 dark:text-cyan-400 font-bold shrink-0" id="goals-velocity-text">75% Daily Goal Velocity</span>
-            </div>
+          <!-- 2 Side-by-Side Tiles (Collapsible) -->
+          <div id="goals-habits-deck-body" class="grid grid-cols-1 lg:grid-cols-12 gap-3 transition-all duration-300">
             
-            <!-- Visual Progress Bar -->
-            <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden flex">
-              <div id="goals-progress-bar" class="h-full bg-gradient-to-r from-amber-500 to-emerald-500 rounded-full transition-all duration-500" style="width: 67%;"></div>
+            <!-- TILE 1: Today's Achievable Goals (Left Column, 7 Cols) -->
+            <div class="lg:col-span-7 flex flex-col justify-between p-3 rounded-2xl bg-slate-50/80 dark:bg-black/30 border border-slate-200/80 dark:border-white/5 space-y-3">
+              <div class="space-y-2.5">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                    <h5 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider font-mono">Tile 1: Achievable Goals</h5>
+                  </div>
+                  <button type="button" onclick="openScrapbookModal()" class="text-[11px] text-pink-600 dark:text-pink-400 hover:underline flex items-center gap-1 font-semibold">
+                    <i data-lucide="share-2" class="w-3 h-3"></i> <span>Share</span>
+                  </button>
+                </div>
+
+                <!-- Bulleted Goals List -->
+                <div id="today-goals-list" class="space-y-2">
+                  <!-- Rendered dynamically -->
+                </div>
+              </div>
+
+              <!-- Directional Summary Footer -->
+              <div class="p-2.5 rounded-xl bg-white dark:bg-black/40 border border-slate-200/80 dark:border-white/5 space-y-1.5 mt-2" id="goals-summary-footer">
+                <div class="flex items-center justify-between text-[11px] gap-2">
+                  <span class="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1 truncate">
+                    <i data-lucide="pie-chart" class="w-3 h-3 text-cyan-500 shrink-0"></i>
+                    <span class="truncate">Directional Focus Velocity:</span>
+                  </span>
+                  <span class="font-mono text-cyan-600 dark:text-cyan-400 font-bold shrink-0" id="goals-velocity-text">75% Daily Goal Velocity</span>
+                </div>
+                <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden flex">
+                  <div id="goals-progress-bar" class="h-full bg-gradient-to-r from-amber-500 to-emerald-500 rounded-full transition-all duration-500" style="width: 67%;"></div>
+                </div>
+                <div class="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 pt-0.5 flex-wrap gap-1" id="goals-breakdown-pills"></div>
+              </div>
             </div>
 
-            <div class="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 pt-0.5 flex-wrap gap-1" id="goals-breakdown-pills">
-              <!-- Dynamically populated category time pills -->
+            <!-- TILE 2: Daily Habits & 1-Tap Shortcuts (Right Column, 5 Cols) -->
+            <div class="lg:col-span-5 flex flex-col justify-between p-3 rounded-2xl bg-slate-50/80 dark:bg-black/30 border border-slate-200/80 dark:border-white/5 space-y-3">
+              <div class="space-y-2.5">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-cyan-500"></span>
+                    <h5 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider font-mono">Tile 2: Habits & Streaks</h5>
+                  </div>
+                  <span class="text-[10px] text-cyan-600 dark:text-cyan-400 font-mono font-semibold" id="habit-progress-pill">
+                    5/6 Done Today
+                  </span>
+                </div>
+
+                <!-- Habits List with Bullet Dots & Checkmarks -->
+                <div id="habit-tracker-list" class="space-y-2">
+                  <!-- Rendered dynamically -->
+                </div>
+              </div>
+
+              <!-- 1-Tap Timeline Shortcuts Row -->
+              <div class="pt-2 border-t border-slate-200/80 dark:border-white/5 space-y-1.5 mt-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider">1-Tap Timeline Shortcuts</span>
+                  <button type="button" onclick="openTimelineShortcutsModal()" class="text-[10px] text-amber-600 dark:text-amber-400 hover:underline font-semibold">Customize</button>
+                </div>
+                <div id="timeline-custom-shortcuts-container" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar flex-nowrap py-0.5 max-w-full">
+                  <!-- Rendered dynamically -->
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <!-- CUSTOMIZABLE 1-TAP HABITS & TIMELINE SHORTCUTS BAR -->
-        <div class="p-2.5 sm:p-3 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div class="flex items-center gap-2 shrink-0">
-            <span class="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1">
-              <i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-500"></i> Habits
-            </span>
-            <span id="habit-streak-badge" class="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-bold border border-amber-200 dark:border-amber-500/30 flex items-center gap-1">
-              <i data-lucide="flame" class="w-3 h-3 text-amber-500"></i>
-              <span>12 Days Streak</span>
-            </span>
-          </div>
-
-          <!-- Dynamic 1-Tap Shortcuts Container -->
-          <div id="timeline-custom-shortcuts-container" class="flex items-center gap-1.5 flex-1 overflow-x-auto no-scrollbar flex-nowrap py-0.5 max-w-full">
-            <!-- Rendered dynamically via renderTimelineShortcuts() -->
-          </div>
-
-          <!-- Customize & Add Action -->
-          <div class="flex items-center gap-1 shrink-0 self-end sm:self-auto">
-            <button type="button" onclick="openNewHabitModal()" class="px-2 py-1 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-white/10 text-slate-700 dark:text-slate-300 text-[11px] font-semibold flex items-center gap-1 border border-slate-200 dark:border-white/10 transition-colors" title="Add New Custom Habit">
-              <i data-lucide="plus" class="w-3 h-3 text-cyan-400"></i>
-              <span>Add</span>
-            </button>
-            <button type="button" onclick="openTimelineShortcutsModal()" class="px-2 py-1 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-white/10 text-slate-700 dark:text-slate-300 text-[11px] font-semibold flex items-center gap-1 border border-slate-200 dark:border-white/10 transition-colors" title="Customize Timeline 1-Tap Shortcuts">
-              <i data-lucide="sliders-horizontal" class="w-3 h-3 text-amber-400"></i>
-              <span>Shortcuts</span>
-            </button>
           </div>
         </div>
         
@@ -2890,6 +2917,121 @@
             <span>Permanently Wipe Everything</span>
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: COLLAPSIBLE 2-TILE FOCUS & HABITS MODAL -->
+  <!-- ===================================================================== -->
+  <div id="goals-habits-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-5 hidden overflow-y-auto">
+    <div class="double-bezel max-w-5xl w-full my-auto shadow-2xl">
+      <div class="double-bezel-inner p-4 sm:p-6 bg-slate-950/95 border-white/10 space-y-4 max-h-[90vh] overflow-y-auto">
+        <!-- Modal Top Bar -->
+        <div class="flex items-center justify-between pb-3 border-b border-white/10 flex-wrap gap-2">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+              <i data-lucide="target" class="w-5 h-5 text-amber-400"></i>
+            </div>
+            <div>
+              <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                <span>Today's Focus & Habits Hub</span>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">2-Tile View</span>
+              </h3>
+              <p class="text-xs text-slate-400">Manage achievable goals, start/end duration, daily habit streaks, and shortcuts.</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="openNewGoalModal()" class="btn-secondary !py-1.5 !px-3 text-xs flex items-center gap-1 text-amber-300 hover:border-amber-400 font-semibold">
+              <i data-lucide="plus" class="w-3.5 h-3.5 text-amber-400"></i> <span>+ Goal</span>
+            </button>
+            <button type="button" onclick="openNewHabitModal()" class="btn-secondary !py-1.5 !px-3 text-xs flex items-center gap-1 text-cyan-300 hover:border-cyan-400 font-semibold">
+              <i data-lucide="plus" class="w-3.5 h-3.5 text-cyan-400"></i> <span>+ Habit</span>
+            </button>
+            <button onclick="closeGoalsHabitsModal()" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2 Side-by-Side Tiles in Modal -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+          <!-- TILE 1: Today's Achievable Goals (Left Column, 7 Cols) -->
+          <div class="lg:col-span-7 flex flex-col justify-between p-4 rounded-2xl bg-black/40 border border-white/10 space-y-3">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between border-b border-white/5 pb-2">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                  <h4 class="text-xs font-bold text-white uppercase tracking-wider font-mono">Tile 1: Achievable Goals</h4>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span id="modal-goals-completed-badge" class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 font-mono font-bold flex items-center gap-1">
+                    <i data-lucide="check-circle" class="w-3 h-3 text-emerald-400"></i>
+                    <span>2/3 Done</span>
+                  </span>
+                  <span id="modal-goals-duration-badge" class="text-[10px] px-2 py-0.5 rounded-full bg-amber-950/60 border border-amber-500/30 text-amber-300 font-mono font-bold flex items-center gap-1">
+                    <i data-lucide="clock" class="w-3 h-3 text-amber-400"></i>
+                    <span>3h 15m</span>
+                  </span>
+                </div>
+              </div>
+
+              <!-- Bulleted Goals List -->
+              <div id="modal-today-goals-list" class="space-y-2">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+
+            <!-- Directional Summary Footer -->
+            <div class="p-3 rounded-xl bg-slate-900/80 border border-white/5 space-y-1.5 mt-2">
+              <div class="flex items-center justify-between text-xs gap-2">
+                <span class="font-semibold text-slate-300 flex items-center gap-1">
+                  <i data-lucide="pie-chart" class="w-3.5 h-3.5 text-cyan-400"></i>
+                  <span>Directional Focus Velocity:</span>
+                </span>
+                <span class="font-mono text-cyan-400 font-bold" id="modal-goals-velocity-text">75% Velocity</span>
+              </div>
+              <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden flex">
+                <div id="modal-goals-progress-bar" class="h-full bg-gradient-to-r from-amber-500 to-emerald-500 rounded-full" style="width: 67%;"></div>
+              </div>
+              <div class="flex items-center justify-between text-[10px] text-slate-400 pt-0.5 flex-wrap gap-1" id="modal-goals-breakdown-pills"></div>
+            </div>
+          </div>
+
+          <!-- TILE 2: Daily Habits & 1-Tap Shortcuts (Right Column, 5 Cols) -->
+          <div class="lg:col-span-5 flex flex-col justify-between p-4 rounded-2xl bg-black/40 border border-white/10 space-y-3">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between border-b border-white/5 pb-2">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+                  <h4 class="text-xs font-bold text-white uppercase tracking-wider font-mono">Tile 2: Habits & Streaks</h4>
+                </div>
+                <span class="text-[10px] text-amber-300 font-mono font-bold bg-amber-950/60 border border-amber-500/30 px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <i data-lucide="flame" class="w-3 h-3 text-amber-400"></i>
+                  <span id="modal-habit-streak-badge">12 Days Streak</span>
+                </span>
+              </div>
+
+              <!-- Habits List -->
+              <div id="modal-habit-tracker-list" class="space-y-2">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+
+            <!-- 1-Tap Shortcuts Section -->
+            <div class="pt-2.5 border-t border-white/5 space-y-2 mt-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-mono text-slate-400 uppercase tracking-wider">1-Tap Timeline Shortcuts</span>
+                <button type="button" onclick="openTimelineShortcutsModal()" class="text-[11px] text-amber-400 hover:underline font-semibold">Customize</button>
+              </div>
+              <div id="modal-timeline-shortcuts-container" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar flex-nowrap py-1 max-w-full">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>

@@ -127,6 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initAgendaList();
   initTodayGoal();
   initHabitTracker();
+  initGoalsTilesCollapse();
   initBucketList();
   initAnalyticsCharts();
   loadJournals();
@@ -3641,12 +3642,35 @@ function initTodayGoal() {
 }
 
 function renderTodayGoal() {
-  const container = document.getElementById('today-goals-list');
-  const completedBadge = document.getElementById('goals-completed-badge');
-  const durationBadge = document.getElementById('goals-duration-badge');
-  const velocityText = document.getElementById('goals-velocity-text');
-  const progressBar = document.getElementById('goals-progress-bar');
-  const breakdownPills = document.getElementById('goals-breakdown-pills');
+  const containers = [
+    document.getElementById('today-goals-list'),
+    document.getElementById('modal-today-goals-list')
+  ].filter(Boolean);
+
+  const completedBadges = [
+    document.getElementById('goals-completed-badge'),
+    document.getElementById('modal-goals-completed-badge')
+  ].filter(Boolean);
+
+  const durationBadges = [
+    document.getElementById('goals-duration-badge'),
+    document.getElementById('modal-goals-duration-badge')
+  ].filter(Boolean);
+
+  const velocityTexts = [
+    document.getElementById('goals-velocity-text'),
+    document.getElementById('modal-goals-velocity-text')
+  ].filter(Boolean);
+
+  const progressBars = [
+    document.getElementById('goals-progress-bar'),
+    document.getElementById('modal-goals-progress-bar')
+  ].filter(Boolean);
+
+  const breakdownPillContainers = [
+    document.getElementById('goals-breakdown-pills'),
+    document.getElementById('modal-goals-breakdown-pills')
+  ].filter(Boolean);
 
   if (!state.todayGoals) state.todayGoals = [];
 
@@ -3677,88 +3701,96 @@ function renderTodayGoal() {
     state.todayGoal = { text: "No active goals set", completed: false };
   }
 
-  // Update Badges & Progress Bar
-  if (completedBadge) {
-    completedBadge.innerHTML = `<i data-lucide="check-circle" class="w-3 h-3 text-emerald-500"></i><span>${completedGoals}/${totalGoals} Done (${velocityPct}%)</span>`;
-  }
-  if (durationBadge) {
-    durationBadge.innerHTML = `<i data-lucide="clock" class="w-3 h-3 text-amber-500"></i><span>${formatMinutesToDuration(completedDurationMins)} Invested</span>`;
-  }
-  if (velocityText) {
-    velocityText.textContent = `${velocityPct}% Daily Goal Velocity • ${completedGoals} Achieved`;
-  }
-  if (progressBar) {
-    progressBar.style.width = `${velocityPct}%`;
-  }
+  // Update Badges & Progress Bar across all views
+  completedBadges.forEach(el => {
+    el.innerHTML = `<i data-lucide="check-circle" class="w-3 h-3 text-emerald-500"></i><span>${completedGoals}/${totalGoals} Done (${velocityPct}%)</span>`;
+  });
+
+  durationBadges.forEach(el => {
+    el.innerHTML = `<i data-lucide="clock" class="w-3 h-3 text-amber-500"></i><span>${formatMinutesToDuration(completedDurationMins)} Invested</span>`;
+  });
+
+  velocityTexts.forEach(el => {
+    el.textContent = `${velocityPct}% Daily Goal Velocity • ${completedGoals} Achieved`;
+  });
+
+  progressBars.forEach(el => {
+    el.style.width = `${velocityPct}%`;
+  });
 
   // Update Breakdown Pills
-  if (breakdownPills) {
-    if (Object.keys(categoryTimeMap).length > 0) {
-      breakdownPills.innerHTML = Object.keys(categoryTimeMap).map(cat => `
-        <span class="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 font-mono">
+  const pillsHtml = Object.keys(categoryTimeMap).length > 0
+    ? Object.keys(categoryTimeMap).map(cat => `
+        <span class="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 font-mono text-[10px]">
           ${cat}: <strong>${formatMinutesToDuration(categoryTimeMap[cat])}</strong>
         </span>
-      `).join('');
-    } else {
-      breakdownPills.innerHTML = `<span class="text-slate-400 italic">No completed goal focus recorded yet today. Check off a goal to track duration!</span>`;
-    }
-  }
+      `).join('')
+    : `<span class="text-slate-400 italic text-[10px]">No completed goal focus recorded yet today.</span>`;
+
+  breakdownPillContainers.forEach(el => {
+    el.innerHTML = pillsHtml;
+  });
 
   // Render Goals List
-  if (container) {
-    if (state.todayGoals.length === 0) {
-      container.innerHTML = `
-        <div class="p-4 rounded-xl bg-slate-50 dark:bg-black/30 border border-dashed border-slate-300 dark:border-white/10 text-center text-xs text-slate-400">
-          <p class="mb-2">No daily goals recorded yet today.</p>
-          <button type="button" onclick="openNewGoalModal()" class="text-amber-500 hover:underline font-semibold font-mono text-[11px]">+ Add Your First Goal for Today</button>
-        </div>
-      `;
-    } else {
-      container.innerHTML = state.todayGoals.map(g => `
-        <div class="p-2.5 sm:p-3 rounded-xl border transition-all ${g.completed ? 'bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-500/30' : 'bg-slate-50 dark:bg-black/40 border-slate-200 dark:border-white/10 hover:border-amber-500/40'} flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-          <div class="flex items-start sm:items-center gap-2.5 min-w-0 flex-1">
-            <!-- 1-Click Checkbox -->
-            <button type="button" onclick="toggleGoalItemComplete('${g.id}')" class="w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all shrink-0 cursor-pointer mt-0.5 sm:mt-0 ${g.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-transparent border-slate-300 dark:border-slate-600 hover:border-emerald-500 text-transparent'}" title="Toggle Goal Complete">
-              <i data-lucide="check" class="w-3.5 h-3.5 ${g.completed ? 'block' : 'hidden'}"></i>
-            </button>
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center gap-1.5 flex-wrap mb-0.5">
-                <span class="text-[10px] font-mono px-2 py-0.2 rounded-full ${g.completed ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300' : 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300'} font-semibold">
-                  ${escapeHtml(g.categoryLabel || 'North Star')}
+  const goalsHtml = state.todayGoals.length === 0
+    ? `
+      <div class="p-4 rounded-xl bg-slate-50 dark:bg-black/30 border border-dashed border-slate-300 dark:border-white/10 text-center text-xs text-slate-400">
+        <p class="mb-2">No daily goals recorded yet today.</p>
+        <button type="button" onclick="openNewGoalModal()" class="text-amber-500 hover:underline font-semibold font-mono text-[11px]">+ Add Your First Goal for Today</button>
+      </div>
+    `
+    : state.todayGoals.map(g => `
+      <div class="p-2.5 sm:p-3 rounded-xl border transition-all ${g.completed ? 'bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-500/30' : 'bg-slate-50 dark:bg-black/40 border-slate-200 dark:border-white/10 hover:border-amber-500/40'} flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+        <div class="flex items-start sm:items-center gap-2.5 min-w-0 flex-1">
+          <!-- 1-Click Checkbox -->
+          <button type="button" onclick="toggleGoalItemComplete('${g.id}')" class="w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all shrink-0 cursor-pointer mt-0.5 sm:mt-0 ${g.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-transparent border-slate-300 dark:border-slate-600 hover:border-emerald-500 text-transparent'}" title="Toggle Goal Complete">
+            <i data-lucide="check" class="w-3.5 h-3.5 ${g.completed ? 'block' : 'hidden'}"></i>
+          </button>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-1.5 flex-wrap mb-0.5">
+              <span class="text-[10px] font-mono px-2 py-0.2 rounded-full ${g.completed ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300' : 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300'} font-semibold">
+                ${escapeHtml(g.categoryLabel || 'North Star')}
+              </span>
+              ${g.startTime && g.endTime ? `
+                <span class="text-[10px] font-mono text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                  <i data-lucide="clock" class="w-3 h-3"></i>
+                  <span>${g.startTime} - ${g.endTime}</span>
                 </span>
-                ${g.startTime && g.endTime ? `
-                  <span class="text-[10px] font-mono text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                    <i data-lucide="clock" class="w-3 h-3"></i>
-                    <span>${g.startTime} - ${g.endTime}</span>
-                  </span>
-                ` : ''}
-                ${g.duration ? `
-                  <span class="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 flex items-center gap-1">
-                    <i data-lucide="clock" class="w-3 h-3"></i>
-                    <span>${g.duration}</span>
-                  </span>
-                ` : ''}
-              </div>
-              <h5 class="text-xs font-bold text-slate-900 dark:text-white leading-snug cursor-pointer ${g.completed ? 'line-through opacity-60' : ''}" onclick="openTodayGoalModal('${g.id}')" title="Click to edit goal">
-                ${escapeHtml(g.title)}
-              </h5>
-              ${g.notes ? `<p class="text-[10px] text-slate-500 dark:text-slate-400 italic mt-0.5 truncate">${escapeHtml(g.notes)}</p>` : ''}
+              ` : ''}
+              ${g.duration ? `
+                <span class="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 flex items-center gap-1">
+                  <i data-lucide="clock" class="w-3 h-3"></i>
+                  <span>${g.duration}</span>
+                </span>
+              ` : ''}
             </div>
-          </div>
-
-          <div class="flex items-center gap-1 shrink-0 self-end sm:self-auto">
-            <button type="button" onclick="openTodayGoalModal('${g.id}')" class="p-1 rounded-lg text-slate-400 hover:text-amber-500 transition-colors" title="Edit Goal">
-              <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
-            </button>
-            <button type="button" onclick="deleteGoalItem('${g.id}')" class="p-1 rounded-lg text-slate-400 hover:text-rose-500 transition-colors" title="Delete Goal">
-              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-            </button>
+            <h5 class="text-xs font-bold text-slate-900 dark:text-white leading-snug cursor-pointer ${g.completed ? 'line-through opacity-60' : ''}" onclick="openTodayGoalModal('${g.id}')" title="Click to edit goal">
+              ${escapeHtml(g.title)}
+            </h5>
+            ${g.notes ? `<p class="text-[10px] text-slate-500 dark:text-slate-400 italic mt-0.5 truncate">${escapeHtml(g.notes)}</p>` : ''}
           </div>
         </div>
-      `).join('');
-    }
-    lucide.createIcons();
-  }
+
+        <div class="flex items-center gap-1 shrink-0 self-end sm:self-auto">
+          <button type="button" onclick="openTodayGoalModal('${g.id}')" class="p-1 rounded-lg text-slate-400 hover:text-amber-500 transition-colors" title="Edit Goal">
+            <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+          </button>
+          <button type="button" onclick="deleteGoalItem('${g.id}')" class="p-1 rounded-lg text-slate-400 hover:text-rose-500 transition-colors" title="Delete Goal">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      </div>
+    `).join('');
+
+  containers.forEach(c => {
+    c.innerHTML = goalsHtml;
+  });
+
+  lucide.createIcons();
+
+  // Update Daily Harmony Directional Summary Card
+  updateHarmonyGoalsSummary(completedGoals, totalGoals, velocityPct, completedDurationMins, categoryTimeMap);
+}
 
   // Update Daily Harmony Directional Summary Card
   updateHarmonyGoalsSummary(completedGoals, totalGoals, velocityPct, completedDurationMins, categoryTimeMap);
@@ -4008,23 +4040,27 @@ function initHabitTracker() {
 }
 
 function renderHabitTracker() {
-  const container = document.getElementById('habit-tracker-list');
-  if (!container) return;
+  const containers = [
+    document.getElementById('habit-tracker-list'),
+    document.getElementById('modal-habit-tracker-list')
+  ].filter(Boolean);
+
+  if (containers.length === 0) return;
 
   const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
   const todayDayIdx = (new Date().getDay() + 6) % 7; // Monday = 0
 
-  container.innerHTML = state.habitsList.map(h => `
-    <div class="habit-row p-2.5 rounded-xl bg-black/40 border border-white/5 flex items-center justify-between gap-2 hover:border-white/10 transition-colors" id="habit_row_${h.id}">
+  const habitsHtml = state.habitsList.map(h => `
+    <div class="habit-row p-2.5 rounded-xl bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 flex items-center justify-between gap-2 hover:border-slate-300 dark:hover:border-white/10 transition-colors shadow-sm dark:shadow-none" id="habit_row_${h.id}">
       <div class="flex items-center gap-2.5 min-w-0">
         <span class="text-base shrink-0">${h.emoji || '💧'}</span>
         <div class="min-w-0">
-          <div class="text-xs font-semibold text-slate-200 truncate flex items-center gap-1.5">
+          <div class="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate flex items-center gap-1.5">
             <span>${escapeHtml(h.title)}</span>
-            ${h.isTimelineShortcut !== false ? '<span class="text-[9px] px-1.5 py-0.2 rounded-full bg-cyan-950/60 text-cyan-300 border border-cyan-500/30 font-mono">Shortcut</span>' : ''}
+            ${h.isTimelineShortcut !== false ? '<span class="text-[9px] px-1.5 py-0.2 rounded-full bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-500/30 font-mono">Shortcut</span>' : ''}
           </div>
-          <div class="text-[10px] text-slate-400 font-mono flex items-center gap-1">
-            <span class="text-amber-400 font-bold flex items-center gap-0.5"><i data-lucide="flame" class="w-3 h-3 text-amber-400"></i><span>${h.streak}d streak</span></span>
+          <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono flex items-center gap-1">
+            <span class="text-amber-600 dark:text-amber-400 font-bold flex items-center gap-0.5"><i data-lucide="flame" class="w-3 h-3 text-amber-500"></i><span>${h.streak}d streak</span></span>
             ${h.target ? `• <span>${escapeHtml(h.target)}</span>` : ''}
           </div>
         </div>
@@ -4038,17 +4074,27 @@ function renderHabitTracker() {
             </div>
           `).join('')}
         </div>
-        <button type="button" onclick="openNewHabitModal('${h.id}')" class="p-1 text-slate-500 hover:text-amber-300 transition-colors ml-1" title="Edit Habit">
+        <button type="button" onclick="openNewHabitModal('${h.id}')" class="p-1 text-slate-400 hover:text-amber-500 transition-colors ml-1" title="Edit Habit">
           <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
         </button>
       </div>
     </div>
   `).join('');
 
-  // Update Done count pill
+  containers.forEach(c => {
+    c.innerHTML = habitsHtml;
+  });
+
+  // Update Done count pills & streak badges
   const doneCount = state.habitsList.filter(h => h.history[todayDayIdx]).length;
   const pill = document.getElementById('habit-progress-pill');
-  if (pill) pill.innerHTML = `<i data-lucide="flame" class="w-3 h-3 text-amber-400"></i><span>${doneCount}/${state.habitsList.length} Done Today</span>`;
+  if (pill) pill.innerHTML = `<i data-lucide="flame" class="w-3 h-3 text-amber-500"></i><span>${doneCount}/${state.habitsList.length} Done Today</span>`;
+
+  const modalStreak = document.getElementById('modal-habit-streak-badge');
+  const streakBadge = document.getElementById('habit-streak-badge');
+  const maxStreak = Math.max(...state.habitsList.map(h => h.streak || 0), 0);
+  if (modalStreak) modalStreak.textContent = `${maxStreak || 12} Days Streak`;
+  if (streakBadge) streakBadge.innerHTML = `<i data-lucide="flame" class="w-3 h-3 text-amber-500"></i><span>${maxStreak || 12} Days Streak</span>`;
 
   lucide.createIcons();
 }
@@ -4210,29 +4256,79 @@ function renderShortcutsManagerList() {
 }
 
 function renderTimelineShortcuts() {
-  const container = document.getElementById('timeline-custom-shortcuts-container');
-  if (!container) return;
+  const containers = [
+    document.getElementById('timeline-custom-shortcuts-container'),
+    document.getElementById('modal-timeline-shortcuts-container')
+  ].filter(Boolean);
+
+  if (containers.length === 0) return;
 
   const todayDayIdx = (new Date().getDay() + 6) % 7; // Monday = 0
   const shortcutHabits = state.habitsList.filter(h => h.isTimelineShortcut !== false);
 
   if (shortcutHabits.length === 0) {
-    container.innerHTML = `
-      <span class="text-[11px] text-slate-400 italic py-1">No shortcuts pinned. Click <strong>Shortcuts</strong> to pin 1-tap habits.</span>
-    `;
+    const emptyHtml = `<span class="text-[11px] text-slate-400 italic py-1">No shortcuts pinned. Click <strong>Customize</strong> to pin 1-tap habits.</span>`;
+    containers.forEach(c => { c.innerHTML = emptyHtml; });
     return;
   }
 
-  container.innerHTML = shortcutHabits.map(h => {
+  const shortcutsHtml = shortcutHabits.map(h => {
     const isDone = h.history[todayDayIdx];
     return `
-      <button type="button" onclick="logHabit('${h.id}')" class="p-1 px-2.5 rounded-xl border transition-all text-left flex items-center gap-1.5 shrink-0 ${isDone ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300' : 'bg-slate-50 dark:bg-black/40 border-slate-200 dark:border-white/10 hover:border-cyan-400 text-slate-700 dark:text-slate-200'}" title="1-Tap Log: ${escapeHtml(h.title)}">
+      <button type="button" onclick="logHabit('${h.id}')" class="p-1 px-2.5 rounded-xl border transition-all text-left flex items-center gap-1.5 shrink-0 ${isDone ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-500/40 text-emerald-800 dark:text-emerald-300' : 'bg-slate-50 dark:bg-black/40 border-slate-200 dark:border-white/10 hover:border-cyan-400 text-slate-700 dark:text-slate-200'}" title="1-Tap Log: ${escapeHtml(h.title)}">
         <span class="text-xs">${h.emoji || '💧'}</span>
         <span class="text-xs font-semibold whitespace-nowrap">${escapeHtml(h.title.split(' ')[0] || h.title)}</span>
-        <span class="text-[10px] font-bold ${isDone ? 'text-emerald-400' : 'text-slate-400'}">${isDone ? '✓' : '+1'}</span>
+        <span class="text-[10px] font-bold ${isDone ? 'text-emerald-500' : 'text-slate-400'}">${isDone ? '✓' : '+1'}</span>
       </button>
     `;
   }).join('');
+
+  containers.forEach(c => {
+    c.innerHTML = shortcutsHtml;
+  });
+}
+
+function toggleGoalsTilesCollapse() {
+  const deck = document.getElementById('goals-habits-deck-body');
+  const chevron = document.getElementById('goals-tiles-chevron');
+  if (!deck) return;
+
+  const isCollapsed = deck.classList.contains('hidden');
+  if (isCollapsed) {
+    deck.classList.remove('hidden');
+    if (chevron) chevron.style.transform = 'rotate(0deg)';
+    localStorage.setItem('mind_cave_goals_collapsed', 'false');
+  } else {
+    deck.classList.add('hidden');
+    if (chevron) chevron.style.transform = 'rotate(180deg)';
+    localStorage.setItem('mind_cave_goals_collapsed', 'true');
+  }
+}
+
+function initGoalsTilesCollapse() {
+  const isCollapsed = localStorage.getItem('mind_cave_goals_collapsed') === 'true';
+  const deck = document.getElementById('goals-habits-deck-body');
+  const chevron = document.getElementById('goals-tiles-chevron');
+  if (deck && isCollapsed) {
+    deck.classList.add('hidden');
+    if (chevron) chevron.style.transform = 'rotate(180deg)';
+  }
+}
+
+function openGoalsHabitsModal() {
+  const modal = document.getElementById('goals-habits-modal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    renderTodayGoal();
+    renderHabitTracker();
+    renderTimelineShortcuts();
+    lucide.createIcons();
+  }
+}
+
+function closeGoalsHabitsModal() {
+  const modal = document.getElementById('goals-habits-modal');
+  if (modal) modal.classList.add('hidden');
 }
 
 function logHabit(habitKey) {
