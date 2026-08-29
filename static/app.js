@@ -63,12 +63,12 @@ const state = {
     completed: false
   },
   habitsList: JSON.parse(localStorage.getItem('mind_cave_habits_list') || 'null') || [
-    { id: 'h1', title: '💧 Hydrate 2.5 Liters', streak: 12, history: [true, true, true, true, true, true, true] },
-    { id: 'h2', title: '🧘 15m Mindfulness & CBT', streak: 7, history: [true, true, true, false, true, true, true] },
-    { id: 'h3', title: '🏃 30m Zone-2 Cardio / Walk', streak: 5, history: [true, true, true, true, false, true, true] },
-    { id: 'h4', title: '📖 20m Focused Reading', streak: 9, history: [true, true, true, true, true, true, false] },
-    { id: 'h5', title: '🌙 8h Circadian Sleep Protocol', streak: 6, history: [true, true, true, true, true, true, true] },
-    { id: 'h6', title: '💻 90m Deep Work Block', streak: 14, history: [true, true, true, true, true, true, true] }
+    { id: 'h1', title: 'Hydrate 2.5 Liters', emoji: '💧', streak: 12, target: '8 glasses', isTimelineShortcut: true, history: [true, true, true, true, true, true, true] },
+    { id: 'h2', title: '15m Mindfulness & CBT', emoji: '🧘', streak: 7, target: '15 mins', isTimelineShortcut: true, history: [true, true, true, false, true, true, true] },
+    { id: 'h3', title: '30m Zone-2 Cardio / Walk', emoji: '🚶', streak: 5, target: '30 mins', isTimelineShortcut: true, history: [true, true, true, true, false, true, true] },
+    { id: 'h4', title: '20m Focused Reading', emoji: '📖', streak: 9, target: '20 pages', isTimelineShortcut: true, history: [true, true, true, true, true, true, false] },
+    { id: 'h5', title: '8h Circadian Sleep Protocol', emoji: '🌙', streak: 6, target: '8 hours', isTimelineShortcut: false, history: [true, true, true, true, true, true, true] },
+    { id: 'h6', title: '90m Deep Work Block', emoji: '💻', streak: 14, target: '1 block', isTimelineShortcut: false, history: [true, true, true, true, true, true, true] }
   ],
   bucketList: JSON.parse(localStorage.getItem('mind_cave_bucket_list') || 'null') || [
     { id: 'b1', title: 'Scuba dive the Great Barrier Reef', category: 'travel', year: '2027', achieved: false },
@@ -2228,72 +2228,6 @@ function renderMemoryPhotos() {
 // =============================================================================
 // 1-TAP HABIT TRACKING STATE & ENGINE
 // =============================================================================
-let habitState = {
-  waterCount: 6,
-  waterTarget: 8,
-  meditation: true,
-  walk: true,
-  reading: false,
-  streak: 12
-};
-
-function logHabit(habitType) {
-  if (habitType === 'water') {
-    habitState.waterCount = (habitState.waterCount % habitState.waterTarget) + 1;
-    const el = document.getElementById('habit-water-count');
-    if (el) el.textContent = `${habitState.waterCount}/${habitState.waterTarget} Glasses`;
-    showToast(`💧 Logged 1 glass of water (${habitState.waterCount}/${habitState.waterTarget})`);
-  } else if (habitType === 'meditation') {
-    habitState.meditation = !habitState.meditation;
-    const stEl = document.getElementById('habit-meditation-status');
-    const icon = document.getElementById('habit-meditation-icon');
-    if (stEl) {
-      stEl.textContent = habitState.meditation ? 'Done (10m)' : 'Pending';
-      stEl.className = habitState.meditation ? 'text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-[10px] text-slate-500 font-semibold';
-    }
-    if (icon) {
-      icon.setAttribute('data-lucide', habitState.meditation ? 'check-circle' : 'circle');
-      icon.className = habitState.meditation ? 'w-4 h-4 text-emerald-500' : 'w-4 h-4 text-slate-400';
-    }
-    showToast(habitState.meditation ? '🧘 Mindfulness logged!' : '🧘 Mindfulness reset');
-  } else if (habitType === 'walk') {
-    habitState.walk = !habitState.walk;
-    const stEl = document.getElementById('habit-walk-status');
-    const icon = document.getElementById('habit-walk-icon');
-    if (stEl) {
-      stEl.textContent = habitState.walk ? 'Done (35m)' : 'Pending';
-      stEl.className = habitState.walk ? 'text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-[10px] text-slate-500 font-semibold';
-    }
-    if (icon) {
-      icon.setAttribute('data-lucide', habitState.walk ? 'check-circle' : 'circle');
-      icon.className = habitState.walk ? 'w-4 h-4 text-emerald-500' : 'w-4 h-4 text-slate-400';
-    }
-    showToast(habitState.walk ? '🚶 Mindful walk logged!' : '🚶 Mindful walk reset');
-  } else if (habitType === 'reading') {
-    habitState.reading = !habitState.reading;
-    const stEl = document.getElementById('habit-reading-status');
-    const icon = document.getElementById('habit-reading-icon');
-    if (stEl) {
-      stEl.textContent = habitState.reading ? 'Done (15m)' : 'Pending (15m)';
-      stEl.className = habitState.reading ? 'text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-[10px] text-slate-500 font-semibold';
-    }
-    if (icon) {
-      icon.setAttribute('data-lucide', habitState.reading ? 'check-circle' : 'circle');
-      icon.className = habitState.reading ? 'w-4 h-4 text-emerald-500' : 'w-4 h-4 text-slate-400';
-    }
-    showToast(habitState.reading ? '📖 15m Reading logged!' : '📖 Reading reset');
-  }
-
-  // Update streak live
-  const allComplete = habitState.waterCount >= habitState.waterTarget && habitState.meditation && habitState.walk && habitState.reading;
-  const streakBadge = document.getElementById('habit-streak-badge');
-  if (streakBadge) {
-    streakBadge.textContent = allComplete ? '🔥 13 Days Streak (All Complete!)' : `🔥 ${habitState.streak} Days Streak`;
-  }
-  lucide.createIcons();
-}
-
-// =============================================================================
 // NOTIFICATIONS & REMINDERS PREFERENCES MODAL
 // =============================================================================
 function openNotificationsModal() {
@@ -3442,8 +3376,17 @@ function toggleTodayGoalComplete() {
 // DAILY HABIT TRACKER & STREAKS
 // =============================================================================
 
+let selectedHabitEmojiVal = '💧';
+
+function selectHabitEmoji(emoji) {
+  selectedHabitEmojiVal = emoji;
+  const badge = document.getElementById('habit-selected-emoji-badge');
+  if (badge) badge.textContent = emoji;
+}
+
 function initHabitTracker() {
   renderHabitTracker();
+  renderTimelineShortcuts();
 }
 
 function renderHabitTracker() {
@@ -3454,20 +3397,32 @@ function renderHabitTracker() {
   const todayDayIdx = (new Date().getDay() + 6) % 7; // Monday = 0
 
   container.innerHTML = state.habitsList.map(h => `
-    <div class="habit-row" id="habit_row_${h.id}">
-      <div class="flex items-center gap-2 min-w-0">
-        <span class="text-xs font-semibold text-slate-200 truncate">${escapeHtml(h.title)}</span>
-        <span class="text-[10px] text-amber-400 font-mono font-bold flex items-center shrink-0">
-          🔥 ${h.streak}d
-        </span>
+    <div class="habit-row p-2.5 rounded-xl bg-black/40 border border-white/5 flex items-center justify-between gap-2 hover:border-white/10 transition-colors" id="habit_row_${h.id}">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <span class="text-base shrink-0">${h.emoji || '💧'}</span>
+        <div class="min-w-0">
+          <div class="text-xs font-semibold text-slate-200 truncate flex items-center gap-1.5">
+            <span>${escapeHtml(h.title)}</span>
+            ${h.isTimelineShortcut !== false ? '<span class="text-[9px] px-1.5 py-0.2 rounded-full bg-cyan-950/60 text-cyan-300 border border-cyan-500/30 font-mono">Shortcut</span>' : ''}
+          </div>
+          <div class="text-[10px] text-slate-400 font-mono flex items-center gap-1">
+            <span class="text-amber-400 font-bold">🔥 ${h.streak}d</span>
+            ${h.target ? `• <span>${escapeHtml(h.target)}</span>` : ''}
+          </div>
+        </div>
       </div>
 
-      <div class="flex items-center gap-1 shrink-0">
-        ${h.history.map((isDone, idx) => `
-          <div onclick="toggleHabitDay('${h.id}', ${idx})" class="habit-dot ${isDone ? 'done' : ''} ${idx === todayDayIdx ? 'ring-1 ring-amber-400' : ''}" title="${days[idx]} - ${isDone ? 'Done' : 'Missed'}">
-            ${isDone ? '✓' : days[idx]}
-          </div>
-        `).join('')}
+      <div class="flex items-center gap-1.5 shrink-0">
+        <div class="flex items-center gap-1">
+          ${h.history.map((isDone, idx) => `
+            <div onclick="toggleHabitDay('${h.id}', ${idx})" class="habit-dot ${isDone ? 'done' : ''} ${idx === todayDayIdx ? 'ring-1 ring-amber-400' : ''}" title="${days[idx]} - ${isDone ? 'Done' : 'Missed'}">
+              ${isDone ? '✓' : days[idx]}
+            </div>
+          `).join('')}
+        </div>
+        <button type="button" onclick="openNewHabitModal('${h.id}')" class="p-1 text-slate-500 hover:text-amber-300 transition-colors ml-1" title="Edit Habit">
+          <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+        </button>
       </div>
     </div>
   `).join('');
@@ -3476,6 +3431,8 @@ function renderHabitTracker() {
   const doneCount = state.habitsList.filter(h => h.history[todayDayIdx]).length;
   const pill = document.getElementById('habit-progress-pill');
   if (pill) pill.textContent = `🔥 ${doneCount}/${state.habitsList.length} Done Today`;
+
+  lucide.createIcons();
 }
 
 function toggleHabitDay(habitId, dayIndex) {
@@ -3488,11 +3445,43 @@ function toggleHabitDay(habitId, dayIndex) {
 
   localStorage.setItem('mind_cave_habits_list', JSON.stringify(state.habitsList));
   renderHabitTracker();
-  showToast(`${habit.title}: ${habit.history[dayIndex] ? 'Completed!' : 'Marked incomplete'}`);
+  renderTimelineShortcuts();
+  showToast(`${habit.emoji || '🌿'} ${habit.title}: ${habit.history[dayIndex] ? 'Completed!' : 'Marked incomplete'}`);
 }
 
-function openNewHabitModal() {
-  document.getElementById('habit-modal')?.classList.remove('hidden');
+function openNewHabitModal(habitId = null) {
+  const modal = document.getElementById('habit-modal');
+  if (!modal) return;
+
+  const idInput = document.getElementById('habit-edit-id-input');
+  const titleInput = document.getElementById('habit-title-input');
+  const targetInput = document.getElementById('habit-target-unit-input');
+  const freqSelect = document.getElementById('habit-freq-select');
+  const shortcutToggle = document.getElementById('habit-shortcut-toggle-check');
+  const modalTitle = document.getElementById('habit-modal-title');
+
+  if (habitId) {
+    const habit = state.habitsList.find(h => h.id === habitId);
+    if (habit) {
+      if (idInput) idInput.value = habit.id;
+      if (titleInput) titleInput.value = habit.title;
+      if (targetInput) targetInput.value = habit.target || '';
+      selectHabitEmoji(habit.emoji || '💧');
+      if (freqSelect) freqSelect.value = habit.frequency || 'daily';
+      if (shortcutToggle) shortcutToggle.checked = habit.isTimelineShortcut !== false;
+      if (modalTitle) modalTitle.textContent = 'Edit Custom Habit';
+    }
+  } else {
+    if (idInput) idInput.value = '';
+    if (titleInput) titleInput.value = '';
+    if (targetInput) targetInput.value = '';
+    selectHabitEmoji('💧');
+    if (freqSelect) freqSelect.value = 'daily';
+    if (shortcutToggle) shortcutToggle.checked = true;
+    if (modalTitle) modalTitle.textContent = 'Add New Micro-Habit';
+  }
+
+  modal.classList.remove('hidden');
 }
 
 function closeNewHabitModal() {
@@ -3501,22 +3490,153 @@ function closeNewHabitModal() {
 
 function submitNewHabit(event) {
   event.preventDefault();
-  const title = document.getElementById('habit-title-input').value.trim();
+  const id = document.getElementById('habit-edit-id-input')?.value;
+  const title = document.getElementById('habit-title-input')?.value.trim();
+  const target = document.getElementById('habit-target-unit-input')?.value.trim();
+  const freq = document.getElementById('habit-freq-select')?.value;
+  const isShortcut = document.getElementById('habit-shortcut-toggle-check')?.checked ?? true;
+
   if (!title) return;
 
-  const newHabit = {
-    id: `h_${Date.now()}`,
-    title: title,
-    streak: 1,
-    history: [true, false, false, false, false, false, false]
-  };
+  if (id) {
+    // Edit existing
+    const habit = state.habitsList.find(h => h.id === id);
+    if (habit) {
+      habit.title = title;
+      habit.emoji = selectedHabitEmojiVal;
+      habit.target = target;
+      habit.frequency = freq;
+      habit.isTimelineShortcut = isShortcut;
+      showToast(`✓ Updated habit: ${habit.emoji} ${title}`);
+    }
+  } else {
+    // Add new
+    const newHabit = {
+      id: `h_${Date.now()}`,
+      title: title,
+      emoji: selectedHabitEmojiVal,
+      target: target,
+      frequency: freq,
+      isTimelineShortcut: isShortcut,
+      streak: 1,
+      history: [true, false, false, false, false, false, false]
+    };
+    state.habitsList.push(newHabit);
+    showToast(`✓ Added habit: ${newHabit.emoji} ${title}`);
+  }
 
-  state.habitsList.push(newHabit);
   localStorage.setItem('mind_cave_habits_list', JSON.stringify(state.habitsList));
-
   closeNewHabitModal();
   renderHabitTracker();
-  showToast(`✓ Added habit: ${title}`);
+  renderTimelineShortcuts();
+}
+
+function deleteHabit(habitId) {
+  state.habitsList = state.habitsList.filter(h => h.id !== habitId);
+  localStorage.setItem('mind_cave_habits_list', JSON.stringify(state.habitsList));
+  renderHabitTracker();
+  renderTimelineShortcuts();
+  renderShortcutsManagerList();
+  showToast('Habit deleted.');
+}
+
+function toggleHabitTimelineShortcut(habitId) {
+  const habit = state.habitsList.find(h => h.id === habitId);
+  if (habit) {
+    habit.isTimelineShortcut = !habit.isTimelineShortcut;
+    localStorage.setItem('mind_cave_habits_list', JSON.stringify(state.habitsList));
+    renderTimelineShortcuts();
+    renderShortcutsManagerList();
+    showToast(`${habit.emoji || '🌿'} ${habit.title} ${habit.isTimelineShortcut ? 'added to' : 'removed from'} timeline shortcuts.`);
+  }
+}
+
+function openTimelineShortcutsModal() {
+  renderShortcutsManagerList();
+  document.getElementById('shortcuts-modal')?.classList.remove('hidden');
+}
+
+function closeTimelineShortcutsModal() {
+  document.getElementById('shortcuts-modal')?.classList.add('hidden');
+}
+
+function renderShortcutsManagerList() {
+  const container = document.getElementById('shortcuts-manager-list');
+  if (!container) return;
+
+  container.innerHTML = state.habitsList.map(h => `
+    <div class="p-2.5 rounded-xl bg-black/40 border border-white/10 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <span class="text-lg">${h.emoji || '💧'}</span>
+        <div class="min-w-0">
+          <div class="text-xs font-bold text-white truncate">${escapeHtml(h.title)}</div>
+          <div class="text-[10px] text-slate-400 font-mono">🔥 ${h.streak}d streak ${h.target ? '• ' + escapeHtml(h.target) : ''}</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-semibold ${h.isTimelineShortcut !== false ? 'text-cyan-300' : 'text-slate-500'}">
+          <input type="checkbox" ${h.isTimelineShortcut !== false ? 'checked' : ''} onchange="toggleHabitTimelineShortcut('${h.id}')" class="w-4 h-4 rounded text-cyan-500 bg-slate-900 border-slate-700 cursor-pointer">
+          <span class="hidden sm:inline">Timeline</span>
+        </label>
+        <button type="button" onclick="openNewHabitModal('${h.id}')" class="p-1 text-slate-400 hover:text-amber-300" title="Edit Habit">
+          <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+        </button>
+        <button type="button" onclick="deleteHabit('${h.id}')" class="p-1 text-slate-400 hover:text-rose-400" title="Delete Habit">
+          <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+    </div>
+  `).join('');
+
+  lucide.createIcons();
+}
+
+function renderTimelineShortcuts() {
+  const container = document.getElementById('timeline-custom-shortcuts-container');
+  if (!container) return;
+
+  const todayDayIdx = (new Date().getDay() + 6) % 7; // Monday = 0
+  const shortcutHabits = state.habitsList.filter(h => h.isTimelineShortcut !== false);
+
+  if (shortcutHabits.length === 0) {
+    container.innerHTML = `
+      <span class="text-[11px] text-slate-400 italic py-1">No shortcuts pinned. Click <strong>Shortcuts</strong> to pin 1-tap habits.</span>
+    `;
+    return;
+  }
+
+  container.innerHTML = shortcutHabits.map(h => {
+    const isDone = h.history[todayDayIdx];
+    return `
+      <button type="button" onclick="logHabit('${h.id}')" class="p-1 px-2.5 rounded-xl border transition-all text-left flex items-center gap-1.5 shrink-0 ${isDone ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300' : 'bg-slate-50 dark:bg-black/40 border-slate-200 dark:border-white/10 hover:border-cyan-400 text-slate-700 dark:text-slate-200'}" title="1-Tap Log: ${escapeHtml(h.title)}">
+        <span class="text-xs">${h.emoji || '💧'}</span>
+        <span class="text-xs font-semibold whitespace-nowrap">${escapeHtml(h.title.split(' ')[0] || h.title)}</span>
+        <span class="text-[10px] font-bold ${isDone ? 'text-emerald-400' : 'text-slate-400'}">${isDone ? '✓' : '+1'}</span>
+      </button>
+    `;
+  }).join('');
+}
+
+function logHabit(habitKey) {
+  const todayDayIdx = (new Date().getDay() + 6) % 7;
+  let habit = state.habitsList.find(h => h.id === habitKey || h.id === `h_${habitKey}`);
+  if (!habit) {
+    habit = state.habitsList.find(h => h.title.toLowerCase().includes(habitKey.toLowerCase()));
+  }
+  if (!habit && state.habitsList.length > 0) {
+    habit = state.habitsList[0];
+  }
+
+  if (habit) {
+    habit.history[todayDayIdx] = !habit.history[todayDayIdx];
+    if (habit.history[todayDayIdx]) habit.streak += 1;
+    else habit.streak = Math.max(0, habit.streak - 1);
+
+    localStorage.setItem('mind_cave_habits_list', JSON.stringify(state.habitsList));
+    renderHabitTracker();
+    renderTimelineShortcuts();
+    showToast(`${habit.emoji || '🌿'} ${habit.title}: ${habit.history[todayDayIdx] ? '✓ Done for today!' : 'Marked incomplete'}`);
+  }
 }
 
 // =============================================================================
@@ -3697,8 +3817,8 @@ function renderScrapbookCard() {
   if (!canvas) return;
 
   const ctx = canvas.getContext('2d');
-  const width = canvas.width;
-  const height = canvas.height;
+  const width = canvas.width = 880;
+  const height = canvas.height = 1150;
 
   // Selected font
   const fontSelect = document.getElementById('scrapbook-font-select');
@@ -3711,44 +3831,54 @@ function renderScrapbookCard() {
   const incPolaroid = document.getElementById('scrap-toggle-polaroid')?.checked ?? true;
   const incReflection = document.getElementById('scrap-toggle-reflection')?.checked ?? true;
 
-  // Theme palettes
+  // Theme palettes (Cottagecore, Vintage Botanical, Muji Grid, Midnight Velvet)
   const themes = {
     pastel: {
-      bg: '#fbf3ed',
-      pageInner: '#fffaf6',
-      ink: '#2d2538',
-      accent1: '#ec4899',
+      bg: '#fdf6ee',
+      pageInner: '#fffdfa',
+      ink: '#2b2333',
+      inkLight: '#574c63',
+      accent1: '#e11d48',
       accent2: '#0284c7',
-      washi1: '#fce7f3',
+      accent3: '#10b981',
+      washi1: '#ffe4e6',
       washi2: '#e0f2fe',
       washi3: '#fef3c7',
-      tapeBorder: '#f472b6',
-      paperLines: '#f3e8df',
-      cardBg1: '#fdf2f8',
+      tapeBorder: '#fb7185',
+      paperLines: '#f5ebe0',
+      cardBg1: '#fff5f7',
       cardBg2: '#f0f9ff',
-      cardBg3: '#fffbeb'
+      cardBg3: '#fefce8',
+      polaroidBg: '#ffffff',
+      flameColor: '#f97316'
     },
     vintage: {
-      bg: '#ecd9c6',
-      pageInner: '#f7eee3',
-      ink: '#2b2118',
+      bg: '#eddcc9',
+      pageInner: '#f9f3ea',
+      ink: '#2b2015',
+      inkLight: '#594432',
       accent1: '#b45309',
       accent2: '#78350f',
-      washi1: '#e5d5c5',
-      washi2: '#d8c4b2',
+      accent3: '#047857',
+      washi1: '#e8d7c4',
+      washi2: '#d8c2ad',
       washi3: '#fed7aa',
       tapeBorder: '#92400e',
-      paperLines: '#e6d5c3',
+      paperLines: '#e6d4c0',
       cardBg1: '#f5ebe0',
       cardBg2: '#ede0d4',
-      cardBg3: '#ffedd5'
+      cardBg3: '#ffedd5',
+      polaroidBg: '#faf5ee',
+      flameColor: '#d97706'
     },
     notebook: {
       bg: '#f1f5f9',
       pageInner: '#ffffff',
       ink: '#0f172a',
+      inkLight: '#475569',
       accent1: '#0284c7',
       accent2: '#4f46e5',
+      accent3: '#059669',
       washi1: '#e2e8f0',
       washi2: '#bae6fd',
       washi3: '#fef08a',
@@ -3756,244 +3886,261 @@ function renderScrapbookCard() {
       paperLines: '#e2e8f0',
       cardBg1: '#f8fafc',
       cardBg2: '#f0f9ff',
-      cardBg3: '#fefce8'
+      cardBg3: '#fefce8',
+      polaroidBg: '#ffffff',
+      flameColor: '#ea580c'
     },
     cyber: {
-      bg: '#070a12',
-      pageInner: '#0f172a',
+      bg: '#05070d',
+      pageInner: '#0b0f19',
       ink: '#f8fafc',
-      accent1: '#ec4899',
+      inkLight: '#94a3b8',
+      accent1: '#f43f5e',
       accent2: '#06b6d4',
+      accent3: '#10b981',
       washi1: '#1e293b',
       washi2: '#164e63',
       washi3: '#831843',
       tapeBorder: '#38bdf8',
       paperLines: '#1e293b',
-      cardBg1: '#1e293b',
-      cardBg2: '#0f2744',
-      cardBg3: '#3b0764'
+      cardBg1: '#111827',
+      cardBg2: '#082f49',
+      cardBg3: '#4c0519',
+      polaroidBg: '#1e293b',
+      flameColor: '#fb923c'
     }
   };
 
   const t = themes[state.scrapbookTheme] || themes.pastel;
 
-  // 1. Draw Page Background
+  // 1. Canvas Background
   ctx.fillStyle = t.bg;
   ctx.fillRect(0, 0, width, height);
 
-  // 2. Draw Inner Paper with realistic drop shadow
+  // 2. Inner Textured Sheet with High-End Drop Shadow
   ctx.save();
   ctx.fillStyle = t.pageInner;
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
-  ctx.shadowBlur = 24;
-  ctx.shadowOffsetY = 8;
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.16)';
+  ctx.shadowBlur = 28;
+  ctx.shadowOffsetY = 10;
   ctx.beginPath();
-  ctx.roundRect(40, 30, width - 80, height - 60, 20);
+  ctx.roundRect(45, 30, width - 90, height - 60, 24);
   ctx.fill();
   ctx.restore();
 
-  // 3. Draw Spiral Wire Notebook Spine on Left Edge
-  for (let y = 60; y < height - 60; y += 36) {
-    // Hole
+  // 3. Realistic Spiral Notebook Wire Binder on Left
+  for (let y = 65; y < height - 60; y += 38) {
+    // Punch Hole
     ctx.beginPath();
-    ctx.arc(62, y, 6, 0, Math.PI * 2);
-    ctx.fillStyle = state.scrapbookTheme === 'cyber' ? '#070a12' : '#cbd5e1';
+    ctx.arc(68, y, 6.5, 0, Math.PI * 2);
+    ctx.fillStyle = state.scrapbookTheme === 'cyber' ? '#05070d' : '#cbd5e1';
     ctx.fill();
 
-    // Wire
+    // Metallic Double Wire Ring
     ctx.beginPath();
-    ctx.ellipse(56, y, 14, 4, -0.2, 0, Math.PI * 2);
+    ctx.ellipse(62, y, 16, 4.5, -0.18, 0, Math.PI * 2);
     ctx.strokeStyle = state.scrapbookTheme === 'cyber' ? '#38bdf8' : '#64748b';
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 2.5;
     ctx.stroke();
   }
 
-  // 4. Ruled Notebook Lines
+  // 4. Subtle Ruled Journal Lines
   ctx.strokeStyle = t.paperLines;
   ctx.lineWidth = 1;
-  for (let y = 140; y < height - 60; y += 32) {
+  for (let y = 145; y < height - 70; y += 34) {
     ctx.beginPath();
-    ctx.moveTo(90, y);
-    ctx.lineTo(width - 60, y);
+    ctx.moveTo(100, y);
+    ctx.lineTo(width - 65, y);
     ctx.stroke();
   }
 
-  // 5. Header: "✦ ABOUT TODAY ✦" with Washi Banner
+  // 5. Header Section: Title + Date Washi + Stickers
   ctx.fillStyle = t.ink;
-  ctx.font = `bold 40px ${selectedFont}`;
+  ctx.font = `bold 42px ${selectedFont}`;
   const d = state.selectedDiaryDate || new Date();
   const dateStr = d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' });
-  ctx.fillText("✦ ABOUT TODAY ✦", 100, 85);
+  ctx.fillText("✦ TODAY'S CHRONICLE ✦", 110, 85);
 
-  // Washi tape date pill
+  // Date Washi Tape Banner
   ctx.save();
   ctx.fillStyle = t.washi2;
   ctx.beginPath();
-  ctx.roundRect(100, 98, 280, 28, 8);
+  ctx.roundRect(110, 98, 300, 30, 8);
   ctx.fill();
   ctx.restore();
 
-  ctx.font = `bold 20px ${selectedFont}`;
-  ctx.fillStyle = t.accent1;
-  ctx.fillText(`📅 ${dateStr}`, 112, 118);
+  ctx.font = `bold 21px ${selectedFont}`;
+  ctx.fillStyle = t.accent2;
+  ctx.fillText(`📅 ${dateStr}`, 124, 120);
 
-  // Doodle Stickers & Stars on top right
-  ctx.font = `26px ${selectedFont}`;
+  // Doodle Stickers & Sparkles
+  ctx.font = `28px ${selectedFont}`;
   ctx.fillStyle = t.accent1;
-  ctx.fillText("✨ 🌸 ♡ ☕ ★", width - 210, 85);
+  ctx.fillText("✨ 🌸 ♡ ☕ ✦", width - 240, 85);
 
   // =========================================================================
-  // 2-COLUMN PINTEREST SCRAPBOOK BENTO GRID
-  // Left Column: x = 100, width = 310 px
-  // Right Column: x = 435, width = 305 px
+  // 2-COLUMN BALANCED AESTHETIC GRID
+  // Left Column: x = 110, width = 345 px
+  // Right Column: x = 480, width = 335 px
   // =========================================================================
 
   // --- LEFT COLUMN 1: NORTH STAR GOAL ---
+  let leftY = 148;
   if (incGoal) {
-    // Card Box
     ctx.save();
     ctx.fillStyle = t.cardBg1;
     ctx.beginPath();
-    ctx.roundRect(100, 140, 310, 105, 14);
+    ctx.roundRect(110, leftY, 345, 115, 16);
     ctx.fill();
     ctx.strokeStyle = t.tapeBorder;
     ctx.lineWidth = 1.5;
     ctx.setLineDash([5, 4]);
     ctx.stroke();
 
-    // Cute Washi Tape on top left
+    // Washi Tape on top left
     ctx.fillStyle = t.washi1;
     ctx.setLineDash([]);
-    ctx.fillRect(130, 132, 70, 16);
+    ctx.fillRect(145, leftY - 8, 80, 18);
     ctx.restore();
 
     ctx.fillStyle = t.ink;
-    ctx.font = `bold 22px ${selectedFont}`;
-    ctx.fillText("🎯 North Star Goal", 115, 172);
+    ctx.font = `bold 24px ${selectedFont}`;
+    ctx.fillText("🎯 North Star Goal", 125, leftY + 34);
 
-    ctx.font = `19px ${selectedFont}`;
-    const goalText = `"${state.todayGoal?.text || 'Ship core system architecture'}"`;
-    wrapCanvasText(ctx, goalText, 115, 198, 280, 22, 2);
+    ctx.font = `20px ${selectedFont}`;
+    ctx.fillStyle = t.inkLight;
+    const goalText = `"${state.todayGoal?.text || 'Ship core system architecture & complete 30m mindful walk'}"`;
+    wrapCanvasText(ctx, goalText, 125, leftY + 62, 315, 23, 2);
+
+    leftY += 132;
   }
 
-  // --- LEFT COLUMN 2: PLAN VS ACTION & COMPLETED TASKS ---
-  if (incMetrics) {
+  // --- LEFT COLUMN 2: DAILY HABIT STREAKS (FULL TITLES, NO TRUNCATION) ---
+  if (incHabits) {
+    const activeHabits = state.habitsList.slice(0, 5);
+    const boxHeight = 70 + (activeHabits.length * 36);
+
+    ctx.save();
+    ctx.fillStyle = t.cardBg2;
+    ctx.beginPath();
+    ctx.roundRect(110, leftY, 345, boxHeight, 16);
+    ctx.fill();
+    ctx.strokeStyle = t.accent2;
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+
+    // Washi Tape
+    ctx.fillStyle = t.washi2;
+    ctx.fillRect(160, leftY - 8, 85, 18);
+    ctx.restore();
+
+    ctx.fillStyle = t.ink;
+    ctx.font = `bold 24px ${selectedFont}`;
+    ctx.fillText("🌿 Daily Habit Streaks", 125, leftY + 34);
+
+    let habitRowY = leftY + 68;
+    const todayDayIdx = (new Date().getDay() + 6) % 7;
+
+    activeHabits.forEach((h) => {
+      const isDone = h.history[todayDayIdx];
+      // Habit Emoji & Title
+      ctx.font = `21px ${selectedFont}`;
+      ctx.fillStyle = isDone ? t.accent3 : t.ink;
+      ctx.fillText(`${isDone ? '✓' : '○'} ${h.emoji || '💧'} ${h.title}`, 125, habitRowY);
+
+      // Streak flame on right edge
+      ctx.font = `bold 19px ${selectedFont}`;
+      ctx.fillStyle = t.flameColor;
+      ctx.fillText(`🔥 ${h.streak}d`, 390, habitRowY);
+
+      habitRowY += 36;
+    });
+
+    leftY += boxHeight + 16;
+  }
+
+  // --- LEFT COLUMN 3: PLAN VS ACTION VELOCITY ---
+  if (incMetrics && leftY < 920) {
     ctx.save();
     ctx.fillStyle = t.cardBg3;
     ctx.beginPath();
-    ctx.roundRect(100, 258, 310, 215, 14);
+    ctx.roundRect(110, leftY, 345, 160, 16);
     ctx.fill();
     ctx.strokeStyle = t.accent1;
     ctx.lineWidth = 1;
     ctx.stroke();
 
-    // Top Washi
+    // Washi
     ctx.fillStyle = t.washi3;
-    ctx.fillRect(200, 250, 70, 16);
+    ctx.fillRect(210, leftY - 8, 80, 18);
     ctx.restore();
 
     ctx.fillStyle = t.ink;
-    ctx.font = `bold 22px ${selectedFont}`;
-    ctx.fillText("⚡ Plan vs. Action Velocity", 115, 288);
+    ctx.font = `bold 23px ${selectedFont}`;
+    ctx.fillText("⚡ Plan vs. Action Velocity", 125, leftY + 34);
 
-    ctx.font = `bold 18px ${selectedFont}`;
+    ctx.font = `bold 19px ${selectedFont}`;
     ctx.fillStyle = t.accent1;
-    ctx.fillText("80% Velocity • 4/5 Tasks Done", 115, 312);
+    ctx.fillText("80% Execution • 4/5 Tasks Completed", 125, leftY + 60);
 
-    // Completed Tasks Checklist
-    ctx.font = `19px ${selectedFont}`;
-    ctx.fillStyle = t.ink;
-    const completedTasks = [
-      "☑ Core Architecture Sprint",
-      "☑ 15m Mindfulness Stroll",
-      "☑ Google Fit Vitality Sync",
-      "☑ CBT Distortion Reframing"
-    ];
+    ctx.font = `20px ${selectedFont}`;
+    ctx.fillStyle = t.inkLight;
+    ctx.fillText("☑ Core Architecture Sprint", 125, leftY + 90);
+    ctx.fillText("☑ 15m Mindfulness Stroll", 125, leftY + 116);
+    ctx.fillText("☑ CBT Distortion Reframing", 125, leftY + 142);
 
-    let taskY = 340;
-    completedTasks.forEach(task => {
-      ctx.fillText(task, 115, taskY);
-      taskY += 28;
-    });
-  }
-
-  // --- LEFT COLUMN 3: DAILY HABIT TRACKER ---
-  if (incHabits) {
-    ctx.save();
-    ctx.fillStyle = t.cardBg2;
-    ctx.beginPath();
-    ctx.roundRect(100, 485, 310, 240, 14);
-    ctx.fill();
-    ctx.strokeStyle = t.accent2;
-    ctx.lineWidth = 1;
-    ctx.stroke();
-
-    // Top Washi
-    ctx.fillStyle = t.washi2;
-    ctx.fillRect(140, 477, 70, 16);
-    ctx.restore();
-
-    ctx.fillStyle = t.ink;
-    ctx.font = `bold 22px ${selectedFont}`;
-    ctx.fillText("🌿 Daily Habit Streaks", 115, 515);
-
-    let habitY = 546;
-    state.habitsList.slice(0, 5).forEach((h) => {
-      // Title (clipped cleanly to avoid collision)
-      ctx.font = `19px ${selectedFont}`;
-      ctx.fillStyle = t.ink;
-      let title = h.title;
-      if (title.length > 18) title = title.substring(0, 17) + '...';
-      ctx.fillText(`✓ ${title}`, 115, habitY);
-
-      // Streak flame on right
-      ctx.fillStyle = t.accent1;
-      ctx.font = `bold 18px ${selectedFont}`;
-      ctx.fillText(`🔥 ${h.streak}d`, 335, habitY);
-      habitY += 34;
-    });
+    leftY += 175;
   }
 
   // --- RIGHT COLUMN 1: POLAROID PHOTO ---
+  let rightY = 148;
   if (incPolaroid) {
     ctx.save();
-    ctx.translate(585, 280);
-    ctx.rotate(0.04); // Cute tilt
+    ctx.translate(645, rightY + 130);
+    ctx.rotate(-0.035); // Subtle authentic tilt
 
-    // Polaroid frame
-    ctx.fillStyle = '#ffffff';
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
-    ctx.shadowBlur = 14;
-    ctx.shadowOffsetY = 6;
+    // Polaroid Card Sheet
+    ctx.fillStyle = t.polaroidBg;
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.18)';
+    ctx.shadowBlur = 18;
+    ctx.shadowOffsetY = 8;
     ctx.beginPath();
-    ctx.roundRect(-125, -130, 250, 260, 8);
+    ctx.roundRect(-145, -135, 290, 275, 10);
     ctx.fill();
-
-    // Photo Box
-    ctx.fillStyle = '#e2e8f0';
-    ctx.fillRect(-110, -115, 220, 170);
-
-    // Camera Icon & Visual Memory Note
-    ctx.fillStyle = '#0284c7';
-    ctx.font = `bold 20px ${selectedFont}`;
-    ctx.textAlign = 'center';
-    ctx.fillText("📷 Daily Memory Snapshot", 0, -35);
-
-    ctx.font = `16px ${selectedFont}`;
-    ctx.fillStyle = '#64748b';
-    ctx.fillText("📍 Studio & Creative Flow", 0, -10);
-    ctx.fillText("🌅 9.2/10 Energy State", 0, 15);
-
-    // Caption
-    ctx.font = `bold 20px ${selectedFont}`;
-    ctx.fillStyle = '#1e293b';
-    ctx.fillText("Focus & Serenity Flow ✦", 0, 95);
-
-    // Polaroid Top Washi Tape
-    ctx.rotate(-0.04);
-    ctx.fillStyle = t.washi1;
-    ctx.fillRect(-45, -145, 90, 24);
     ctx.restore();
+
+    // Draw Photo Content
+    ctx.save();
+    ctx.translate(645, rightY + 130);
+    ctx.rotate(-0.035);
+
+    // Inner Photo Box
+    ctx.fillStyle = state.scrapbookTheme === 'cyber' ? '#1e293b' : '#f1f5f9';
+    ctx.fillRect(-130, -120, 260, 185);
+
+    // Snapshot Graphic & Text
+    ctx.fillStyle = t.accent2;
+    ctx.font = `bold 22px ${selectedFont}`;
+    ctx.textAlign = 'center';
+    ctx.fillText("📸 Memory Snapshot", 0, -35);
+
+    ctx.font = `18px ${selectedFont}`;
+    ctx.fillStyle = t.inkLight;
+    ctx.fillText("📍 Studio Sanctuary Flow", 0, -5);
+    ctx.fillText("🌅 9.4/10 Vitality State", 0, 22);
+
+    // Handwritten Caption below photo
+    ctx.font = `bold 23px ${selectedFont}`;
+    ctx.fillStyle = t.ink;
+    ctx.fillText("Serenity & Clarity ✦", 0, 105);
+
+    // Polaroid Top Scotch Tape
+    ctx.rotate(0.035);
+    ctx.fillStyle = t.washi1;
+    ctx.fillRect(-55, -150, 110, 24);
+    ctx.restore();
+
+    rightY += 300;
   }
 
   // --- RIGHT COLUMN 2: CBT REFLECTION & WISDOM NOTE ---
@@ -4001,45 +4148,49 @@ function renderScrapbookCard() {
     ctx.save();
     ctx.fillStyle = t.cardBg1;
     ctx.beginPath();
-    ctx.roundRect(435, 455, 305, 270, 14);
+    ctx.roundRect(480, rightY, 335, 240, 16);
     ctx.fill();
     ctx.strokeStyle = t.tapeBorder;
-    ctx.lineWidth = 1.5;
+    ctx.lineWidth = 1.4;
     ctx.stroke();
 
     // Top Washi
     ctx.fillStyle = t.washi1;
-    ctx.fillRect(475, 447, 70, 16);
+    ctx.fillRect(525, rightY - 8, 80, 18);
     ctx.restore();
 
     ctx.fillStyle = t.ink;
-    ctx.font = `bold 22px ${selectedFont}`;
-    ctx.fillText("💭 Daily CBT Insight", 450, 485);
+    ctx.font = `bold 24px ${selectedFont}`;
+    ctx.fillText("💭 Daily Reflection & CBT Insight", 498, rightY + 34);
 
-    ctx.font = `italic 19px ${selectedFont}`;
-    const quote = "Energy aligned with execution. Morning resistance was reframed into decoupled milestones. Flow maintained.";
-    wrapCanvasText(ctx, `"${quote}"`, 450, 515, 275, 24, 6);
+    ctx.font = `italic 21px ${selectedFont}`;
+    ctx.fillStyle = t.inkLight;
+    const quote = "Energy aligned with execution. Morning resistance was reframed into decoupled milestones. Deep flow maintained.";
+    wrapCanvasText(ctx, `"${quote}"`, 498, rightY + 66, 300, 25, 4);
 
-    // Cognitive Harmony Tag
+    // Cognitive Harmony Tag Pill
     ctx.save();
     ctx.fillStyle = t.washi2;
     ctx.beginPath();
-    ctx.roundRect(450, 675, 260, 32, 8);
+    ctx.roundRect(498, rightY + 185, 290, 34, 10);
     ctx.fill();
     ctx.restore();
 
-    ctx.font = `bold 17px ${selectedFont}`;
-    ctx.fillStyle = t.accent2;
-    ctx.fillText("🌿 96% Mental Equilibrium", 465, 696);
+    ctx.font = `bold 19px ${selectedFont}`;
+    ctx.fillStyle = t.accent3;
+    ctx.fillText("🌿 96% Mental Equilibrium", 515, rightY + 208);
+
+    rightY += 255;
   }
 
   // =========================================================================
-  // FOOTER: BUCKET LIST DREAMS PROGRESS & WATERMARK
+  // FOOTER: BUCKET LIST DREAMS & SIGNATURE
   // =========================================================================
+  const footerY = 945;
   ctx.save();
   ctx.fillStyle = t.washi3;
   ctx.beginPath();
-  ctx.roundRect(100, 740, width - 200, 95, 14);
+  ctx.roundRect(110, footerY, width - 200, 95, 16);
   ctx.fill();
   ctx.strokeStyle = t.accent1;
   ctx.lineWidth = 1;
@@ -4047,18 +4198,19 @@ function renderScrapbookCard() {
   ctx.restore();
 
   ctx.fillStyle = t.ink;
-  ctx.font = `bold 20px ${selectedFont}`;
-  ctx.fillText("🌠 Life Bucket List Progress:", 115, 770);
+  ctx.font = `bold 22px ${selectedFont}`;
+  ctx.fillText("🌠 Life Bucket List Milestone Progress:", 130, footerY + 32);
 
-  ctx.font = `18px ${selectedFont}`;
+  ctx.font = `20px ${selectedFont}`;
+  ctx.fillStyle = t.inkLight;
   const bucketDream = state.bucketList?.[0]?.title || "Scuba dive the Great Barrier Reef (2027)";
-  ctx.fillText(`• ${bucketDream} ✨`, 115, 796);
-  ctx.fillText("• Published Open-Source AI Architecture Benchmark [Achieved ✓]", 115, 820);
+  ctx.fillText(`• ${bucketDream} ✨`, 130, footerY + 58);
+  ctx.fillText("• Published Open-Source AI Architecture Benchmark [Achieved ✓]", 130, footerY + 82);
 
-  // Bottom Signature
-  ctx.font = `bold 20px ${selectedFont}`;
+  // Bottom Signature Stamp
+  ctx.font = `bold 21px ${selectedFont}`;
   ctx.fillStyle = t.accent1;
-  ctx.fillText("✍ Mind Cave Life Intelligence Journal", width - 360, height - 70);
+  ctx.fillText("✍ Mind Cave Life Intelligence Journal", width - 390, height - 48);
 }
 
 function generateNanoBananaScrapbookArt() {
