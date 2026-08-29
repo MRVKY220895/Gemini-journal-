@@ -163,7 +163,7 @@ class GeminiService:
                     "parts": [{"text": final_input}]
                 })
 
-                candidate_models = ["gemini-flash-latest", "gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-1.5-flash"]
+                candidate_models = ["gemini-3.5-flash", "gemini-3.7-flash", "gemini-3.6-flash", "gemini-3.1-flash-lite"]
                 for model_name in candidate_models:
                     try:
                         response = self._genai_client.models.generate_content(
@@ -172,7 +172,7 @@ class GeminiService:
                             config={
                                 "system_instruction": system_instruction,
                                 "temperature": 0.7,
-                                "max_output_tokens": 1500
+                                "max_output_tokens": 1000
                             }
                         )
                         if response and response.text:

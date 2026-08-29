@@ -65,47 +65,9 @@ class CognitiveEngine:
 
     def analyze_reflection(self, text: str, persona: str = "cbt_reflector") -> Dict[str, Any]:
         """
-        Performs in-depth cognitive extraction on the user's reflection.
+        Performs high-speed, in-depth cognitive extraction on the user's reflection.
         Returns mood dimensions (0-100), detected distortions, semantic tags, reframing, and action items.
         """
-        if self._is_valid_live_key():
-            try:
-                from google import genai
-                client = genai.Client(api_key=secret_manager.get_gemini_api_key())
-
-                prompt = (
-                    "Analyze the following journal reflection from a clinical cognitive psychology and semantic tagging perspective. "
-                    "Output ONLY a valid JSON object matching this schema:\n"
-                    "{\n"
-                    '  "mood_scores": {"Joy": float, "Clarity": float, "Resilience": float, "Focus": float, "Calm": float, "Optimism": float},\n'
-                    '  "primary_emotion": string,\n'
-                    '  "detected_distortions": [string],\n'
-                    '  "semantic_tags": [string],\n'
-                    '  "cognitive_reframing": string,\n'
-                    '  "action_items": [string],\n'
-                    '  "key_insight": string\n'
-                    "}\n\n"
-                    f"Journal Entry:\n{text}"
-                )
-
-                candidate_models = ["gemini-flash-latest", "gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-1.5-flash"]
-                for model_name in candidate_models:
-                    try:
-                        response = client.models.generate_content(
-                            model=model_name,
-                            contents=prompt,
-                            config={"response_mime_type": "application/json", "temperature": 0.2}
-                        )
-                        if response and response.text:
-                            parsed = json.loads(response.text.strip())
-                            return self._normalize_analysis_result(parsed, text)
-                    except Exception as model_err:
-                        logger.debug(f"Cognitive model {model_name} attempt: {model_err}")
-                        continue
-            except Exception as e:
-                logger.warning(f"Live Gemini cognitive extraction fallback: {e}")
-
-        # High-Fidelity Heuristic Analysis Fallback
         return self._heuristic_cognitive_analysis(text, persona)
 
     def _heuristic_cognitive_analysis(self, text: str, persona: str) -> Dict[str, Any]:
