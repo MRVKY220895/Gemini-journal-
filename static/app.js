@@ -98,12 +98,12 @@ const state = {
     completed: false
   },
   habitsList: JSON.parse(localStorage.getItem('mind_cave_habits_list') || 'null') || [
-    { id: 'h1', title: 'Hydrate 2.5 Liters', emoji: '💧', streak: 12, target: '8 glasses', isTimelineShortcut: true, history: [true, true, true, true, true, true, true] },
-    { id: 'h2', title: '15m Mindfulness & CBT', emoji: '🧘', streak: 7, target: '15 mins', isTimelineShortcut: true, history: [true, true, true, false, true, true, true] },
-    { id: 'h3', title: '30m Zone-2 Cardio / Walk', emoji: '🚶', streak: 5, target: '30 mins', isTimelineShortcut: true, history: [true, true, true, true, false, true, true] },
-    { id: 'h4', title: '20m Focused Reading', emoji: '📖', streak: 9, target: '20 pages', isTimelineShortcut: true, history: [true, true, true, true, true, true, false] },
-    { id: 'h5', title: '8h Circadian Sleep Protocol', emoji: '🌙', streak: 6, target: '8 hours', isTimelineShortcut: false, history: [true, true, true, true, true, true, true] },
-    { id: 'h6', title: '90m Deep Work Block', emoji: '💻', streak: 14, target: '1 block', isTimelineShortcut: false, history: [true, true, true, true, true, true, true] }
+    { id: 'h1', title: 'Hydrate (Drink Water)', emoji: '💧', type: 'counter', targetCount: 8, currentCount: 5, unit: 'glasses', streak: 12, target: '8 glasses', isTimelineShortcut: true, history: [true, true, true, true, true, true, false] },
+    { id: 'h2', title: '15m Mindfulness & CBT', emoji: '🧘', type: 'boolean', streak: 7, target: '15 mins', isTimelineShortcut: true, history: [true, true, true, false, true, true, true] },
+    { id: 'h3', title: '30m Zone-2 Cardio / Walk', emoji: '🚶', type: 'counter', targetCount: 30, currentCount: 30, unit: 'mins', streak: 5, target: '30 mins', isTimelineShortcut: true, history: [true, true, true, true, false, true, true] },
+    { id: 'h4', title: '20m Focused Reading', emoji: '📖', type: 'counter', targetCount: 20, currentCount: 15, unit: 'pages', streak: 9, target: '20 pages', isTimelineShortcut: true, history: [true, true, true, true, true, true, false] },
+    { id: 'h5', title: '8h Circadian Sleep Protocol', emoji: '🌙', type: 'boolean', streak: 6, target: '8 hours', isTimelineShortcut: false, history: [true, true, true, true, true, true, true] },
+    { id: 'h6', title: '90m Deep Work Block', emoji: '💻', type: 'counter', targetCount: 2, currentCount: 2, unit: 'blocks', streak: 14, target: '2 blocks', isTimelineShortcut: false, history: [true, true, true, true, true, true, true] }
   ],
   archivedHabits: JSON.parse(localStorage.getItem('mind_cave_archived_habits') || '[]'),
   bucketList: JSON.parse(localStorage.getItem('mind_cave_bucket_list') || 'null') || [
@@ -4081,27 +4081,50 @@ function renderHabitTracker() {
       </div>
     `
     : state.habitsList.map(h => {
-      const isDoneToday = Boolean(h.history && h.history[todayDayIdx]);
+      const isCounter = h.type === 'counter' || Boolean(h.targetCount);
+      const targetCount = Number(h.targetCount) || 1;
+      const currentCount = Number(h.currentCount) || 0;
+      const isDoneToday = isCounter ? (currentCount >= targetCount) : Boolean(h.history && h.history[todayDayIdx]);
+      const unit = h.unit || 'times';
+      const pct = isCounter ? Math.min(100, Math.round((currentCount / targetCount) * 100)) : (isDoneToday ? 100 : 0);
 
       return `
         <div class="habit-row p-2.5 rounded-xl border transition-all duration-200 flex items-center justify-between gap-2.5 shadow-sm ${isDoneToday ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-500/30' : 'bg-white dark:bg-black/40 border-slate-200 dark:border-white/5 hover:border-cyan-400/40'}" id="habit_row_${h.id}">
           <div class="flex items-center gap-2.5 min-w-0 flex-1">
             <span class="text-lg shrink-0">${h.emoji || '💧'}</span>
             <div class="min-w-0 flex-1">
-              <div class="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate flex items-center gap-1.5">
-                <span class="cursor-pointer hover:text-cyan-500 transition-colors ${isDoneToday ? 'font-bold' : ''}" onclick="openNewHabitModal('${h.id}')" title="Click to edit">${escapeHtml(h.title)}</span>
+              <div class="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate flex items-center gap-1.5 flex-wrap">
+                <span class="cursor-pointer hover:text-cyan-500 transition-colors ${isDoneToday ? 'font-bold text-emerald-600 dark:text-emerald-300' : ''}" onclick="openNewHabitModal('${h.id}')" title="Click to edit">${escapeHtml(h.title)}</span>
+                ${isCounter ? `<span class="text-[9px] px-1.5 py-0.2 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30 font-mono font-bold">Summation: ${currentCount}/${targetCount} ${unit}</span>` : ''}
                 ${h.isTimelineShortcut !== false ? '<span class="text-[9px] px-1.5 py-0.2 rounded-full bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-500/30 font-mono">Shortcut</span>' : ''}
               </div>
-              <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono flex items-center gap-1.5 mt-0.5">
+              <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono flex items-center gap-2 mt-0.5 flex-wrap">
                 <span class="text-amber-600 dark:text-amber-400 font-bold flex items-center gap-0.5"><i data-lucide="flame" class="w-3 h-3 text-amber-500"></i><span>${h.streak}d streak</span></span>
-                ${h.target ? `<span class="text-slate-400">•</span> <span class="text-slate-600 dark:text-slate-300">${escapeHtml(h.target)}</span>` : ''}
+                ${isCounter ? `
+                  <div class="flex items-center gap-1.5">
+                    <div class="w-16 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden flex">
+                      <div class="h-full ${isDoneToday ? 'bg-emerald-500' : 'bg-cyan-500'} rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+                    </div>
+                    <span class="text-slate-600 dark:text-slate-300 font-bold">${pct}%</span>
+                  </div>
+                ` : (h.target ? `<span class="text-slate-400">•</span> <span class="text-slate-600 dark:text-slate-300">${escapeHtml(h.target)}</span>` : '')}
               </div>
             </div>
           </div>
 
-          <!-- Today Only Action or Optional Week Matrix -->
+          <!-- Actions: Repeatable Counter Stepper OR 1-Tap Toggle -->
           <div class="flex items-center gap-1.5 shrink-0">
-            ${showWeeklyHabitMatrix ? `
+            ${isCounter ? `
+              <!-- Repeatable Counter Stepper: [-] [Count/Target] [+1] -->
+              <div class="flex items-center gap-1 bg-slate-100 dark:bg-white/5 p-0.5 rounded-xl border border-slate-200 dark:border-white/10">
+                <button type="button" onclick="incrementHabitCount('${h.id}', -1)" class="w-6 h-6 rounded-lg bg-white dark:bg-black/40 hover:bg-slate-200 dark:hover:bg-white/20 text-slate-700 dark:text-slate-300 flex items-center justify-center font-bold text-xs transition-colors" title="Subtract 1 ${unit}">-</button>
+                <span class="px-2 font-mono font-bold text-xs ${isDoneToday ? 'text-emerald-600 dark:text-emerald-400' : 'text-cyan-600 dark:text-cyan-300'}">${currentCount}/${targetCount}</span>
+                <button type="button" onclick="incrementHabitCount('${h.id}', 1)" class="px-2 h-6 rounded-lg ${isDoneToday ? 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-sm' : 'bg-cyan-500 text-white hover:bg-cyan-600 shadow-sm'} flex items-center gap-0.5 font-bold text-xs transition-colors" title="Log +1 ${unit}">
+                  <i data-lucide="plus" class="w-3 h-3 text-white"></i>
+                  <span>+1</span>
+                </button>
+              </div>
+            ` : (showWeeklyHabitMatrix ? `
               <div class="flex items-center gap-1 mr-1">
                 ${h.history.map((isDone, idx) => `
                   <div onclick="toggleHabitDay('${h.id}', ${idx})" class="habit-dot ${isDone ? 'done' : ''} ${idx === todayDayIdx ? 'ring-1 ring-amber-400 font-bold' : ''}" title="${days[idx]} - ${isDone ? 'Done' : 'Missed'}">
@@ -4115,8 +4138,8 @@ function renderHabitTracker() {
                 <i data-lucide="${isDoneToday ? 'check-circle' : 'circle'}" class="w-3.5 h-3.5 ${isDoneToday ? 'text-white' : 'text-slate-400'}"></i>
                 <span>${isDoneToday ? 'Done Today' : 'Mark Done'}</span>
               </button>
-            `}
-            <button type="button" onclick="openNewHabitModal('${h.id}')" class="p-1 text-slate-400 hover:text-amber-500 transition-colors" title="Edit Habit">
+            `)}
+            <button type="button" onclick="openNewHabitModal('${h.id}')" class="p-1 text-slate-400 hover:text-amber-500 transition-colors" title="Edit Habit & Target Metrics">
               <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
             </button>
             <button type="button" onclick="deleteHabit('${h.id}')" class="p-1 text-slate-400 hover:text-rose-500 transition-colors" title="Move to Archive (Preserves Tracks & Streaks)">
@@ -4132,7 +4155,12 @@ function renderHabitTracker() {
   });
 
   // Update Done count pills & streak badges
-  const doneCount = state.habitsList.filter(h => h.history[todayDayIdx]).length;
+  const doneCount = state.habitsList.filter(h => {
+    if (h.type === 'counter' || h.targetCount) {
+      return (Number(h.currentCount) || 0) >= (Number(h.targetCount) || 1);
+    }
+    return Boolean(h.history && h.history[todayDayIdx]);
+  }).length;
   const totalHabits = state.habitsList.length;
   const habitPct = totalHabits > 0 ? Math.round((doneCount / totalHabits) * 100) : 0;
 
@@ -4147,6 +4175,50 @@ function renderHabitTracker() {
 
   renderUndoHabitBanner();
   updateArchivedHabitsBadges();
+  lucide.createIcons();
+}
+
+function incrementHabitCount(habitId, delta = 1) {
+  const todayDayIdx = (new Date().getDay() + 6) % 7; // Monday = 0
+  const habit = state.habitsList.find(h => h.id === habitId);
+  if (!habit) return;
+
+  habit.type = 'counter';
+  const target = Number(habit.targetCount) || 8;
+  habit.targetCount = target;
+  habit.currentCount = Math.max(0, (Number(habit.currentCount) || 0) + delta);
+  const wasCompleted = Boolean(habit.history && habit.history[todayDayIdx]);
+  const isNowCompleted = habit.currentCount >= target;
+
+  if (Array.isArray(habit.history)) {
+    habit.history[todayDayIdx] = isNowCompleted;
+  }
+
+  if (isNowCompleted && !wasCompleted) {
+    habit.streak = (habit.streak || 0) + 1;
+    showToast(`🎉 Daily Target Met! ${habit.title} (${habit.currentCount}/${target} ${habit.unit || 'units'})`);
+  } else if (!isNowCompleted && wasCompleted) {
+    habit.streak = Math.max(0, (habit.streak || 1) - 1);
+  } else if (delta > 0) {
+    showToast(`+1 ${habit.unit || 'time'} logged for "${habit.title}" (${habit.currentCount}/${target})`);
+  }
+
+  localStorage.setItem('mind_cave_habits_list', JSON.stringify(state.habitsList));
+  renderHabitTracker();
+  renderTimelineShortcuts();
+  renderShortcutsManagerList();
+}
+
+function toggleHabitTypeFields(type) {
+  const boolGroup = document.getElementById('habit-boolean-fields-group');
+  const countGroup = document.getElementById('habit-counter-fields-group');
+  if (type === 'counter') {
+    if (boolGroup) boolGroup.classList.add('hidden');
+    if (countGroup) countGroup.classList.remove('hidden');
+  } else {
+    if (boolGroup) boolGroup.classList.remove('hidden');
+    if (countGroup) countGroup.classList.add('hidden');
+  }
   lucide.createIcons();
 }
 
@@ -4380,6 +4452,11 @@ function toggleHabitDay(habitId, dayIndex) {
   const habit = state.habitsList.find(h => h.id === habitId);
   if (!habit) return;
 
+  if (habit.type === 'counter' || habit.targetCount) {
+    incrementHabitCount(habitId, 1);
+    return;
+  }
+
   habit.history[dayIndex] = !habit.history[dayIndex];
   if (habit.history[dayIndex]) habit.streak += 1;
   else habit.streak = Math.max(0, habit.streak - 1);
@@ -4403,6 +4480,12 @@ function openNewHabitModal(habitId = null) {
   const deleteBtn = document.getElementById('habit-modal-delete-btn');
   const submitLbl = document.getElementById('habit-modal-submit-lbl');
 
+  const boolRadio = document.getElementById('habit-type-boolean');
+  const counterRadio = document.getElementById('habit-type-counter');
+  const targetCountInput = document.getElementById('habit-target-count-input');
+  const unitNameInput = document.getElementById('habit-unit-name-input');
+  const currentCountInput = document.getElementById('habit-current-count-input');
+
   if (habitId) {
     const habit = state.habitsList.find(h => h.id === habitId);
     if (habit) {
@@ -4415,6 +4498,19 @@ function openNewHabitModal(habitId = null) {
       if (modalTitle) modalTitle.textContent = 'Edit Custom Habit';
       if (submitLbl) submitLbl.textContent = 'Update Habit';
       if (deleteBtn) deleteBtn.classList.remove('hidden');
+
+      if (habit.type === 'counter' || habit.targetCount) {
+        if (counterRadio) counterRadio.checked = true;
+        if (boolRadio) boolRadio.checked = false;
+        toggleHabitTypeFields('counter');
+        if (targetCountInput) targetCountInput.value = habit.targetCount || 8;
+        if (unitNameInput) unitNameInput.value = habit.unit || 'glasses';
+        if (currentCountInput) currentCountInput.value = habit.currentCount || 0;
+      } else {
+        if (boolRadio) boolRadio.checked = true;
+        if (counterRadio) counterRadio.checked = false;
+        toggleHabitTypeFields('boolean');
+      }
     }
   } else {
     if (idInput) idInput.value = '';
@@ -4426,6 +4522,13 @@ function openNewHabitModal(habitId = null) {
     if (modalTitle) modalTitle.textContent = 'Add New Micro-Habit';
     if (submitLbl) submitLbl.textContent = 'Save Habit';
     if (deleteBtn) deleteBtn.classList.add('hidden');
+
+    if (boolRadio) boolRadio.checked = true;
+    if (counterRadio) counterRadio.checked = false;
+    toggleHabitTypeFields('boolean');
+    if (targetCountInput) targetCountInput.value = 8;
+    if (unitNameInput) unitNameInput.value = 'glasses';
+    if (currentCountInput) currentCountInput.value = 0;
   }
 
   modal.classList.remove('hidden');
@@ -4452,6 +4555,11 @@ function submitNewHabit(event) {
   const freq = document.getElementById('habit-freq-select')?.value;
   const isShortcut = document.getElementById('habit-shortcut-toggle-check')?.checked ?? true;
 
+  const isCounter = document.getElementById('habit-type-counter')?.checked;
+  const targetCount = Number(document.getElementById('habit-target-count-input')?.value) || 8;
+  const unitName = document.getElementById('habit-unit-name-input')?.value.trim() || 'times';
+  const currentCount = Number(document.getElementById('habit-current-count-input')?.value) || 0;
+
   if (!title) return;
 
   if (id) {
@@ -4460,23 +4568,49 @@ function submitNewHabit(event) {
     if (habit) {
       habit.title = title;
       habit.emoji = selectedHabitEmojiVal;
-      habit.target = target;
       habit.frequency = freq;
       habit.isTimelineShortcut = isShortcut;
+
+      if (isCounter) {
+        habit.type = 'counter';
+        habit.targetCount = targetCount;
+        habit.unit = unitName;
+        habit.currentCount = currentCount;
+        habit.target = `${targetCount} ${unitName}`;
+      } else {
+        habit.type = 'boolean';
+        habit.target = target;
+        delete habit.targetCount;
+        delete habit.currentCount;
+        delete habit.unit;
+      }
+
       showToast(`Updated habit: ${title}`);
     }
   } else {
     // Add new
+    const todayDayIdx = (new Date().getDay() + 6) % 7;
+    const historyArr = [false, false, false, false, false, false, false];
+    if (isCounter && currentCount >= targetCount) historyArr[todayDayIdx] = true;
+
     const newHabit = {
       id: `h_${Date.now()}`,
       title: title,
       emoji: selectedHabitEmojiVal,
-      target: target,
+      type: isCounter ? 'counter' : 'boolean',
+      target: isCounter ? `${targetCount} ${unitName}` : target,
       frequency: freq,
       isTimelineShortcut: isShortcut,
       streak: 1,
-      history: [true, false, false, false, false, false, false]
+      history: historyArr
     };
+
+    if (isCounter) {
+      newHabit.targetCount = targetCount;
+      newHabit.unit = unitName;
+      newHabit.currentCount = currentCount;
+    }
+
     state.habitsList.push(newHabit);
     showToast(`Added habit: ${title}`);
   }
@@ -4556,12 +4690,17 @@ function renderTimelineShortcuts() {
   }
 
   const shortcutsHtml = shortcutHabits.map(h => {
-    const isDone = h.history[todayDayIdx];
+    const isCounter = h.type === 'counter' || Boolean(h.targetCount);
+    const targetCount = Number(h.targetCount) || 1;
+    const currentCount = Number(h.currentCount) || 0;
+    const isDone = isCounter ? (currentCount >= targetCount) : Boolean(h.history && h.history[todayDayIdx]);
+
     return `
       <button type="button" onclick="logHabit('${h.id}')" class="p-1 px-2.5 rounded-xl border transition-all text-left flex items-center gap-1.5 shrink-0 ${isDone ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-500/40 text-emerald-800 dark:text-emerald-300' : 'bg-slate-50 dark:bg-black/40 border-slate-200 dark:border-white/10 hover:border-cyan-400 text-slate-700 dark:text-slate-200'}" title="1-Tap Log: ${escapeHtml(h.title)}">
         <span class="text-xs">${h.emoji || '💧'}</span>
         <span class="text-xs font-semibold whitespace-nowrap">${escapeHtml(h.title.split(' ')[0] || h.title)}</span>
-        <span class="text-[10px] font-bold ${isDone ? 'text-emerald-500' : 'text-slate-400'}">${isDone ? '✓' : '+1'}</span>
+        ${isCounter ? `<span class="text-[10px] font-mono font-bold ${isDone ? 'text-emerald-500' : 'text-cyan-400'}">${currentCount}/${targetCount}</span>` : ''}
+        <span class="text-[10px] font-bold ${isDone ? 'text-emerald-500' : 'text-slate-400'}">${isDone && !isCounter ? '✓' : '+1'}</span>
       </button>
     `;
   }).join('');
@@ -4569,6 +4708,24 @@ function renderTimelineShortcuts() {
   containers.forEach(c => {
     c.innerHTML = shortcutsHtml;
   });
+}
+
+function logHabit(habitKey) {
+  let habit = state.habitsList.find(h => h.id === habitKey || h.id === `h_${habitKey}`);
+  if (!habit) {
+    habit = state.habitsList.find(h => h.title.toLowerCase().includes(habitKey.toLowerCase()));
+  }
+  if (!habit && state.habitsList.length > 0) {
+    habit = state.habitsList[0];
+  }
+  if (!habit) return;
+
+  if (habit.type === 'counter' || habit.targetCount) {
+    incrementHabitCount(habit.id, 1);
+  } else {
+    const todayDayIdx = (new Date().getDay() + 6) % 7;
+    toggleHabitDay(habit.id, todayDayIdx);
+  }
 }
 
 function toggleGoalsTilesCollapse() {
@@ -4612,28 +4769,6 @@ function openGoalsHabitsModal() {
 function closeGoalsHabitsModal() {
   const modal = document.getElementById('goals-habits-modal');
   if (modal) modal.classList.add('hidden');
-}
-
-function logHabit(habitKey) {
-  const todayDayIdx = (new Date().getDay() + 6) % 7;
-  let habit = state.habitsList.find(h => h.id === habitKey || h.id === `h_${habitKey}`);
-  if (!habit) {
-    habit = state.habitsList.find(h => h.title.toLowerCase().includes(habitKey.toLowerCase()));
-  }
-  if (!habit && state.habitsList.length > 0) {
-    habit = state.habitsList[0];
-  }
-
-  if (habit) {
-    habit.history[todayDayIdx] = !habit.history[todayDayIdx];
-    if (habit.history[todayDayIdx]) habit.streak += 1;
-    else habit.streak = Math.max(0, habit.streak - 1);
-
-    localStorage.setItem('mind_cave_habits_list', JSON.stringify(state.habitsList));
-    renderHabitTracker();
-    renderTimelineShortcuts();
-    showToast(`${habit.title}: ${habit.history[todayDayIdx] ? '✓ Done for today!' : 'Marked incomplete'}`);
-  }
 }
 
 // =============================================================================

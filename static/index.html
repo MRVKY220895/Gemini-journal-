@@ -372,13 +372,13 @@
           <!-- 2 Side-by-Side Tiles (Collapsible) -->
           <div id="goals-habits-deck-body" class="grid grid-cols-1 lg:grid-cols-12 gap-3 transition-all duration-300">
             
-            <!-- TILE 1: Today's Achievable Goals (Left Column, 7 Cols) -->
+            <!-- Today's Achievable Goals (Left Column, 7 Cols) -->
             <div class="lg:col-span-7 flex flex-col justify-between p-3 rounded-2xl bg-slate-50/80 dark:bg-black/30 border border-slate-200/80 dark:border-white/5 space-y-3">
               <div class="space-y-2.5">
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-                    <h5 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider font-mono">Tile 1: Achievable Goals</h5>
+                    <h5 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider font-mono">Today's Achievable Goals</h5>
                   </div>
                   <button type="button" onclick="openScrapbookModal()" class="text-[11px] text-pink-600 dark:text-pink-400 hover:underline flex items-center gap-1 font-semibold">
                     <i data-lucide="share-2" class="w-3 h-3"></i> <span>Share</span>
@@ -407,13 +407,13 @@
               </div>
             </div>
 
-            <!-- TILE 2: Daily Habits & 1-Tap Shortcuts (Right Column, 5 Cols) -->
+            <!-- Daily Habits & Streaks (Right Column, 5 Cols) -->
             <div class="lg:col-span-5 flex flex-col justify-between p-3 rounded-2xl bg-slate-50/80 dark:bg-black/30 border border-slate-200/80 dark:border-white/5 space-y-3">
               <div class="space-y-2.5">
                 <div class="flex items-center justify-between flex-wrap gap-1">
                   <div class="flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-cyan-500"></span>
-                    <h5 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider font-mono">Tile 2: Today's Habits</h5>
+                    <h5 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider font-mono">Daily Habits & Streaks</h5>
                   </div>
                   <div class="flex items-center gap-2">
                     <button type="button" onclick="openArchivedHabitsModal()" class="text-[10px] text-slate-500 hover:text-cyan-500 dark:text-slate-400 dark:hover:text-cyan-300 font-mono flex items-center gap-1 transition-colors" title="View & Recover Archived Habits">
@@ -2480,7 +2480,29 @@
             </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-2">
+          <!-- Tracking Mode: Boolean or Repeatable Counter -->
+          <div>
+            <label class="text-slate-300 block mb-1 font-semibold">Habit Tracking Mode</label>
+            <div class="grid grid-cols-2 gap-2">
+              <label class="p-2.5 rounded-xl border border-slate-700 bg-black/40 flex items-center gap-2 cursor-pointer hover:border-amber-500 transition-colors has-[:checked]:border-amber-500 has-[:checked]:bg-amber-500/10">
+                <input type="radio" name="habit_type_radio" id="habit-type-boolean" value="boolean" checked onchange="toggleHabitTypeFields(this.value)" class="text-amber-500 accent-amber-500 cursor-pointer">
+                <div>
+                  <div class="font-bold text-slate-200 text-xs">1-Tap Check-in</div>
+                  <div class="text-[10px] text-slate-400">Done / Not Done (1x/day)</div>
+                </div>
+              </label>
+              <label class="p-2.5 rounded-xl border border-slate-700 bg-black/40 flex items-center gap-2 cursor-pointer hover:border-cyan-500 transition-colors has-[:checked]:border-cyan-500 has-[:checked]:bg-cyan-500/10">
+                <input type="radio" name="habit_type_radio" id="habit-type-counter" value="counter" onchange="toggleHabitTypeFields(this.value)" class="text-cyan-500 accent-cyan-500 cursor-pointer">
+                <div>
+                  <div class="font-bold text-slate-200 text-xs">Repeatable Counter</div>
+                  <div class="text-[10px] text-slate-400">Summation (e.g. 8 glasses)</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Boolean Type Fields -->
+          <div id="habit-boolean-fields-group" class="grid grid-cols-2 gap-2">
             <div>
               <label class="text-slate-300 block mb-1 font-semibold">Target Frequency</label>
               <select id="habit-freq-select" class="w-full bg-slate-900 text-slate-200 text-xs p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-500">
@@ -2490,15 +2512,37 @@
               </select>
             </div>
             <div>
-              <label class="text-slate-300 block mb-1 font-semibold">Daily Target Unit</label>
-              <input type="text" id="habit-target-unit-input" placeholder="e.g. 8 glasses / 20 mins" class="w-full bg-slate-900 text-slate-200 text-xs p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-500">
+              <label class="text-slate-300 block mb-1 font-semibold">Goal Description / Unit</label>
+              <input type="text" id="habit-target-unit-input" placeholder="e.g. 15 mins / 8 hours" class="w-full bg-slate-900 text-slate-200 text-xs p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-500">
+            </div>
+          </div>
+
+          <!-- Counter Type Fields (Dynamic) -->
+          <div id="habit-counter-fields-group" class="p-3 rounded-2xl bg-cyan-950/20 border border-cyan-500/30 space-y-2.5 hidden">
+            <div class="flex items-center gap-1.5 text-cyan-400 font-semibold text-xs">
+              <i data-lucide="calculator" class="w-3.5 h-3.5"></i>
+              <span>Daily Summation Metrics</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              <div>
+                <label class="text-slate-300 block mb-1 font-semibold">Target Goal</label>
+                <input type="number" id="habit-target-count-input" min="1" max="1000" placeholder="e.g. 8" value="8" class="w-full bg-slate-900 text-cyan-300 font-mono font-bold text-xs p-2 rounded-xl border border-slate-700 focus:outline-none focus:border-cyan-400">
+              </div>
+              <div>
+                <label class="text-slate-300 block mb-1 font-semibold">Unit Metric</label>
+                <input type="text" id="habit-unit-name-input" placeholder="e.g. glasses, cups, reps, km" value="glasses" class="w-full bg-slate-900 text-slate-200 text-xs p-2 rounded-xl border border-slate-700 focus:outline-none focus:border-cyan-400">
+              </div>
+              <div>
+                <label class="text-slate-300 block mb-1 font-semibold">Done Today</label>
+                <input type="number" id="habit-current-count-input" min="0" max="1000" placeholder="0" value="0" class="w-full bg-slate-900 text-emerald-400 font-mono font-bold text-xs p-2 rounded-xl border border-slate-700 focus:outline-none focus:border-emerald-400">
+              </div>
             </div>
           </div>
 
           <div class="p-2.5 rounded-xl bg-cyan-950/30 border border-cyan-500/20 flex items-center justify-between">
             <div>
               <div class="font-bold text-cyan-300">Show on Living Timeline</div>
-              <div class="text-[10px] text-slate-400">1-tap shortcut button above the timeline</div>
+              <div class="text-[10px] text-slate-400">1-tap +1 shortcut button above the timeline</div>
             </div>
             <input type="checkbox" id="habit-shortcut-toggle-check" checked class="w-4 h-4 rounded text-cyan-500 bg-slate-900 border-slate-700 cursor-pointer">
           </div>
@@ -3075,7 +3119,7 @@
             <div>
               <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
                 <span>Today's Focus & Habits Hub</span>
-                <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">2-Tile View</span>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">Focus Deck</span>
               </h3>
               <p class="text-xs text-slate-400">Manage achievable goals, start/end duration, daily habit streaks, and shortcuts.</p>
             </div>
@@ -3094,15 +3138,15 @@
           </div>
         </div>
 
-        <!-- 2 Side-by-Side Tiles in Modal -->
+        <!-- 2 Side-by-Side Cards in Modal -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-          <!-- TILE 1: Today's Achievable Goals (Left Column, 7 Cols) -->
+          <!-- Today's Achievable Goals (Left Column, 7 Cols) -->
           <div class="lg:col-span-7 flex flex-col justify-between p-4 rounded-2xl bg-black/40 border border-white/10 space-y-3">
             <div class="space-y-3">
               <div class="flex items-center justify-between border-b border-white/5 pb-2">
                 <div class="flex items-center gap-2">
                   <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
-                  <h4 class="text-xs font-bold text-white uppercase tracking-wider font-mono">Tile 1: Achievable Goals</h4>
+                  <h4 class="text-xs font-bold text-white uppercase tracking-wider font-mono">Today's Achievable Goals</h4>
                 </div>
                 <div class="flex items-center gap-1.5">
                   <span id="modal-goals-completed-badge" class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 font-mono font-bold flex items-center gap-1">
@@ -3138,13 +3182,13 @@
             </div>
           </div>
 
-          <!-- TILE 2: Daily Habits & 1-Tap Shortcuts (Right Column, 5 Cols) -->
+          <!-- Daily Habits & Streaks (Right Column, 5 Cols) -->
           <div class="lg:col-span-5 flex flex-col justify-between p-4 rounded-2xl bg-black/40 border border-white/10 space-y-3">
             <div class="space-y-3">
               <div class="flex items-center justify-between border-b border-white/5 pb-2 flex-wrap gap-1">
                 <div class="flex items-center gap-2">
                   <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
-                  <h4 class="text-xs font-bold text-white uppercase tracking-wider font-mono">Tile 2: Today's Habits</h4>
+                  <h4 class="text-xs font-bold text-white uppercase tracking-wider font-mono">Daily Habits & Streaks</h4>
                 </div>
                 <div class="flex items-center gap-2">
                   <button type="button" onclick="toggleHabitWeeklyView()" class="text-[10px] text-slate-400 hover:text-cyan-300 font-mono flex items-center gap-1 transition-colors">
