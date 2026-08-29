@@ -82,6 +82,7 @@ class FirebaseAuthManager:
         """
         Verify the Firebase ID Token.
         In production with Firebase Admin SDK, cryptographically verifies the token.
+        """
         # 0. Graceful fallback for empty, guest, or undefined tokens
         if not token or not token.strip() or token.strip().lower() in ("null", "undefined", "bearer", "guest"):
             return UserContext(
