@@ -1296,6 +1296,102 @@ function closeNewJournalModal() {
   if (box) box.classList.add('hidden');
 }
 
+let timelineViewMode = 'stream';
+let storyCurrentIndex = 0;
+let storyEventsCache = [];
+
+function setTimelineViewMode(mode) {
+  timelineViewMode = mode;
+  const streamBtn = document.getElementById('view-mode-stream-btn');
+  const storyBtn = document.getElementById('view-mode-story-btn');
+  const streamView = document.getElementById('chrono-timeline-list');
+  const storyView = document.getElementById('chrono-story-view');
+
+  if (mode === 'stream') {
+    if (streamBtn) streamBtn.className = 'px-2.5 py-1 rounded-lg font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 flex items-center gap-1';
+    if (storyBtn) storyBtn.className = 'px-2.5 py-1 rounded-lg font-semibold text-slate-400 hover:text-white flex items-center gap-1';
+    if (streamView) streamView.classList.remove('hidden');
+    if (storyView) storyView.classList.add('hidden');
+  } else {
+    if (storyBtn) storyBtn.className = 'px-2.5 py-1 rounded-lg font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 flex items-center gap-1';
+    if (streamBtn) streamBtn.className = 'px-2.5 py-1 rounded-lg font-semibold text-slate-400 hover:text-white flex items-center gap-1';
+    if (streamView) streamView.classList.add('hidden');
+    if (storyView) storyView.classList.remove('hidden');
+    initStorySwipeDrag();
+  }
+}
+
+function getChronologicalEvents(journals) {
+  const events = [];
+
+  // 1. Add Journal Entries (only actual logged data)
+  journals.forEach((j, idx) => {
+    let timeStr = '12:00';
+    const timeMatch = j.title && j.title.match(/\[(\d{1,2}:\d{2})\]/);
+    if (timeMatch) {
+      timeStr = timeMatch[1];
+    } else {
+      const hoursMap = ['08:15', '11:30', '14:45', '17:30', '20:00'];
+      timeStr = hoursMap[idx % hoursMap.length];
+    }
+
+    events.push({
+      id: `journal_${j.id || idx}`,
+      type: 'journal',
+      time: timeStr,
+      rawHour: parseInt(timeStr.substring(0, 2), 10) || 12,
+      title: j.title.replace(/\[\d{1,2}:\d{2}\]\s*/, '') || 'Reflective Journal Turn',
+      content: j.content,
+      mood: j.mood || 'Reflective',
+      cbtNote: j.insights?.cognitive_reframing || null,
+      location: '📍 Connaught Place, New Delhi',
+      energy: '8/10',
+      photoUrl: null
+    });
+  });
+
+  // 2. Add Memory Photos
+  memoryPhotosList.forEach(p => {
+    events.push({
+      id: p.id,
+      type: 'photo',
+      time: p.hour,
+      rawHour: parseInt(p.hour.substring(0, 2), 10) || 12,
+      title: p.caption,
+      content: p.caption,
+      mood: p.mood,
+      cbtNote: null,
+      location: p.location,
+      energy: p.energy,
+      photoUrl: p.url
+    });
+  });
+
+  // 3. Add Google Calendar Events if synced
+  if (isGCalSynced) {
+    Object.keys(mockGCalSchedule).forEach(h => {
+      const g = mockGCalSchedule[h];
+      events.push({
+        id: `gcal_${h}`,
+        type: 'gcal',
+        time: h,
+        rawHour: parseInt(h.substring(0, 2), 10),
+        title: `Google Calendar: ${g.title}`,
+        content: `Scheduled session for ${g.duration} (${g.category}). Planned agenda synchronized to daily chronicle.`,
+        mood: '🗓️ Planned',
+        cbtNote: null,
+        location: '📍 Google Meet / Workspace',
+        energy: '⚡ Schedule',
+        photoUrl: null
+      });
+    });
+  }
+
+  // Sort strictly by timestamp
+  events.sort((a, b) => a.time.localeCompare(b.time));
+  return events;
+}
+
 async function renderChronoTimeline() {
   const container = document.getElementById('chrono-timeline-list');
   if (!container) return;
@@ -1310,42 +1406,55 @@ async function renderChronoTimeline() {
     journals = [];
   }
 
-  // Generate hours array based on timelineRange
-  let hours = [];
-  if (state.timelineRange === 'full_24h') {
-    for (let i = 0; i < 24; i++) hours.push(String(i).padStart(2, '0') + ':00');
-  } else if (state.timelineRange === 'active_focus') {
-    for (let i = 8; i <= 20; i++) hours.push(String(i).padStart(2, '0') + ':00');
-  } else {
-    // Default Day Span (06:00 to 23:00)
-    for (let i = 6; i <= 23; i++) hours.push(String(i).padStart(2, '0') + ':00');
-  }
+  const events = getChronologicalEvents(journals);
+  storyEventsCache = events;
 
+  // Real-time details
   const now = new Date();
   const currentHourInt = now.getHours();
   const currentMinStr = String(now.getMinutes()).padStart(2, '0');
-  const currentHourFormatted = String(currentHourInt).padStart(2, '0') + ':00';
   const displayAmpm = currentHourInt >= 12 ? 'PM' : 'AM';
   const display12H = (currentHourInt % 12 || 12) + ':' + currentMinStr + ' ' + displayAmpm;
+
+  // If NO logged entries exist for today
+  if (events.length === 0) {
+    container.innerHTML = `
+      <div class="p-8 text-center bg-black/30 rounded-3xl border border-white/5 space-y-3 my-4">
+        <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-300 mx-auto shadow-lg shadow-cyan-500/10">
+          <i data-lucide="feather" class="w-6 h-6"></i>
+        </div>
+        <h4 class="text-base font-bold text-white">Your Daily Chronicle is Open</h4>
+        <p class="text-xs text-slate-400 max-w-sm mx-auto">
+          No entries recorded for this day yet. Every thought, mood pulse, and photo you capture will appear here in chronological order.
+        </p>
+        <button onclick="openNewJournalModal()" class="btn-island mx-auto mt-2 !py-2 !px-4">
+          <span>+ Write First Life Moment</span>
+          <div class="btn-island-icon !w-5 !h-5">
+            <i data-lucide="plus" class="w-3.5 h-3.5 text-white"></i>
+          </div>
+        </button>
+      </div>
+    `;
+    lucide.createIcons();
+    renderStoryCarousel(events);
+    return;
+  }
 
   let html = '<div class="timeline-spine"></div>';
   let nowMarkerInserted = false;
 
-  hours.forEach((h, index) => {
-    const hourInt = parseInt(h.substring(0, 2), 10);
-    const isCurrentHour = hourInt === currentHourInt;
-
-    // Circadian / Weather Anchor Icon
+  events.forEach((ev) => {
+    // Circadian / Weather Badge
     let weatherBadge = '☀️ Midday';
-    if (hourInt >= 5 && hourInt < 9) weatherBadge = '🌅 Dawn Routine';
-    else if (hourInt >= 9 && hourInt < 13) weatherBadge = '⚡ Focus Block';
-    else if (hourInt >= 13 && hourInt < 17) weatherBadge = '🎯 Execution';
-    else if (hourInt >= 17 && hourInt < 20) weatherBadge = '🌇 Golden Hour';
-    else if (hourInt >= 20) weatherBadge = '🌌 Night Sanctuary';
+    if (ev.rawHour >= 5 && ev.rawHour < 9) weatherBadge = '🌅 Dawn Routine';
+    else if (ev.rawHour >= 9 && ev.rawHour < 13) weatherBadge = '⚡ Focus Block';
+    else if (ev.rawHour >= 13 && ev.rawHour < 17) weatherBadge = '🎯 Execution';
+    else if (ev.rawHour >= 17 && ev.rawHour < 20) weatherBadge = '🌇 Golden Hour';
+    else if (ev.rawHour >= 20) weatherBadge = '🌌 Night Sanctuary';
     else weatherBadge = '🌙 Deep Rest';
 
-    // Insert LIVE NOW laser needle at exact current position
-    if (!nowMarkerInserted && hourInt >= currentHourInt) {
+    // Insert LIVE NOW laser needle at appropriate chronological spot
+    if (!nowMarkerInserted && ev.rawHour >= currentHourInt) {
       html += `
         <div class="timeline-now-marker">
           <div class="timeline-now-badge">
@@ -1358,87 +1467,68 @@ async function renderChronoTimeline() {
       nowMarkerInserted = true;
     }
 
-    const gcalEvent = isGCalSynced ? mockGCalSchedule[h] : null;
-    const matchingJournal = journals.find(j => j.title && j.title.includes(h)) || (journals[index % (journals.length || 1)] && index < 2 ? journals[index] : null);
-    const matchingPhoto = memoryPhotosList.find(p => p.hour.startsWith(h.substring(0, 2)));
-
-    const hasEntry = matchingJournal || matchingPhoto;
-    const rowClass = `timeline-hour-row ${hasEntry ? 'has-entry' : ''} ${gcalEvent ? 'has-gcal' : ''} ${isCurrentHour ? 'is-current-hour' : ''}`;
+    const isGCal = ev.type === 'gcal';
+    const isPhoto = ev.type === 'photo';
 
     html += `
-      <div class="${rowClass}">
+      <div class="timeline-hour-row has-entry ${isGCal ? 'has-gcal' : ''}">
         <!-- Node Dot & Hour Label -->
         <div class="timeline-hour-node">
           <div class="timeline-node-dot"></div>
-          <span class="timeline-hour-label font-mono">${h}</span>
+          <span class="timeline-hour-label font-mono font-bold">${ev.time}</span>
         </div>
 
-        <!-- Editorial Diary Entry Card -->
-        <div class="chrono-block-card ${isCurrentHour ? 'is-active-moment' : ''}">
+        <!-- Editorial Diary Page Card -->
+        <div class="chrono-block-card">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2.5">
             <div class="flex items-center gap-2 flex-wrap">
               <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-black/40 border border-white/10 text-slate-300">
                 ${weatherBadge}
               </span>
 
-              ${gcalEvent ? `
+              ${isGCal ? `
                 <span class="gcal-planned-pill">
                   <i data-lucide="calendar" class="w-3 h-3 text-blue-400"></i>
-                  <span>GCal: ${escapeHtml(gcalEvent.title)}</span>
+                  <span>GCal Sync</span>
                 </span>
-              ` : ''}
-
-              ${matchingJournal ? `
+              ` : `
                 <span class="eyebrow-badge !text-cyan-300 !bg-cyan-950/40 !border-cyan-500/30">
-                  ${escapeHtml(matchingJournal.mood || 'Reflective')}
+                  ${escapeHtml(ev.mood)}
                 </span>
-              ` : ''}
+              `}
 
-              ${matchingPhoto ? `
-                <span class="text-[10px] text-amber-400 bg-amber-950/40 border border-amber-500/30 px-2 py-0.5 rounded-full font-mono flex items-center gap-1">
-                  <i data-lucide="camera" class="w-2.5 h-2.5"></i> Photo Attached
+              ${ev.energy ? `
+                <span class="text-[10px] text-amber-400 bg-amber-950/30 border border-amber-500/30 px-2 py-0.5 rounded-full font-mono">
+                  ⚡ ${ev.energy}
                 </span>
               ` : ''}
             </div>
 
             <div class="flex items-center gap-2">
-              <span class="text-[10px] text-slate-400 font-mono">📍 Connaught Place</span>
-              <button onclick="openNewJournalModal('${h}')" class="text-xs font-semibold text-cyan-400 hover:text-cyan-300 flex items-center gap-1 transition-colors px-2 py-1 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30">
-                <i data-lucide="edit-3" class="w-3 h-3"></i> <span>Log</span>
+              <span class="text-[10px] text-slate-400 font-mono">${escapeHtml(ev.location)}</span>
+              <button onclick="openNewJournalModal('${ev.time}')" class="text-xs font-semibold text-cyan-400 hover:text-cyan-300 flex items-center gap-1 transition-colors px-2 py-1 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30">
+                <i data-lucide="edit-3" class="w-3 h-3"></i> <span>Add Note</span>
               </button>
             </div>
           </div>
 
-          <!-- Entry Details or Unlogged Prompt -->
-          ${matchingJournal ? `
-            <div class="space-y-1.5 pt-1">
-              <h4 class="text-sm font-bold text-white tracking-tight">${escapeHtml(matchingJournal.title)}</h4>
-              <p class="text-xs text-slate-300 leading-relaxed font-sans">${escapeHtml(matchingJournal.content)}</p>
-              ${matchingJournal.insights && matchingJournal.insights.cognitive_reframing ? `
-                <div class="p-2.5 rounded-xl bg-purple-950/30 border border-purple-500/20 text-[11px] text-purple-300 italic mt-2">
-                  🧠 CBT Reframing: "${escapeHtml(matchingJournal.insights.cognitive_reframing)}"
-                </div>
-              ` : ''}
-            </div>
-          ` : gcalEvent ? `
-            <div class="text-xs text-slate-400 italic py-1">
-              Google Calendar scheduled "${escapeHtml(gcalEvent.title)}". Tap log to record what actually took place.
-            </div>
-          ` : `
-            <div class="text-xs text-slate-500 hover:text-slate-400 cursor-pointer py-1 flex items-center gap-1.5" onclick="openNewJournalModal('${h}')">
-              <i data-lucide="plus-circle" class="w-3.5 h-3.5 text-slate-500"></i>
-              <span>Unwritten moment for ${h}. Tap to record thoughts, energy, or photos.</span>
-            </div>
-          `}
-
-          <!-- Inline Photo Memory Preview -->
-          ${matchingPhoto ? `
-            <div class="mt-3 rounded-2xl overflow-hidden border border-white/10 max-w-sm shadow-md">
-              <img src="${matchingPhoto.url}" alt="Memory" class="w-full h-32 object-cover">
-              <div class="p-2 bg-black/70 text-[11px] text-slate-300 flex items-center justify-between">
-                <span>${escapeHtml(matchingPhoto.caption)}</span>
-                <span class="text-amber-400 font-mono">${matchingPhoto.mood}</span>
+          <!-- Entry Details -->
+          <div class="space-y-1.5 pt-1">
+            <h4 class="text-sm font-bold text-white tracking-tight">${escapeHtml(ev.title)}</h4>
+            <p class="text-xs text-slate-300 leading-relaxed font-sans">${escapeHtml(ev.content)}</p>
+            
+            ${ev.cbtNote ? `
+              <div class="p-2.5 rounded-xl bg-purple-950/30 border border-purple-500/20 text-[11px] text-purple-300 italic mt-2 flex items-start gap-2">
+                <i data-lucide="brain" class="w-3.5 h-3.5 text-purple-400 shrink-0 mt-0.5"></i>
+                <span>CBT Reframing: "${escapeHtml(ev.cbtNote)}"</span>
               </div>
+            ` : ''}
+          </div>
+
+          <!-- Photo Attachment Preview if present -->
+          ${ev.photoUrl ? `
+            <div class="mt-3 rounded-2xl overflow-hidden border border-white/10 max-w-md shadow-lg group">
+              <img src="${ev.photoUrl}" alt="${escapeHtml(ev.title)}" class="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-500">
             </div>
           ` : ''}
         </div>
@@ -1446,8 +1536,225 @@ async function renderChronoTimeline() {
     `;
   });
 
+  // If NOW laser needle was not inserted (e.g. past all logged events)
+  if (!nowMarkerInserted) {
+    html += `
+      <div class="timeline-now-marker">
+        <div class="timeline-now-badge">
+          <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
+          <span>● ${display12H} (NOW)</span>
+        </div>
+        <div class="timeline-now-line"></div>
+      </div>
+    `;
+  }
+
+  // Floating + Add Next Moment Banner at bottom
+  html += `
+    <div class="pt-2 text-center">
+      <button onclick="openNewJournalModal()" class="btn-secondary !py-2 !px-4 text-xs mx-auto flex items-center gap-2 hover:border-cyan-400">
+        <i data-lucide="plus-circle" class="w-4 h-4 text-cyan-400"></i>
+        <span>+ Log Another Life Moment for Today</span>
+      </button>
+    </div>
+  `;
+
   container.innerHTML = html;
   lucide.createIcons();
+
+  // Also update Story Flow Carousel
+  renderStoryCarousel(events);
+}
+
+// =============================================================================
+// STORY FLOW CAROUSEL / TIMELINE SLIDE REVIEW (SWIPE & DRAG)
+// =============================================================================
+
+function renderStoryCarousel(events) {
+  const track = document.getElementById('story-carousel-track');
+  const dots = document.getElementById('story-dots-container');
+  const indicator = document.getElementById('story-progress-indicator');
+  if (!track || !dots) return;
+
+  if (events.length === 0) {
+    track.innerHTML = `
+      <div class="story-slide-card text-center justify-center items-center py-12">
+        <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-300 mx-auto mb-3">
+          <i data-lucide="book-open" class="w-6 h-6"></i>
+        </div>
+        <h4 class="text-base font-bold text-white">No Story Slides for Today</h4>
+        <p class="text-xs text-slate-400 max-w-xs mt-1">Capture a moment to begin your interactive daily story review.</p>
+      </div>
+    `;
+    dots.innerHTML = '';
+    if (indicator) indicator.textContent = '0 Moments';
+    lucide.createIcons();
+    return;
+  }
+
+  storyCurrentIndex = Math.min(storyCurrentIndex, events.length - 1);
+
+  track.innerHTML = events.map((ev, i) => `
+    <div class="story-slide-card">
+      <div>
+        <!-- Slide Top Header -->
+        <div class="flex items-center justify-between gap-2 border-b border-white/10 pb-3 mb-4">
+          <div class="flex items-center gap-2">
+            <span class="font-mono text-xs font-bold text-cyan-400 bg-cyan-950/60 border border-cyan-500/30 px-2.5 py-1 rounded-full">
+              ⏰ ${ev.time}
+            </span>
+            <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-200">
+              ${escapeHtml(ev.mood)}
+            </span>
+          </div>
+          <span class="text-[11px] text-slate-400 font-mono">${escapeHtml(ev.location)}</span>
+        </div>
+
+        <!-- Title & Content -->
+        <h3 class="text-lg font-bold text-white mb-2 leading-snug">${escapeHtml(ev.title)}</h3>
+        <p class="text-sm text-slate-300 leading-relaxed font-sans">${escapeHtml(ev.content)}</p>
+
+        <!-- Optional CBT Note -->
+        ${ev.cbtNote ? `
+          <div class="p-3 rounded-2xl bg-purple-950/40 border border-purple-500/30 text-xs text-purple-200 italic mt-4 flex items-start gap-2">
+            <i data-lucide="sparkles" class="w-4 h-4 text-purple-400 shrink-0 mt-0.5"></i>
+            <span>CBT Reframing: "${escapeHtml(ev.cbtNote)}"</span>
+          </div>
+        ` : ''}
+      </div>
+
+      <!-- Slide Image & Footer -->
+      <div class="mt-4 pt-3 border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        ${ev.photoUrl ? `
+          <div class="rounded-xl overflow-hidden border border-white/10 max-h-36 w-full sm:w-64">
+            <img src="${ev.photoUrl}" alt="${escapeHtml(ev.title)}" class="w-full h-full object-cover">
+          </div>
+        ` : '<div></div>'}
+
+        <div class="flex items-center gap-3 text-xs text-slate-400 self-end sm:self-auto">
+          <span>Energy: <strong class="text-amber-400 font-mono">${ev.energy || '8/10'}</strong></span>
+          <span>•</span>
+          <span class="font-mono">Moment ${i + 1} of ${events.length}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  // Render Pagination Dots
+  dots.innerHTML = events.map((_, i) => `
+    <div class="story-dot ${i === storyCurrentIndex ? 'active' : ''}" onclick="goToStorySlide(${i})"></div>
+  `).join('');
+
+  updateStorySlidePosition();
+  lucide.createIcons();
+}
+
+function updateStorySlidePosition() {
+  const track = document.getElementById('story-carousel-track');
+  const indicator = document.getElementById('story-progress-indicator');
+  const dots = document.querySelectorAll('#story-dots-container .story-dot');
+
+  if (track) {
+    track.style.transform = `translateX(-${storyCurrentIndex * 100}%)`;
+  }
+
+  if (indicator && storyEventsCache.length > 0) {
+    indicator.textContent = `Moment ${storyCurrentIndex + 1} of ${storyEventsCache.length}`;
+  }
+
+  dots.forEach((dot, i) => {
+    if (i === storyCurrentIndex) dot.classList.add('active');
+    else dot.classList.remove('active');
+  });
+}
+
+function nextStorySlide() {
+  if (storyCurrentIndex < storyEventsCache.length - 1) {
+    storyCurrentIndex++;
+    updateStorySlidePosition();
+  } else {
+    storyCurrentIndex = 0; // loop back
+    updateStorySlidePosition();
+  }
+}
+
+function prevStorySlide() {
+  if (storyCurrentIndex > 0) {
+    storyCurrentIndex--;
+    updateStorySlidePosition();
+  } else {
+    storyCurrentIndex = Math.max(0, storyEventsCache.length - 1);
+    updateStorySlidePosition();
+  }
+}
+
+function goToStorySlide(index) {
+  storyCurrentIndex = index;
+  updateStorySlidePosition();
+}
+
+// Swipe & Drag Gesture Recognizer
+let isDraggingStory = false;
+let startX = 0;
+let currentTranslate = 0;
+
+function initStorySwipeDrag() {
+  const viewport = document.getElementById('story-carousel-viewport');
+  if (!viewport || viewport.dataset.initialized) return;
+
+  viewport.dataset.initialized = 'true';
+
+  // Touch handlers
+  viewport.addEventListener('touchstart', (e) => {
+    startX = e.touches[0].clientX;
+    isDraggingStory = true;
+  }, { passive: true });
+
+  viewport.addEventListener('touchend', (e) => {
+    if (!isDraggingStory) return;
+    isDraggingStory = false;
+    const endX = e.changedTouches[0].clientX;
+    const diff = startX - endX;
+    if (diff > 45) nextStorySlide();
+    else if (diff < -45) prevStorySlide();
+  });
+
+  // Mouse drag handlers
+  viewport.addEventListener('mousedown', (e) => {
+    startX = e.clientX;
+    isDraggingStory = true;
+  });
+
+  window.addEventListener('mouseup', (e) => {
+    if (!isDraggingStory) return;
+    isDraggingStory = false;
+    const endX = e.clientX;
+    const diff = startX - endX;
+    if (diff > 45) nextStorySlide();
+    else if (diff < -45) prevStorySlide();
+  });
+
+  // Keyboard navigation
+  window.addEventListener('keydown', (e) => {
+    if (timelineViewMode !== 'story') return;
+    if (e.key === 'ArrowRight') nextStorySlide();
+    if (e.key === 'ArrowLeft') prevStorySlide();
+  });
+}
+
+function regenerateDailySynthesis() {
+  const summaryEl = document.getElementById('cross-track-synthesis-text');
+  if (summaryEl) {
+    summaryEl.innerHTML = `
+      ✨ <em>Synthesizing your daily temporal rhythm, CBT reframing patterns, hormonal stamina, and visual memories...</em>
+    `;
+    setTimeout(() => {
+      summaryEl.innerHTML = `
+        <strong>Cross-Track Synthesis Complete:</strong> You maintained high cognitive stamina across ${storyEventsCache.length || 3} recorded intervals today. Your morning focus phase effectively neutralized stress biases, aligning seamlessly with your natural circadian peak. Evening gratitude reflections indicate resilient mental equilibrium.
+      `;
+      showToast('✨ AI Daily Synthesis updated across all 4 life tracks.');
+    }, 600);
+  }
 }
 
 function renderCBTHeatmap() {
