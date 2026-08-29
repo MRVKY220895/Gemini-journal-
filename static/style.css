@@ -729,6 +729,86 @@ html:not(.dark) body {
     radial-gradient(circle at 50% 90%, rgba(16, 185, 129, 0.05) 0%, transparent 55%);
 }
 
+/* Light Mode Empty Hero Stage & Headings */
+html.light #empty-hero-stage h1,
+html:not(.dark) #empty-hero-stage h1 {
+  background: linear-gradient(180deg, #0f172a 0%, #1e293b 70%, #334155 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: #0f172a !important;
+  text-shadow: none !important;
+}
+
+html.light #session-topic-heading,
+html:not(.dark) #session-topic-heading,
+html.light h1, html:not(.dark) h1,
+html.light h2, html:not(.dark) h2,
+html.light h3, html:not(.dark) h3,
+html.light h4, html:not(.dark) h4,
+html.light .font-bold.text-white,
+html:not(.dark) .font-bold.text-white,
+html.light .font-semibold.text-white,
+html:not(.dark) .font-semibold.text-white,
+html.light .text-slate-100,
+html:not(.dark) .text-slate-100,
+html.light .text-slate-200,
+html:not(.dark) .text-slate-200 {
+  color: #0f172a !important;
+}
+
+html.light .text-slate-300,
+html:not(.dark) .text-slate-300,
+html.light .text-slate-400,
+html:not(.dark) .text-slate-400 {
+  color: #475569 !important;
+}
+
+/* Light Mode Badges & Pills */
+html.light .eyebrow-badge,
+html:not(.dark) .eyebrow-badge {
+  background: rgba(14, 165, 233, 0.1) !important;
+  color: #0284c7 !important;
+  border: 1px solid rgba(14, 165, 233, 0.3) !important;
+}
+
+html.light #gemini-key-pill,
+html:not(.dark) #gemini-key-pill {
+  background: rgba(16, 185, 129, 0.1) !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+}
+
+html.light #gemini-key-label,
+html:not(.dark) #gemini-key-label {
+  color: #047857 !important;
+  font-weight: 600 !important;
+}
+
+html.light .bg-emerald-950\/50,
+html:not(.dark) .bg-emerald-950\/50,
+html.light .bg-emerald-950\/40,
+html:not(.dark) .bg-emerald-950\/40,
+html.light .bg-emerald-950\/30,
+html:not(.dark) .bg-emerald-950\/30 {
+  background: rgba(16, 185, 129, 0.12) !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+  color: #047857 !important;
+}
+
+html.light #user-pill,
+html:not(.dark) #user-pill,
+html.light .bg-slate-900\/90,
+html:not(.dark) .bg-slate-900\/90,
+html.light .bg-slate-900\/80,
+html:not(.dark) .bg-slate-900\/80 {
+  background: rgba(241, 245, 249, 0.95) !important;
+  border-color: rgba(15, 23, 42, 0.12) !important;
+}
+
+html.light #user-display-name,
+html:not(.dark) #user-display-name {
+  color: #0f172a !important;
+}
+
 /* Light Mode Card & Layout Overrides */
 html.light .double-bezel,
 html:not(.dark) .double-bezel {
@@ -749,32 +829,6 @@ html:not(.dark) .floating-nav {
   background: rgba(255, 255, 255, 0.92);
   border-color: rgba(15, 23, 42, 0.1);
   box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
-}
-
-html.light .floating-nav span.text-white,
-html:not(.dark) .floating-nav span.text-white,
-html.light .floating-nav h1,
-html:not(.dark) .floating-nav h1,
-html.light h1.text-white,
-html:not(.dark) h1.text-white,
-html.light h2.text-white,
-html:not(.dark) h2.text-white,
-html.light h3.text-white,
-html:not(.dark) h3.text-white,
-html.light h4.text-white,
-html:not(.dark) h4.text-white,
-html.light .text-slate-100,
-html:not(.dark) .text-slate-100,
-html.light .text-slate-200,
-html:not(.dark) .text-slate-200 {
-  color: #0f172a !important;
-}
-
-html.light .text-slate-300,
-html:not(.dark) .text-slate-300,
-html.light .text-slate-400,
-html:not(.dark) .text-slate-400 {
-  color: #475569 !important;
 }
 
 html.light .modes-track,
@@ -831,10 +885,11 @@ html:not(.dark) .btn-secondary:hover {
   background: #e2e8f0;
 }
 
+/* Light Mode Composer Outer & Inner */
 html.light .composer-outer,
 html:not(.dark) .composer-outer {
   background: rgba(255, 255, 255, 0.95);
-  border-color: rgba(15, 23, 42, 0.1);
+  border-color: rgba(15, 23, 42, 0.12);
   box-shadow: 0 20px 48px -12px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04);
 }
 
@@ -847,13 +902,26 @@ html:not(.dark) .composer-inner {
 html.light #chat-input,
 html:not(.dark) #chat-input {
   color: #0f172a !important;
+  background: transparent !important;
 }
 
 html.light #chat-input::placeholder,
 html:not(.dark) #chat-input::placeholder {
-  color: #94a3b8 !important;
+  color: #64748b !important;
 }
 
+html.light .composer-inner span,
+html:not(.dark) .composer-inner span {
+  color: #475569 !important;
+  font-family: var(--font-sans) !important;
+}
+
+html.light .composer-inner .border-t,
+html:not(.dark) .composer-inner .border-t {
+  border-color: rgba(15, 23, 42, 0.08) !important;
+}
+
+/* Light Mode Chat Messages */
 html.light .chat-msg-user-card,
 html:not(.dark) .chat-msg-user-card {
   background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%) !important;
@@ -882,10 +950,11 @@ html:not(.dark) .chat-msg-ai-card .markdown-body {
   color: #1e293b !important;
 }
 
+/* Light Mode Bento Prompt Starter Cards */
 html.light .prompt-starter-card,
 html:not(.dark) .prompt-starter-card {
   background: #ffffff !important;
-  border-color: rgba(15, 23, 42, 0.08) !important;
+  border: 1px solid rgba(15, 23, 42, 0.1) !important;
   box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.04) !important;
 }
 
@@ -897,10 +966,34 @@ html:not(.dark) .prompt-starter-card:hover {
 }
 
 html.light .prompt-starter-card .text-white,
-html:not(.dark) .prompt-starter-card .text-white {
+html:not(.dark) .prompt-starter-card .text-white,
+html.light .prompt-starter-card .font-bold,
+html:not(.dark) .prompt-starter-card .font-bold {
   color: #0f172a !important;
 }
 
+html.light .prompt-starter-card .text-slate-400,
+html:not(.dark) .prompt-starter-card .text-slate-400 {
+  color: #475569 !important;
+}
+
+/* Light Mode Contextual Prompt Chips */
+html.light #contextual-prompt-chips button,
+html:not(.dark) #contextual-prompt-chips button {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-color: rgba(15, 23, 42, 0.12) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+}
+
+html.light #contextual-prompt-chips button:hover,
+html:not(.dark) #contextual-prompt-chips button:hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-color: rgba(15, 23, 42, 0.2) !important;
+}
+
+/* Light Mode Chrono Blocks & Inputs */
 html.light .chrono-block-card,
 html:not(.dark) .chrono-block-card {
   background: #ffffff !important;
@@ -933,7 +1026,7 @@ html.light input::placeholder,
 html:not(.dark) input::placeholder,
 html.light textarea::placeholder,
 html:not(.dark) textarea::placeholder {
-  color: #94a3b8 !important;
+  color: #64748b !important;
 }
 
 html.light #ai-studio-code-view,
@@ -943,17 +1036,6 @@ html:not(.dark) pre {
   background: #f1f5f9 !important;
   color: #0f172a !important;
   border-color: rgba(15, 23, 42, 0.08) !important;
-}
-
-html.light #user-pill,
-html:not(.dark) #user-pill {
-  background: rgba(241, 245, 249, 0.9) !important;
-  border-color: rgba(15, 23, 42, 0.1) !important;
-}
-
-html.light #user-display-name,
-html:not(.dark) #user-display-name {
-  color: #0f172a !important;
 }
 
 html.light .cbt-heat-cell,
