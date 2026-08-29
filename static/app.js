@@ -47,21 +47,24 @@ function initTheme() {
 function applyTheme(theme) {
   const html = document.documentElement;
   const icon = document.getElementById('theme-toggle-icon');
+  const label = document.getElementById('theme-toggle-label');
   
   if (theme === 'light') {
     html.classList.remove('dark');
     html.classList.add('light');
     if (icon) {
       icon.setAttribute('data-lucide', 'moon');
-      icon.className = 'w-3.5 h-3.5 text-indigo-500';
+      icon.className = 'w-3.5 h-3.5';
     }
+    if (label) label.textContent = 'Dark';
   } else {
     html.classList.remove('light');
     html.classList.add('dark');
     if (icon) {
       icon.setAttribute('data-lucide', 'sun');
-      icon.className = 'w-3.5 h-3.5 text-amber-400';
+      icon.className = 'w-3.5 h-3.5';
     }
+    if (label) label.textContent = 'Light';
   }
   localStorage.setItem('mind_cave_theme', theme);
   lucide.createIcons();
@@ -1744,6 +1747,11 @@ function initStorySwipeDrag() {
 
 function regenerateDailySynthesis() {
   const summaryEl = document.getElementById('cross-track-synthesis-text');
+  // Auto-expand when refreshing
+  const body = document.getElementById('synthesis-expanded-body');
+  if (body && body.classList.contains('hidden')) {
+    toggleSynthesisExpand();
+  }
   if (summaryEl) {
     summaryEl.innerHTML = `
       ✨ <em>Synthesizing your daily temporal rhythm, CBT reframing patterns, hormonal stamina, and visual memories...</em>
@@ -1755,6 +1763,15 @@ function regenerateDailySynthesis() {
       showToast('✨ AI Daily Synthesis updated across all 4 life tracks.');
     }, 600);
   }
+}
+
+function toggleSynthesisExpand() {
+  const body = document.getElementById('synthesis-expanded-body');
+  const btn = document.getElementById('synthesis-expand-btn');
+  if (!body) return;
+  const isHidden = body.classList.contains('hidden');
+  body.classList.toggle('hidden', !isHidden);
+  if (btn) btn.classList.toggle('expanded', isHidden);
 }
 
 function renderCBTHeatmap() {
