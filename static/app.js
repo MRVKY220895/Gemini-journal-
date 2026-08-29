@@ -826,41 +826,66 @@ async function signInWithFirebaseGoogle() {
 
 
   try {
-
     const provider = new firebase.auth.GoogleAuthProvider();
+    provider.addScope('https://www.googleapis.com/auth/user.gender.read');
+    provider.addScope('https://www.googleapis.com/auth/user.birthday.read');
 
     const result = await state.firebaseAuth.signInWithPopup(provider);
-
     const idToken = await result.user.getIdToken();
+    const accessToken = result.credential?.accessToken;
 
+    const displayName = result.user.displayName || result.user.email?.split('@')[0] || 'User';
     state.currentUser = {
-
       uid: result.user.uid,
-
-      name: result.user.displayName || result.user.email,
-
+      name: displayName,
+      email: result.user.email,
       token: idToken
-
     };
 
     localStorage.setItem('gemini_journal_uid', state.currentUser.uid);
-
     localStorage.setItem('gemini_journal_name', state.currentUser.name);
-
     localStorage.setItem('gemini_journal_token', state.currentUser.token);
+    localStorage.setItem('mind_cave_profile_name', displayName);
 
+    // Fetch Google People API for Gender & Birthday
+    if (accessToken) {
+      try {
+        const peopleRes = await fetch('https://people.googleapis.com/v1/people/me?personFields=genders,birthdays,names', {
+          headers: { Authorization: `Bearer ${accessToken}` }
+        });
+        if (peopleRes.ok) {
+          const peopleData = await peopleRes.json();
+          // Gender extraction
+          if (peopleData.genders && peopleData.genders.length > 0) {
+            const gVal = peopleData.genders[0].value?.toLowerCase();
+            let gCode = 'unspecified';
+            if (gVal === 'female') gCode = 'female';
+            else if (gVal === 'male') gCode = 'male';
+            else if (gVal === 'other') gCode = 'non_binary';
+            updateUserGender(gCode);
+          }
+          // Birthday extraction
+          if (peopleData.birthdays && peopleData.birthdays.length > 0) {
+            const b = peopleData.birthdays[0].date;
+            if (b && b.year && b.month && b.day) {
+              const mm = String(b.month).padStart(2, '0');
+              const dd = String(b.day).padStart(2, '0');
+              const dobStr = `${b.year}-${mm}-${dd}`;
+              localStorage.setItem('mind_cave_profile_dob', dobStr);
+            }
+          }
+        }
+      } catch (pErr) {
+        console.debug('People API notice:', pErr);
+      }
+    }
 
-
+    loadProfileDetails();
     updateUserUI();
-
     closeAuthModal();
-
     loadJournals();
-
     loadAnalytics();
-
-    showToast(`Signed in with Google as ${state.currentUser.name}`);
-
+    showToast(`Welcome ${displayName}! Biological profile synchronized.`);
   } catch (err) {
     if (err.code === 'auth/api-key-not-valid' || (err.message && err.message.includes('api-key-not-valid'))) {
       const reset = confirm("Firebase Error: The Web API key configured for Firebase Authentication is invalid.\n\nNote: Do NOT enter your Gemini AI Studio API Key here. Enter your Firebase Web App API Key (from Firebase Console → Project Settings → Web App).\n\nWould you like to clear the custom configuration now?");
@@ -13266,28 +13291,55 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
+function calculateAge(dobStr) {
+  if (!dobStr) return null;
+  const birth = new Date(dobStr);
+  if (isNaN(birth.getTime())) return null;
+  const now = new Date();
+  let age = now.getFullYear() - birth.getFullYear();
+  const m = now.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) {
+    age--;
+  }
+  return age >= 0 ? age : null;
+}
+
+function updateAgeBadge() {
+  const dob = document.getElementById('profile-dob')?.value;
+  const age = calculateAge(dob);
+  const badge = document.getElementById('profile-age-badge');
+  if (badge) {
+    if (age !== null && !isNaN(age)) {
+      badge.textContent = `${age} yrs • Active Biological Stage`;
+      badge.classList.remove('hidden');
+    } else {
+      badge.classList.add('hidden');
+    }
+  }
+}
+
 function saveProfileDetails() {
   const fname = document.getElementById('profile-first-name')?.value || '';
   const dob = document.getElementById('profile-dob')?.value || '';
+  const gender = document.getElementById('profile-gender-select')?.value || 'unspecified';
+  
   localStorage.setItem('mind_cave_profile_name', fname);
   localStorage.setItem('mind_cave_profile_dob', dob);
+  localStorage.setItem('mind_cave_user_gender', gender);
+  
+  if (state.currentUser && fname) {
+    state.currentUser.name = fname;
+    localStorage.setItem('gemini_journal_name', fname);
+    updateUserUI();
+  }
+  
+  updateAgeBadge();
 }
 
 function loadProfileDetails() {
-  let fname = localStorage.getItem('mind_cave_profile_name') || '';
+  let fname = localStorage.getItem('mind_cave_profile_name') || state.currentUser?.name || '';
   let dob = localStorage.getItem('mind_cave_profile_dob') || '';
-  
-  if (!fname && !dob && (!state.currentUser || state.currentUser.uid === 'user_alice')) {
-    const randomNames = ['Explorer', 'Seeker', 'Nomad', 'Voyager'];
-    const randomName = randomNames[Math.floor(Math.random() * randomNames.length)];
-    const randomYear = 1985 + Math.floor(Math.random() * 15);
-    const randomMonth = String(1 + Math.floor(Math.random() * 12)).padStart(2, '0');
-    const randomDay = String(1 + Math.floor(Math.random() * 28)).padStart(2, '0');
-    dob = randomYear + '-' + randomMonth + '-' + randomDay;
-    fname = 'Anonymous ' + randomName;
-    localStorage.setItem('mind_cave_profile_name', fname);
-    localStorage.setItem('mind_cave_profile_dob', dob);
-  }
+  let gender = localStorage.getItem('mind_cave_user_gender') || 'unspecified';
 
   if (document.getElementById('profile-first-name')) {
     document.getElementById('profile-first-name').value = fname;
@@ -13295,28 +13347,25 @@ function loadProfileDetails() {
   if (document.getElementById('profile-dob')) {
     document.getElementById('profile-dob').value = dob;
   }
+  if (document.getElementById('profile-gender-select')) {
+    document.getElementById('profile-gender-select').value = gender;
+  }
+  updateAgeBadge();
 }
 
 function getProfileContext() {
-
+  const dob = localStorage.getItem('mind_cave_profile_dob') || '';
+  const age = calculateAge(dob);
   return {
-
-    first_name: localStorage.getItem('mind_cave_profile_name') || 'Unknown',
-
-    date_of_birth: localStorage.getItem('mind_cave_profile_dob') || 'Unknown',
-
-    gender_track: document.getElementById('profile-gender-select')?.value || 'unspecified',
-
+    first_name: localStorage.getItem('mind_cave_profile_name') || state.currentUser?.name || 'User',
+    date_of_birth: dob || 'Unspecified',
+    calculated_age: age !== null ? age : 'Unspecified',
+    gender_track: document.getElementById('profile-gender-select')?.value || localStorage.getItem('mind_cave_user_gender') || 'unspecified',
     vitality_tracks: {
-
       cycle_intelligence: document.getElementById('profile-toggle-cycle')?.checked || false,
-
       circadian_energy: document.getElementById('profile-toggle-circadian')?.checked || false
-
     }
-
   };
-
 }
 
 

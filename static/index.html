@@ -2157,25 +2157,26 @@
             <span class="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
               <i data-lucide="user-check" class="w-3.5 h-3.5 text-cyan-500 dark:text-cyan-400"></i> Biological Profile & Timezone
             </span>
-            <span class="text-[10px] text-slate-500 dark:text-slate-400 font-mono">Client Encrypted</span>
+            <span id="profile-age-badge" class="hidden text-[10px] font-mono font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-2 py-0.5 rounded-full"></span>
           </div>
+
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
             <div>
-              <label class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 block mb-1">First Name (or Moniker)</label>
-              <input type="text" id="profile-first-name" oninput="saveProfileDetails()" placeholder="e.g. Alex" class="w-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 text-xs p-2.5 rounded-xl border border-slate-300 dark:border-slate-800 focus:outline-none focus:border-cyan-500 placeholder-slate-400 dark:placeholder-slate-600">
+              <label class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 block mb-1">Full Name / Moniker</label>
+              <input type="text" id="profile-first-name" oninput="saveProfileDetails()" placeholder="e.g. Vignesh Ramkumar" class="w-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 text-xs p-2.5 rounded-xl border border-slate-300 dark:border-slate-800 focus:outline-none focus:border-cyan-500 placeholder-slate-400 dark:placeholder-slate-600">
             </div>
             <div>
-              <label class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 block mb-1">Date of Birth</label>
-              <input type="date" id="profile-dob" oninput="saveProfileDetails()" class="w-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 text-xs p-2.5 rounded-xl border border-slate-300 dark:border-slate-800 focus:outline-none focus:border-cyan-500 text-slate-500">
+              <label class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 block mb-1">Date of Birth (DOB)</label>
+              <input type="date" id="profile-dob" oninput="saveProfileDetails()" class="w-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 text-xs p-2.5 rounded-xl border border-slate-300 dark:border-slate-800 focus:outline-none focus:border-cyan-500">
             </div>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div>
               <label class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 block mb-1">Gender / Wellness Track</label>
-              <select id="profile-gender-select" onchange="updateUserGender(this.value)" class="w-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 text-xs p-2.5 rounded-xl border border-slate-300 dark:border-slate-800 focus:outline-none focus:border-cyan-500">
-                <option value="female">Female (Cycle Track)</option>
-                <option value="male">Male (Circadian Track)</option>
+              <select id="profile-gender-select" onchange="updateUserGender(this.value); saveProfileDetails();" class="w-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 text-xs p-2.5 rounded-xl border border-slate-300 dark:border-slate-800 focus:outline-none focus:border-cyan-500">
+                <option value="female">Female (Cycle Intelligence Track)</option>
+                <option value="male">Male (Circadian & Stamina Track)</option>
                 <option value="non_binary">Non-Binary / Custom Track</option>
                 <option value="unspecified">Unspecified / Custom Track</option>
               </select>
@@ -2188,6 +2189,7 @@
                 <option value="active_focus">Active Focus (08:00 – 20:00)</option>
               </select>
             </div>
+          </div>
           </div>
 
           <!-- Custom Track Toggles -->
