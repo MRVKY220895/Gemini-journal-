@@ -359,9 +359,8 @@
               <button type="button" onclick="openNewHabitModal()" class="btn-secondary !py-1 !px-2.5 text-[11px] flex items-center gap-1 text-cyan-600 dark:text-cyan-300 hover:border-cyan-400 font-semibold" title="Add New Habit">
                 <i data-lucide="plus" class="w-3 h-3 text-cyan-400"></i> <span>+ Habit</span>
               </button>
-              <button type="button" onclick="openGoalsHabitsModal()" class="px-2.5 py-1 rounded-xl bg-gradient-to-r from-amber-500/20 to-cyan-500/20 hover:from-amber-500/30 hover:to-cyan-500/30 text-amber-600 dark:text-amber-300 border border-amber-500/30 text-[11px] font-bold flex items-center gap-1.5 transition-all shadow-sm" title="Open Fullscreen 2-Tile Popup Modal">
+              <button type="button" onclick="openGoalsHabitsModal()" class="w-7 h-7 rounded-lg bg-gradient-to-r from-amber-500/20 to-cyan-500/20 hover:from-amber-500/30 hover:to-cyan-500/30 text-amber-600 dark:text-amber-300 border border-amber-500/30 flex items-center justify-center transition-all shadow-sm" title="Expand Focus Deck Modal">
                 <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
-                <span class="hidden sm:inline">Popup Modal</span>
               </button>
               <button type="button" id="toggle-goals-tiles-btn" onclick="toggleGoalsTilesCollapse()" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-colors" title="Collapse / Expand Deck">
                 <i data-lucide="chevron-up" id="goals-tiles-chevron" class="w-4 h-4 transition-transform duration-300"></i>
@@ -911,7 +910,7 @@
                     </div>
                     <h3 class="text-xs font-bold text-white">Daily Habit Tracker & Streaks</h3>
                   </div>
-                  <span class="text-[10px] text-amber-400 bg-amber-950/60 border border-amber-500/30 px-2 py-0.5 rounded-full font-mono font-bold flex items-center gap-1" id="habit-progress-pill">
+                  <span class="text-[10px] text-amber-400 bg-amber-950/60 border border-amber-500/30 px-2 py-0.5 rounded-full font-mono font-bold flex items-center gap-1" id="sanctuary-habit-progress-pill">
                     <i data-lucide="flame" class="w-3 h-3 text-amber-400"></i>
                     <span>5/6 Done Today</span>
                   </span>
@@ -919,7 +918,7 @@
                 <p class="text-[11px] text-slate-400 mb-3">Micro-habits compounding daily cognitive clarity and vitality.</p>
 
                 <!-- Habit List -->
-                <div class="space-y-2" id="habit-tracker-list">
+                <div class="space-y-2" id="sanctuary-habit-tracker-list">
                   <!-- Rendered dynamically via JS -->
                 </div>
               </div>

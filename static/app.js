@@ -1498,7 +1498,11 @@ function switchJournalTrack(trackId) {
   if (activeBtn) activeBtn.className = `track-tab-btn active-${trackId}`;
 
   if (trackId === 'chrono') renderChronoTimeline();
-  if (trackId === 'sanctuary' || trackId === 'cbt') renderCBTHeatmap();
+  if (trackId === 'sanctuary' || trackId === 'cbt') {
+    renderCBTHeatmap();
+    renderHabitTracker();
+    renderBucketList();
+  }
   if (trackId === 'memory') renderMemoryPhotos();
 }
 
@@ -4057,7 +4061,8 @@ function updateArchivedHabitsBadges() {
 function renderHabitTracker() {
   const containers = [
     document.getElementById('habit-tracker-list'),
-    document.getElementById('modal-habit-tracker-list')
+    document.getElementById('modal-habit-tracker-list'),
+    document.getElementById('sanctuary-habit-tracker-list')
   ].filter(Boolean);
 
   if (containers.length === 0) return;
@@ -4164,8 +4169,13 @@ function renderHabitTracker() {
   const totalHabits = state.habitsList.length;
   const habitPct = totalHabits > 0 ? Math.round((doneCount / totalHabits) * 100) : 0;
 
-  const pill = document.getElementById('habit-progress-pill');
-  if (pill) pill.innerHTML = `<i data-lucide="check-circle" class="w-3 h-3 text-cyan-500"></i><span>${doneCount}/${totalHabits} Done Today (${habitPct}%)</span>`;
+  const pills = [
+    document.getElementById('habit-progress-pill'),
+    document.getElementById('sanctuary-habit-progress-pill')
+  ].filter(Boolean);
+  pills.forEach(p => {
+    p.innerHTML = `<i data-lucide="check-circle" class="w-3 h-3 text-cyan-500"></i><span>${doneCount}/${totalHabits} Done Today (${habitPct}%)</span>`;
+  });
 
   const modalStreak = document.getElementById('modal-habit-streak-badge');
   const streakBadge = document.getElementById('habit-streak-badge');
