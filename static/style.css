@@ -2125,4 +2125,279 @@ html:not(.dark) .bucket-card {
 .font-kalam { font-family: 'Kalam', cursive; }
 .font-architect { font-family: 'Architects Daughter', cursive; }
 
+/* ==========================================================================
+   COSMIC RIVER OF TIME — HORIZONTAL TIMELINE STREAM (ANCIENT ONE TIME RAY)
+   ========================================================================== */
+
+@keyframes cosmicBeamFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes cosmicParticleDrift {
+  0% { transform: translateX(0) translateY(0); opacity: 0.3; }
+  50% { opacity: 0.9; }
+  100% { transform: translateX(120px) translateY(-10px); opacity: 0.1; }
+}
+
+@keyframes gemOrbPulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 15px var(--gem-glow, rgba(255, 180, 0, 0.7)); }
+  50% { transform: scale(1.18); box-shadow: 0 0 28px var(--gem-glow, rgba(255, 180, 0, 1)), 0 0 45px var(--gem-glow-outer, rgba(56, 189, 248, 0.6)); }
+}
+
+@keyframes beaconRingPing {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
+.cosmic-river-container {
+  position: relative;
+  width: 100%;
+  border-radius: 1.5rem;
+  background: radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.95), rgba(5, 7, 13, 0.98));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.8), inset 0 0 80px rgba(0, 0, 0, 0.6);
+}
+
+html.light .cosmic-river-container,
+html:not(.dark) .cosmic-river-container {
+  background: radial-gradient(circle at 50% 50%, #f8fafc, #f1f5f9) !important;
+  border-color: rgba(15, 23, 42, 0.1) !important;
+  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.08) !important;
+}
+
+.cosmic-river-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+html.light .cosmic-river-header,
+html:not(.dark) .cosmic-river-header {
+  border-bottom-color: rgba(15, 23, 42, 0.08) !important;
+  background: rgba(255, 255, 255, 0.6) !important;
+}
+
+.cosmic-scroll-viewport {
+  position: relative;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 180, 0, 0.3) transparent;
+  cursor: grab;
+  user-select: none;
+  min-height: 480px;
+  padding: 2.5rem 2rem;
+}
+
+.cosmic-scroll-viewport:active {
+  cursor: grabbing;
+}
+
+.cosmic-river-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: max-content;
+  padding: 0 3rem;
+  height: 440px;
+}
+
+/* The Luminous River of Time (Central Energy Beam) */
+.cosmic-central-beam {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 5px;
+  transform: translateY(-50%);
+  background: linear-gradient(90deg, 
+    #ff7e1d 0%, 
+    #ffd200 20%, 
+    #38bdf8 45%, 
+    #818cf8 70%, 
+    #ffd200 88%, 
+    #ff7e1d 100%
+  );
+  background-size: 200% 100%;
+  animation: cosmicBeamFlow 6s ease infinite;
+  box-shadow: 
+    0 0 16px rgba(255, 180, 0, 0.9),
+    0 0 32px rgba(255, 120, 0, 0.7),
+    0 0 60px rgba(56, 189, 248, 0.5);
+  border-radius: 9999px;
+  z-index: 10;
+}
+
+/* Plasma Aura Haze */
+.cosmic-beam-plasma-glow {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 40px;
+  transform: translateY(-50%);
+  background: linear-gradient(90deg, 
+    rgba(255, 126, 29, 0.15), 
+    rgba(255, 210, 0, 0.22), 
+    rgba(56, 189, 248, 0.22), 
+    rgba(129, 140, 248, 0.18), 
+    rgba(255, 126, 29, 0.15)
+  );
+  filter: blur(12px);
+  pointer-events: none;
+  z-index: 9;
+}
+
+/* Event Node along River */
+.cosmic-event-node {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 290px;
+  margin: 0 1.75rem;
+  z-index: 20;
+  flex-shrink: 0;
+}
+
+/* Node Gem Orb sitting on central beam */
+.cosmic-gem-orb {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffffff, var(--gem-core, #ffd200));
+  border: 2px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  z-index: 25;
+  cursor: pointer;
+  animation: gemOrbPulse 3s ease-in-out infinite;
+  transition: transform 0.2s ease;
+}
+
+.cosmic-gem-orb:hover {
+  transform: translateY(-50%) scale(1.35) !important;
+}
+
+/* Energy Conduit Line (Connecting Gem to Card) */
+.cosmic-conduit-line {
+  position: absolute;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--gem-glow, #ffd200), rgba(255, 255, 255, 0.4));
+  box-shadow: 0 0 8px var(--gem-glow, #ffd200);
+  z-index: 15;
+}
+
+.cosmic-event-node.is-top .cosmic-conduit-line {
+  bottom: 50%;
+  height: 60px;
+  transform: translateY(12px);
+}
+
+.cosmic-event-node.is-bottom .cosmic-conduit-line {
+  top: 50%;
+  height: 60px;
+  transform: translateY(-12px);
+}
+
+/* Orbital Event Card */
+.cosmic-orbital-card {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 1.25rem;
+  background: rgba(10, 14, 24, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.6);
+  transition: all 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+  cursor: pointer;
+}
+
+.cosmic-event-node.is-top .cosmic-orbital-card {
+  margin-bottom: 72px;
+}
+
+.cosmic-event-node.is-bottom .cosmic-orbital-card {
+  margin-top: 72px;
+}
+
+.cosmic-orbital-card:hover {
+  transform: translateY(-4px) scale(1.03);
+  border-color: var(--gem-glow, #38bdf8);
+  box-shadow: 0 16px 40px -4px rgba(0, 0, 0, 0.8), 0 0 24px var(--gem-glow, rgba(56, 189, 248, 0.3));
+}
+
+html.light .cosmic-orbital-card,
+html:not(.dark) .cosmic-orbital-card {
+  background: #ffffff !important;
+  border-color: rgba(15, 23, 42, 0.12) !important;
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.08) !important;
+  color: #0f172a !important;
+}
+
+html.light .cosmic-orbital-card p,
+html:not(.dark) .cosmic-orbital-card p {
+  color: #334155 !important;
+}
+
+/* Current "NOW" Cosmic Singularity Beacon */
+.cosmic-now-beacon {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 2rem;
+  z-index: 30;
+  flex-shrink: 0;
+}
+
+.cosmic-now-singularity {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 20px #ffffff, 0 0 40px #38bdf8;
+  z-index: 35;
+}
+
+.cosmic-now-singularity::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 2px solid #38bdf8;
+  animation: beaconRingPing 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.cosmic-now-tag {
+  position: absolute;
+  top: -45px;
+  background: linear-gradient(135deg, #0284c7, #6366f1);
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 16px rgba(14, 165, 233, 0.5);
+  white-space: nowrap;
+}
+
 
