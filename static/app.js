@@ -306,24 +306,19 @@ async function checkGeminiKeyStatus() {
     const auditResp = await fetch('/api/security/audit');
     if (!auditResp.ok) return;
     const auditData = await auditResp.json();
-    const isConfigured = auditData?.key_management?.gemini_api_key_masked !== '[NOT SET]';
+    const isConfigured = Boolean(
+      auditData?.key_management?.gemini_api_key_configured ||
+      (auditData?.key_management?.gemini_api_key_masked && auditData?.key_management?.gemini_api_key_masked !== '[NOT SET]')
+    );
 
     const dot = document.getElementById('gemini-key-dot');
     const label = document.getElementById('gemini-key-label');
 
     if (dot && label) {
-      if (data.status === 'live') {
+      if (isConfigured) {
         dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0';
         label.textContent = 'Gemini 3.5 (Live)';
         label.className = 'font-mono text-[11px] text-emerald-300 font-semibold whitespace-nowrap';
-      } else if (data.status === 'quota_exhausted') {
-        dot.className = 'w-2 h-2 rounded-full bg-amber-400 shrink-0';
-        label.textContent = 'Quota Exhausted (429)';
-        label.className = 'font-mono text-[11px] text-amber-300 font-semibold whitespace-nowrap';
-      } else if (data.status === 'blocked') {
-        dot.className = 'w-2 h-2 rounded-full bg-rose-400 shrink-0';
-        label.textContent = 'Key Blocked (403)';
-        label.className = 'font-mono text-[11px] text-rose-300 font-semibold whitespace-nowrap';
       } else {
         dot.className = 'w-2 h-2 rounded-full bg-slate-400 shrink-0';
         label.textContent = 'Connect Gemini API';

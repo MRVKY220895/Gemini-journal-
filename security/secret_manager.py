@@ -49,31 +49,23 @@ class SecretManager:
     def get_secret(self, secret_id: str, default: Optional[str] = None) -> Optional[str]:
         """
         Fetch a secret by its ID.
-        First checks in-memory cache, then GCP Secret Manager (if enabled), then environment variables.
+        Checks cache -> environment variables -> GCP Secret Manager -> default.
         """
-        # Check cache
         if secret_id in self._cached_secrets:
             return self._cached_secrets[secret_id]
 
-        value = None
+        env_key = secret_id.upper().replace("-", "_")
+        value = os.getenv(env_key) or os.getenv(secret_id)
 
-        # 1. Attempt GCP Secret Manager if enabled
-        if self._client and self.project_id:
+        if not value and self._client and self.project_id:
             try:
                 name = f"projects/{self.project_id}/secrets/{secret_id}/versions/latest"
                 response = self._client.access_secret_version(request={"name": name})
                 value = response.payload.data.decode("UTF-8").strip()
                 logger.info(f"Successfully retrieved secret '{secret_id}' from GCP Secret Manager.")
             except Exception as e:
-                logger.warning(f"Could not retrieve '{secret_id}' from GCP Secret Manager: {e}. Checking environment...")
+                logger.debug(f"Could not retrieve '{secret_id}' from GCP Secret Manager: {e}")
 
-        # 2. Check environment variable mapping
-        if not value:
-            # Map secret_id (e.g., 'gemini-api-key' -> 'GEMINI_API_KEY')
-            env_key = secret_id.upper().replace("-", "_")
-            value = os.getenv(env_key) or os.getenv(secret_id)
-
-        # 3. Fallback
         if not value:
             value = default
 
@@ -114,13 +106,15 @@ class SecretManager:
         """Provide a non-leaking diagnostic status of the secret resolution engine."""
         gemini_key = self.get_gemini_api_key()
         fb_creds = self.get_firebase_credentials()
+        is_cloud_run = bool(os.getenv("K_SERVICE") or os.getenv("GCP_PROJECT_ID"))
+        is_configured = bool(gemini_key or is_cloud_run)
         return {
             "gcp_secret_manager_enabled": bool(self._client and self.project_id),
             "project_id": self.project_id or "[Local / Not Set]",
-            "gemini_api_key_configured": bool(gemini_key),
-            "gemini_api_key_masked": self.mask_secret(gemini_key),
+            "gemini_api_key_configured": is_configured,
+            "gemini_api_key_masked": self.mask_secret(gemini_key) if gemini_key else ("Vertex AI ADC (Cloud Run)" if is_cloud_run else "[NOT SET]"),
             "firebase_credentials_configured": bool(fb_creds),
-            "secrets_source": "Google Cloud Secret Manager" if (self._client and self.project_id) else "Secure Environment Variables (.env)",
+            "secrets_source": "Vertex AI ADC (Cloud Run)" if (is_cloud_run and not gemini_key) else ("Google Cloud Secret Manager" if (self._client and self.project_id) else "Secure Environment Variables"),
             "hardcoded_keys_detected": False,
             "zero_leakage_guarantee": True
         }
