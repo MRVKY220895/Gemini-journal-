@@ -446,11 +446,11 @@ function switchTab(tabId) {
 
 function selectPersona(personaId) {
   state.currentPersona = personaId;
-  document.querySelectorAll('.persona-btn').forEach(btn => {
+  document.querySelectorAll('#persona-selector .persona-btn[data-persona]').forEach(btn => {
     if (btn.getAttribute('data-persona') === personaId) {
-      btn.className = "persona-btn active text-xs px-3 py-1.5 rounded-full font-medium transition-all bg-blue-600/30 text-blue-300 border border-blue-500/40";
+      btn.classList.add('active');
     } else {
-      btn.className = "persona-btn text-xs px-3 py-1.5 rounded-full font-medium transition-all text-slate-400 hover:text-slate-200 border border-transparent";
+      btn.classList.remove('active');
     }
   });
 }
