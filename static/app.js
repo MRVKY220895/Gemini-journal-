@@ -1057,27 +1057,6 @@ function updateLiveCognitiveBar(cogData) {
   }
 }
 
-async function saveQuickJournal(title, content, mood) {
-  try {
-    const response = await fetch('/api/journals', {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify({
-        title: title.substring(0, 50) || 'Studio Reflection',
-        content: content,
-        persona: state.currentPersona,
-        mood: mood || 'Reflective',
-        tags: [state.currentPersona, mood],
-        is_encrypted: false
-      })
-    });
-    if (!response.ok) throw new Error('Could not save to journal.');
-    showToast('Reflection turn saved directly to your isolated journal vault!');
-  } catch (err) {
-    alert(`Save error: ${err.message}`);
-  }
-}
-
 // =============================================================================
 // MULTI-TRACK DIGITAL LIFE JOURNAL ENGINE (CHRONO, CBT, CYCLE, MEMORY)
 // =============================================================================
@@ -1485,23 +1464,6 @@ function selectMoodChip(moodName, emoji, btnElement) {
   if (btnElement) btnElement.classList.add('selected');
   const lbl = document.getElementById('mood-pulse-label');
   if (lbl) lbl.textContent = `${emoji} ${moodName}`;
-}
-
-function previewJournalPhoto(input) {
-  const file = input.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    attachedPhotoBase64 = e.target.result;
-    const box = document.getElementById('journal-photo-preview-box');
-    const img = document.getElementById('journal-photo-preview-img');
-    if (box && img) {
-      img.src = attachedPhotoBase64;
-      box.classList.remove('hidden');
-    }
-  };
-  reader.readAsDataURL(file);
 }
 
 function toggleLocationStamp(checkbox) {
@@ -2342,7 +2304,6 @@ function testPushNotification() {
 // =============================================================================
 // RICH MEDIA ATTACHMENTS STATE (P1)
 // =============================================================================
-let attachedPhotoBase64 = null;
 let attachedSketchBase64 = null;
 let attachedFileName = null;
 
