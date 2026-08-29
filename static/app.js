@@ -181,27 +181,27 @@ const state = {
       notes: 'In progress'
     }
   ],
-  todayGoal: JSON.parse(localStorage.getItem('mind_cave_today_goal') || 'null') || {
+  todayGoal: JSON.parse(localStorage.getItem('mind_cave_today_goal') || 'null') || (localStorage.getItem('mind_cave_is_reset') ? { text: '', completed: false } : {
     text: "Ship Core System Architecture & complete evening 30m mindful walk",
     completed: false
-  },
-  habitsList: JSON.parse(localStorage.getItem('mind_cave_habits_list') || 'null') || [
+  }),
+  habitsList: JSON.parse(localStorage.getItem('mind_cave_habits_list') || 'null') || (localStorage.getItem('mind_cave_is_reset') ? [] : [
     { id: 'h1', title: 'Hydrate (Drink Water)', emoji: '💧', type: 'counter', targetCount: 8, currentCount: 5, unit: 'glasses', streak: 12, target: '8 glasses', isTimelineShortcut: true, history: [true, true, true, true, true, true, false] },
     { id: 'h2', title: '15m Mindfulness & CBT', emoji: '🧘', type: 'boolean', streak: 7, target: '15 mins', isTimelineShortcut: true, history: [true, true, true, false, true, true, true] },
     { id: 'h3', title: '30m Zone-2 Cardio / Walk', emoji: '🚶', type: 'counter', targetCount: 30, currentCount: 30, unit: 'mins', streak: 5, target: '30 mins', isTimelineShortcut: true, history: [true, true, true, true, false, true, true] },
     { id: 'h4', title: '20m Focused Reading', emoji: '📖', type: 'counter', targetCount: 20, currentCount: 15, unit: 'pages', streak: 9, target: '20 pages', isTimelineShortcut: true, history: [true, true, true, true, true, true, false] },
     { id: 'h5', title: '8h Circadian Sleep Protocol', emoji: '🌙', type: 'boolean', streak: 6, target: '8 hours', isTimelineShortcut: false, history: [true, true, true, true, true, true, true] },
     { id: 'h6', title: '90m Deep Work Block', emoji: '💻', type: 'counter', targetCount: 2, currentCount: 2, unit: 'blocks', streak: 14, target: '2 blocks', isTimelineShortcut: false, history: [true, true, true, true, true, true, true] }
-  ],
+  ]),
   archivedHabits: JSON.parse(localStorage.getItem('mind_cave_archived_habits') || '[]'),
-  bucketList: JSON.parse(localStorage.getItem('mind_cave_bucket_list') || 'null') || [
+  bucketList: JSON.parse(localStorage.getItem('mind_cave_bucket_list') || 'null') || (localStorage.getItem('mind_cave_is_reset') ? [] : [
     { id: 'b1', title: 'Scuba dive the Great Barrier Reef', category: 'travel', year: '2027', achieved: false },
     { id: 'b2', title: 'Publish Open-Source AI Architecture Benchmark', category: 'career', year: '2026', achieved: true },
     { id: 'b3', title: 'Trek the Annapurna Circuit in Himalayas', category: 'adventure', year: '2027', achieved: false },
     { id: 'b4', title: 'Run a sub-4-hour Marathon', category: 'wellness', year: '2026', achieved: false },
     { id: 'b5', title: 'Solo Roadtrip across New Zealand South Island', category: 'travel', year: '2028', achieved: false },
     { id: 'b6', title: 'Build a private off-grid mountain cabin sanctuary', category: 'wellness', year: '2029', achieved: false }
-  ],
+  ]),
   bucketCategories: JSON.parse(localStorage.getItem('mind_cave_bucket_categories') || 'null') || [
     { id: 'travel', name: 'Travel & World Exploration', color: 'cyan' },
     { id: 'career', name: 'Career & Mastery', color: 'indigo' },
@@ -12551,10 +12551,10 @@ async function executeFactoryReset() {
 
 
   // 2. Clear all local storage & session storage
-
   localStorage.clear();
-
   sessionStorage.clear();
+  localStorage.setItem('mind_cave_is_reset', 'true');
+  localStorage.setItem('gemini_journal_uid', 'user_' + Date.now());
 
 
 
