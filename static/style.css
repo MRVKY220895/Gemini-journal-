@@ -1322,82 +1322,182 @@ html:not(.dark) #contextual-prompt-chips button:hover {
   border-color: rgba(15, 23, 42, 0.2) !important;
 }
 
-/* Light Mode Chrono Blocks & Inputs */
+/* Master Fluid Luxury Container */
+.studio-container {
+  max-width: 1240px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .studio-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .studio-container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* Floating Glass Header */
+.floating-nav {
+  position: sticky;
+  top: 0.5rem;
+  z-index: 50;
+  max-width: 1240px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  background: rgba(10, 14, 24, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  padding: 0.45rem 1.25rem;
+  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.7);
+  box-sizing: border-box;
+}
+
+/* Light Mode Card & Typography Contrast Overrides */
 html.light .chrono-block-card,
 html:not(.dark) .chrono-block-card {
   background: #ffffff !important;
-  border-color: rgba(15, 23, 42, 0.08) !important;
-  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.04) !important;
+  border: 1px solid rgba(15, 23, 42, 0.1) !important;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+  border-radius: 1.25rem !important;
 }
 
 html.light .chrono-block-card:hover,
 html:not(.dark) .chrono-block-card:hover {
-  background: #f8fafc !important;
-  border-color: rgba(15, 23, 42, 0.16) !important;
+  background: #ffffff !important;
+  border-color: rgba(14, 165, 233, 0.5) !important;
+  box-shadow: 0 12px 32px -4px rgba(15, 23, 42, 0.1) !important;
+  transform: translateY(-2px);
 }
 
-html.light input[type="text"],
-html:not(.dark) input[type="text"],
-html.light input[type="password"],
-html:not(.dark) input[type="password"],
-html.light input[type="email"],
-html:not(.dark) input[type="email"],
-html.light textarea,
-html:not(.dark) textarea,
-html.light select,
-html:not(.dark) select {
-  background-color: #f8fafc !important;
+html.light .chrono-block-card h4,
+html:not(.dark) .chrono-block-card h4,
+html.light .chrono-card-title,
+html:not(.dark) .chrono-card-title {
   color: #0f172a !important;
-  border-color: rgba(15, 23, 42, 0.12) !important;
+  font-weight: 700 !important;
 }
 
-html.light input::placeholder,
-html:not(.dark) input::placeholder,
-html.light textarea::placeholder,
-html:not(.dark) textarea::placeholder {
+html.light .chrono-block-card p,
+html:not(.dark) .chrono-block-card p,
+html.light .chrono-card-text,
+html:not(.dark) .chrono-card-text {
+  color: #334155 !important;
+  font-size: 0.875rem !important;
+  line-height: 1.6 !important;
+}
+
+html.light .chrono-block-card .text-slate-300,
+html:not(.dark) .chrono-block-card .text-slate-300,
+html.light .chrono-block-card .text-slate-400,
+html:not(.dark) .chrono-block-card .text-slate-400 {
+  color: #475569 !important;
+}
+
+html.light .chrono-block-card .text-white,
+html:not(.dark) .chrono-block-card .text-white {
+  color: #0f172a !important;
+}
+
+/* Category Left Border Accents */
+.chrono-block-card.type-journal {
+  border-left: 4px solid #10b981 !important;
+}
+
+.chrono-block-card.type-gcal {
+  border-left: 4px solid #3b82f6 !important;
+}
+
+.chrono-block-card.type-task {
+  border-left: 4px solid #f59e0b !important;
+}
+
+.chrono-block-card.type-photo {
+  border-left: 4px solid #8b5cf6 !important;
+}
+
+/* Today's North Star Goal Card Light Mode */
+html.light .today-goal-card,
+html:not(.dark) .today-goal-card {
+  background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%) !important;
+  border: 1px solid #fde68a !important;
+  box-shadow: 0 4px 20px -2px rgba(245, 158, 11, 0.12) !important;
+}
+
+html.light .today-goal-card h4,
+html:not(.dark) .today-goal-card h4 {
+  color: #0f172a !important;
+}
+
+/* Weekly Ribbon Days Light Mode */
+html.light .diary-day-pill,
+html:not(.dark) .diary-day-pill {
+  background: #ffffff !important;
+  border-color: rgba(15, 23, 42, 0.1) !important;
+}
+
+html.light .diary-day-pill .day-name,
+html:not(.dark) .diary-day-pill .day-name {
   color: #64748b !important;
 }
 
-html.light #ai-studio-code-view,
-html:not(.dark) #ai-studio-code-view,
-html.light pre,
-html:not(.dark) pre {
-  background: #f1f5f9 !important;
+html.light .diary-day-pill .day-number,
+html:not(.dark) .diary-day-pill .day-number {
   color: #0f172a !important;
-  border-color: rgba(15, 23, 42, 0.08) !important;
 }
 
-html.light .cbt-heat-cell,
-html:not(.dark) .cbt-heat-cell {
-  background: rgba(15, 23, 42, 0.04);
-  border-color: rgba(15, 23, 42, 0.06);
-  color: #64748b;
+html.light .diary-day-pill.active,
+html:not(.dark) .diary-day-pill.active {
+  background: #e0f2fe !important;
+  border-color: #0284c7 !important;
 }
 
-html.light .mood-chip,
-html:not(.dark) .mood-chip {
-  background: rgba(15, 23, 42, 0.04);
-  border-color: rgba(15, 23, 42, 0.08);
+html.light .diary-day-pill.active .day-name,
+html:not(.dark) .diary-day-pill.active .day-name {
+  color: #0284c7 !important;
 }
 
-/* Modal Light Mode Refinements */
-html.light #auth-modal,
-html:not(.dark) #auth-modal,
-html.light #journal-modal,
-html:not(.dark) #journal-modal,
-html.light #gemini-key-modal,
-html:not(.dark) #gemini-key-modal {
-  background: rgba(15, 23, 42, 0.5) !important;
+html.light .diary-day-pill.active .day-number,
+html:not(.dark) .diary-day-pill.active .day-number {
+  color: #0369a1 !important;
 }
 
-html.light #auth-modal .double-bezel-inner,
-html:not(.dark) #auth-modal .double-bezel-inner,
-html.light #journal-modal .double-bezel-inner,
-html:not(.dark) #journal-modal .double-bezel-inner,
-html.light #gemini-key-modal .double-bezel-inner,
-html:not(.dark) #gemini-key-modal .double-bezel-inner {
+/* Daily Harmony Strip Light Mode */
+html.light .synthesis-strip,
+html:not(.dark) .synthesis-strip {
   background: #ffffff !important;
+  border-color: rgba(15, 23, 42, 0.1) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04) !important;
+}
+
+html.light .synthesis-strip-title,
+html:not(.dark) .synthesis-strip-title {
   color: #0f172a !important;
+}
+
+html.light .synthesis-mini-chip,
+html:not(.dark) .synthesis-mini-chip {
+  background: #f8fafc !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+  color: #334155 !important;
+}
+
+html.light .journal-page-header h2,
+html:not(.dark) .journal-page-header h2 {
+  color: #0f172a !important;
+}
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
 }
 
@@ -2124,280 +2224,5 @@ html:not(.dark) .bucket-card {
 .font-patrick { font-family: 'Patrick Hand', cursive; }
 .font-kalam { font-family: 'Kalam', cursive; }
 .font-architect { font-family: 'Architects Daughter', cursive; }
-
-/* ==========================================================================
-   COSMIC RIVER OF TIME — HORIZONTAL TIMELINE STREAM (ANCIENT ONE TIME RAY)
-   ========================================================================== */
-
-@keyframes cosmicBeamFlow {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-@keyframes cosmicParticleDrift {
-  0% { transform: translateX(0) translateY(0); opacity: 0.3; }
-  50% { opacity: 0.9; }
-  100% { transform: translateX(120px) translateY(-10px); opacity: 0.1; }
-}
-
-@keyframes gemOrbPulse {
-  0%, 100% { transform: scale(1); box-shadow: 0 0 15px var(--gem-glow, rgba(255, 180, 0, 0.7)); }
-  50% { transform: scale(1.18); box-shadow: 0 0 28px var(--gem-glow, rgba(255, 180, 0, 1)), 0 0 45px var(--gem-glow-outer, rgba(56, 189, 248, 0.6)); }
-}
-
-@keyframes beaconRingPing {
-  0% { transform: scale(0.8); opacity: 1; }
-  100% { transform: scale(2.4); opacity: 0; }
-}
-
-.cosmic-river-container {
-  position: relative;
-  width: 100%;
-  border-radius: 1.5rem;
-  background: radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.95), rgba(5, 7, 13, 0.98));
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  overflow: hidden;
-  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.8), inset 0 0 80px rgba(0, 0, 0, 0.6);
-}
-
-html.light .cosmic-river-container,
-html:not(.dark) .cosmic-river-container {
-  background: radial-gradient(circle at 50% 50%, #f8fafc, #f1f5f9) !important;
-  border-color: rgba(15, 23, 42, 0.1) !important;
-  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.08) !important;
-}
-
-.cosmic-river-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem 1.25rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(0, 0, 0, 0.3);
-}
-
-html.light .cosmic-river-header,
-html:not(.dark) .cosmic-river-header {
-  border-bottom-color: rgba(15, 23, 42, 0.08) !important;
-  background: rgba(255, 255, 255, 0.6) !important;
-}
-
-.cosmic-scroll-viewport {
-  position: relative;
-  width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 180, 0, 0.3) transparent;
-  cursor: grab;
-  user-select: none;
-  min-height: 480px;
-  padding: 2.5rem 2rem;
-}
-
-.cosmic-scroll-viewport:active {
-  cursor: grabbing;
-}
-
-.cosmic-river-stage {
-  position: relative;
-  display: flex;
-  align-items: center;
-  min-width: max-content;
-  padding: 0 3rem;
-  height: 440px;
-}
-
-/* The Luminous River of Time (Central Energy Beam) */
-.cosmic-central-beam {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 5px;
-  transform: translateY(-50%);
-  background: linear-gradient(90deg, 
-    #ff7e1d 0%, 
-    #ffd200 20%, 
-    #38bdf8 45%, 
-    #818cf8 70%, 
-    #ffd200 88%, 
-    #ff7e1d 100%
-  );
-  background-size: 200% 100%;
-  animation: cosmicBeamFlow 6s ease infinite;
-  box-shadow: 
-    0 0 16px rgba(255, 180, 0, 0.9),
-    0 0 32px rgba(255, 120, 0, 0.7),
-    0 0 60px rgba(56, 189, 248, 0.5);
-  border-radius: 9999px;
-  z-index: 10;
-}
-
-/* Plasma Aura Haze */
-.cosmic-beam-plasma-glow {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 40px;
-  transform: translateY(-50%);
-  background: linear-gradient(90deg, 
-    rgba(255, 126, 29, 0.15), 
-    rgba(255, 210, 0, 0.22), 
-    rgba(56, 189, 248, 0.22), 
-    rgba(129, 140, 248, 0.18), 
-    rgba(255, 126, 29, 0.15)
-  );
-  filter: blur(12px);
-  pointer-events: none;
-  z-index: 9;
-}
-
-/* Event Node along River */
-.cosmic-event-node {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 290px;
-  margin: 0 1.75rem;
-  z-index: 20;
-  flex-shrink: 0;
-}
-
-/* Node Gem Orb sitting on central beam */
-.cosmic-gem-orb {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #ffffff, var(--gem-core, #ffd200));
-  border: 2px solid #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  z-index: 25;
-  cursor: pointer;
-  animation: gemOrbPulse 3s ease-in-out infinite;
-  transition: transform 0.2s ease;
-}
-
-.cosmic-gem-orb:hover {
-  transform: translateY(-50%) scale(1.35) !important;
-}
-
-/* Energy Conduit Line (Connecting Gem to Card) */
-.cosmic-conduit-line {
-  position: absolute;
-  width: 2px;
-  background: linear-gradient(to bottom, var(--gem-glow, #ffd200), rgba(255, 255, 255, 0.4));
-  box-shadow: 0 0 8px var(--gem-glow, #ffd200);
-  z-index: 15;
-}
-
-.cosmic-event-node.is-top .cosmic-conduit-line {
-  bottom: 50%;
-  height: 60px;
-  transform: translateY(12px);
-}
-
-.cosmic-event-node.is-bottom .cosmic-conduit-line {
-  top: 50%;
-  height: 60px;
-  transform: translateY(-12px);
-}
-
-/* Orbital Event Card */
-.cosmic-orbital-card {
-  width: 100%;
-  padding: 1rem;
-  border-radius: 1.25rem;
-  background: rgba(10, 14, 24, 0.88);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.6);
-  transition: all 0.25s cubic-bezier(0.32, 0.72, 0, 1);
-  cursor: pointer;
-}
-
-.cosmic-event-node.is-top .cosmic-orbital-card {
-  margin-bottom: 72px;
-}
-
-.cosmic-event-node.is-bottom .cosmic-orbital-card {
-  margin-top: 72px;
-}
-
-.cosmic-orbital-card:hover {
-  transform: translateY(-4px) scale(1.03);
-  border-color: var(--gem-glow, #38bdf8);
-  box-shadow: 0 16px 40px -4px rgba(0, 0, 0, 0.8), 0 0 24px var(--gem-glow, rgba(56, 189, 248, 0.3));
-}
-
-html.light .cosmic-orbital-card,
-html:not(.dark) .cosmic-orbital-card {
-  background: #ffffff !important;
-  border-color: rgba(15, 23, 42, 0.12) !important;
-  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.08) !important;
-  color: #0f172a !important;
-}
-
-html.light .cosmic-orbital-card p,
-html:not(.dark) .cosmic-orbital-card p {
-  color: #334155 !important;
-}
-
-/* Current "NOW" Cosmic Singularity Beacon */
-.cosmic-now-beacon {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 0 2rem;
-  z-index: 30;
-  flex-shrink: 0;
-}
-
-.cosmic-now-singularity {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: #ffffff;
-  box-shadow: 0 0 20px #ffffff, 0 0 40px #38bdf8;
-  z-index: 35;
-}
-
-.cosmic-now-singularity::before {
-  content: '';
-  position: absolute;
-  inset: -8px;
-  border-radius: 50%;
-  border: 2px solid #38bdf8;
-  animation: beaconRingPing 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
-}
-
-.cosmic-now-tag {
-  position: absolute;
-  top: -45px;
-  background: linear-gradient(135deg, #0284c7, #6366f1);
-  color: #ffffff;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  padding: 0.25rem 0.65rem;
-  border-radius: 9999px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 4px 16px rgba(14, 165, 233, 0.5);
-  white-space: nowrap;
-}
 
 

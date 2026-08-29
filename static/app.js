@@ -1537,34 +1537,27 @@ function closeNewJournalModal() {
   if (box) box.classList.add('hidden');
 }
 
-let timelineViewMode = 'cosmic';
+let timelineViewMode = 'stream';
 let storyCurrentIndex = 0;
 let storyEventsCache = [];
 
 function setTimelineViewMode(mode) {
   timelineViewMode = mode;
-  const cosmicBtn = document.getElementById('view-mode-cosmic-btn');
   const streamBtn = document.getElementById('view-mode-stream-btn');
   const storyBtn = document.getElementById('view-mode-story-btn');
-  
-  const cosmicView = document.getElementById('chrono-cosmic-view');
   const streamView = document.getElementById('chrono-timeline-list');
   const storyView = document.getElementById('chrono-story-view');
 
-  const activeBtnClass = 'px-2 py-0.5 rounded-md font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 flex items-center gap-1 text-[11px]';
-  const inactiveBtnClass = 'px-2 py-0.5 rounded-md font-semibold text-slate-400 hover:text-white flex items-center gap-1 text-[11px]';
-
-  if (cosmicBtn) cosmicBtn.className = mode === 'cosmic' ? activeBtnClass : inactiveBtnClass;
-  if (streamBtn) streamBtn.className = mode === 'stream' ? activeBtnClass : inactiveBtnClass;
-  if (storyBtn) storyBtn.className = mode === 'story' ? activeBtnClass : inactiveBtnClass;
-
-  if (cosmicView) cosmicView.classList.toggle('hidden', mode !== 'cosmic');
-  if (streamView) streamView.classList.toggle('hidden', mode !== 'stream');
-  if (storyView) storyView.classList.toggle('hidden', mode !== 'story');
-
-  if (mode === 'cosmic') {
-    renderCosmicRiver(storyEventsCache);
-  } else if (mode === 'story') {
+  if (mode === 'stream') {
+    if (streamBtn) streamBtn.className = 'px-2.5 py-1 rounded-lg font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 flex items-center gap-1';
+    if (storyBtn) storyBtn.className = 'px-2.5 py-1 rounded-lg font-semibold text-slate-400 hover:text-white flex items-center gap-1';
+    if (streamView) streamView.classList.remove('hidden');
+    if (storyView) storyView.classList.add('hidden');
+  } else {
+    if (storyBtn) storyBtn.className = 'px-2.5 py-1 rounded-lg font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 flex items-center gap-1';
+    if (streamBtn) streamBtn.className = 'px-2.5 py-1 rounded-lg font-semibold text-slate-400 hover:text-white flex items-center gap-1';
+    if (streamView) streamView.classList.add('hidden');
+    if (storyView) storyView.classList.remove('hidden');
     initStorySwipeDrag();
   }
 }
@@ -1838,46 +1831,54 @@ async function renderChronoTimeline() {
         </div>
 
         <!-- Editorial Diary Page Card -->
-        <div class="chrono-block-card">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+        <div class="chrono-block-card type-${ev.type}">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-2.5 pb-2 border-b border-black/5 dark:border-white/5">
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-black/40 border border-white/10 text-slate-300">
-                ${weatherBadge}
-              </span>
-
+              <!-- Event Category Pill -->
               ${isGCal ? `
-                <span class="gcal-planned-pill">
-                  <i data-lucide="calendar" class="w-3 h-3 text-blue-400"></i>
-                  <span>GCal Sync</span>
+                <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200 dark:border-blue-500/30">
+                  <i data-lucide="calendar" class="w-3.5 h-3.5 text-blue-500"></i>
+                  <span>Google Calendar</span>
                 </span>
               ` : isTask ? `
-                <span class="text-[10px] px-2 py-0.5 rounded-full ${ev.taskType === 'milestone' ? 'bg-amber-950/50 border-amber-500/30 text-amber-300' : ev.taskType === 'reminder' ? 'bg-purple-950/50 border-purple-500/30 text-purple-300' : 'bg-blue-950/50 border-blue-500/30 text-blue-300'} border font-semibold font-mono">
-                  ${ev.taskType === 'milestone' ? '⭐ Milestone' : ev.taskType === 'reminder' ? '⏰ Reminder' : '☑️ Task'}
+                <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full ${ev.isCompleted ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/30' : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-500/30'} border">
+                  <i data-lucide="${ev.isCompleted ? 'check-circle' : 'target'}" class="w-3.5 h-3.5"></i>
+                  <span>${ev.isCompleted ? 'Completed Task' : (ev.taskType === 'milestone' ? 'Goal Milestone' : 'Action Item')}</span>
+                </span>
+              ` : ev.type === 'photo' ? `
+                <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 border border-purple-200 dark:border-purple-500/30">
+                  <i data-lucide="image" class="w-3.5 h-3.5 text-purple-500"></i>
+                  <span>Visual Memory</span>
                 </span>
               ` : `
-                <span class="eyebrow-badge !text-cyan-300 !bg-cyan-950/40 !border-cyan-500/30">
-                  ${escapeHtml(ev.mood)}
+                <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30">
+                  <i data-lucide="feather" class="w-3.5 h-3.5 text-emerald-500"></i>
+                  <span>${escapeHtml(ev.mood || 'Reflection')}</span>
                 </span>
               `}
 
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded-full bg-slate-100 dark:bg-black/40 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10">
+                ${weatherBadge}
+              </span>
+
               ${ev.energy ? `
-                <span class="text-[10px] text-amber-400 bg-amber-950/30 border border-amber-500/30 px-2 py-0.5 rounded-full font-mono">
+                <span class="text-[11px] text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-500/30 px-2 py-0.5 rounded-full font-mono">
                   ⚡ ${ev.energy}
                 </span>
               ` : ''}
             </div>
 
             <div class="flex items-center gap-2">
-              <span class="text-[10px] text-slate-400 font-mono">${escapeHtml(ev.location)}</span>
+              <span class="text-[11px] text-slate-500 dark:text-slate-400 font-mono">${escapeHtml(ev.location)}</span>
               ${isTask ? `
-                <button onclick="convertTaskToReflection('${ev.taskId}')" class="text-xs font-semibold text-cyan-400 hover:text-cyan-300 flex items-center gap-1 transition-colors px-2 py-0.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30" title="Reflect on this task">
-                  <i data-lucide="feather" class="w-3 h-3"></i> <span>Reflect</span>
+                <button onclick="convertTaskToReflection('${ev.taskId}')" class="text-xs font-semibold text-cyan-600 dark:text-cyan-400 hover:opacity-80 flex items-center gap-1 transition-colors px-2.5 py-1 rounded-lg bg-cyan-50 dark:bg-cyan-500/10 border border-cyan-200 dark:border-cyan-500/30" title="Reflect on this task">
+                  <i data-lucide="sparkles" class="w-3 h-3"></i> <span>Reflect</span>
                 </button>
-                <button onclick="deleteTask('${ev.taskId}')" class="text-xs text-slate-500 hover:text-rose-400 transition-colors p-1" title="Delete Task">
-                  <i data-lucide="trash-2" class="w-3 h-3"></i>
+                <button onclick="deleteTask('${ev.taskId}')" class="text-xs text-slate-400 hover:text-rose-500 transition-colors p-1" title="Delete Task">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                 </button>
               ` : `
-                <button onclick="openNewJournalModal('${ev.time}')" class="text-xs font-semibold text-cyan-400 hover:text-cyan-300 flex items-center gap-1 transition-colors px-2 py-0.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30">
+                <button onclick="openNewJournalModal('${ev.time}')" class="text-xs font-semibold text-cyan-600 dark:text-cyan-400 hover:opacity-80 flex items-center gap-1 transition-colors px-2.5 py-1 rounded-lg bg-cyan-50 dark:bg-cyan-500/10 border border-cyan-200 dark:border-cyan-500/30">
                   <i data-lucide="edit-3" class="w-3 h-3"></i> <span>Add Note</span>
                 </button>
               `}
@@ -1885,24 +1886,24 @@ async function renderChronoTimeline() {
           </div>
 
           <!-- Entry Details -->
-          <div class="space-y-1.5 pt-0.5">
+          <div class="space-y-2 pt-0.5">
             ${isTask ? `
-              <div class="flex items-center gap-2">
-                <button type="button" onclick="toggleTaskComplete('${ev.taskId}')" class="w-4 h-4 rounded-md border flex items-center justify-center transition-colors shrink-0 ${ev.isCompleted ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400' : 'bg-black/40 border-slate-700 hover:border-cyan-400 text-transparent'}" title="Toggle Completion">
-                  <i data-lucide="check" class="w-3 h-3 ${ev.isCompleted ? 'block' : 'hidden'}"></i>
+              <div class="flex items-center gap-3">
+                <button type="button" onclick="toggleTaskComplete('${ev.taskId}')" class="w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all shrink-0 cursor-pointer ${ev.isCompleted ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-transparent border-slate-300 dark:border-slate-600 hover:border-emerald-500 text-transparent'}" title="Click to mark done/undone">
+                  <i data-lucide="check" class="w-3.5 h-3.5 ${ev.isCompleted ? 'block' : 'hidden'}"></i>
                 </button>
-                <h4 class="text-sm font-bold ${ev.isCompleted ? 'line-through text-slate-400' : 'text-white'} tracking-tight">${escapeHtml(ev.title)}</h4>
+                <h4 class="chrono-card-title text-base font-bold ${ev.isCompleted ? 'line-through opacity-50' : ''}">${escapeHtml(ev.title)}</h4>
               </div>
             ` : `
-              <h4 class="text-sm font-bold text-white tracking-tight">${escapeHtml(ev.title)}</h4>
+              <h4 class="chrono-card-title text-base font-bold">${escapeHtml(ev.title)}</h4>
             `}
             
-            <p class="text-xs text-slate-300 leading-relaxed font-sans">${escapeHtml(ev.content)}</p>
+            <p class="chrono-card-text text-sm leading-relaxed">${escapeHtml(ev.content)}</p>
             
             ${ev.cbtNote ? `
-              <div class="p-2.5 rounded-xl bg-purple-950/30 border border-purple-500/20 text-[11px] text-purple-300 italic mt-2 flex items-start gap-2">
-                <i data-lucide="brain" class="w-3.5 h-3.5 text-purple-400 shrink-0 mt-0.5"></i>
-                <span>CBT Reframing: "${escapeHtml(ev.cbtNote)}"</span>
+              <div class="p-3 rounded-xl bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-500/20 text-xs text-purple-800 dark:text-purple-300 italic mt-2 flex items-start gap-2">
+                <i data-lucide="brain" class="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5"></i>
+                <span><strong>💡 Reflection Note:</strong> "${escapeHtml(ev.cbtNote)}"</span>
               </div>
             ` : ''}
           </div>
@@ -1959,211 +1960,8 @@ async function renderChronoTimeline() {
   container.innerHTML = html;
   lucide.createIcons();
 
-  // Also update Cosmic River and Story Flow Carousel
-  renderCosmicRiver(events);
+  // Also update Story Flow Carousel
   renderStoryCarousel(events);
-}
-
-// =============================================================================
-// COSMIC RIVER OF TIME (HORIZONTAL STREAM OF TIME ENGINE)
-// =============================================================================
-
-function renderCosmicRiver(events) {
-  const stage = document.getElementById('cosmic-river-stage');
-  if (!stage) return;
-
-  const dateFormatted = (state.selectedDiaryDate || new Date()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-
-  if (events.length === 0) {
-    stage.innerHTML = `
-      <div class="cosmic-central-beam"></div>
-      <div class="cosmic-beam-plasma-glow"></div>
-      <div class="p-6 text-center bg-black/40 rounded-3xl border border-white/10 mx-auto z-20">
-        <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-300 flex items-center justify-center mx-auto mb-2">
-          <i data-lucide="sparkles" class="w-5 h-5"></i>
-        </div>
-        <h4 class="text-sm font-bold text-white">The Stream of Time is Flowing</h4>
-        <p class="text-xs text-slate-400 mt-1">Log a journal reflection or task for ${dateFormatted} to anchor an infinity event on the stream.</p>
-      </div>
-    `;
-    lucide.createIcons();
-    return;
-  }
-
-  // Sort events chronologically along the river stream (Earliest -> Latest)
-  const sortedEvents = [...events].sort((a, b) => {
-    if (a.entryDate && b.entryDate && a.entryDate.getTime() !== b.entryDate.getTime()) {
-      return a.entryDate.getTime() - b.entryDate.getTime();
-    }
-    return a.time.localeCompare(b.time);
-  });
-
-  const now = new Date();
-  const currentHourInt = now.getHours();
-  const currentMinStr = String(now.getMinutes()).padStart(2, '0');
-  const nowTime12H = (currentHourInt % 12 || 12) + ':' + currentMinStr + (currentHourInt >= 12 ? ' PM' : ' AM');
-
-  let html = `
-    <div class="cosmic-central-beam"></div>
-    <div class="cosmic-beam-plasma-glow"></div>
-  `;
-
-  let nowBeaconInserted = false;
-
-  sortedEvents.forEach((ev, idx) => {
-    const isTop = idx % 2 === 0;
-    
-    // Choose Infinity Gem Style based on type & mood
-    let gemIcon = '💎';
-    let gemColor = '#10b981';
-    let gemGlow = 'rgba(16, 185, 129, 0.9)';
-    let gemName = 'Time Gem (Reflection)';
-
-    if (ev.type === 'task') {
-      gemIcon = '🔶';
-      gemColor = '#f59e0b';
-      gemGlow = 'rgba(245, 158, 11, 0.9)';
-      gemName = 'Mind Gem (Goal Action)';
-    } else if (ev.title && ev.title.includes('Google Calendar')) {
-      gemIcon = '🔷';
-      gemColor = '#0ea5e9';
-      gemGlow = 'rgba(14, 165, 233, 0.9)';
-      gemName = 'Space Gem (Calendar)';
-    } else if (ev.type === 'photo' || ev.photoUrl) {
-      gemIcon = '🔮';
-      gemColor = '#a855f7';
-      gemGlow = 'rgba(168, 85, 247, 0.9)';
-      gemName = 'Power Gem (Memory)';
-    } else if (ev.mood && (ev.mood.includes('Grateful') || ev.mood.includes('Joy'))) {
-      gemIcon = '🔴';
-      gemColor = '#f43f5e';
-      gemGlow = 'rgba(244, 63, 94, 0.9)';
-      gemName = 'Reality Gem (Gratitude)';
-    }
-
-    // Insert NOW Beacon when time crosses
-    if (!nowBeaconInserted && ev.rawHour >= currentHourInt) {
-      html += `
-        <div class="cosmic-now-beacon" id="cosmic-now-beacon-el">
-          <div class="cosmic-now-tag">⚡ ${nowTime12H} (NOW)</div>
-          <div class="cosmic-now-singularity"></div>
-        </div>
-      `;
-      nowBeaconInserted = true;
-    }
-
-    html += `
-      <div class="cosmic-event-node ${isTop ? 'is-top' : 'is-bottom'}" style="--gem-core: ${gemColor}; --gem-glow: ${gemGlow};">
-        <!-- Floating Orbital Card -->
-        <div class="cosmic-orbital-card" onclick="openStorySlideById('${ev.id}')" title="Click to expand moment">
-          <div class="flex items-center justify-between gap-2 mb-2 pb-1.5 border-b border-white/5">
-            <span class="text-[11px] font-bold font-mono text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded-md border border-cyan-500/30">
-              ⏰ ${ev.time}
-            </span>
-            <span class="text-[10px] text-slate-300 bg-white/5 px-2 py-0.5 rounded-full border border-white/10">
-              ${escapeHtml(ev.mood)}
-            </span>
-          </div>
-
-          <h4 class="text-xs font-bold text-white mb-1 line-clamp-1">${escapeHtml(ev.title)}</h4>
-          <p class="text-[11px] text-slate-300 line-clamp-2 leading-relaxed font-sans">${escapeHtml(ev.content)}</p>
-
-          ${ev.cbtNote ? `
-            <div class="mt-2 text-[10px] text-purple-300 bg-purple-950/40 p-1.5 rounded-lg border border-purple-500/20 truncate">
-              ✨ <em>${escapeHtml(ev.cbtNote)}</em>
-            </div>
-          ` : ''}
-
-          ${ev.photoUrl ? `
-            <div class="mt-2 rounded-lg overflow-hidden h-14 border border-white/10">
-              <img src="${ev.photoUrl}" alt="${escapeHtml(ev.title)}" class="w-full h-full object-cover">
-            </div>
-          ` : ''}
-
-          <div class="mt-2 pt-1.5 border-t border-white/5 flex items-center justify-between text-[10px] text-slate-400">
-            <span>${escapeHtml(ev.location || '📍 Life River')}</span>
-            <button onclick="event.stopPropagation(); narrateAIMessage('${escapeHtml(ev.content).replace(/'/g, "\\'")}', this)" class="text-cyan-400 hover:text-cyan-300 flex items-center gap-0.5" title="Listen">
-              <i data-lucide="volume-2" class="w-3 h-3"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- Energy Conduit -->
-        <div class="cosmic-conduit-line"></div>
-
-        <!-- Central Gem Orb on Beam -->
-        <div class="cosmic-gem-orb" title="${gemName} at ${ev.time}">
-          ${gemIcon}
-        </div>
-      </div>
-    `;
-  });
-
-  if (!nowBeaconInserted) {
-    html += `
-      <div class="cosmic-now-beacon" id="cosmic-now-beacon-el">
-        <div class="cosmic-now-tag">⚡ ${nowTime12H} (NOW)</div>
-        <div class="cosmic-now-singularity"></div>
-      </div>
-    `;
-  }
-
-  stage.innerHTML = html;
-  lucide.createIcons();
-  initCosmicRiverDrag();
-}
-
-function scrollCosmicRiver(offset) {
-  const viewport = document.getElementById('cosmic-scroll-viewport');
-  if (viewport) {
-    viewport.scrollBy({ left: offset, behavior: 'smooth' });
-  }
-}
-
-function centerCosmicRiverOnNow() {
-  const beacon = document.getElementById('cosmic-now-beacon-el');
-  const viewport = document.getElementById('cosmic-scroll-viewport');
-  if (beacon && viewport) {
-    const beaconLeft = beacon.offsetLeft;
-    const viewportWidth = viewport.clientWidth;
-    viewport.scrollTo({ left: beaconLeft - (viewportWidth / 2) + 20, behavior: 'smooth' });
-  }
-}
-
-function openStorySlideById(eventId) {
-  const idx = storyEventsCache.findIndex(e => e.id === eventId);
-  if (idx !== -1) {
-    setTimelineViewMode('story');
-    goToStorySlide(idx);
-  }
-}
-
-let isDraggingCosmic = false;
-let cosmicStartX = 0;
-let cosmicScrollLeft = 0;
-
-function initCosmicRiverDrag() {
-  const viewport = document.getElementById('cosmic-scroll-viewport');
-  if (!viewport || viewport.dataset.dragInit) return;
-  viewport.dataset.dragInit = 'true';
-
-  viewport.addEventListener('mousedown', (e) => {
-    isDraggingCosmic = true;
-    cosmicStartX = e.pageX - viewport.offsetLeft;
-    cosmicScrollLeft = viewport.scrollLeft;
-  });
-
-  window.addEventListener('mouseup', () => {
-    isDraggingCosmic = false;
-  });
-
-  viewport.addEventListener('mousemove', (e) => {
-    if (!isDraggingCosmic) return;
-    e.preventDefault();
-    const x = e.pageX - viewport.offsetLeft;
-    const walk = (x - cosmicStartX) * 1.5;
-    viewport.scrollLeft = cosmicScrollLeft - walk;
-  });
 }
 
 // =============================================================================
