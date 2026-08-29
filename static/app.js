@@ -2021,6 +2021,13 @@ function switchChatHistoryTab(tab) {
   }
 }
 
+function startNewSessionFromHistory() {
+  closeChatHistoryModal();
+  switchTab('studio');
+  startNewSession();
+  showToast('Started a fresh reflection session.');
+}
+
 function renderChatHistorySessions() {
   const container = document.getElementById('history-sessions-view');
   if (!container) return;
@@ -2032,6 +2039,11 @@ function renderChatHistorySessions() {
     try { history = JSON.parse(saved) || []; } catch(e) {}
   }
 
+  // Also check in-memory state.chatHistory
+  if (history.length === 0 && Array.isArray(state.chatHistory) && state.chatHistory.length > 0) {
+    history = state.chatHistory;
+  }
+
   if (history.length === 0) {
     container.innerHTML = `
       <div class="text-center py-10 text-xs text-slate-400">
@@ -2039,7 +2051,11 @@ function renderChatHistorySessions() {
           <i data-lucide="messages-square" class="w-5 h-5"></i>
         </div>
         <p class="font-bold text-slate-200">No Active Conversations Yet</p>
-        <p class="text-[11px] text-slate-500 mt-1">Start chatting in the AI Studio to build your private reflection history.</p>
+        <p class="text-[11px] text-slate-500 mt-1 mb-4">Start chatting in the AI Studio to build your private reflection history.</p>
+        <button type="button" onclick="startNewSessionFromHistory()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold shadow-md shadow-purple-600/20 transition-all">
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+          <span>Start Conversation</span>
+        </button>
       </div>
     `;
     lucide.createIcons();
@@ -6237,6 +6253,16 @@ function setMasterDashboardHorizon(horizon) {
   setEl('dash-cat-health', data.health);
   setEl('dash-cat-career', data.career);
   setEl('dash-cat-mindset', data.mindset);
+
+  const barDeep = document.getElementById('dash-cat-deepwork-bar');
+  const barHealth = document.getElementById('dash-cat-health-bar');
+  const barCareer = document.getElementById('dash-cat-career-bar');
+  const barMind = document.getElementById('dash-cat-mindset-bar');
+
+  if (barDeep) barDeep.style.width = isClean ? '0%' : '45%';
+  if (barHealth) barHealth.style.width = isClean ? '0%' : '25%';
+  if (barCareer) barCareer.style.width = isClean ? '0%' : '20%';
+  if (barMind) barMind.style.width = isClean ? '0%' : '10%';
 
   // 4. Update Habit Consistency Bento & Heatmap
   setEl('dash-habit-rate-badge', data.habitRate);

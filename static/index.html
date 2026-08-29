@@ -1337,10 +1337,10 @@
                   <span class="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                     <span class="w-2 h-2 rounded-full bg-cyan-500"></span> Deep Work & Architecture
                   </span>
-                  <span class="font-mono text-slate-500 dark:text-slate-400" id="dash-cat-deepwork">18.5 hrs (45%)</span>
+                  <span class="font-mono text-slate-500 dark:text-slate-400" id="dash-cat-deepwork">0 hrs (0%)</span>
                 </div>
                 <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                  <div class="h-full bg-cyan-500 rounded-full" style="width: 45%;"></div>
+                  <div class="h-full bg-cyan-500 rounded-full transition-all duration-500" id="dash-cat-deepwork-bar" style="width: 0%;"></div>
                 </div>
               </div>
 
@@ -1349,10 +1349,10 @@
                   <span class="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                     <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Physical Vitality & Somatics
                   </span>
-                  <span class="font-mono text-slate-500 dark:text-slate-400" id="dash-cat-health">10.2 hrs (25%)</span>
+                  <span class="font-mono text-slate-500 dark:text-slate-400" id="dash-cat-health">0 hrs (0%)</span>
                 </div>
                 <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                  <div class="h-full bg-emerald-500 rounded-full" style="width: 25%;"></div>
+                  <div class="h-full bg-emerald-500 rounded-full transition-all duration-500" id="dash-cat-health-bar" style="width: 0%;"></div>
                 </div>
               </div>
 
@@ -1361,10 +1361,10 @@
                   <span class="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                     <span class="w-2 h-2 rounded-full bg-purple-500"></span> Strategic Career & Quests
                   </span>
-                  <span class="font-mono text-slate-500 dark:text-slate-400" id="dash-cat-career">8.2 hrs (20%)</span>
+                  <span class="font-mono text-slate-500 dark:text-slate-400" id="dash-cat-career">0 hrs (0%)</span>
                 </div>
                 <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                  <div class="h-full bg-purple-500 rounded-full" style="width: 20%;"></div>
+                  <div class="h-full bg-purple-500 rounded-full transition-all duration-500" id="dash-cat-career-bar" style="width: 0%;"></div>
                 </div>
               </div>
 
@@ -1373,10 +1373,10 @@
                   <span class="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                     <span class="w-2 h-2 rounded-full bg-pink-500"></span> Mindfulness & Reflection
                   </span>
-                  <span class="font-mono text-slate-500 dark:text-slate-400" id="dash-cat-mindset">4.1 hrs (10%)</span>
+                  <span class="font-mono text-slate-500 dark:text-slate-400" id="dash-cat-mindset">0 hrs (0%)</span>
                 </div>
                 <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                  <div class="h-full bg-pink-500 rounded-full" style="width: 10%;"></div>
+                  <div class="h-full bg-pink-500 rounded-full transition-all duration-500" id="dash-cat-mindset-bar" style="width: 0%;"></div>
                 </div>
               </div>
             </div>
@@ -1700,14 +1700,20 @@
         </div>
 
         <!-- Modal Footer Actions -->
-        <div class="pt-3 border-t border-slate-200 dark:border-white/10 flex items-center justify-between">
+        <div class="pt-3 border-t border-slate-200 dark:border-white/10 flex items-center justify-between gap-2">
           <button type="button" onclick="clearAllChatHistory()" class="text-xs text-rose-500 hover:text-rose-400 font-semibold flex items-center gap-1 hover:underline">
             <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
             <span>Clear Chat History</span>
           </button>
-          <button type="button" onclick="closeChatHistoryModal()" class="btn-secondary text-xs">
-            Close
-          </button>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="startNewSessionFromHistory()" class="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-md shadow-purple-600/20 transition-all">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+              <span>+ New Session</span>
+            </button>
+            <button type="button" onclick="closeChatHistoryModal()" class="btn-secondary text-xs">
+              Close
+            </button>
+          </div>
         </div>
       </div>
     </div>
