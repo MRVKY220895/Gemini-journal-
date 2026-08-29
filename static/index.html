@@ -780,22 +780,22 @@
                 <p class="text-xs text-slate-500 dark:text-slate-400">Mindful self-awareness without productivity pressure</p>
               </div>
             </div>
-            <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-500/30">
-              18 Entries This Month
+            <span id="journal-stat-month" class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-500/30">
+              0 Entries This Month
             </span>
           </div>
 
           <div class="grid grid-cols-3 gap-2.5 text-center">
             <div class="p-3 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5">
-              <div class="text-lg font-bold text-slate-900 dark:text-white font-mono">127</div>
+              <div id="journal-stat-total" class="text-lg font-bold text-slate-900 dark:text-white font-mono">0</div>
               <div class="text-[10px] text-slate-500 uppercase font-mono">Total Entries</div>
             </div>
             <div class="p-3 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5">
-              <div class="text-lg font-bold text-slate-900 dark:text-white font-mono">83</div>
+              <div id="journal-stat-days" class="text-lg font-bold text-slate-900 dark:text-white font-mono">0</div>
               <div class="text-[10px] text-slate-500 uppercase font-mono">Writing Days</div>
             </div>
             <div class="p-3 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5">
-              <div class="text-lg font-bold text-emerald-600 dark:text-emerald-400 font-mono">68%</div>
+              <div id="journal-stat-clarity" class="text-lg font-bold text-emerald-600 dark:text-emerald-400 font-mono">0%</div>
               <div class="text-[10px] text-slate-500 uppercase font-mono">Clarity Index</div>
             </div>
           </div>
@@ -805,19 +805,19 @@
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
               <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/5 flex items-center justify-between text-xs">
                 <span class="flex items-center gap-1.5"><i data-lucide="briefcase" class="w-3.5 h-3.5 text-blue-500"></i><span>Career</span></span>
-                <span class="font-mono text-slate-500 font-bold">32</span>
+                <span id="journal-theme-career" class="font-mono text-slate-500 font-bold">0</span>
               </div>
               <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/5 flex items-center justify-between text-xs">
                 <span class="flex items-center gap-1.5"><i data-lucide="book-open" class="w-3.5 h-3.5 text-amber-500"></i><span>Learning</span></span>
-                <span class="font-mono text-slate-500 font-bold">21</span>
+                <span id="journal-theme-learning" class="font-mono text-slate-500 font-bold">0</span>
               </div>
               <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/5 flex items-center justify-between text-xs">
                 <span class="flex items-center gap-1.5"><i data-lucide="heart" class="w-3.5 h-3.5 text-emerald-500"></i><span>Mindful</span></span>
-                <span class="font-mono text-slate-500 font-bold">18</span>
+                <span id="journal-theme-mindful" class="font-mono text-slate-500 font-bold">0</span>
               </div>
               <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/5 flex items-center justify-between text-xs">
                 <span class="flex items-center gap-1.5"><i data-lucide="zap" class="w-3.5 h-3.5 text-rose-500"></i><span>Movement</span></span>
-                <span class="font-mono text-slate-500 font-bold">14</span>
+                <span id="journal-theme-movement" class="font-mono text-slate-500 font-bold">0</span>
               </div>
             </div>
           </div>
@@ -846,15 +846,15 @@
             </button>
           </div>
 
-          <div class="p-4 rounded-xl bg-black/50 border border-amber-500/20 space-y-2">
+          <div id="memory-lane-quote-container" class="p-4 rounded-xl bg-black/50 border border-amber-500/20 space-y-2">
             <div class="flex items-center gap-2">
               <span class="text-xs text-amber-300 font-mono font-bold flex items-center gap-1">
                 <i data-lucide="calendar" class="w-3.5 h-3.5 text-amber-400"></i>
-                <span>July 30, 2026 (30 Days Ago)</span>
+                <span id="memory-lane-date">July 30, 2026 (30 Days Ago)</span>
               </span>
-              <span class="text-[10px] px-2 py-0.5 rounded-full bg-rose-950/60 text-rose-300 border border-rose-500/30 font-medium">Overwhelmed & Hesitant</span>
+              <span id="memory-lane-tag" class="text-[10px] px-2 py-0.5 rounded-full bg-rose-950/60 text-rose-300 border border-rose-500/30 font-medium">Overwhelmed & Hesitant</span>
             </div>
-            <p class="text-xs sm:text-sm text-amber-100/90 italic leading-relaxed">
+            <p id="memory-lane-quote" class="text-xs sm:text-sm text-amber-100/90 italic leading-relaxed">
               "I'm not sure whether I should change directions or stay. I'm afraid I'll regret staying if I don't speak up during sprint planning..."
             </p>
           </div>
