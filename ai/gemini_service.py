@@ -193,7 +193,22 @@ class GeminiService:
                         logger.debug(f"Model {model_name} attempt failed: {model_err}")
                         continue
             except Exception as e:
-                logger.warning(f"Error calling modern Gemini SDK: {e}. Falling back to legacy/simulation.")
+                err_str = str(e)
+                logger.warning(f"Error calling modern Gemini SDK: {err_str}. Falling back to legacy/simulation.")
+                if "API_KEY_SERVICE_BLOCKED" in err_str or "PERMISSION_DENIED" in err_str:
+                    return {
+                        "role": "model",
+                        "content": (
+                            "⚠️ **Google API Key Restriction Notice**\n\n"
+                            "Your Google API key (`AIzaSy...`) was reached, but Google returned `403 PERMISSION_DENIED (API_KEY_SERVICE_BLOCKED)`.\n\n"
+                            "**How to enable live Gemini in 1 minute:**\n"
+                            "1. Go to [Google AI Studio (aistudio.google.com/app/apikey)](https://aistudio.google.com/app/apikey) and click **Create API Key**.\n"
+                            "2. *Or* in [Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials), click your API Key and under **API restrictions**, add **Generative Language API** (or select *Don't restrict key*).\n\n"
+                            "---\n\n" + self._generate_simulated_reflective_response(last_user_msg, persona)["content"]
+                        ),
+                        "model_used": "gemini-fallback-restricted-key",
+                        "is_live_gemini": False
+                    }
 
         if self._legacy_model and self._is_valid_live_key():
             try:
