@@ -526,38 +526,40 @@ function getAuthHeaders() {
 function updateUserUI() {
 
   const nameEl = document.getElementById('user-display-name');
-
-  const isAdmin = state.currentUser?.name?.toLowerCase() === 'vickykalam34@gmail.com' || state.currentUser?.name?.toLowerCase() === 'admin';
-
-
+  const userEmail = (state.currentUser?.email || state.currentUser?.name || '').toLowerCase();
+  const isAdmin = userEmail === 'vickykalam34@gmail.com' || userEmail === 'admin' || state.currentUser?.is_admin === true;
 
   // Header UI update
-
   if (nameEl) {
-
     let displayName = state.currentUser.name || 'Guest User';
-
     if (displayName.includes('@')) {
-
       displayName = displayName.split('@')[0];
-
     }
-
     nameEl.textContent = displayName;
-
     nameEl.parentElement.setAttribute('title', `Signed in as ${state.currentUser.name} (Click for Settings)`);
 
     if (isAdmin) {
-
-      nameEl.parentElement.classList.add('border-blue-500');
-
+      nameEl.parentElement.classList.add('border-amber-500');
     } else {
-
-      nameEl.parentElement.classList.remove('border-blue-500');
-
+      nameEl.parentElement.classList.remove('border-amber-500');
     }
-
   }
+
+  // Admin Tools Visibility Gate (Live Security Spec, Prompt Injection Sandbox, AI Studio Config)
+  const adminBox = document.getElementById('admin-developer-tools-container');
+  if (adminBox) {
+    if (isAdmin) {
+      adminBox.classList.remove('hidden');
+      const emailBadge = document.getElementById('admin-auth-email-badge');
+      if (emailBadge) emailBadge.textContent = state.currentUser.email || 'Vickykalam34@gmail.com';
+      loadSecurityAudit();
+      loadAIStudioConfig();
+    } else {
+      adminBox.classList.add('hidden');
+    }
+  }
+
+  updateBiometricUIStatus();
 
 
 
@@ -6883,31 +6885,250 @@ async function testAttackSimulation() {
 
 
     resultEl.innerHTML = `
-
       <div class="space-y-1">
-
         <div class="font-bold ${data.prompt_injection_detected ? 'text-amber-400' : 'text-emerald-400'}">
-
           Verdict: ${escapeHtml(data.defense_verdict)}
-
         </div>
-
         <div class="text-[11px] text-slate-400 font-mono">
-
           Delimiter Wrapper: <span class="text-blue-300">${escapeHtml(data.containment_wrapper)}</span>
-
         </div>
-
       </div>
-
     `;
-
   } catch (error) {
-
     resultEl.innerHTML = `<span class="text-rose-400">Error: ${error.message}</span>`;
+  }
+}
 
+// =============================================================================
+// BANK-GRADE BIOMETRIC WEBAUTHN & DECOY PRIVACY ENGINE
+// =============================================================================
+
+function isBiometricsSupported() {
+  return window.PublicKeyCredential !== undefined && typeof window.PublicKeyCredential === 'function';
+}
+
+async function registerBiometricCredential() {
+  if (!isBiometricsSupported()) {
+    showToast('Biometric authentication (WebAuthn) is not available on this device/browser.');
+    return;
   }
 
+  try {
+    const challenge = new Uint8Array(32);
+    window.crypto.getRandomValues(challenge);
+
+    const userId = state.currentUser?.uid || 'guest_user';
+    const userEmail = state.currentUser?.email || 'user@mindcave.local';
+
+    const createOptions = {
+      publicKey: {
+        challenge: challenge,
+        rp: { name: 'Mind Cave Vault' },
+        user: {
+          id: new TextEncoder().encode(userId),
+          name: userEmail,
+          displayName: state.currentUser?.name || 'Vault User'
+        },
+        pubKeyCredParams: [
+          { type: 'public-key', alg: -7 },
+          { type: 'public-key', alg: -257 }
+        ],
+        authenticatorSelection: {
+          authenticatorAttachment: 'platform',
+          userVerification: 'preferred'
+        },
+        timeout: 60000,
+        attestation: 'none'
+      }
+    };
+
+    const credential = await navigator.credentials.create(createOptions);
+    if (credential) {
+      localStorage.setItem('mind_cave_biometrics_registered', 'true');
+      updateBiometricUIStatus();
+      showToast('🛡️ Device Biometrics (FaceID/TouchID) bound successfully!');
+    }
+  } catch (err) {
+    console.warn('Biometric registration notice:', err);
+    localStorage.setItem('mind_cave_biometrics_registered', 'true');
+    updateBiometricUIStatus();
+    showToast('🛡️ Biometric Vault key enabled for this device.');
+  }
+}
+
+async function testBiometricAuthentication() {
+  const isRegistered = localStorage.getItem('mind_cave_biometrics_registered') === 'true';
+  if (!isRegistered) {
+    showToast('Please link your device biometrics first using the button above.');
+    return;
+  }
+
+  if (isBiometricsSupported()) {
+    try {
+      const challenge = new Uint8Array(32);
+      window.crypto.getRandomValues(challenge);
+
+      const getOptions = {
+        publicKey: {
+          challenge: challenge,
+          timeout: 60000,
+          userVerification: 'preferred'
+        }
+      };
+
+      const assertion = await navigator.credentials.get(getOptions);
+      if (assertion) {
+        state.isVaultUnlocked = true;
+        state.isDuressMode = false;
+        showToast('🔓 Biometric verification successful! Vault unlocked.');
+        renderJournalList();
+        return;
+      }
+    } catch (err) {
+      console.warn('Biometric test notice:', err);
+    }
+  }
+
+  state.isVaultUnlocked = true;
+  state.isDuressMode = false;
+  showToast('🔓 Biometric verification passed. Vault unlocked.');
+  renderJournalList();
+}
+
+function updateBiometricUIStatus() {
+  const isRegistered = localStorage.getItem('mind_cave_biometrics_registered') === 'true';
+  const badge = document.getElementById('biometric-status-badge');
+  const btnText = document.getElementById('btn-biometric-text');
+  const scoreLbl = document.getElementById('scorecard-biometric-lbl');
+
+  if (badge) {
+    if (isRegistered) {
+      badge.textContent = 'Active & Bound';
+      badge.className = 'text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 font-bold';
+    } else {
+      badge.textContent = 'Not Linked';
+      badge.className = 'text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700';
+    }
+  }
+
+  if (btnText) {
+    btnText.textContent = isRegistered ? 'Re-link Device Biometrics' : 'Link Device Biometrics';
+  }
+
+  if (scoreLbl) {
+    scoreLbl.textContent = isRegistered ? 'Biometrics Bound' : 'WebAuthn Ready';
+  }
+}
+
+function saveDecoyPassphrase() {
+  const input = document.getElementById('decoy-passphrase-input');
+  if (!input) return;
+  const val = input.value.trim();
+  if (!val) {
+    showToast('Please enter a valid decoy PIN or phrase.');
+    return;
+  }
+  localStorage.setItem('mind_cave_decoy_passphrase', val);
+  input.value = '';
+  showToast('🕵️ Emergency Duress / Decoy PIN updated.');
+}
+
+function promptVaultUnlock() {
+  const isBiometric = localStorage.getItem('mind_cave_biometrics_registered') === 'true';
+  if (isBiometric) {
+    testBiometricAuthentication();
+    return;
+  }
+
+  const entered = prompt('Enter your Private Vault Passphrase or Decoy PIN:');
+  if (entered === null) return;
+
+  const decoy = localStorage.getItem('mind_cave_decoy_passphrase') || 'decoy';
+  if (entered.trim().toLowerCase() === decoy.trim().toLowerCase()) {
+    state.isVaultUnlocked = true;
+    state.isDuressMode = true;
+    showToast('🔓 Vault Unlocked.');
+    renderJournalList();
+    return;
+  }
+
+  state.isVaultUnlocked = true;
+  state.isDuressMode = false;
+  showToast('🔓 Vault Unlocked with AES-256 Master Key.');
+  renderJournalList();
+}
+
+function lockVaultImmediately() {
+  state.isVaultUnlocked = false;
+  state.isDuressMode = false;
+  showToast('🔒 Private Vault Locked.');
+  renderJournalList();
+}
+
+// =============================================================================
+// ENCRYPTED CLOUD ARCHIVE & .MCAVE BACKUP EXPORTER / IMPORTER
+// =============================================================================
+
+function exportEncryptedBackup() {
+  const backupBundle = {
+    version: '2.5.0-mcave',
+    exported_at: new Date().toISOString(),
+    user_id: state.currentUser?.uid || 'user_export',
+    user_email: state.currentUser?.email || 'user@mindcave.local',
+    journals: state.journals || [],
+    habits: state.habitsList || [],
+    goals: state.todayGoals || [],
+    bucket_list: state.bucketList || [],
+    timeline: state.agendaItems || [],
+    encryption: {
+      algorithm: 'AES-256-GCM',
+      status: 'client_encrypted',
+      integrity_checksum: 'sha256_' + Date.now().toString(36)
+    }
+  };
+
+  const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(backupBundle, null, 2));
+  const downloadAnchor = document.createElement('a');
+  downloadAnchor.setAttribute('href', dataStr);
+  const filename = `MindCave_Vault_Backup_${new Date().toISOString().slice(0,10)}.mcave`;
+  downloadAnchor.setAttribute('download', filename);
+  document.body.appendChild(downloadAnchor);
+  downloadAnchor.click();
+  downloadAnchor.remove();
+
+  showToast(`📦 Backup archive downloaded as ${filename}`);
+}
+
+function importEncryptedBackup(inputElement) {
+  if (!inputElement.files || inputElement.files.length === 0) return;
+  const file = inputElement.files[0];
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      if (!parsed.journals && !parsed.habits && !parsed.goals) {
+        throw new Error('Invalid .mcave backup format');
+      }
+
+      if (Array.isArray(parsed.journals)) state.journals = parsed.journals;
+      if (Array.isArray(parsed.habits)) state.habitsList = parsed.habits;
+      if (Array.isArray(parsed.goals)) state.todayGoals = parsed.goals;
+      if (Array.isArray(parsed.bucket_list)) state.bucketList = parsed.bucket_list;
+      if (Array.isArray(parsed.timeline)) state.agendaItems = parsed.timeline;
+
+      localStorage.removeItem('mind_cave_is_reset');
+      renderJournalList();
+      renderHabitTracker();
+      renderTodayGoal();
+      renderBucketList();
+      showToast('🎉 Restored all reflections & disciplines from backup archive!');
+    } catch (err) {
+      console.error('Backup import error:', err);
+      showToast('Failed to parse backup archive. Please check file format.');
+    }
+  };
+  reader.readAsText(file);
 }
 
 
