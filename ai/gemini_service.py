@@ -89,7 +89,18 @@ class GeminiService:
             except Exception as e:
                 logger.debug(f"GenAI API Key client notice: {e}")
 
-        # Attempt 2: Application Default Credentials (Vertex AI Mode - for Cloud Run / Org Policy environments)
+        # Attempt 2: Legacy google.generativeai SDK with API Key
+        if api_key:
+            try:
+                import google.generativeai as legacy_genai
+                legacy_genai.configure(api_key=api_key)
+                self._legacy_model = legacy_genai.GenerativeModel("gemini-1.5-flash")
+                logger.info("Initialized legacy google.generativeai with API key.")
+                return
+            except Exception as e:
+                logger.debug(f"Legacy genai notice: {e}")
+
+        # Attempt 3: Application Default Credentials (Vertex AI Mode - for Cloud Run / Org Policy environments)
         try:
             from google import genai
             gcp_project = os.getenv("GCP_PROJECT_ID", "project-eb461b9f-34ae-46e3-b00")
@@ -173,12 +184,12 @@ class GeminiService:
                 })
 
                 candidate_models = [
-                    "gemini-3.6-flash",
-                    "gemini-3.5-flash",
-                    "gemini-3.7-flash",
-                    "gemini-flash-latest",
-                    "gemini-3.1-flash-lite",
-                    "gemini-2.5-flash"
+                    "gemini-2.0-flash",
+                    "gemini-1.5-flash",
+                    "gemini-1.5-pro",
+                    "gemini-2.0-flash-lite",
+                    "gemini-2.5-flash",
+                    "gemini-flash-latest"
                 ]
                 last_api_error = None
                 for model_name in candidate_models:
