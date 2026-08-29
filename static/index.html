@@ -1217,100 +1217,136 @@
   </main>
 
   <!-- ===================================================================== -->
-  <!-- MODAL: AUTHENTICATION & SWITCH USER -->
   <!-- ===================================================================== -->
-  <div id="auth-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-    <div class="double-bezel max-w-md w-full">
-      <div class="double-bezel-inner p-6">
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-xl bg-blue-600/20 text-blue-400 flex items-center justify-center">
-              <i data-lucide="lock" class="w-4 h-4"></i>
+  <!-- MODAL: AUTHENTICATION & BIOLOGICAL PROFILE -->
+  <!-- ===================================================================== -->
+  <div id="auth-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
+    <div class="double-bezel max-w-lg w-full my-auto">
+      <div class="double-bezel-inner p-5 sm:p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-white/10">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/25">
+              <i data-lucide="shield-check" class="w-5 h-5 text-white"></i>
             </div>
-            <h3 class="text-base font-bold text-white">Firebase User Authentication</h3>
+            <div>
+              <h3 class="text-base font-bold text-slate-900 dark:text-white">Account & Biological Profile</h3>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400">Isolated Cloud Firestore vault & encrypted biometric sync</p>
+            </div>
           </div>
-          <button onclick="closeAuthModal()" class="text-slate-400 hover:text-white">
-            <i data-lucide="x" class="w-5 h-5"></i>
+          <button onclick="closeAuthModal()" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition-colors">
+            <i data-lucide="x" class="w-4 h-4"></i>
           </button>
         </div>
 
-        <p class="text-xs text-slate-400 mb-4">Sign in with Firebase to access your isolated Cloud Firestore vault. Every request is verified via cryptographically signed JWTs.</p>
+        <!-- Active User Status Card -->
+        <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-9 h-9 rounded-full bg-blue-600/15 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-sm shrink-0 font-mono">
+              👤
+            </div>
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0 animate-pulse"></span>
+                <span class="text-xs font-bold text-slate-900 dark:text-white truncate" id="modal-current-user-lbl">vickykalam34@gmail.com</span>
+              </div>
+              <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono flex items-center gap-1 mt-0.5">
+                <i data-lucide="lock" class="w-2.5 h-2.5 text-emerald-500"></i>
+                <span>Client AES-256 Vault Active</span>
+              </div>
+            </div>
+          </div>
+          <button type="button" onclick="signOutUser()" class="shrink-0 px-2.5 py-1 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-500/30 text-rose-600 dark:text-rose-400 text-xs font-semibold hover:bg-rose-100 dark:hover:bg-rose-900/50 transition-colors flex items-center gap-1">
+            <i data-lucide="log-out" class="w-3 h-3"></i>
+            <span>Sign Out</span>
+          </button>
+        </div>
 
-        <!-- Auth Method Selector Tabs -->
-        <div class="flex gap-1 bg-black/40 p-1 rounded-xl mb-4 border border-white/5 text-xs">
-          <button onclick="switchAuthTab('firebase')" id="auth-tab-btn-firebase" class="flex-1 py-1.5 rounded-lg font-semibold bg-blue-600/30 text-blue-300 border border-blue-500/40">
+        <!-- Main Modal Tabs (Auth vs Profile) -->
+        <div class="flex gap-1 bg-slate-100 dark:bg-black/50 p-1 rounded-xl border border-slate-200 dark:border-white/10 text-xs">
+          <button type="button" onclick="switchAuthTab('firebase')" id="auth-tab-btn-firebase" class="flex-1 py-1.5 rounded-lg font-semibold transition-all bg-white dark:bg-blue-600/30 text-blue-600 dark:text-blue-300 shadow-sm dark:shadow-none border border-slate-200/80 dark:border-blue-500/40">
             🔥 Firebase Auth
           </button>
-          <button onclick="switchAuthTab('sandbox')" id="auth-tab-btn-sandbox" class="flex-1 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-slate-200">
+          <button type="button" onclick="switchAuthTab('sandbox')" id="auth-tab-btn-sandbox" class="flex-1 py-1.5 rounded-lg font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">
             👥 Demo Sandbox
           </button>
         </div>
 
-        <!-- Section A: Live Firebase Auth (Google & Email/Password) -->
+        <!-- Section A: Live Firebase Auth -->
         <div id="auth-panel-firebase" class="space-y-3">
           <!-- Google Sign In Button -->
-          <button onclick="signInWithFirebaseGoogle()" class="w-full flex items-center justify-center gap-2.5 bg-white text-slate-900 hover:bg-slate-100 font-semibold py-2.5 px-4 rounded-xl text-xs shadow-md transition-all">
-            <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
-            Sign In with Google (Firebase)
+          <button type="button" onclick="signInWithFirebaseGoogle()" class="w-full flex items-center justify-center gap-2.5 bg-white text-slate-800 hover:bg-slate-50 font-semibold py-2.5 px-4 rounded-xl text-xs border border-slate-300 dark:border-white/20 shadow-sm transition-all">
+            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+            <span>Sign In with Google (Firebase)</span>
           </button>
 
-          <div class="flex items-center gap-2 my-2 text-[10px] text-slate-500 uppercase tracking-widest text-center before:flex-1 before:border-t before:border-slate-800 after:flex-1 after:border-t after:border-slate-800">
-            or email
+          <div class="flex items-center gap-2 my-2 text-[10px] text-slate-400 uppercase tracking-widest text-center before:flex-1 before:border-t before:border-slate-200 dark:before:border-slate-800 after:flex-1 after:border-t after:border-slate-200 dark:after:border-slate-800">
+            or continue with email
           </div>
 
-          <!-- Email / Password Form -->
-          <div class="space-y-2">
-            <input type="email" id="firebase-email-input" placeholder="name@example.com" class="w-full bg-black/60 text-slate-200 text-xs p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-blue-500 font-sans">
-            <input type="password" id="firebase-password-input" placeholder="Password (min 6 chars)" class="w-full bg-black/60 text-slate-200 text-xs p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-blue-500 font-sans">
+          <!-- Email / Password Inputs -->
+          <div class="space-y-2.5">
+            <div>
+              <label class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 block mb-1">Email Address</label>
+              <input type="email" id="firebase-email-input" placeholder="name@example.com" class="w-full bg-slate-50 dark:bg-slate-900/90 text-slate-900 dark:text-slate-100 text-xs p-2.5 rounded-xl border border-slate-300 dark:border-white/10 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 font-sans">
+            </div>
+
+            <div>
+              <label class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 block mb-1">Password</label>
+              <input type="password" id="firebase-password-input" placeholder="Password (min 6 chars)" class="w-full bg-slate-50 dark:bg-slate-900/90 text-slate-900 dark:text-slate-100 text-xs p-2.5 rounded-xl border border-slate-300 dark:border-white/10 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 font-sans">
+            </div>
             
             <div class="grid grid-cols-2 gap-2 pt-1">
-              <button onclick="signInWithFirebaseEmail()" class="btn-secondary text-xs !justify-center !py-2">
+              <button type="button" onclick="signInWithFirebaseEmail()" class="btn-secondary text-xs !justify-center !py-2 font-semibold">
                 Sign In
               </button>
-              <button onclick="signUpWithFirebaseEmail()" class="btn-secondary text-xs !justify-center !py-2 !bg-blue-600/20 !border-blue-500/30 !text-blue-300">
+              <button type="button" onclick="signUpWithFirebaseEmail()" class="btn-island text-xs !justify-center !py-2 font-semibold !bg-gradient-to-r !from-blue-600 !to-indigo-600">
                 Create Account
               </button>
             </div>
           </div>
 
-          <!-- Firebase Status & Config Badge -->
-          <div id="firebase-status-banner" class="mt-3 p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
+          <!-- Firebase Status & Config Box -->
+          <div id="firebase-status-banner" class="mt-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400 flex items-center justify-between">
             <span class="flex items-center gap-1.5">
-              <span id="fb-status-dot" class="w-2 h-2 rounded-full bg-amber-400"></span>
-              <span id="fb-status-text">Firebase Client Ready</span>
+              <span id="fb-status-dot" class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span id="fb-status-text" class="font-medium">Firebase Client Ready</span>
             </span>
-            <button onclick="toggleFirebaseConfigBox()" class="text-[10px] text-blue-400 hover:underline">Config</button>
+            <button type="button" onclick="toggleFirebaseConfigBox()" class="text-[10px] text-blue-600 dark:text-blue-400 hover:underline font-semibold flex items-center gap-1">
+              <i data-lucide="settings" class="w-3 h-3"></i>
+              <span>Config</span>
+            </button>
           </div>
 
           <!-- Custom Web Config Details (Collapsible) -->
-          <div id="firebase-config-box" class="hidden p-3 rounded-xl bg-black/60 border border-slate-800 text-[11px] space-y-2 mt-2">
-            <p class="text-slate-400 text-[10px]">Enter Firebase Web App credentials (from Firebase Console):</p>
-            <input type="text" id="cfg-fb-api-key" placeholder="apiKey (AIza...)" class="w-full bg-slate-950 p-2 rounded text-xs border border-slate-800 font-mono">
-            <input type="text" id="cfg-fb-auth-domain" placeholder="authDomain (project.firebaseapp.com)" class="w-full bg-slate-950 p-2 rounded text-xs border border-slate-800 font-mono">
-            <input type="text" id="cfg-fb-project-id" placeholder="projectId" class="w-full bg-slate-950 p-2 rounded text-xs border border-slate-800 font-mono">
-            <button onclick="saveCustomFirebaseConfig()" class="btn-secondary text-[11px] !py-1 w-full !justify-center">Initialize Custom Firebase Project</button>
+          <div id="firebase-config-box" class="hidden p-3 rounded-xl bg-slate-50 dark:bg-black/60 border border-slate-200 dark:border-slate-800 text-[11px] space-y-2 mt-2">
+            <p class="text-slate-500 dark:text-slate-400 text-[10px]">Enter Firebase Web App credentials (from Firebase Console):</p>
+            <input type="text" id="cfg-fb-api-key" placeholder="apiKey (AIza...)" class="w-full bg-white dark:bg-slate-950 p-2 rounded-lg text-xs border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white font-mono">
+            <input type="text" id="cfg-fb-auth-domain" placeholder="authDomain (project.firebaseapp.com)" class="w-full bg-white dark:bg-slate-950 p-2 rounded-lg text-xs border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white font-mono">
+            <input type="text" id="cfg-fb-project-id" placeholder="projectId" class="w-full bg-white dark:bg-slate-950 p-2 rounded-lg text-xs border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white font-mono">
+            <button type="button" onclick="saveCustomFirebaseConfig()" class="btn-secondary text-[11px] !py-1.5 w-full !justify-center font-semibold">Initialize Custom Firebase Project</button>
           </div>
         </div>
 
         <!-- Section B: Instant Sandbox Multi-Tenant Switcher -->
         <div id="auth-panel-sandbox" class="hidden space-y-3">
-          <div class="bg-blue-950/40 p-3.5 rounded-xl border border-blue-500/20">
-            <span class="text-[11px] text-blue-400 font-semibold uppercase tracking-wider block mb-1">Instant Multi-Tenant Testing:</span>
+          <div class="bg-blue-50 dark:bg-blue-950/40 p-3.5 rounded-2xl border border-blue-200 dark:border-blue-500/20">
+            <span class="text-[11px] text-blue-700 dark:text-blue-400 font-semibold uppercase tracking-wider block mb-1">Instant Multi-Tenant Testing:</span>
             <div class="grid grid-cols-2 gap-2 mt-2">
-              <button onclick="setSandboxUser('user_alice')" class="btn-secondary text-xs !justify-center !w-full">
+              <button type="button" onclick="setSandboxUser('user_alice')" class="btn-secondary text-xs !justify-center !w-full font-semibold">
                 👤 User Alice
               </button>
-              <button onclick="setSandboxUser('user_bob')" class="btn-secondary text-xs !justify-center !w-full">
+              <button type="button" onclick="setSandboxUser('user_bob')" class="btn-secondary text-xs !justify-center !w-full font-semibold">
                 👤 User Bob
               </button>
             </div>
-            <p class="text-[10px] text-slate-400 mt-2">Switch between Alice & Bob to instantly test zero cross-user storage leakage in isolation.</p>
+            <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-2">Switch between Alice & Bob to instantly test zero cross-user storage leakage in isolation.</p>
           </div>
 
-          <div class="space-y-2 pt-2 border-t border-white/10">
-            <label class="text-xs text-slate-300 block">Custom Username / Email:</label>
-            <input type="text" id="custom-auth-input" placeholder="e.g. dev_engineer@google.com" class="w-full bg-black/60 text-slate-200 text-xs p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-blue-500 font-mono">
-            <button onclick="setCustomUser()" class="btn-island w-full !justify-center mt-2">
+          <div class="space-y-2 pt-2 border-t border-slate-200 dark:border-white/10">
+            <label class="text-xs font-semibold text-slate-700 dark:text-slate-300 block">Custom Username / Identifier:</label>
+            <input type="text" id="custom-auth-input" placeholder="e.g. dev_engineer@google.com" class="w-full bg-slate-50 dark:bg-black/60 text-slate-900 dark:text-slate-200 text-xs p-2.5 rounded-xl border border-slate-300 dark:border-slate-800 focus:outline-none focus:border-blue-500 font-mono">
+            <button type="button" onclick="setCustomUser()" class="btn-island w-full !justify-center mt-2 font-semibold">
               <span>Sign In & Load Vault</span>
               <div class="btn-island-icon">
                 <i data-lucide="arrow-right" class="w-4 h-4 text-white"></i>
@@ -1320,18 +1356,18 @@
         </div>
 
         <!-- Section C: Profile & Physiological Personalization -->
-        <div class="pt-3 mt-3 border-t border-white/10 space-y-3">
+        <div class="pt-3 border-t border-slate-200 dark:border-white/10 space-y-3">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-white flex items-center gap-1.5">
-              <i data-lucide="user-check" class="w-3.5 h-3.5 text-cyan-400"></i> Biological Profile & Timezone
+            <span class="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+              <i data-lucide="user-check" class="w-3.5 h-3.5 text-cyan-500 dark:text-cyan-400"></i> Biological Profile & Timezone
             </span>
-            <span class="text-[10px] text-slate-500 font-mono">Client Encrypted</span>
+            <span class="text-[10px] text-slate-500 dark:text-slate-400 font-mono">Client Encrypted</span>
           </div>
 
-          <div class="grid grid-cols-2 gap-2">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div>
-              <label class="text-[11px] text-slate-300 block mb-1">Gender / Wellness Track</label>
-              <select id="profile-gender-select" onchange="updateUserGender(this.value)" class="w-full bg-slate-950 text-slate-200 text-xs p-2 rounded-xl border border-slate-800 focus:outline-none">
+              <label class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 block mb-1">Gender / Wellness Track</label>
+              <select id="profile-gender-select" onchange="updateUserGender(this.value)" class="w-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 text-xs p-2.5 rounded-xl border border-slate-300 dark:border-slate-800 focus:outline-none focus:border-cyan-500">
                 <option value="female">👩 Female (Cycle Track)</option>
                 <option value="male">👨 Male (Circadian Track)</option>
                 <option value="non_binary">✨ Non-Binary / Other (Custom)</option>
@@ -1339,8 +1375,8 @@
               </select>
             </div>
             <div>
-              <label class="text-[11px] text-slate-300 block mb-1">Daily Diary Span</label>
-              <select id="profile-span-select" onchange="changeTimeRange(this.value)" class="w-full bg-slate-950 text-slate-200 text-xs p-2 rounded-xl border border-slate-800 focus:outline-none">
+              <label class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 block mb-1">Daily Diary Span</label>
+              <select id="profile-span-select" onchange="changeTimeRange(this.value)" class="w-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 text-xs p-2.5 rounded-xl border border-slate-300 dark:border-slate-800 focus:outline-none focus:border-cyan-500">
                 <option value="day_standard">☀️ Day Span (06–23h)</option>
                 <option value="full_24h">🌙 Full 24 Hours</option>
                 <option value="active_focus">⚡ Active (08–20h)</option>
@@ -1348,36 +1384,28 @@
             </div>
           </div>
 
-          <!-- Custom Track Toggles for Non-Binary / Other / Personal Preferences -->
-          <div id="profile-custom-tracks-container" class="p-2.5 rounded-xl bg-black/40 border border-slate-800 space-y-2 mt-2">
+          <!-- Custom Track Toggles -->
+          <div id="profile-custom-tracks-container" class="p-3 rounded-2xl bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-800 space-y-2">
             <div class="flex items-center justify-between">
-              <span class="text-[11px] font-semibold text-slate-300">Custom Wellness Tracks:</span>
-              <span class="text-[10px] text-cyan-400 font-mono" id="profile-tracks-status-hint">Dynamic Sync</span>
+              <span class="text-[11px] font-semibold text-slate-800 dark:text-slate-200">Active Vitality Tracks:</span>
+              <span class="text-[10px] text-cyan-600 dark:text-cyan-400 font-mono font-semibold" id="profile-tracks-status-hint">Dynamic Sync</span>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-              <label class="flex items-center justify-between p-2 rounded-lg bg-slate-900/60 hover:bg-slate-900 border border-slate-800 cursor-pointer">
-                <span class="flex items-center gap-1.5 text-xs text-slate-200">
-                  <span>🌙</span> <span class="font-medium">Cycle Intelligence</span>
+              <label class="flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 cursor-pointer transition-colors shadow-sm dark:shadow-none">
+                <span class="flex items-center gap-2 text-xs text-slate-800 dark:text-slate-200 font-semibold">
+                  <span class="text-sm">🌙</span> <span>Cycle Intelligence</span>
                 </span>
                 <input type="checkbox" id="profile-toggle-cycle" onchange="toggleTrackPreference('cycle', this.checked)" class="accent-rose-500 rounded w-4 h-4 cursor-pointer">
               </label>
-              <label class="flex items-center justify-between p-2 rounded-lg bg-slate-900/60 hover:bg-slate-900 border border-slate-800 cursor-pointer">
-                <span class="flex items-center gap-1.5 text-xs text-slate-200">
-                  <span>⚡</span> <span class="font-medium">Circadian & Energy</span>
+              <label class="flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 cursor-pointer transition-colors shadow-sm dark:shadow-none">
+                <span class="flex items-center gap-2 text-xs text-slate-800 dark:text-slate-200 font-semibold">
+                  <span class="text-sm">⚡</span> <span>Circadian & Energy</span>
                 </span>
                 <input type="checkbox" id="profile-toggle-circadian" onchange="toggleTrackPreference('circadian', this.checked)" class="accent-amber-500 rounded w-4 h-4 cursor-pointer">
               </label>
             </div>
-            <p class="text-[10px] text-slate-400">Toggle individual biological & vitality tracks on/off for your journal.</p>
+            <p class="text-[10px] text-slate-500 dark:text-slate-400">Toggle individual biological & vitality tracks on/off for your journal.</p>
           </div>
-        </div>
-
-        <!-- Sign Out Action -->
-        <div class="pt-3 border-t border-white/10 flex justify-between items-center text-xs">
-          <span class="text-slate-500 text-[11px]">Current: <strong id="modal-current-user-lbl" class="text-slate-300">user_alice</strong></span>
-          <button onclick="signOutUser()" class="text-rose-400 hover:text-rose-300 flex items-center gap-1 font-semibold">
-            <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Sign Out
-          </button>
         </div>
 
       </div>

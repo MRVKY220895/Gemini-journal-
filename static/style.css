@@ -2003,17 +2003,21 @@ html:not(.dark) input[type="time"]::-webkit-calendar-picker-indicator {
   cursor: pointer;
 }
 
+html.light #auth-modal .double-bezel-inner,
 html.light #task-modal .double-bezel-inner,
 html.light #goal-modal .double-bezel-inner,
 html.light #habit-modal .double-bezel-inner,
+html.light #shortcuts-modal .double-bezel-inner,
 html.light #bucket-modal .double-bezel-inner,
 html.light #blocker-modal .double-bezel-inner,
 html.light #journal-modal .double-bezel-inner,
 html.light #gemini-key-modal .double-bezel-inner,
 html.light #scrapbook-modal .double-bezel-inner,
+html:not(.dark) #auth-modal .double-bezel-inner,
 html:not(.dark) #task-modal .double-bezel-inner,
 html:not(.dark) #goal-modal .double-bezel-inner,
 html:not(.dark) #habit-modal .double-bezel-inner,
+html:not(.dark) #shortcuts-modal .double-bezel-inner,
 html:not(.dark) #bucket-modal .double-bezel-inner,
 html:not(.dark) #blocker-modal .double-bezel-inner,
 html:not(.dark) #journal-modal .double-bezel-inner,
@@ -2321,5 +2325,61 @@ html:not(.dark) #master-menu-modal .menu-subitem-btn:hover {
   background: #f1f5f9 !important;
   border-color: rgba(2, 132, 199, 0.4) !important;
 }
+
+/* =============================================================================
+   AUTH & BIOLOGICAL PROFILE MODAL STYLING
+   ============================================================================= */
+
+/* Dark Mode Auth Modal */
+html.dark #auth-modal .double-bezel-inner {
+  background: #0b0f19 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #f8fafc !important;
+}
+
+html.dark #auth-modal input,
+html.dark #auth-modal select {
+  background: rgba(15, 23, 42, 0.85) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Light Mode Auth Modal */
+html.light #auth-modal .double-bezel-inner,
+html:not(.dark) #auth-modal .double-bezel-inner {
+  background: #ffffff !important;
+  border: 1px solid rgba(15, 23, 42, 0.12) !important;
+  color: #0f172a !important;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.2) !important;
+}
+
+html.light #auth-modal input,
+html.light #auth-modal select,
+html:not(.dark) #auth-modal input,
+html:not(.dark) #auth-modal select {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+html.light #auth-modal input:focus,
+html.light #auth-modal select:focus,
+html:not(.dark) #auth-modal input:focus,
+html:not(.dark) #auth-modal select:focus {
+  background: #ffffff !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+}
+
+html.light #auth-modal label,
+html:not(.dark) #auth-modal label {
+  color: #334155 !important;
+}
+
+html.light #auth-modal h3,
+html:not(.dark) #auth-modal h3 {
+  color: #0f172a !important;
+}
+
 
 
