@@ -1,0 +1,50 @@
+steps:
+  # 1. Run Security & Multi-Tenant Isolation Pytest Suite
+  - name: 'python:3.11-slim'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        pip install --no-cache-dir -r requirements.txt pytest
+        pytest tests/test_security_isolation.py -v
+
+  # 2. Build Container Image via Docker
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io//gemini-journal:'
+      - '-t'
+      - 'gcr.io//gemini-journal:latest'
+      - '.'
+
+  # 3. Push Container Image to Google Container Registry / Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io//gemini-journal:'
+
+  # 4. Deploy to Google Cloud Run with Managed Identity & Secret Manager Access
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'gemini-journal'
+      - '--image=gcr.io//gemini-journal:'
+      - '--region=us-central1'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--set-env-vars=GCP_PROJECT_ID='
+      - '--memory=512Mi'
+      - '--cpu=1'
+      - '--min-instances=0'
+      - '--max-instances=10'
+
+images:
+  - 'gcr.io//gemini-journal:'
+  - 'gcr.io//gemini-journal:latest'
+
+timeout: 1200s
+options:
+  logging: CLOUD_LOGGING_ONLY
