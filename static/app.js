@@ -706,29 +706,36 @@ function copyToClipboard(text, btnElement) {
 
 function updateLiveCognitiveBar(cogData) {
   const bar = document.getElementById('live-cognitive-bar');
+  if (!bar) return;
+  
   bar.classList.remove('hidden');
 
-  document.getElementById('live-primary-emotion').textContent = cogData.primary_emotion || 'Balanced';
+  const emoEl = document.getElementById('live-primary-emotion');
+  if (emoEl) emoEl.textContent = cogData.primary_emotion || 'Balanced';
   
   const distBadge = document.getElementById('live-distortions-badge');
-  if (cogData.detected_distortions && cogData.detected_distortions.length > 0) {
-    distBadge.innerHTML = `<span class="bg-amber-950/60 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-full font-bold">⚠️ ${escapeHtml(cogData.detected_distortions.join(' • '))}</span>`;
-  } else {
-    distBadge.innerHTML = `<span class="text-[11px] text-emerald-400 font-mono">✨ Zero Distortions Detected</span>`;
+  if (distBadge) {
+    if (cogData.detected_distortions && cogData.detected_distortions.length > 0) {
+      distBadge.innerHTML = `<span class="bg-amber-950/60 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-full font-bold">⚠️ ${escapeHtml(cogData.detected_distortions.join(' • '))}</span>`;
+    } else {
+      distBadge.innerHTML = `<span class="text-[11px] text-emerald-400 font-mono">✨ Zero Distortions Detected</span>`;
+    }
   }
 
   const chipsContainer = document.getElementById('live-mood-chips');
-  chipsContainer.innerHTML = '';
-  const moods = cogData.mood_scores || {};
-  Object.keys(moods).forEach(key => {
-    const val = moods[key];
-    chipsContainer.innerHTML += `
-      <div class="bg-black/40 p-2 rounded-lg border border-white/5">
-        <div class="text-[10px] text-slate-400 uppercase">${key}</div>
-        <div class="text-xs font-bold text-blue-400 font-mono">${val}%</div>
-      </div>
-    `;
-  });
+  if (chipsContainer) {
+    chipsContainer.innerHTML = '';
+    const moods = cogData.mood_scores || {};
+    Object.keys(moods).forEach(key => {
+      const val = moods[key];
+      chipsContainer.innerHTML += `
+        <div class="bg-black/40 p-2 rounded-lg border border-white/5">
+          <div class="text-[10px] text-slate-400 uppercase">${key}</div>
+          <div class="text-xs font-bold text-blue-400 font-mono">${val}%</div>
+        </div>
+      `;
+    });
+  }
 }
 
 async function saveQuickJournal(title, content, mood) {
