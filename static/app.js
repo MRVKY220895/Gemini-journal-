@@ -67,7 +67,7 @@ const state = {
       endTime: '12:00',
       duration: '2h 30m',
       category: 'north_star',
-      categoryLabel: '🎯 North Star',
+      categoryLabel: 'North Star',
       notes: 'Clean zero-warning build & 7/7 pytest verification'
     },
     {
@@ -78,7 +78,7 @@ const state = {
       endTime: '14:15',
       duration: '45m',
       category: 'wellness',
-      categoryLabel: '🌿 Wellness',
+      categoryLabel: 'Wellness',
       notes: 'Zone 2 cardio completed'
     },
     {
@@ -89,7 +89,7 @@ const state = {
       endTime: '18:00',
       duration: '2h',
       category: 'deep_work',
-      categoryLabel: '⚡ Deep Work',
+      categoryLabel: 'Deep Work',
       notes: 'In progress'
     }
   ],
@@ -174,7 +174,7 @@ function toggleTheme() {
   const current = document.documentElement.classList.contains('light') ? 'light' : 'dark';
   const next = current === 'dark' ? 'light' : 'dark';
   applyTheme(next);
-  showToast(`Switched to ${next === 'light' ? '☀️ Light' : '🌙 Dark'} Mode`);
+  showToast(`Switched to ${next === 'light' ? 'Light' : 'Dark'} Mode`);
 }
 
 function updateChartsTheme(theme) {
@@ -269,7 +269,7 @@ async function submitGeminiApiKey(event) {
     checkGeminiKeyStatus();
     loadSecurityAudit();
 
-    showToast('✨ Gemini 2.5 Flash API Connected! All conversations are now live.');
+    showToast('Gemini 2.5 Flash API Connected! All conversations are now live.');
   } catch (err) {
     alert(`Error connecting Gemini API: ${err.message}`);
   }
@@ -834,36 +834,37 @@ function updateContextualSuggestions(userMessage, cognitiveData) {
 
   if (lower.includes('happy') || lower.includes('joy') || lower.includes('excited') || lower.includes('good')) {
     suggestions = [
-      { icon: '✨', text: 'How does this happiness feel in your body right now?' },
-      { icon: '🌿', text: 'What contributed to this positive feeling today?' },
-      { icon: '💾', text: 'Save this moment as a gratitude anchor' }
+      { icon: 'sparkles', text: 'How does this happiness feel in your body right now?' },
+      { icon: 'feather', text: 'What contributed to this positive feeling today?' },
+      { icon: 'bookmark', text: 'Save this moment as a gratitude anchor' }
     ];
   } else if (lower.includes('anxious') || lower.includes('stress') || lower.includes('overwhelm') || lower.includes('deadline') || lower.includes('fear')) {
     suggestions = [
-      { icon: '⚡', text: 'What is the single most actionable next step?' },
-      { icon: '🔄', text: 'Help me reframe this worst-case assumption' },
-      { icon: '🌬️', text: 'Guide me through a 2-minute centering reflection' }
+      { icon: 'zap', text: 'What is the single most actionable next step?' },
+      { icon: 'repeat', text: 'Help me reframe this worst-case assumption' },
+      { icon: 'wind', text: 'Guide me through a 2-minute centering reflection' }
     ];
   } else if (lower.includes('architect') || lower.includes('system') || lower.includes('build') || lower.includes('project') || lower.includes('strategy')) {
     suggestions = [
-      { icon: '💡', text: 'What hidden assumptions might I be making?' },
-      { icon: '🎯', text: 'Break this down into 3 concrete milestones' },
-      { icon: '🔍', text: 'Where are the key security and edge-case risks?' }
+      { icon: 'lightbulb', text: 'What hidden assumptions might I be making?' },
+      { icon: 'target', text: 'Break this down into 3 concrete milestones' },
+      { icon: 'shield-alert', text: 'Where are the key security and edge-case risks?' }
     ];
   } else {
     suggestions = [
-      { icon: '🌿', text: 'Explore this feeling a little deeper' },
-      { icon: '💭', text: 'What do you think is at the root of this?' },
-      { icon: '📝', text: 'Summarize key takeaways for my journal' }
+      { icon: 'feather', text: 'Explore this feeling a little deeper' },
+      { icon: 'message-square', text: 'What do you think is at the root of this?' },
+      { icon: 'file-text', text: 'Summarize key takeaways for my journal' }
     ];
   }
 
   container.classList.remove('hidden');
   container.innerHTML = suggestions.map(s => `
     <button onclick="insertPrompt('${escapeHtml(s.text).replace(/'/g, "\\'")}')" class="text-xs text-slate-300 hover:text-white bg-slate-900/90 hover:bg-slate-800 px-3.5 py-1.5 rounded-full border border-white/10 transition-all shrink-0 flex items-center gap-1.5 shadow-sm">
-      <span>${s.icon}</span> <span>${escapeHtml(s.text)}</span>
+      <i data-lucide="${s.icon}" class="w-3.5 h-3.5 text-cyan-400 shrink-0"></i> <span>${escapeHtml(s.text)}</span>
     </button>
   `).join('');
+  lucide.createIcons();
 }
 
 function appendErrorCard(errorMessage, retryPrompt) {
@@ -976,8 +977,8 @@ function appendChatMessage(role, content, authorName, modelTag, cognitiveData = 
               ` : ''}
 
               ${cognitiveData?.cognitive_reframing ? `
-                <div class="text-xs text-slate-300 bg-blue-950/20 p-2 rounded-lg border border-blue-500/15 leading-relaxed">
-                  <strong class="text-blue-300">🔄 Reframing:</strong> ${escapeHtml(cognitiveData.cognitive_reframing)}
+                <div class="text-xs text-slate-300 bg-blue-950/20 p-2 rounded-lg border border-blue-500/15 leading-relaxed flex items-start gap-1.5">
+                  <strong class="text-blue-300 shrink-0 flex items-center gap-1"><i data-lucide="repeat" class="w-3.5 h-3.5 text-blue-400"></i><span>Reframing:</span></strong> <span>${escapeHtml(cognitiveData.cognitive_reframing)}</span>
                 </div>
               ` : ''}
             </div>
@@ -990,7 +991,8 @@ function appendChatMessage(role, content, authorName, modelTag, cognitiveData = 
           <div class="flex flex-wrap items-center gap-1.5">
             ${distortions.map(d => `
               <span class="bg-amber-950/50 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full text-[10px] font-medium flex items-center gap-1">
-                ⚠️ ${escapeHtml(d)}
+                <i data-lucide="alert-triangle" class="w-3 h-3 text-amber-400"></i>
+                <span>${escapeHtml(d)}</span>
               </span>
             `).join('')}
             ${tags.map(t => `
@@ -1036,7 +1038,7 @@ function narrateAIMessage(text, btnElement) {
   utterance.rate = 1.0;
   utterance.pitch = 1.0;
   window.speechSynthesis.speak(utterance);
-  showToast('🔊 Speaking AI response...');
+  showToast('Speaking AI response...');
 }
 
 async function saveAndFeedback(title, content, mood, btnElement) {
@@ -1045,7 +1047,7 @@ async function saveAndFeedback(title, content, mood, btnElement) {
     if (btnElement) {
       const span = btnElement.querySelector('span');
       if (span) {
-        span.textContent = '✓ Saved to Journal';
+        span.textContent = 'Saved to Journal';
         btnElement.classList.add('text-emerald-300', 'bg-emerald-950/40', 'border-emerald-500/30');
       }
     }
@@ -1098,9 +1100,9 @@ function updateLiveCognitiveBar(cogData) {
   const distBadge = document.getElementById('live-distortions-badge');
   if (distBadge) {
     if (cogData.detected_distortions && cogData.detected_distortions.length > 0) {
-      distBadge.innerHTML = `<span class="bg-amber-950/60 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-full font-bold">⚠️ ${escapeHtml(cogData.detected_distortions.join(' • '))}</span>`;
+      distBadge.innerHTML = `<span class="bg-amber-950/60 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-full font-bold flex items-center gap-1"><i data-lucide="alert-triangle" class="w-3 h-3 text-amber-400"></i><span>${escapeHtml(cogData.detected_distortions.join(' • '))}</span></span>`;
     } else {
-      distBadge.innerHTML = `<span class="text-[11px] text-emerald-400 font-mono">✨ Zero Distortions Detected</span>`;
+      distBadge.innerHTML = `<span class="text-[11px] text-emerald-400 font-mono flex items-center gap-1"><i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-400"></i><span>Zero Distortions Detected</span></span>`;
     }
   }
 
@@ -1141,7 +1143,7 @@ let memoryPhotosList = [
     url: 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=600&q=80',
     caption: 'Morning coffee & quiet planning before the sprint',
     location: 'Cafe Botanica, Central Square',
-    mood: '🙂 Calm',
+    mood: 'Calm',
     energy: '8/10'
   },
   {
@@ -1150,7 +1152,7 @@ let memoryPhotosList = [
     url: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=600&q=80',
     caption: 'Whiteboarding session on multi-track cognitive sync',
     location: 'Design Studio Room 4B',
-    mood: '🔥 Energized',
+    mood: 'Energized',
     energy: '9/10'
   },
   {
@@ -1159,13 +1161,13 @@ let memoryPhotosList = [
     url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80',
     caption: 'Sunset run to clear mental cache and anchor gratitude',
     location: 'Riverbank Promenade',
-    mood: '😊 Joyful',
+    mood: 'Joyful',
     energy: '8/10'
   }
 ];
 
 let attachedPhotoBase64 = null;
-let currentSelectedMood = { name: 'Calm', emoji: '🙂' };
+let currentSelectedMood = { name: 'Calm', emoji: '' };
 let isGCalSynced = false;
 let isCycleOptedIn = true;
 let liveDiaryClockInterval = null;
@@ -1214,7 +1216,7 @@ function updateLiveDiaryClock() {
   if (clockEl) clockEl.textContent = `● LIVE: ${timeStr}`;
 
   const tzEl = document.getElementById('chrono-user-tz-badge');
-  if (tzEl) tzEl.textContent = `📍 ${tzName}`;
+  if (tzEl) tzEl.innerHTML = `<i data-lucide="map-pin" class="w-3 h-3 text-slate-400"></i><span>${tzName}</span>`;
 }
 
 function renderDiaryWeeklyRibbon() {
@@ -1337,7 +1339,7 @@ function toggleMediaMode() {
   updateMediaModeUI();
   renderChronoTimeline();
   renderMemoryPhotos();
-  showToast(state.mediaMode === 'compact' ? '📄 Lightweight Mode: Photos collapsed for fast reading.' : '📷 Rich Media Mode: Photos enabled across journal.');
+  showToast(state.mediaMode === 'compact' ? 'Lightweight Mode: Photos collapsed for fast reading.' : 'Rich Media Mode: Photos enabled across journal.');
 }
 
 function toggleSingleMomentPhoto(btn) {
@@ -1392,10 +1394,10 @@ function applyGenderTrackVisibility(gender) {
   if (synthBioChip) {
     if (cycleEnabled) {
       synthBioChip.classList.remove('hidden');
-      synthBioChip.innerHTML = `<span style="color:var(--cycle-accent)">🌙</span><span id="synth-bio-chip">Luteal Phase</span>`;
+      synthBioChip.innerHTML = `<i data-lucide="moon" class="w-3 h-3 text-purple-400"></i><span id="synth-bio-chip">Luteal Phase</span>`;
     } else if (circEnabled) {
       synthBioChip.classList.remove('hidden');
-      synthBioChip.innerHTML = `<span style="color:var(--memory-accent)">⚡</span><span id="synth-bio-chip">Circadian Peak</span>`;
+      synthBioChip.innerHTML = `<i data-lucide="zap" class="w-3 h-3 text-amber-400"></i><span id="synth-bio-chip">Circadian Peak</span>`;
     } else {
       synthBioChip.classList.add('hidden');
     }
@@ -1405,7 +1407,7 @@ function applyGenderTrackVisibility(gender) {
 function toggleTrackPreference(trackId, isChecked) {
   localStorage.setItem(`mind_cave_track_${trackId}_enabled`, isChecked ? 'true' : 'false');
   applyGenderTrackVisibility(state.currentUser.gender);
-  showToast(`${trackId === 'cycle' ? '🌙 Cycle Intelligence' : '⚡ Circadian Energy'} track ${isChecked ? 'enabled' : 'hidden'}.`);
+  showToast(`${trackId === 'cycle' ? 'Cycle Intelligence' : 'Circadian Energy'} track ${isChecked ? 'enabled' : 'hidden'}.`);
 }
 
 function updateUserGender(gender) {
@@ -1426,7 +1428,7 @@ function updateUserGender(gender) {
   }
 
   applyGenderTrackVisibility(gender);
-  showToast(`Profile updated: ${gender === 'female' ? '👩 Female (Cycle Active)' : gender === 'male' ? '👨 Male (Circadian Active)' : '✨ Non-Binary / Other (Custom Active)'}`);
+  showToast(`Profile updated: ${gender === 'female' ? 'Female (Cycle Active)' : gender === 'male' ? 'Male (Circadian Active)' : 'Non-Binary / Other (Custom Active)'}`);
 }
 
 function changeTimeRange(rangeVal) {
@@ -1497,8 +1499,8 @@ function toggleGCalSync() {
 
   if (isGCalSynced) {
     btn.classList.add('!bg-blue-600/25', '!border-blue-500/40', '!text-blue-300');
-    btnText.textContent = '✓ Google Calendar Synced (5 Events)';
-    showToast('✨ Google Calendar connected! 5 planned events mapped to your hourly timeline.');
+    btnText.textContent = 'Google Calendar Synced (5 Events)';
+    showToast('Google Calendar connected! 5 planned events mapped to your hourly timeline.');
   } else {
     btn.classList.remove('!bg-blue-600/25', '!border-blue-500/40', '!text-blue-300');
     btnText.textContent = 'Sync Google Calendar';
@@ -1511,11 +1513,11 @@ function toggleCycleOptIn() {
   isCycleOptedIn = !isCycleOptedIn;
   const btn = document.getElementById('cycle-optin-btn');
   if (isCycleOptedIn) {
-    btn.textContent = '✓ Active (Encrypted)';
+    btn.textContent = 'Active (Encrypted)';
     btn.className = 'text-xs font-semibold px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40';
     showToast('Cycle intelligence active and encrypted locally.');
   } else {
-    btn.textContent = '○ Paused';
+    btn.textContent = 'Paused';
     btn.className = 'text-xs font-semibold px-3 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700';
     showToast('Cycle tracking paused.');
   }
@@ -1526,7 +1528,7 @@ function selectMoodChip(moodName, emoji, btnElement) {
   document.querySelectorAll('#mood-chip-group .mood-chip').forEach(btn => btn.classList.remove('selected'));
   if (btnElement) btnElement.classList.add('selected');
   const lbl = document.getElementById('mood-pulse-label');
-  if (lbl) lbl.textContent = `${emoji} ${moodName}`;
+  if (lbl) lbl.textContent = moodName;
 }
 
 function toggleLocationStamp(checkbox) {
@@ -1535,11 +1537,11 @@ function toggleLocationStamp(checkbox) {
   if (checkbox.checked) {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        () => { txt.textContent = '📍 Connaught Place, New Delhi'; },
-        () => { txt.textContent = '📍 Central District (Approx)'; }
+        () => { txt.textContent = 'Connaught Place, New Delhi'; },
+        () => { txt.textContent = 'Central District (Approx)'; }
       );
     } else {
-      txt.textContent = '📍 Home / Office Studio';
+      txt.textContent = 'Home / Office Studio';
     }
   } else {
     txt.textContent = 'Location Stamp Disabled';
@@ -1664,7 +1666,7 @@ function getChronologicalEvents(journals) {
         content: j.content,
         mood: j.mood || 'Reflective',
         cbtNote: j.insights?.cognitive_reframing || null,
-        location: '📍 Connaught Place, New Delhi',
+        location: 'Connaught Place, New Delhi',
         energy: '8/10',
         photoUrl: null
       });
@@ -1705,10 +1707,10 @@ function getChronologicalEvents(journals) {
         dateHeader: selectedDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
         title: `Google Calendar: ${g.title}`,
         content: `Scheduled session for ${g.duration} (${g.category}). Planned agenda synchronized to daily chronicle.`,
-        mood: '🗓️ Planned',
+        mood: 'Planned',
         cbtNote: null,
-        location: '📍 Google Meet / Workspace',
-        energy: '⚡ Schedule',
+        location: 'Google Meet / Workspace',
+        energy: 'Schedule',
         photoUrl: null
       });
     });
@@ -1739,10 +1741,10 @@ function getChronologicalEvents(journals) {
         content: `Priority: ${t.priority.toUpperCase()} • 2-Way Google Calendar Synced`,
         isCompleted: t.completed,
         taskType: t.type,
-        mood: t.completed ? '✨ Fulfilled' : '🎯 Actionable',
+        mood: t.completed ? 'Fulfilled' : 'Actionable',
         cbtNote: null,
-        location: '📍 Google Calendar Task',
-        energy: t.priority === 'high' ? '⚡ High' : '🌱 Normal',
+        location: 'Google Calendar Task',
+        energy: t.priority === 'high' ? 'High Priority' : 'Normal Priority',
         photoUrl: null
       });
     }
@@ -1761,17 +1763,17 @@ function getChronologicalEvents(journals) {
         entryDate: selectedDate,
         dateHeader: selectedDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
         title: g.title,
-        content: `Domain: ${g.categoryLabel || '🎯 North Star'}${g.duration ? ' • Focus Duration: ' + g.duration : ''}${g.notes ? ' • Note: ' + g.notes : ''}`,
+        content: `Domain: ${g.categoryLabel || 'North Star'}${g.duration ? ' • Focus Duration: ' + g.duration : ''}${g.notes ? ' • Note: ' + g.notes : ''}`,
         isCompleted: g.completed,
         startTime: g.startTime,
         endTime: g.endTime,
         duration: g.duration,
         category: g.category,
-        categoryLabel: g.categoryLabel || '🎯 North Star',
-        mood: g.completed ? '🏆 Completed Goal' : '🎯 Intended Goal',
+        categoryLabel: g.categoryLabel || 'North Star',
+        mood: g.completed ? 'Completed Goal' : 'Intended Goal',
         cbtNote: g.notes || null,
-        location: '🎯 Today\'s Goal Plan',
-        energy: g.duration ? `⏱️ ${g.duration}` : '⚡ Focus Block',
+        location: "Today's Goal Plan",
+        energy: g.duration ? g.duration : 'Focus Block',
         photoUrl: null
       });
     });
@@ -1860,13 +1862,13 @@ async function renderChronoTimeline() {
     }
 
     // Circadian / Weather Badge
-    let weatherBadge = '☀️ Midday';
-    if (ev.rawHour >= 5 && ev.rawHour < 9) weatherBadge = '🌅 Dawn Routine';
-    else if (ev.rawHour >= 9 && ev.rawHour < 13) weatherBadge = '⚡ Focus Block';
-    else if (ev.rawHour >= 13 && ev.rawHour < 17) weatherBadge = '🎯 Execution';
-    else if (ev.rawHour >= 17 && ev.rawHour < 20) weatherBadge = '🌇 Golden Hour';
-    else if (ev.rawHour >= 20) weatherBadge = '🌌 Night Sanctuary';
-    else weatherBadge = '🌙 Deep Rest';
+    let weatherBadge = 'Midday Focus';
+    if (ev.rawHour >= 5 && ev.rawHour < 9) weatherBadge = 'Dawn Routine';
+    else if (ev.rawHour >= 9 && ev.rawHour < 13) weatherBadge = 'Focus Block';
+    else if (ev.rawHour >= 13 && ev.rawHour < 17) weatherBadge = 'Execution Block';
+    else if (ev.rawHour >= 17 && ev.rawHour < 20) weatherBadge = 'Golden Hour';
+    else if (ev.rawHour >= 20) weatherBadge = 'Night Sanctuary';
+    else weatherBadge = 'Deep Rest';
 
     // Insert LIVE NOW laser needle if viewing today in single mode
     if (state.diaryRangeMode === 'single' && isSelectedToday && !nowMarkerInserted && ev.rawHour >= currentHourInt) {
@@ -1986,7 +1988,7 @@ async function renderChronoTimeline() {
             ${ev.cbtNote ? `
               <div class="p-3 rounded-xl bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-500/20 text-xs text-purple-800 dark:text-purple-300 italic mt-2 flex items-start gap-2">
                 <i data-lucide="brain" class="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5"></i>
-                <span><strong>💡 Reflection Note:</strong> "${escapeHtml(ev.cbtNote)}"</span>
+                <span><strong>Reflection Note:</strong> "${escapeHtml(ev.cbtNote)}"</span>
               </div>
             ` : ''}
           </div>
@@ -2083,8 +2085,9 @@ function renderStoryCarousel(events) {
         <!-- Slide Top Header -->
         <div class="flex items-center justify-between gap-2 border-b border-white/10 pb-3 mb-4">
           <div class="flex items-center gap-2">
-            <span class="font-mono text-xs font-bold text-cyan-400 bg-cyan-950/60 border border-cyan-500/30 px-2.5 py-1 rounded-full">
-              ⏰ ${ev.time}
+            <span class="font-mono text-xs font-bold text-cyan-400 bg-cyan-950/60 border border-cyan-500/30 px-2.5 py-1 rounded-full flex items-center gap-1">
+              <i data-lucide="clock" class="w-3 h-3"></i>
+              <span>${ev.time}</span>
             </span>
             <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-200">
               ${escapeHtml(ev.mood)}
@@ -2241,13 +2244,13 @@ function regenerateDailySynthesis() {
   }
   if (summaryEl) {
     summaryEl.innerHTML = `
-      ✨ <em>Synthesizing your daily temporal rhythm, CBT reframing patterns, hormonal stamina, and visual memories...</em>
+      <em>Synthesizing your daily temporal rhythm, CBT reframing patterns, hormonal stamina, and visual memories...</em>
     `;
     setTimeout(() => {
       summaryEl.innerHTML = `
         <strong>Cross-Track Synthesis Complete:</strong> You maintained high cognitive stamina across ${storyEventsCache.length || 3} recorded intervals today. Your morning focus phase effectively neutralized stress biases, aligning seamlessly with your natural circadian peak. Evening gratitude reflections indicate resilient mental equilibrium.
       `;
-      showToast('✨ AI Daily Synthesis updated across all 4 life tracks.');
+      showToast('AI Daily Synthesis updated across all 4 life tracks.');
     }, 600);
   }
 }
@@ -2294,11 +2297,11 @@ function renderMemoryPhotos() {
       </div>
       <div class="p-3.5 flex flex-col justify-between flex-1 gap-2">
         <div>
-          <span class="text-[10px] text-slate-500 dark:text-slate-400 font-mono block mb-1">📍 ${escapeHtml(p.location)}</span>
+          <span class="text-[10px] text-slate-500 dark:text-slate-400 font-mono mb-1 flex items-center gap-1"><i data-lucide="map-pin" class="w-3 h-3"></i><span>${escapeHtml(p.location)}</span></span>
           <h5 class="text-sm font-bold text-slate-900 dark:text-white leading-snug line-clamp-2">${escapeHtml(p.caption)}</h5>
         </div>
         <div class="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-white/5 text-xs">
-          <span class="text-amber-600 dark:text-amber-400 font-mono text-[11px] font-semibold">⚡ ${p.energy}</span>
+          <span class="text-amber-600 dark:text-amber-400 font-mono text-[11px] font-semibold flex items-center gap-1"><i data-lucide="zap" class="w-3 h-3"></i><span>${p.energy}</span></span>
           <button onclick="openScrapbookModal()" class="text-xs text-pink-600 dark:text-pink-400 hover:opacity-80 flex items-center gap-1 font-semibold">
             <i data-lucide="share-2" class="w-3 h-3"></i> <span>Scrapbook</span>
           </button>
@@ -2326,11 +2329,11 @@ function closeNotificationsModal() {
 
 function saveNotificationPreferences() {
   closeNotificationsModal();
-  showToast('🔔 Notification and reminder preferences saved.');
+  showToast('Notification and reminder preferences saved.');
 }
 
 function testPushNotification() {
-  showToast('🔔 [Reminder Test]: 01:30 PM — Time for a 2-minute mindful reflection & water check-in!');
+  showToast('[Reminder Test]: 01:30 PM — Time for a 2-minute mindful reflection & water check-in!');
   if ('Notification' in window && Notification.permission === 'granted') {
     new Notification('Mind Cave Daily Reminder', {
       body: 'Time for a 2-minute mindful reflection & water check-in!',
@@ -2384,7 +2387,7 @@ function handleJournalFileAttach(input) {
   const box = document.getElementById('journal-file-preview-box');
   const nameEl = document.getElementById('journal-file-preview-name');
   if (box && nameEl) {
-    nameEl.textContent = `📎 ${file.name} (${Math.round(file.size / 1024)} KB)`;
+    nameEl.textContent = `${file.name} (${Math.round(file.size / 1024)} KB)`;
     box.classList.remove('hidden');
   }
 }
@@ -2501,7 +2504,7 @@ function saveSketchToMoment() {
     }
   }
   closeSketchModal();
-  showToast('🎨 Sketch doodle attached to moment!');
+  showToast('Sketch doodle attached to moment!');
 }
 
 function removeAttachedSketch() {
@@ -2559,7 +2562,7 @@ function askWhatChangedAI() {
     input.value = prompt;
     input.focus();
   }
-  showToast('✨ Longitudinal AI Growth prompt loaded into Studio.');
+  showToast('Longitudinal AI Growth prompt loaded into Studio.');
 }
 
 function jumpToYesterday() {
@@ -2596,7 +2599,7 @@ async function submitNewJournal(event) {
   const energy = document.getElementById('journal-energy-slider').value;
   const isEncrypted = document.getElementById('journal-encrypt-checkbox').checked;
   const locChecked = document.getElementById('journal-location-check').checked;
-  const locationStr = locChecked ? '📍 Connaught Place, New Delhi' : 'Private Location';
+  const locationStr = locChecked ? 'Connaught Place, New Delhi' : 'Private Location';
   const linkUrl = document.getElementById('journal-link-input')?.value.trim();
 
   // If photo attached, save to memory photos
@@ -2607,15 +2610,15 @@ async function submitNewJournal(event) {
       url: attachedPhotoBase64,
       caption: title || content.substring(0, 40),
       location: locationStr,
-      mood: `${currentSelectedMood.emoji} ${currentSelectedMood.name}`,
+      mood: currentSelectedMood.name,
       energy: `${energy}/10`
     });
   }
 
-  let finalContent = `${content}\n\n📍 ${locationStr} • Energy: ${energy}/10 • Track: ${track}`;
-  if (linkUrl) finalContent += `\n🔗 Reference: ${linkUrl}`;
-  if (attachedFileName) finalContent += `\n📎 Attachment: ${attachedFileName}`;
-  if (attachedSketchBase64) finalContent += `\n🎨 Includes Canvas Sketch`;
+  let finalContent = `${content}\n\nLocation: ${locationStr} • Energy: ${energy}/10 • Track: ${track}`;
+  if (linkUrl) finalContent += `\nReference: ${linkUrl}`;
+  if (attachedFileName) finalContent += `\nAttachment: ${attachedFileName}`;
+  if (attachedSketchBase64) finalContent += `\nIncludes Canvas Sketch`;
 
   try {
     const response = await fetch('/api/journals', {
@@ -2995,8 +2998,9 @@ async function loadAnalytics() {
     const freqs = analytics.distortion_frequencies || {};
     if (Object.keys(freqs).length === 0) {
       distContainer.innerHTML = `
-        <div class="p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/30 text-xs text-emerald-300">
-          ✨ Zero persistent cognitive distortions detected. Neural cognition remains highly objective.
+        <div class="p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/30 text-xs text-emerald-300 flex items-center gap-1.5">
+          <i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-400 shrink-0"></i>
+          <span>Zero persistent cognitive distortions detected. Neural cognition remains highly objective.</span>
         </div>
       `;
     } else {
@@ -3067,7 +3071,7 @@ function launchGuidedCBT(type) {
     input.value = promptText;
     input.focus();
   }
-  showToast('✨ Guided cognitive reframing prompt loaded into Studio.');
+  showToast('Guided cognitive reframing prompt loaded into Studio.');
 }
 
 async function loadSecurityAudit() {
@@ -3204,11 +3208,12 @@ function renderAgendaList() {
 
         <div class="min-w-0">
           <div class="flex items-center gap-1.5 flex-wrap mb-0.5">
-            <span class="text-[10px] font-mono px-1.5 py-0.2 rounded-md ${item.type === 'milestone' ? 'bg-amber-950/60 text-amber-300 border border-amber-500/30' : item.type === 'reminder' ? 'bg-purple-950/60 text-purple-300 border border-purple-500/30' : 'bg-blue-950/60 text-blue-300 border border-blue-500/30'}">
-              ${item.type === 'milestone' ? '⭐ Milestone' : item.type === 'reminder' ? '⏰ Reminder' : '☑️ Task'}
+            <span class="text-[10px] font-mono px-1.5 py-0.2 rounded-md ${item.type === 'milestone' ? 'bg-amber-950/60 text-amber-300 border border-amber-500/30' : item.type === 'reminder' ? 'bg-purple-950/60 text-purple-300 border border-purple-500/30' : 'bg-blue-950/60 text-blue-300 border border-blue-500/30'} flex items-center gap-1">
+              <i data-lucide="${item.type === 'milestone' ? 'star' : item.type === 'reminder' ? 'bell' : 'check-square'}" class="w-3 h-3"></i>
+              <span>${item.type === 'milestone' ? 'Milestone' : item.type === 'reminder' ? 'Reminder' : 'Task'}</span>
             </span>
-            <span class="text-[10px] text-slate-400 font-mono">⏰ ${item.time} • ${item.date}</span>
-            ${item.priority === 'high' ? '<span class="text-[10px] text-rose-400 font-mono font-bold">⚡ High</span>' : ''}
+            <span class="text-[10px] text-slate-400 font-mono flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i><span>${item.time} • ${item.date}</span></span>
+            ${item.priority === 'high' ? '<span class="text-[10px] text-rose-400 font-mono font-bold flex items-center gap-0.5"><i data-lucide="alert-triangle" class="w-3 h-3"></i><span>High</span></span>' : ''}
           </div>
           <h5 class="agenda-title text-xs font-semibold text-slate-200 truncate">${escapeHtml(item.title)}</h5>
         </div>
@@ -3272,7 +3277,7 @@ function submitNewTask(event) {
   closeNewTaskModal();
   renderAgendaList();
   renderChronoTimeline();
-  showToast(`✓ Added "${title}" & synced with Google Calendar.`);
+  showToast(`Added "${title}" & synced with Google Calendar.`);
 }
 
 function toggleTaskComplete(id) {
@@ -3282,7 +3287,7 @@ function toggleTaskComplete(id) {
     localStorage.setItem('mind_cave_agenda_items', JSON.stringify(state.agendaItems));
     renderAgendaList();
     renderChronoTimeline();
-    showToast(task.completed ? '🎉 Task completed & Google Calendar status updated.' : 'Task marked active.');
+    showToast(task.completed ? 'Task completed & Google Calendar status updated.' : 'Task marked active.');
   }
 }
 
@@ -3366,7 +3371,7 @@ function toggleVoiceInput(targetInputId, indicatorId) {
     }
 
     recognition.start();
-    showToast('🎙️ Listening... Speak naturally.');
+    showToast('Listening... Speak naturally.');
   } catch (err) {
     console.error('Speech recognition initiation error:', err);
     stopSpeechRecognition();
@@ -3451,7 +3456,7 @@ function toggleVoiceSummary() {
     };
 
     window.speechSynthesis.speak(utterance);
-    showToast('🔊 Speaking Daily Life Synthesis...');
+    showToast('Speaking Daily Life Synthesis...');
   } catch (err) {
     console.error('TTS speech error:', err);
     stopVoiceSummary();
@@ -3486,8 +3491,8 @@ function syncGooglePhotosForDate() {
       hour: '09:30',
       url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=700&auto=format&fit=crop&q=80',
       caption: `Morning Light Walk & Reflection (${dateFormatted})`,
-      location: '📍 Connaught Place, New Delhi',
-      mood: '🌅 Serene',
+      location: 'Connaught Place, New Delhi',
+      mood: 'Serene',
       energy: '9/10'
     },
     {
@@ -3495,8 +3500,8 @@ function syncGooglePhotosForDate() {
       hour: '15:15',
       url: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=700&auto=format&fit=crop&q=80',
       caption: `Deep Work Workspace Flow (${dateFormatted})`,
-      location: '📍 Studio Workspace',
-      mood: '⚡ Focused',
+      location: 'Studio Workspace',
+      mood: 'Focused',
       energy: '8/10'
     }
   ];
@@ -3504,7 +3509,7 @@ function syncGooglePhotosForDate() {
   samplePhotos.forEach(p => memoryPhotosList.unshift(p));
   renderMemoryPhotos();
   renderChronoTimeline();
-  showToast(`📸 Google Photos: 2 memories pinned to timeline for ${dateFormatted}!`);
+  showToast(`Google Photos: 2 memories pinned to timeline for ${dateFormatted}!`);
 }
 
 function syncGoogleFitData() {
@@ -3519,9 +3524,9 @@ function syncGoogleFitData() {
   if (activeEl) activeEl.textContent = '64 mins';
 
   const harmonyBadge = document.getElementById('synthesis-harmony-badge');
-  if (harmonyBadge) harmonyBadge.textContent = '🌿 96%';
+  if (harmonyBadge) harmonyBadge.textContent = '96%';
 
-  showToast('⚡ Google Fit & Health Connect: 9,140 steps • 8.1h sleep • High Recovery Synced!');
+  showToast('Google Fit & Health Connect: 9,140 steps • 8.1h sleep • High Recovery Synced!');
 }
 
 // =============================================================================
@@ -3590,7 +3595,7 @@ function initTodayGoal() {
         endTime: '12:00',
         duration: '2h 30m',
         category: 'north_star',
-        categoryLabel: '🎯 North Star',
+        categoryLabel: 'North Star',
         notes: 'Clean zero-warning build & 7/7 pytest verification'
       },
       {
@@ -3601,7 +3606,7 @@ function initTodayGoal() {
         endTime: '14:15',
         duration: '45m',
         category: 'wellness',
-        categoryLabel: '🌿 Wellness',
+        categoryLabel: 'Wellness',
         notes: 'Zone 2 cardio completed'
       },
       {
@@ -3612,7 +3617,7 @@ function initTodayGoal() {
         endTime: '18:00',
         duration: '2h',
         category: 'deep_work',
-        categoryLabel: '⚡ Deep Work',
+        categoryLabel: 'Deep Work',
         notes: 'In progress'
       }
     ];
@@ -3644,7 +3649,7 @@ function renderTodayGoal() {
     totalDurationMins += mins;
     if (g.completed) {
       completedDurationMins += mins;
-      const cat = g.categoryLabel || '🎯 North Star';
+      const cat = g.categoryLabel || 'North Star';
       categoryTimeMap[cat] = (categoryTimeMap[cat] || 0) + mins;
     }
   });
@@ -3659,10 +3664,10 @@ function renderTodayGoal() {
 
   // Update Badges & Progress Bar
   if (completedBadge) {
-    completedBadge.textContent = `⚡ ${completedGoals}/${totalGoals} Done (${velocityPct}%)`;
+    completedBadge.innerHTML = `<i data-lucide="check-circle" class="w-3 h-3 text-emerald-500"></i><span>${completedGoals}/${totalGoals} Done (${velocityPct}%)</span>`;
   }
   if (durationBadge) {
-    durationBadge.textContent = `⏱️ ${formatMinutesToDuration(completedDurationMins)} Invested`;
+    durationBadge.innerHTML = `<i data-lucide="clock" class="w-3 h-3 text-amber-500"></i><span>${formatMinutesToDuration(completedDurationMins)} Invested</span>`;
   }
   if (velocityText) {
     velocityText.textContent = `${velocityPct}% Daily Goal Velocity • ${completedGoals} Achieved`;
@@ -3704,16 +3709,18 @@ function renderTodayGoal() {
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-1.5 flex-wrap mb-0.5">
                 <span class="text-[10px] font-mono px-2 py-0.2 rounded-full ${g.completed ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300' : 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300'} font-semibold">
-                  ${escapeHtml(g.categoryLabel || '🎯 North Star')}
+                  ${escapeHtml(g.categoryLabel || 'North Star')}
                 </span>
                 ${g.startTime && g.endTime ? `
-                  <span class="text-[10px] font-mono text-slate-500 dark:text-slate-400">
-                    ⏰ ${g.startTime} - ${g.endTime}
+                  <span class="text-[10px] font-mono text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                    <i data-lucide="clock" class="w-3 h-3"></i>
+                    <span>${g.startTime} - ${g.endTime}</span>
                   </span>
                 ` : ''}
                 ${g.duration ? `
-                  <span class="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                    ⏱️ ${g.duration}
+                  <span class="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 flex items-center gap-1">
+                    <i data-lucide="clock" class="w-3 h-3"></i>
+                    <span>${g.duration}</span>
                   </span>
                 ` : ''}
               </div>
@@ -3748,8 +3755,8 @@ function updateHarmonyGoalsSummary(completedCount, totalCount, velocityPct, tota
   const catGrid = document.getElementById('harmony-goals-category-grid');
   const narrative = document.getElementById('harmony-goals-narrative');
 
-  if (totBadge) totBadge.textContent = `⏱️ ${formatMinutesToDuration(totalMins)} Total Time`;
-  if (velBadge) velBadge.textContent = `🎯 ${velocityPct}% Velocity`;
+  if (totBadge) totBadge.innerHTML = `<i data-lucide="clock" class="w-3 h-3 text-amber-500"></i><span>${formatMinutesToDuration(totalMins)} Total Time</span>`;
+  if (velBadge) velBadge.innerHTML = `<i data-lucide="target" class="w-3 h-3 text-cyan-500"></i><span>${velocityPct}% Velocity</span>`;
 
   if (catGrid) {
     const cats = Object.keys(catMap);
@@ -3779,15 +3786,16 @@ function updateHarmonyGoalsSummary(completedCount, totalCount, velocityPct, tota
   if (narrative) {
     if (completedCount > 0) {
       narrative.innerHTML = `
-        <strong class="text-amber-500 block mb-1">🧭 Directional Focus Insight:</strong>
-        You fulfilled <strong>${completedCount} of ${totalCount}</strong> daily goals today, investing a cumulative <strong>${formatMinutesToDuration(totalMins)}</strong> of structured execution. Your time distribution demonstrates high cognitive momentum and grounded daily agency.
+        <strong class="text-amber-500 mb-1 flex items-center gap-1.5"><i data-lucide="compass" class="w-3.5 h-3.5"></i><span>Directional Focus Insight:</span></strong>
+        <span>You fulfilled <strong>${completedCount} of ${totalCount}</strong> daily goals today, investing a cumulative <strong>${formatMinutesToDuration(totalMins)}</strong> of structured execution. Your time distribution demonstrates high cognitive momentum and grounded daily agency.</span>
       `;
     } else {
       narrative.innerHTML = `
-        <strong class="text-amber-500 block mb-1">🧭 Daily Goal Direction:</strong>
-        ${totalCount} goal${totalCount === 1 ? '' : 's'} staged for execution today. Start with your primary North Star block to anchor circadian focus.
+        <strong class="text-amber-500 mb-1 flex items-center gap-1.5"><i data-lucide="compass" class="w-3.5 h-3.5"></i><span>Daily Goal Direction:</span></strong>
+        <span>${totalCount} goal${totalCount === 1 ? '' : 's'} staged for execution today. Start with your primary North Star block to anchor circadian focus.</span>
       `;
     }
+    lucide.createIcons();
   }
 }
 
@@ -3876,14 +3884,14 @@ function submitTodayGoal(event) {
   if (!title) return;
 
   const catLabelMap = {
-    north_star: '🎯 North Star',
-    deep_work: '⚡ Deep Work',
-    wellness: '🌿 Wellness',
-    learning: '📚 Learning',
-    team: '🤝 Collaboration',
-    admin: '📋 Admin'
+    north_star: 'North Star',
+    deep_work: 'Deep Work',
+    wellness: 'Wellness',
+    learning: 'Learning',
+    team: 'Collaboration',
+    admin: 'Admin'
   };
-  const categoryLabel = catLabelMap[category] || '🎯 North Star';
+  const categoryLabel = catLabelMap[category] || 'North Star';
 
   if (!state.todayGoals) state.todayGoals = [];
 
@@ -3923,7 +3931,7 @@ function submitTodayGoal(event) {
   closeTodayGoalModal();
   renderTodayGoal();
   renderChronoTimeline();
-  showToast(editId ? '🎯 Goal updated!' : '🎯 New goal added to today!');
+  showToast(editId ? 'Goal updated successfully.' : 'New goal added to today.');
 }
 
 function toggleGoalItemComplete(goalId) {
@@ -3937,7 +3945,7 @@ function toggleGoalItemComplete(goalId) {
 
   renderTodayGoal();
   renderChronoTimeline();
-  showToast(goal.completed ? `🎉 Goal Achieved: "${goal.title}" (${goal.duration || 'Done'})` : `Goal marked in progress.`);
+  showToast(goal.completed ? `Goal Achieved: "${goal.title}" (${goal.duration || 'Done'})` : `Goal marked in progress.`);
 }
 
 function deleteGoalItem(goalId) {
@@ -4001,7 +4009,7 @@ function renderHabitTracker() {
             ${h.isTimelineShortcut !== false ? '<span class="text-[9px] px-1.5 py-0.2 rounded-full bg-cyan-950/60 text-cyan-300 border border-cyan-500/30 font-mono">Shortcut</span>' : ''}
           </div>
           <div class="text-[10px] text-slate-400 font-mono flex items-center gap-1">
-            <span class="text-amber-400 font-bold">🔥 ${h.streak}d</span>
+            <span class="text-amber-400 font-bold flex items-center gap-0.5"><i data-lucide="flame" class="w-3 h-3 text-amber-400"></i><span>${h.streak}d streak</span></span>
             ${h.target ? `• <span>${escapeHtml(h.target)}</span>` : ''}
           </div>
         </div>
@@ -4025,7 +4033,7 @@ function renderHabitTracker() {
   // Update Done count pill
   const doneCount = state.habitsList.filter(h => h.history[todayDayIdx]).length;
   const pill = document.getElementById('habit-progress-pill');
-  if (pill) pill.textContent = `🔥 ${doneCount}/${state.habitsList.length} Done Today`;
+  if (pill) pill.innerHTML = `<i data-lucide="flame" class="w-3 h-3 text-amber-400"></i><span>${doneCount}/${state.habitsList.length} Done Today</span>`;
 
   lucide.createIcons();
 }
@@ -4041,7 +4049,7 @@ function toggleHabitDay(habitId, dayIndex) {
   localStorage.setItem('mind_cave_habits_list', JSON.stringify(state.habitsList));
   renderHabitTracker();
   renderTimelineShortcuts();
-  showToast(`${habit.emoji || '🌿'} ${habit.title}: ${habit.history[dayIndex] ? 'Completed!' : 'Marked incomplete'}`);
+  showToast(`${habit.title}: ${habit.history[dayIndex] ? 'Completed!' : 'Marked incomplete'}`);
 }
 
 function openNewHabitModal(habitId = null) {
@@ -4102,7 +4110,7 @@ function submitNewHabit(event) {
       habit.target = target;
       habit.frequency = freq;
       habit.isTimelineShortcut = isShortcut;
-      showToast(`✓ Updated habit: ${habit.emoji} ${title}`);
+      showToast(`Updated habit: ${title}`);
     }
   } else {
     // Add new
@@ -4117,7 +4125,7 @@ function submitNewHabit(event) {
       history: [true, false, false, false, false, false, false]
     };
     state.habitsList.push(newHabit);
-    showToast(`✓ Added habit: ${newHabit.emoji} ${title}`);
+    showToast(`Added habit: ${title}`);
   }
 
   localStorage.setItem('mind_cave_habits_list', JSON.stringify(state.habitsList));
@@ -4142,7 +4150,7 @@ function toggleHabitTimelineShortcut(habitId) {
     localStorage.setItem('mind_cave_habits_list', JSON.stringify(state.habitsList));
     renderTimelineShortcuts();
     renderShortcutsManagerList();
-    showToast(`${habit.emoji || '🌿'} ${habit.title} ${habit.isTimelineShortcut ? 'added to' : 'removed from'} timeline shortcuts.`);
+    showToast(`${habit.title} ${habit.isTimelineShortcut ? 'added to' : 'removed from'} timeline shortcuts.`);
   }
 }
 
@@ -4165,7 +4173,7 @@ function renderShortcutsManagerList() {
         <span class="text-lg">${h.emoji || '💧'}</span>
         <div class="min-w-0">
           <div class="text-xs font-bold text-white truncate">${escapeHtml(h.title)}</div>
-          <div class="text-[10px] text-slate-400 font-mono">🔥 ${h.streak}d streak ${h.target ? '• ' + escapeHtml(h.target) : ''}</div>
+          <div class="text-[10px] text-slate-400 font-mono flex items-center gap-1"><i data-lucide="flame" class="w-3 h-3 text-amber-400"></i><span>${h.streak}d streak ${h.target ? '• ' + escapeHtml(h.target) : ''}</span></div>
         </div>
       </div>
       <div class="flex items-center gap-2 shrink-0">
@@ -4230,7 +4238,7 @@ function logHabit(habitKey) {
     localStorage.setItem('mind_cave_habits_list', JSON.stringify(state.habitsList));
     renderHabitTracker();
     renderTimelineShortcuts();
-    showToast(`${habit.emoji || '🌿'} ${habit.title}: ${habit.history[todayDayIdx] ? '✓ Done for today!' : 'Marked incomplete'}`);
+    showToast(`${habit.title}: ${habit.history[todayDayIdx] ? '✓ Done for today!' : 'Marked incomplete'}`);
   }
 }
 
@@ -4251,7 +4259,7 @@ function closeBlockerModal() {
 function setTaskBlockerReason(reasonKey) {
   const taskId = document.getElementById('blocker-task-id-input')?.value;
   closeBlockerModal();
-  showToast(`⚡ Logged friction blocker for task. Added to AI Reframing analysis.`);
+  showToast(`Logged friction blocker for task. Added to AI Reframing analysis.`);
 }
 
 // =============================================================================
@@ -4267,11 +4275,11 @@ function renderBucketList() {
   if (!container) return;
 
   const catMap = {
-    travel: '✈️ Travel',
-    career: '🏆 Career',
-    adventure: '🧗 Adventure',
-    wellness: '🌿 Wellness',
-    creative: '🎨 Creative'
+    travel: 'Travel',
+    career: 'Career',
+    adventure: 'Adventure',
+    wellness: 'Wellness',
+    creative: 'Creative'
   };
 
   container.innerHTML = state.bucketList.map(b => `
@@ -4287,7 +4295,7 @@ function renderBucketList() {
 
       <div class="flex items-center justify-between pt-1 border-t border-white/5 text-[10px]">
         <button type="button" onclick="toggleBucketAchieved('${b.id}')" class="font-semibold transition-colors ${b.achieved ? 'text-emerald-400' : 'text-slate-400 hover:text-pink-400'}">
-          ${b.achieved ? '✨ Achieved' : '○ Mark Achieved'}
+          ${b.achieved ? '✓ Achieved' : '○ Mark Achieved'}
         </button>
         <button type="button" onclick="deleteBucketItem('${b.id}')" class="text-slate-500 hover:text-rose-400">
           <i data-lucide="trash-2" class="w-3 h-3"></i>
@@ -4334,7 +4342,7 @@ function submitBucketItem(event) {
 
   closeBucketListModal();
   renderBucketList();
-  showToast(`🌠 Pinned dream: "${title}" to your Bucket List!`);
+  showToast(`Pinned dream: "${title}" to your Bucket List!`);
 }
 
 function toggleBucketAchieved(id) {
@@ -4344,7 +4352,7 @@ function toggleBucketAchieved(id) {
   item.achieved = !item.achieved;
   localStorage.setItem('mind_cave_bucket_list', JSON.stringify(state.bucketList));
   renderBucketList();
-  showToast(item.achieved ? '🎉 Congratulations! Dream milestone achieved!' : 'Milestone returned to active bucket list.');
+  showToast(item.achieved ? 'Congratulations! Dream milestone achieved!' : 'Milestone returned to active bucket list.');
 }
 
 function deleteBucketItem(id) {
@@ -4809,10 +4817,10 @@ function renderScrapbookCard() {
 }
 
 function generateNanoBananaScrapbookArt() {
-  showToast('🎨 Nano Banana: Crafting custom AI aesthetic doodles & watercolor stickers...');
+  showToast('Nano Banana: Crafting custom AI aesthetic doodles & watercolor stickers...');
   setTimeout(() => {
     renderScrapbookCard();
-    showToast('✨ Nano Banana AI Artwork applied to your Scrapbook Card!');
+    showToast('Nano Banana AI Artwork applied to your Scrapbook Card!');
   }, 400);
 }
 
@@ -4827,7 +4835,7 @@ function downloadScrapbookPNG() {
   link.href = canvas.toDataURL('image/png');
   link.click();
 
-  showToast('📥 High-Res Scrapbook Card downloaded as PNG!');
+  showToast('High-Res Scrapbook Card downloaded as PNG!');
 }
 
 async function shareScrapbookImage() {
@@ -4843,9 +4851,9 @@ async function shareScrapbookImage() {
         await navigator.share({
           files: [file],
           title: 'My Daily Mind Cave Journal',
-          text: 'My aesthetic daily life intelligence chronicle from Mind Cave ✦'
+          text: 'My aesthetic daily life intelligence chronicle from Mind Cave'
         });
-        showToast('✨ Shared scrapbook card successfully!');
+        showToast('Shared scrapbook card successfully!');
       } catch (e) {
         downloadScrapbookPNG();
       }
@@ -4855,7 +4863,7 @@ async function shareScrapbookImage() {
         await navigator.clipboard.write([
           new ClipboardItem({ 'image/png': blob })
         ]);
-        showToast('📋 Scrapbook image copied to clipboard! Ready to paste into social apps.');
+        showToast('Scrapbook image copied to clipboard! Ready to paste into social apps.');
       } catch (e) {
         downloadScrapbookPNG();
       }
