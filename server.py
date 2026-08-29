@@ -75,6 +75,12 @@ class SetApiKeyRequest(BaseModel):
     api_key: str = Field(..., min_length=10)
 
 
+class PlanGenerateRequest(BaseModel):
+    title: str = Field(..., min_length=1, max_length=300)
+    category: Optional[str] = "adventure"
+    target_date: Optional[str] = None
+
+
 # =============================================================================
 # PUBLIC & SECURITY DIAGNOSTIC ROUTES
 # =============================================================================
@@ -282,6 +288,45 @@ async def chat_interaction(
         "model_used": ai_response.get("model_used", "gemini-2.5-flash"),
         "is_live_gemini": ai_response.get("is_live_gemini", False)
     }
+
+
+@app.post("/api/gemini/generate-plan")
+async def generate_milestone_plan(
+    req: PlanGenerateRequest,
+    current_user: UserContext = Depends(get_current_user)
+):
+    """Generate structured multi-phase execution blueprint using Gemini Flash / cognitive engine."""
+    prompt = (
+        f"Create a realistic, actionable 3-phase execution blueprint for this milestone dream:\n"
+        f"Title: {req.title}\n"
+        f"Category: {req.category}\n"
+        f"Target Date: {req.target_date or 'Next 12-24 months'}\n\n"
+        f"Format with bullet points:\n"
+        f"• Phase 1 (Preparation): Specific preparatory and research steps\n"
+        f"• Phase 2 (Execution): Key tangible milestones\n"
+        f"• Phase 3 (Fulfillment): Final stretch and celebration\n"
+        f"• Action Item: The single next micro-action to do this week"
+    )
+
+    try:
+        res = gemini_client.generate_response(
+            prompt=prompt,
+            system_instruction="You are an elite Executive Life Strategist. Break dreams into concise, inspiring, actionable milestones.",
+            temperature=0.7
+        )
+        plan_text = res.get("content", "") or res.get("text", "")
+        if not plan_text:
+            raise ValueError("Empty response")
+        return {"plan": plan_text}
+    except Exception as e:
+        logger.warning(f"Gemini plan generation fallback: {e}")
+        fallback_plan = (
+            f"• Phase 1 (Preparation): Establish foundation, resources & timeline for \"{req.title}\"\n"
+            f"• Phase 2 (Execution): Execute core milestone sprints and track weekly progress\n"
+            f"• Phase 3 (Fulfillment): Final push, milestone achievement & integration\n"
+            f"• Immediate Action: Dedicate 30m this Sunday to schedule Phase 1 tasks"
+        )
+        return {"plan": fallback_plan}
 
 
 @app.get("/api/sessions")

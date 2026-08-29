@@ -114,6 +114,14 @@ const state = {
     { id: 'b5', title: 'Solo Roadtrip across New Zealand South Island', category: 'travel', year: '2028', achieved: false },
     { id: 'b6', title: 'Build a private off-grid mountain cabin sanctuary', category: 'wellness', year: '2029', achieved: false }
   ],
+  bucketCategories: JSON.parse(localStorage.getItem('mind_cave_bucket_categories') || 'null') || [
+    { id: 'travel', name: 'Travel & World Exploration', color: 'cyan' },
+    { id: 'career', name: 'Career & Mastery', color: 'indigo' },
+    { id: 'adventure', name: 'Adventure & Sports', color: 'amber' },
+    { id: 'wellness', name: 'Wellness & Health', color: 'emerald' },
+    { id: 'creative', name: 'Art & Creation', color: 'purple' },
+    { id: 'wealth', name: 'Financial Freedom', color: 'rose' }
+  ],
   scrapbookTheme: 'pastel'
 };
 
@@ -4809,16 +4817,145 @@ let bucketStatusFilter = 'all';
 let bucketCategoryFilter = 'all';
 
 function initBucketList() {
+  if (!state.bucketCategories) {
+    state.bucketCategories = JSON.parse(localStorage.getItem('mind_cave_bucket_categories') || 'null') || [
+      { id: 'travel', name: 'Travel & World Exploration', color: 'cyan' },
+      { id: 'career', name: 'Career & Mastery', color: 'indigo' },
+      { id: 'adventure', name: 'Adventure & Sports', color: 'amber' },
+      { id: 'wellness', name: 'Wellness & Health', color: 'emerald' },
+      { id: 'creative', name: 'Art & Creation', color: 'purple' },
+      { id: 'wealth', name: 'Financial Freedom', color: 'rose' }
+    ];
+  }
+
   // Normalize existing bucketList items to have rich fields if missing
   if (state.bucketList) {
     state.bucketList.forEach(b => {
       if (!b.targetDate) b.targetDate = b.year ? `${b.year}-12-31` : '2027-12-31';
       if (!b.status) b.status = b.achieved ? 'fulfilled' : 'planning';
       if (b.progress === undefined) b.progress = b.achieved ? 100 : 35;
-      if (!b.plan) b.plan = '• Define key milestones & timeline\n• Execute phase 1 preparations\n• Review progress';
+      if (!b.plan) b.plan = '• Phase 1: Research & define key requirements\n• Phase 2: Secure resources and initial milestones\n• Phase 3: Final execution and summit celebration';
+      if (!Array.isArray(b.completedStepIndices)) b.completedStepIndices = b.achieved ? [0, 1, 2] : [];
     });
   }
+
+  populateBucketCategoryDropdowns();
   renderBucketList();
+  renderDashboardMilestoneRadar();
+}
+
+function getCategoryColorClasses(color) {
+  const colorMap = {
+    cyan: 'text-cyan-400 bg-cyan-950/60 border-cyan-500/30',
+    indigo: 'text-indigo-400 bg-indigo-950/60 border-indigo-500/30',
+    amber: 'text-amber-400 bg-amber-950/60 border-amber-500/30',
+    emerald: 'text-emerald-400 bg-emerald-950/60 border-emerald-500/30',
+    purple: 'text-purple-400 bg-purple-950/60 border-purple-500/30',
+    rose: 'text-rose-400 bg-rose-950/60 border-rose-500/30',
+    pink: 'text-pink-400 bg-pink-950/60 border-pink-500/30'
+  };
+  return colorMap[color] || 'text-slate-300 bg-black/40 border-white/10';
+}
+
+function populateBucketCategoryDropdowns() {
+  const selects = [
+    document.getElementById('bucket-category-select'),
+    document.getElementById('bucket-category-filter')
+  ].filter(Boolean);
+
+  if (!state.bucketCategories) return;
+
+  const modalSelect = document.getElementById('bucket-category-select');
+  if (modalSelect) {
+    const currentVal = modalSelect.value;
+    modalSelect.innerHTML = state.bucketCategories.map(c => `
+      <option value="${c.id}">${escapeHtml(c.name)}</option>
+    `).join('');
+    if (currentVal && state.bucketCategories.some(c => c.id === currentVal)) {
+      modalSelect.value = currentVal;
+    }
+  }
+
+  const filterSelect = document.getElementById('bucket-category-filter');
+  if (filterSelect) {
+    const currentVal = filterSelect.value || 'all';
+    filterSelect.innerHTML = `
+      <option value="all">All Domains</option>
+      ${state.bucketCategories.map(c => `
+        <option value="${c.id}">${escapeHtml(c.name)}</option>
+      `).join('')}
+    `;
+    filterSelect.value = currentVal;
+  }
+}
+
+function openBucketCategoriesModal() {
+  renderBucketCategoriesList();
+  document.getElementById('bucket-categories-modal')?.classList.remove('hidden');
+  lucide.createIcons();
+}
+
+function closeBucketCategoriesModal() {
+  document.getElementById('bucket-categories-modal')?.classList.add('hidden');
+}
+
+function renderBucketCategoriesList() {
+  const container = document.getElementById('bucket-categories-list-container');
+  if (!container || !state.bucketCategories) return;
+
+  container.innerHTML = state.bucketCategories.map(c => `
+    <div class="p-2.5 rounded-xl bg-black/40 border border-white/10 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-${c.color || 'pink'}-500"></span>
+        <span class="text-xs font-bold text-white">${escapeHtml(c.name)}</span>
+        <span class="text-[10px] font-mono px-2 py-0.2 rounded-full border ${getCategoryColorClasses(c.color)} capitalize">${c.color}</span>
+      </div>
+      <button type="button" onclick="deleteBucketCategory('${c.id}')" class="p-1 text-slate-400 hover:text-rose-400 transition-colors" title="Delete Category">
+        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+      </button>
+    </div>
+  `).join('');
+
+  lucide.createIcons();
+}
+
+function submitNewBucketCategory(event) {
+  event.preventDefault();
+  const nameInput = document.getElementById('new-category-name-input');
+  const colorSelect = document.getElementById('new-category-color-select');
+  const name = nameInput?.value.trim();
+  const color = colorSelect?.value || 'pink';
+
+  if (!name) return;
+
+  const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '_');
+  if (!state.bucketCategories) state.bucketCategories = [];
+  if (state.bucketCategories.some(c => c.id === id)) {
+    showToast(`Category "${name}" already exists.`);
+    return;
+  }
+
+  state.bucketCategories.push({ id, name, color });
+  localStorage.setItem('mind_cave_bucket_categories', JSON.stringify(state.bucketCategories));
+
+  if (nameInput) nameInput.value = '';
+  renderBucketCategoriesList();
+  populateBucketCategoryDropdowns();
+  renderBucketList();
+  showToast(`Added new domain category: "${name}"`);
+}
+
+function deleteBucketCategory(catId) {
+  if (!state.bucketCategories || state.bucketCategories.length <= 1) {
+    showToast('You must keep at least 1 category.');
+    return;
+  }
+  state.bucketCategories = state.bucketCategories.filter(c => c.id !== catId);
+  localStorage.setItem('mind_cave_bucket_categories', JSON.stringify(state.bucketCategories));
+  renderBucketCategoriesList();
+  populateBucketCategoryDropdowns();
+  renderBucketList();
+  showToast('Category deleted.');
 }
 
 function filterBucketListByStatus(status, btnEl) {
@@ -4863,18 +5000,185 @@ function formatTargetDateCountdown(targetDateStr) {
   }
 }
 
+function generateLocalAIBucketPlan(title, category, targetDate) {
+  const cat = (category || 'general').toLowerCase();
+  if (cat.includes('travel') || cat.includes('adventure')) {
+    return `• Phase 1 (Prep): Deep destination research, gear acquisition & budget allocation\n• Phase 2 (Logistics): Secure flights, mountain/expedition permits & guide bookings\n• Phase 3 (Execution): Embark on journey, document milestones & summit achievement\n• Immediate Action: Create dedicated gear checklist and set aside monthly travel fund`;
+  } else if (cat.includes('career') || cat.includes('wealth')) {
+    return `• Phase 1 (Architecture): Define technical MVP specification, market positioning & roadmap\n• Phase 2 (Building): Sprint 1-4 prototype builds, benchmark testing & code audits\n• Phase 3 (Launch & Scale): Public open-source launch, conference demonstration & scaling\n• Immediate Action: Schedule 2 hours deep-work block this Saturday to finish Phase 1 spec`;
+  } else if (cat.includes('wellness')) {
+    return `• Phase 1 (Foundation): Establish baseline physiological biomarkers, training plan & diet protocol\n• Phase 2 (Progression): Build volume consistently, zone-2 cardio & weekly milestone checks\n• Phase 3 (Target Event): Race day / goal execution and structured recovery protocol\n• Immediate Action: Book initial fitness assessment and log weekly training schedule`;
+  } else {
+    return `• Phase 1 (Foundation): Establish core requirements, resources & execution timeline for "${title}"\n• Phase 2 (Execution): Build tangible prototypes and complete Phase 2 milestone sprints\n• Phase 3 (Fulfillment): Final polish, milestone fulfillment and reflective retrospective\n• Immediate Action: Dedicate 30 minutes this week to define milestone 1 deliverables`;
+  }
+}
+
+async function generateAIBucketPlan(dreamId = null) {
+  let title = '';
+  let category = '';
+  let targetDate = '';
+
+  const titleInput = document.getElementById('bucket-title-input');
+  const catSelect = document.getElementById('bucket-category-select');
+  const dateInput = document.getElementById('bucket-target-date-input');
+  const planInput = document.getElementById('bucket-plan-input');
+  const progressSlider = document.getElementById('bucket-progress-slider');
+  const btn = document.getElementById('btn-generate-ai-bucket-plan');
+
+  if (titleInput && titleInput.value.trim()) {
+    title = titleInput.value.trim();
+    category = catSelect?.value || 'adventure';
+    targetDate = dateInput?.value || '2027-12-31';
+  } else if (dreamId) {
+    const item = state.bucketList.find(b => b.id === dreamId);
+    if (item) {
+      title = item.title;
+      category = item.category;
+      targetDate = item.targetDate;
+    }
+  }
+
+  if (!title) {
+    showToast('Please enter a dream or milestone title first.');
+    titleInput?.focus();
+    return;
+  }
+
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `<i data-lucide="loader-2" class="w-3 h-3 text-pink-400 animate-spin"></i><span>Generating AI Plan...</span>`;
+  }
+
+  try {
+    const response = await fetch('/api/gemini/generate-plan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+      body: JSON.stringify({
+        title: title,
+        category: category,
+        target_date: targetDate
+      })
+    });
+
+    let generatedPlan = '';
+    if (response.ok) {
+      const data = await response.json();
+      generatedPlan = data.plan;
+    }
+
+    if (!generatedPlan) {
+      generatedPlan = generateLocalAIBucketPlan(title, category, targetDate);
+    }
+
+    if (planInput) {
+      planInput.value = generatedPlan;
+    }
+    if (progressSlider) {
+      progressSlider.value = 35;
+      const lbl = document.getElementById('bucket-progress-val-lbl');
+      if (lbl) lbl.textContent = '35%';
+    }
+
+    showToast(`✨ Generated AI execution blueprint for "${title}"!`);
+  } catch (err) {
+    const localPlan = generateLocalAIBucketPlan(title, category, targetDate);
+    if (planInput) planInput.value = localPlan;
+    showToast(`✨ AI blueprint structured for "${title}"!`);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `<i data-lucide="sparkles" class="w-3 h-3 text-pink-400"></i><span>✨ AI Blueprint Generator</span>`;
+      lucide.createIcons();
+    }
+  }
+}
+
+function toggleBucketPlanStep(dreamId, stepIndex) {
+  const item = state.bucketList.find(b => b.id === dreamId);
+  if (!item) return;
+
+  if (!Array.isArray(item.completedStepIndices)) {
+    item.completedStepIndices = [];
+  }
+
+  const idx = item.completedStepIndices.indexOf(stepIndex);
+  if (idx > -1) {
+    item.completedStepIndices.splice(idx, 1);
+  } else {
+    item.completedStepIndices.push(stepIndex);
+  }
+
+  // Recalculate progress based on step completion
+  const totalSteps = (item.plan || '').split('\n').filter(s => s.trim().length > 0).length || 1;
+  const completedCount = item.completedStepIndices.length;
+  item.progress = Math.min(100, Math.round((completedCount / totalSteps) * 100));
+
+  if (item.progress === 100) {
+    item.status = 'fulfilled';
+    item.achieved = true;
+    showToast(`🏆 All milestones completed for "${item.title}"!`);
+  } else if (item.progress >= 75) {
+    item.status = 'final_stretch';
+    item.achieved = false;
+  } else if (item.progress >= 30) {
+    item.status = 'in_action';
+    item.achieved = false;
+  } else {
+    item.status = 'planning';
+    item.achieved = false;
+  }
+
+  localStorage.setItem('mind_cave_bucket_list', JSON.stringify(state.bucketList));
+  renderBucketList();
+  renderDashboardMilestoneRadar();
+}
+
+function renderDashboardMilestoneRadar() {
+  const countBadge = document.getElementById('dashboard-radar-count-badge');
+  const fulfillmentBadge = document.getElementById('dashboard-radar-fulfillment-badge');
+  const stepContainer = document.getElementById('dashboard-radar-active-step');
+
+  if (!state.bucketList || state.bucketList.length === 0) return;
+
+  const total = state.bucketList.length;
+  const fulfilled = state.bucketList.filter(b => b.achieved || b.status === 'fulfilled').length;
+  const inAction = state.bucketList.filter(b => b.status === 'in_action' || b.status === 'final_stretch').length;
+  const fulfilledPct = Math.round((fulfilled / total) * 100);
+
+  if (countBadge) countBadge.textContent = `${inAction} In Flight`;
+  if (fulfillmentBadge) fulfillmentBadge.textContent = `${fulfilled}/${total} Fulfilled (${fulfilledPct}%)`;
+
+  if (stepContainer) {
+    const activeDreams = state.bucketList.filter(b => !b.achieved && b.status !== 'fulfilled');
+    if (activeDreams.length > 0) {
+      const topDream = activeDreams[0];
+      const countdown = formatTargetDateCountdown(topDream.targetDate || topDream.year);
+      const steps = (topDream.plan || '').split('\n').map(s => s.trim()).filter(Boolean);
+      const nextStep = steps[topDream.completedStepIndices ? topDream.completedStepIndices.length : 0] || steps[0] || 'Execute phase 1';
+
+      stepContainer.innerHTML = `
+        <span class="font-bold text-slate-800 dark:text-slate-100">${escapeHtml(topDream.title)}</span>
+        <span class="text-slate-400">•</span>
+        <span class="${countdown.badgeClass} font-mono font-bold">${countdown.text}</span>
+        <span class="text-slate-400">•</span>
+        <span class="text-pink-600 dark:text-pink-300 font-medium italic">Next Step: ${escapeHtml(nextStep.replace(/^[0-9•\-\.]+\s*/, ''))}</span>
+      `;
+    } else {
+      stepContainer.textContent = 'All milestone dreams fulfilled! Add a new quest.';
+    }
+  }
+}
+
 function renderBucketList() {
   const container = document.getElementById('bucket-list-grid');
   if (!container) return;
 
-  const catMap = {
-    travel: { label: 'Travel & World', color: 'text-cyan-400 bg-cyan-950/60 border-cyan-500/30' },
-    career: { label: 'Career & Mastery', color: 'text-indigo-400 bg-indigo-950/60 border-indigo-500/30' },
-    adventure: { label: 'Adventure & Sports', color: 'text-amber-400 bg-amber-950/60 border-amber-500/30' },
-    wellness: { label: 'Wellness & Health', color: 'text-emerald-400 bg-emerald-950/60 border-emerald-500/30' },
-    creative: { label: 'Art & Creation', color: 'text-purple-400 bg-purple-950/60 border-purple-500/30' },
-    wealth: { label: 'Financial Freedom', color: 'text-yellow-400 bg-yellow-950/60 border-yellow-500/30' }
-  };
+  const catDict = {};
+  if (state.bucketCategories) {
+    state.bucketCategories.forEach(c => {
+      catDict[c.id] = { label: c.name, color: getCategoryColorClasses(c.color) };
+    });
+  }
 
   const statusMap = {
     vision: { label: 'Future Vision', icon: 'sparkles', badge: 'bg-blue-950/60 text-blue-300 border-blue-500/30' },
@@ -4906,12 +5210,12 @@ function renderBucketList() {
 
   container.innerHTML = filtered.map(b => {
     const isDone = b.achieved || b.status === 'fulfilled';
-    const catInfo = catMap[b.category] || { label: b.category, color: 'text-slate-300 bg-black/40 border-white/10' };
+    const catInfo = catDict[b.category] || { label: b.category, color: 'text-slate-300 bg-black/40 border-white/10' };
     const stInfo = statusMap[b.status] || statusMap[isDone ? 'fulfilled' : 'planning'];
     const countdown = formatTargetDateCountdown(b.targetDate || b.year);
     const progressVal = isDone ? 100 : (b.progress !== undefined ? b.progress : 35);
+    const completedSteps = Array.isArray(b.completedStepIndices) ? b.completedStepIndices : [];
 
-    // Format plan steps
     const planSteps = (b.plan || '')
       .split('\n')
       .map(s => s.trim())
@@ -4961,18 +5265,24 @@ function renderBucketList() {
             </div>
           </div>
 
-          <!-- Step-by-Step Action Plan (Collapsible details) -->
+          <!-- Interactive AI Milestone Checklist -->
           ${planSteps.length > 0 ? `
-            <div class="pt-1.5 border-t border-slate-100 dark:border-white/5 space-y-1">
-              <span class="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">Action Plan:</span>
-              <ul class="space-y-0.5 text-[11px] text-slate-600 dark:text-slate-300">
-                ${planSteps.map(step => `
-                  <li class="flex items-start gap-1.5 leading-tight">
-                    <span class="text-pink-500 font-bold shrink-0 mt-0.5">•</span>
-                    <span class="truncate">${escapeHtml(step.replace(/^[0-9]+\.\s*/, ''))}</span>
-                  </li>
-                `).join('')}
-              </ul>
+            <div class="pt-2 border-t border-slate-100 dark:border-white/5 space-y-1.5">
+              <div class="flex items-center justify-between text-[10px] font-mono text-slate-400 uppercase tracking-wider">
+                <span>AI Milestone Tracker:</span>
+                <span class="text-pink-500 font-bold">${completedSteps.length}/${planSteps.length} Steps</span>
+              </div>
+              <div class="space-y-1">
+                ${planSteps.map((step, idx) => {
+                  const isStepDone = completedSteps.includes(idx);
+                  return `
+                    <label class="p-1.5 rounded-xl border flex items-start gap-2 cursor-pointer transition-all ${isStepDone ? 'bg-emerald-500/10 border-emerald-500/30 text-slate-400 line-through' : 'bg-black/30 border-white/5 hover:border-pink-500/30 text-slate-200'}">
+                      <input type="checkbox" ${isStepDone ? 'checked' : ''} onchange="toggleBucketPlanStep('${b.id}', ${idx})" class="mt-0.5 w-3.5 h-3.5 rounded text-pink-500 bg-slate-900 border-slate-700 cursor-pointer">
+                      <span class="text-[11px] leading-tight flex-1">${escapeHtml(step.replace(/^[0-9•\-\.]+\s*/, ''))}</span>
+                    </label>
+                  `;
+                }).join('')}
+              </div>
             </div>
           ` : ''}
         </div>
@@ -4992,7 +5302,7 @@ function renderBucketList() {
           </div>
 
           <div class="flex items-center gap-1 shrink-0">
-            <button type="button" onclick="openBucketListModal('${b.id}')" class="p-1 text-slate-400 hover:text-pink-500 transition-colors" title="Edit Milestone">
+            <button type="button" onclick="openBucketListModal('${b.id}')" class="p-1 text-slate-400 hover:text-pink-500 transition-colors" title="Edit Milestone & AI Plan">
               <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
             </button>
             <button type="button" onclick="deleteBucketItem('${b.id}')" class="p-1 text-slate-400 hover:text-rose-500 transition-colors" title="Delete Milestone">
@@ -5005,6 +5315,7 @@ function renderBucketList() {
   }).join('');
 
   lucide.createIcons();
+  renderDashboardMilestoneRadar();
 
   // Update Summary Badge
   const countBadge = document.getElementById('bucket-count-badge');
@@ -5017,6 +5328,7 @@ function renderBucketList() {
 }
 
 function openBucketListModal(editId = null) {
+  populateBucketCategoryDropdowns();
   const modal = document.getElementById('bucket-modal');
   const titleEl = document.getElementById('bucket-modal-title');
   const submitLbl = document.getElementById('bucket-modal-submit-lbl');
@@ -5035,7 +5347,7 @@ function openBucketListModal(editId = null) {
     if (item) {
       if (idInput) idInput.value = item.id;
       if (titleInput) titleInput.value = item.title;
-      if (catSelect) catSelect.value = item.category || 'travel';
+      if (catSelect) catSelect.value = item.category || (state.bucketCategories[0]?.id || 'travel');
       if (statusSelect) statusSelect.value = item.status || (item.achieved ? 'fulfilled' : 'planning');
       if (dateInput) dateInput.value = item.targetDate || '';
       if (progressSlider) progressSlider.value = item.progress !== undefined ? item.progress : (item.achieved ? 100 : 35);
@@ -5048,17 +5360,16 @@ function openBucketListModal(editId = null) {
   } else {
     if (idInput) idInput.value = '';
     if (titleInput) titleInput.value = '';
-    if (catSelect) catSelect.value = 'travel';
+    if (catSelect) catSelect.value = state.bucketCategories[0]?.id || 'travel';
     if (statusSelect) statusSelect.value = 'planning';
-    
-    // Default target date: 1 year from today
+
     const nextYear = new Date();
     nextYear.setFullYear(nextYear.getFullYear() + 1);
     if (dateInput) dateInput.value = nextYear.toISOString().split('T')[0];
-    
+
     if (progressSlider) progressSlider.value = 35;
     if (progressLbl) progressLbl.textContent = '35%';
-    if (planInput) planInput.value = '1. Phase 1: Research & budget preparation\n2. Phase 2: Booking & logistics\n3. Phase 3: Milestone execution';
+    if (planInput) planInput.value = '• Phase 1: Research & budget preparation\n• Phase 2: Booking & logistics\n• Phase 3: Milestone execution';
     if (whyInput) whyInput.value = '';
     if (titleEl) titleEl.textContent = 'Life Milestone Dream Tracker';
     if (submitLbl) submitLbl.textContent = 'Pin to Bucket List';
@@ -5129,6 +5440,7 @@ function submitBucketItem(event) {
       progress: progress,
       plan: plan,
       why: why,
+      completedStepIndices: [],
       achieved: isFulfilled
     };
     state.bucketList.unshift(newItem);
@@ -5138,6 +5450,7 @@ function submitBucketItem(event) {
   localStorage.setItem('mind_cave_bucket_list', JSON.stringify(state.bucketList));
   closeBucketListModal();
   renderBucketList();
+  renderDashboardMilestoneRadar();
 }
 
 function advanceBucketStatus(id) {
@@ -5155,6 +5468,7 @@ function advanceBucketStatus(id) {
 
   localStorage.setItem('mind_cave_bucket_list', JSON.stringify(state.bucketList));
   renderBucketList();
+  renderDashboardMilestoneRadar();
   showToast(`Stage advanced to: ${item.status.replace('_', ' ').toUpperCase()} (${item.progress}%)`);
 }
 
@@ -5172,6 +5486,7 @@ function toggleBucketAchieved(id) {
   }
   localStorage.setItem('mind_cave_bucket_list', JSON.stringify(state.bucketList));
   renderBucketList();
+  renderDashboardMilestoneRadar();
   showToast(item.achieved ? 'Congratulations! Dream milestone fulfilled!' : 'Milestone returned to active pipeline.');
 }
 
@@ -5179,6 +5494,7 @@ function deleteBucketItem(id) {
   state.bucketList = state.bucketList.filter(b => b.id !== id);
   localStorage.setItem('mind_cave_bucket_list', JSON.stringify(state.bucketList));
   renderBucketList();
+  renderDashboardMilestoneRadar();
   showToast('Milestone removed from Bucket List.');
 }
 
