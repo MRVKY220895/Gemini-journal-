@@ -105,6 +105,7 @@ const state = {
     { id: 'h5', title: '8h Circadian Sleep Protocol', emoji: '🌙', streak: 6, target: '8 hours', isTimelineShortcut: false, history: [true, true, true, true, true, true, true] },
     { id: 'h6', title: '90m Deep Work Block', emoji: '💻', streak: 14, target: '1 block', isTimelineShortcut: false, history: [true, true, true, true, true, true, true] }
   ],
+  archivedHabits: JSON.parse(localStorage.getItem('mind_cave_archived_habits') || '[]'),
   bucketList: JSON.parse(localStorage.getItem('mind_cave_bucket_list') || 'null') || [
     { id: 'b1', title: 'Scuba dive the Great Barrier Reef', category: 'travel', year: '2027', achieved: false },
     { id: 'b2', title: 'Publish Open-Source AI Architecture Benchmark', category: 'career', year: '2026', achieved: true },
@@ -4031,8 +4032,26 @@ function selectHabitEmoji(emoji) {
 }
 
 function initHabitTracker() {
+  if (!state.archivedHabits) {
+    state.archivedHabits = JSON.parse(localStorage.getItem('mind_cave_archived_habits') || '[]');
+  }
   renderHabitTracker();
   renderTimelineShortcuts();
+  updateArchivedHabitsBadges();
+}
+
+function updateArchivedHabitsBadges() {
+  if (!state.archivedHabits) state.archivedHabits = [];
+  const count = state.archivedHabits.length;
+
+  const inlineBadge = document.getElementById('archived-habits-badge-inline');
+  const modalBadge = document.getElementById('archived-habits-badge-modal');
+  const modalCountBadge = document.getElementById('archived-habits-count-badge');
+
+  const text = count > 0 ? `Archive (${count})` : 'Archive';
+  if (inlineBadge) inlineBadge.textContent = text;
+  if (modalBadge) modalBadge.textContent = text;
+  if (modalCountBadge) modalCountBadge.textContent = `${count} Archived`;
 }
 
 function renderHabitTracker() {
@@ -4052,7 +4071,13 @@ function renderHabitTracker() {
     ? `
       <div class="p-4 rounded-xl bg-slate-50 dark:bg-black/30 border border-dashed border-slate-300 dark:border-white/10 text-center text-xs text-slate-400 space-y-1.5">
         <p>No active habits scheduled for today.</p>
-        <button type="button" onclick="openNewHabitModal()" class="text-cyan-500 hover:underline font-semibold font-mono text-[11px]">+ Add Your First Habit</button>
+        <div class="flex items-center justify-center gap-2 pt-1">
+          <button type="button" onclick="openNewHabitModal()" class="text-cyan-500 hover:underline font-semibold font-mono text-[11px]">+ Add Your First Habit</button>
+          ${state.archivedHabits && state.archivedHabits.length > 0 ? `
+            <span class="text-slate-500">•</span>
+            <button type="button" onclick="openArchivedHabitsModal()" class="text-amber-500 hover:underline font-semibold font-mono text-[11px]">Restore from Archive (${state.archivedHabits.length})</button>
+          ` : ''}
+        </div>
       </div>
     `
     : state.habitsList.map(h => {
@@ -4094,7 +4119,7 @@ function renderHabitTracker() {
             <button type="button" onclick="openNewHabitModal('${h.id}')" class="p-1 text-slate-400 hover:text-amber-500 transition-colors" title="Edit Habit">
               <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
             </button>
-            <button type="button" onclick="deleteHabit('${h.id}')" class="p-1 text-slate-400 hover:text-rose-500 transition-colors" title="Delete Habit (With Undo)">
+            <button type="button" onclick="deleteHabit('${h.id}')" class="p-1 text-slate-400 hover:text-rose-500 transition-colors" title="Move to Archive (Preserves Tracks & Streaks)">
               <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
             </button>
           </div>
@@ -4121,6 +4146,7 @@ function renderHabitTracker() {
   if (streakBadge) streakBadge.innerHTML = `<i data-lucide="flame" class="w-3 h-3 text-amber-500"></i><span>${maxStreak || 14} Days Streak</span>`;
 
   renderUndoHabitBanner();
+  updateArchivedHabitsBadges();
   lucide.createIcons();
 }
 
@@ -4143,16 +4169,29 @@ function deleteHabit(habitId) {
   if (index === -1) return;
 
   const deletedHabit = state.habitsList[index];
+
+  // Preserve full historic tracks and streak in archivedHabits
+  const archivedCopy = JSON.parse(JSON.stringify(deletedHabit));
+  archivedCopy.archivedAt = new Date().toISOString();
+
+  if (!state.archivedHabits) state.archivedHabits = [];
+  state.archivedHabits = state.archivedHabits.filter(h => h.id !== habitId);
+  state.archivedHabits.unshift(archivedCopy);
+  localStorage.setItem('mind_cave_archived_habits', JSON.stringify(state.archivedHabits));
+
+  // Push to transient undo stack
   recentlyDeletedHabits.push({ habit: JSON.parse(JSON.stringify(deletedHabit)), index: index });
 
+  // Remove from active list
   state.habitsList.splice(index, 1);
   localStorage.setItem('mind_cave_habits_list', JSON.stringify(state.habitsList));
 
   renderHabitTracker();
   renderTimelineShortcuts();
   renderShortcutsManagerList();
+  updateArchivedHabitsBadges();
 
-  showToast(`Deleted habit: "${deletedHabit.title}"`);
+  showToast(`Moved "${deletedHabit.title}" to Archive. Historical tracks preserved!`);
 }
 
 function undoDeleteHabit() {
@@ -4165,12 +4204,142 @@ function undoDeleteHabit() {
   const insertIndex = Math.min(last.index, state.habitsList.length);
   state.habitsList.splice(insertIndex, 0, last.habit);
 
+  if (state.archivedHabits) {
+    state.archivedHabits = state.archivedHabits.filter(h => h.id !== last.habit.id);
+    localStorage.setItem('mind_cave_archived_habits', JSON.stringify(state.archivedHabits));
+  }
+
   localStorage.setItem('mind_cave_habits_list', JSON.stringify(state.habitsList));
   renderHabitTracker();
   renderTimelineShortcuts();
   renderShortcutsManagerList();
+  updateArchivedHabitsBadges();
 
-  showToast(`Restored habit: "${last.habit.title}"`);
+  showToast(`Restored habit: "${last.habit.title}" with tracks.`);
+}
+
+function openArchivedHabitsModal() {
+  renderArchivedHabitsList();
+  document.getElementById('archived-habits-modal')?.classList.remove('hidden');
+  lucide.createIcons();
+}
+
+function closeArchivedHabitsModal() {
+  document.getElementById('archived-habits-modal')?.classList.add('hidden');
+}
+
+function renderArchivedHabitsList() {
+  const container = document.getElementById('archived-habits-list-container');
+  if (!container) return;
+
+  if (!state.archivedHabits) state.archivedHabits = [];
+  updateArchivedHabitsBadges();
+
+  if (state.archivedHabits.length === 0) {
+    container.innerHTML = `
+      <div class="p-8 rounded-2xl bg-white/5 border border-dashed border-white/10 text-center text-xs text-slate-400 space-y-2">
+        <i data-lucide="archive" class="w-8 h-8 text-slate-500 mx-auto"></i>
+        <p class="font-medium text-slate-300">Your Archive is Empty</p>
+        <p class="text-[11px] text-slate-500 max-w-xs mx-auto">When you remove a habit from your active routine, it is safely stored here with its original streaks and 7-day track record intact.</p>
+      </div>
+    `;
+    lucide.createIcons();
+    return;
+  }
+
+  const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
+  container.innerHTML = state.archivedHabits.map(h => {
+    const formattedDate = h.archivedAt ? new Date(h.archivedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Archived';
+    return `
+      <div class="p-3.5 rounded-2xl bg-black/40 border border-white/10 hover:border-cyan-500/30 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex items-start sm:items-center gap-3 min-w-0 flex-1">
+          <span class="text-xl shrink-0 p-2 rounded-xl bg-white/5 border border-white/10">${h.emoji || '💧'}</span>
+          <div class="min-w-0 flex-1 space-y-1">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h5 class="text-xs font-bold text-white truncate">${escapeHtml(h.title)}</h5>
+              <span class="text-[10px] font-mono px-2 py-0.2 rounded-full bg-amber-950/60 text-amber-300 border border-amber-500/30 font-semibold flex items-center gap-1">
+                <i data-lucide="flame" class="w-3 h-3 text-amber-400"></i>
+                <span>${h.streak || 0}d streak preserved</span>
+              </span>
+            </div>
+            <div class="flex items-center gap-2 text-[10px] text-slate-400 font-mono flex-wrap">
+              ${h.target ? `<span>Target: ${escapeHtml(h.target)}</span> •` : ''}
+              <span>${formattedDate}</span>
+            </div>
+            <!-- Preserved 7-day dot track preview -->
+            ${h.history && h.history.length > 0 ? `
+              <div class="flex items-center gap-1 pt-1">
+                <span class="text-[9px] text-slate-500 font-mono uppercase tracking-wider mr-1">Preserved Tracks:</span>
+                ${h.history.map((isDone, idx) => `
+                  <div class="habit-dot ${isDone ? 'done' : ''} !w-4 !h-4 !text-[8px]" title="${days[idx]} - ${isDone ? 'Completed' : 'Missed'}">
+                    ${isDone ? '✓' : days[idx]}
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 shrink-0 self-end sm:self-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-white/5 w-full sm:w-auto justify-end">
+          <button type="button" onclick="restoreArchivedHabit('${h.id}')" class="btn-island !bg-gradient-to-r !from-cyan-500 !to-blue-600 text-xs !py-1.5 !px-3 font-semibold shadow-sm" title="Restore this habit and all its past tracking logs back to active view">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 text-white mr-1"></i>
+            <span>Restore</span>
+          </button>
+          <button type="button" onclick="purgeArchivedHabit('${h.id}')" class="p-1.5 rounded-xl bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-colors" title="Permanently Delete">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  lucide.createIcons();
+}
+
+function restoreArchivedHabit(habitId) {
+  if (!state.archivedHabits) return;
+  const habit = state.archivedHabits.find(h => h.id === habitId);
+  if (!habit) return;
+
+  const restored = JSON.parse(JSON.stringify(habit));
+  delete restored.archivedAt;
+
+  state.habitsList.unshift(restored);
+  localStorage.setItem('mind_cave_habits_list', JSON.stringify(state.habitsList));
+
+  state.archivedHabits = state.archivedHabits.filter(h => h.id !== habitId);
+  localStorage.setItem('mind_cave_archived_habits', JSON.stringify(state.archivedHabits));
+
+  renderHabitTracker();
+  renderTimelineShortcuts();
+  renderShortcutsManagerList();
+  renderArchivedHabitsList();
+  updateArchivedHabitsBadges();
+
+  showToast(`Restored "${restored.title}" with all historic tracks intact!`);
+}
+
+function purgeArchivedHabit(habitId) {
+  if (!state.archivedHabits) return;
+  state.archivedHabits = state.archivedHabits.filter(h => h.id !== habitId);
+  localStorage.setItem('mind_cave_archived_habits', JSON.stringify(state.archivedHabits));
+
+  renderArchivedHabitsList();
+  updateArchivedHabitsBadges();
+  showToast('Habit permanently deleted from archive.');
+}
+
+function clearAllArchivedHabits() {
+  if (!state.archivedHabits || state.archivedHabits.length === 0) return;
+  if (!confirm('Are you sure you want to permanently clear all archived habits?')) return;
+
+  state.archivedHabits = [];
+  localStorage.setItem('mind_cave_archived_habits', JSON.stringify(state.archivedHabits));
+
+  renderArchivedHabitsList();
+  updateArchivedHabitsBadges();
+  showToast('All archived habits permanently cleared.');
 }
 
 function renderUndoHabitBanner() {
@@ -4188,10 +4357,15 @@ function renderUndoHabitBanner() {
             <i data-lucide="info" class="w-3.5 h-3.5 text-amber-400 shrink-0"></i>
             <span class="truncate">Deleted "${escapeHtml(last.habit.title)}"</span>
           </span>
-          <button type="button" onclick="undoDeleteHabit()" class="px-2.5 py-0.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-[11px] transition-colors shrink-0 flex items-center gap-1 ml-2">
-            <i data-lucide="rotate-ccw" class="w-3 h-3 text-slate-950"></i>
-            <span>Undo</span>
-          </button>
+          <div class="flex items-center gap-1.5 shrink-0 ml-2">
+            <button type="button" onclick="undoDeleteHabit()" class="px-2.5 py-0.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-[11px] transition-colors flex items-center gap-1">
+              <i data-lucide="rotate-ccw" class="w-3 h-3 text-slate-950"></i>
+              <span>Undo</span>
+            </button>
+            <button type="button" onclick="openArchivedHabitsModal()" class="text-[11px] text-cyan-400 hover:underline font-semibold font-mono">
+              View Archive →
+            </button>
+          </div>
         </div>
       `;
       b.classList.remove('hidden');
