@@ -82,6 +82,12 @@ class PlanGenerateRequest(BaseModel):
     target_date: Optional[str] = None
 
 
+class TranslateRequest(BaseModel):
+    text: str = Field(..., min_length=1)
+    target_lang: str = Field("en", description="Target ISO code e.g. en, ta, hi, te, es, fr, de, ja, zh, ar")
+    source_lang: Optional[str] = None
+
+
 # =============================================================================
 # PUBLIC & SECURITY DIAGNOSTIC ROUTES
 # =============================================================================
@@ -404,6 +410,26 @@ async def generate_milestone_plan(
             f"• Immediate Action: Dedicate 30m this Sunday to schedule Phase 1 tasks"
         )
         return {"plan": fallback_plan}
+
+
+@app.post("/api/translate")
+async def translate_content(
+    req: TranslateRequest,
+    current_user: UserContext = Depends(get_current_user)
+):
+    """
+    Translates text accurately between native languages and English
+    using Gemini neural translation while preserving psychological and reflective tone.
+    """
+    if not req.text or not req.text.strip():
+        raise HTTPException(status_code=400, detail="Text to translate cannot be empty.")
+
+    res = gemini_service.translate_text(
+        text=req.text,
+        target_lang=req.target_lang,
+        source_lang=req.source_lang
+    )
+    return res
 
 
 @app.get("/api/sessions")

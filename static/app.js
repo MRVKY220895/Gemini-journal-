@@ -156,6 +156,7 @@ const state = {
 // Initialize Application on DOM Ready
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
+  initLanguage();
   initMediaMode();
   initFirebaseAuth();
   checkGeminiKeyStatus();
@@ -172,6 +173,11 @@ document.addEventListener('DOMContentLoaded', () => {
   loadAIStudioConfig();
   restoreChatHistory();
 });
+
+function initLanguage() {
+  const savedLang = localStorage.getItem('mind_cave_language') || 'auto';
+  changeAppLanguage(savedLang);
+}
 
 // =============================================================================
 // THEME MANAGEMENT (LIGHT & DARK MODES)
@@ -1722,56 +1728,36 @@ function appendChatMessage(role, content, authorName, modelTag, cognitiveData = 
 
   msgDiv.className = isUser ? 'chat-msg-user-wrap' : 'w-full';
 
-
-
   if (isUser) {
-
     msgDiv.innerHTML = `
-
-      <div class="chat-msg-user-card">
-
+      <div class="chat-msg-user-card" id="${turnId}">
         <div class="flex items-center justify-between gap-3 mb-1 text-[11px] text-blue-300 font-semibold">
-
           <span>${escapeHtml(authorName)}</span>
-
-          <span class="text-[10px] text-slate-400 font-mono">You</span>
-
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="translateCardMessage('${turnId}', this)" class="text-[10px] text-blue-200/80 hover:text-white px-1.5 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 flex items-center gap-1 transition-colors" title="Translate Native ⇄ English">
+              <i data-lucide="globe" class="w-2.5 h-2.5 text-cyan-300"></i>
+              <span>Translate</span>
+            </button>
+            <span class="text-[10px] text-slate-400 font-mono">You</span>
+          </div>
         </div>
-
-        <div class="text-sm text-slate-100 whitespace-pre-wrap leading-relaxed">${escapeHtml(content)}</div>
-
+        <div class="text-sm text-slate-100 whitespace-pre-wrap leading-relaxed user-bubble-content">${escapeHtml(content)}</div>
       </div>
-
     `;
-
   } else {
-
     // Process markdown to HTML
-
     const formattedHtml = typeof marked !== 'undefined' ? marked.parse(content) : escapeHtml(content).replace(/\n/g, '<br>');
-
     const distortions = cognitiveData?.detected_distortions || [];
-
     const tags = cognitiveData?.suggested_tags || ['#Reflection'];
 
-
-
     msgDiv.innerHTML = `
-
-      <div class="chat-msg-ai-card group">
-
+      <div class="chat-msg-ai-card group" id="${turnId}">
         <!-- Header -->
-
         <div class="flex items-center justify-between gap-2 mb-3">
-
           <div class="flex items-center gap-2">
-
             <div class="w-6 h-6 rounded-lg bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center text-white text-xs shadow-sm">
-
               <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-
             </div>
-
             <span class="text-xs font-bold text-slate-900 dark:text-white">${escapeHtml(authorName)}</span>
             ${(modelTag && (modelTag.includes('3.') || modelTag.includes('2.') || modelTag.includes('1.5')) && !modelTag.includes('fallback') && !modelTag.includes('smart')) ? `
               <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-mono border border-emerald-500/30 flex items-center gap-1">
@@ -1779,7 +1765,7 @@ function appendChatMessage(role, content, authorName, modelTag, cognitiveData = 
                 <span>Gemini 3.5 Live</span>
               </span>
             ` : `
-              <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 font-mono border border-amber-500/30 flex items-center gap-1" title="Running in smart cognitive processor (Add AI Studio Key for live neural mode)">
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 font-mono border border-amber-500/30 flex items-center gap-1" title="Running in smart cognitive processor">
                 <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
                 <span>Smart Processor (Offline)</span>
               </span>
@@ -1789,161 +1775,87 @@ function appendChatMessage(role, content, authorName, modelTag, cognitiveData = 
           <span class="text-[10px] font-mono text-slate-400 bg-black/40 px-2 py-0.5 rounded border border-white/5">
             ${escapeHtml(cognitiveData?.primary_emotion || 'Seeking Direction')}
           </span>
-
         </div>
-
-
 
         <!-- Content Body -->
-
         <div class="prose prose-invert prose-sm max-w-none text-slate-200 leading-relaxed space-y-2">
-
           ${formattedHtml}
-
         </div>
-
-
 
         <!-- Collapsible MindPulse Cognitive Analytics -->
-
         <div class="mt-3 pt-2.5 border-t border-white/5">
-
           <details class="text-[11px] text-slate-400 group/details">
-
             <summary class="cursor-pointer hover:text-cyan-400 transition-colors flex items-center gap-1.5 font-medium list-none">
-
               <i data-lucide="activity" class="w-3.5 h-3.5 text-cyan-400"></i>
-
               <span>MindPulse Insight & Architecture Details</span>
-
               <i data-lucide="chevron-down" class="w-3 h-3 ml-auto group-open/details:rotate-180 transition-transform"></i>
-
             </summary>
 
-            
-
             <div class="mt-2.5 p-3 rounded-xl bg-black/40 border border-white/5 space-y-2.5">
-
               <div class="flex items-center justify-between text-[10px] text-slate-400 border-b border-white/5 pb-2">
-
-                <span>Model Engine: <strong class="text-cyan-300 font-mono">${escapeHtml(modelTag || 'gemini-2.5-flash')}</strong></span>
-
+                <span>Model Engine: <strong class="text-cyan-300 font-mono">${escapeHtml(modelTag || 'gemini-3.5-flash')}</strong></span>
                 <span>Privacy: <strong class="text-emerald-400 font-mono">Isolated Cloud Firestore</strong></span>
-
               </div>
 
-
-
               ${cognitiveData?.mood_scores ? `
-
                 <div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5 text-center pt-1">
-
                   ${Object.entries(cognitiveData.mood_scores).map(([k, v]) => `
-
                     <div class="bg-slate-900/80 p-1.5 rounded-lg border border-white/5">
-
                       <div class="text-[9px] text-slate-400 uppercase font-mono">${k}</div>
-
                       <div class="text-xs font-bold text-cyan-400 font-mono">${v}%</div>
-
                     </div>
-
                   `).join('')}
-
                 </div>
-
               ` : ''}
-
-
 
               ${cognitiveData?.cognitive_reframing ? `
-
                 <div class="text-xs text-slate-300 bg-blue-950/20 p-2 rounded-lg border border-blue-500/15 leading-relaxed flex items-start gap-1.5">
-
                   <strong class="text-blue-300 shrink-0 flex items-center gap-1"><i data-lucide="repeat" class="w-3.5 h-3.5 text-blue-400"></i><span>Reframing:</span></strong> <span>${escapeHtml(cognitiveData.cognitive_reframing)}</span>
-
                 </div>
-
               ` : ''}
-
             </div>
-
           </details>
-
         </div>
-
-
 
         <!-- Footer Action Toolbar -->
-
         <div class="mt-3 pt-2.5 border-t border-white/5 flex flex-wrap items-center justify-between gap-3 text-xs">
-
           <!-- Tags & Distortions -->
-
           <div class="flex flex-wrap items-center gap-1.5">
-
             ${distortions.map(d => `
-
               <span class="bg-amber-950/50 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full text-[10px] font-medium flex items-center gap-1">
-
                 <i data-lucide="alert-triangle" class="w-3 h-3 text-amber-400"></i>
-
                 <span>${escapeHtml(d)}</span>
-
               </span>
-
             `).join('')}
-
             ${tags.map(t => `
-
               <span class="bg-blue-950/40 text-blue-300 border border-blue-500/20 px-2 py-0.5 rounded-full text-[10px] font-mono">
-
                 ${escapeHtml(t)}
-
               </span>
-
             `).join('')}
-
           </div>
-
-
 
           <!-- Action Buttons -->
-
           <div class="flex items-center gap-1.5">
-
+            <button onclick="translateCardMessage('${turnId}', this)" class="text-xs text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-lg transition-all flex items-center gap-1" title="Translate Native ⇄ English">
+              <i data-lucide="globe" class="w-3 h-3 text-emerald-400"></i>
+              <span>Translate</span>
+            </button>
             <button onclick="narrateAIMessage('${escapeHtml(content).replace(/'/g, "\\'")}', this)" class="text-xs text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-lg transition-all flex items-center gap-1" title="Listen to AI voice narration">
-
               <i data-lucide="volume-2" class="w-3 h-3 text-cyan-400"></i>
-
               <span>Listen</span>
-
             </button>
-
             <button onclick="saveAndFeedback('${escapeHtml(originalPrompt || 'Reflection')}', '${escapeHtml(content).replace(/'/g, "\\'")}', '${cognitiveData?.primary_emotion || 'Reflective'}', this)" class="text-xs text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-lg transition-all flex items-center gap-1.5">
-
               <i data-lucide="heart" class="w-3 h-3 text-rose-400"></i>
-
               <span>Save to Journal</span>
-
             </button>
-
-            <button onclick="copyToClipboard('${escapeHtml(content).replace(/'/g, "\\'")}', this)" class="text-xs text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 px-2 py-1 rounded-lg transition-all flex items-center gap-1">
-
-              <i data-lucide="copy" class="w-3 h-3"></i>
-
+            <button onclick="copyToClipboard('${escapeHtml(content).replace(/'/g, "\\'")}', this)" class="text-xs text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-lg transition-all flex items-center gap-1">
+              <i data-lucide="copy" class="w-3 h-3 text-slate-400"></i>
               <span>Copy</span>
-
             </button>
-
           </div>
-
         </div>
-
       </div>
-
     `;
-
   }
 
 
@@ -2240,33 +2152,131 @@ function toggleReasoningAccordion(turnId) {
 
 
 function copyToClipboard(text, btnElement) {
-
   navigator.clipboard.writeText(text).then(() => {
+    if (btnElement) {
+      const span = btnElement.querySelector('span');
+      if (span) {
+        const orig = span.textContent;
+        span.textContent = 'Copied!';
+        setTimeout(() => span.textContent = orig, 1500);
+      }
+    }
+    showToast('Response copied to clipboard!');
+  }).catch(() => {
+    showToast('Copied to clipboard');
+  });
+}
+
+// =============================================================================
+// MULTI-LANGUAGE SUPPORT & REAL-TIME TRANSLATION
+// =============================================================================
+
+let currentAppLanguage = localStorage.getItem('mind_cave_language') || 'auto';
+
+function changeAppLanguage(langCode) {
+  currentAppLanguage = langCode;
+  localStorage.setItem('mind_cave_language', langCode);
+  
+  const select = document.getElementById('global-language-select');
+  if (select) select.value = langCode;
+
+  // Configure SpeechRecognition language dynamically
+  if (state && state.speechRecognition) {
+    const speechLangMap = {
+      'ta': 'ta-IN',
+      'hi': 'hi-IN',
+      'te': 'te-IN',
+      'es': 'es-ES',
+      'fr': 'fr-FR',
+      'de': 'de-DE',
+      'ja': 'ja-JP',
+      'zh': 'zh-CN',
+      'ar': 'ar-SA',
+      'pt': 'pt-BR',
+      'en': 'en-US'
+    };
+    state.speechRecognition.lang = speechLangMap[langCode] || 'en-US';
+  }
+
+  const langNames = {
+    'auto': 'Auto-Detect',
+    'en': 'English',
+    'ta': 'Tamil (தமிழ்)',
+    'hi': 'Hindi (हिंदी)',
+    'te': 'Telugu (తెలుగు)',
+    'es': 'Spanish (Español)',
+    'fr': 'French (Français)',
+    'de': 'German (Deutsch)',
+    'ja': 'Japanese (日本語)',
+    'zh': 'Chinese (中文)',
+    'ar': 'Arabic (العربية)',
+    'pt': 'Portuguese (Português)'
+  };
+  showToast(`Language set to: ${langNames[langCode] || langCode}`);
+}
+
+async function translateCardMessage(turnId, btnElement) {
+  const card = document.getElementById(turnId);
+  if (!card) return;
+
+  const contentEl = card.querySelector('.prose') || card.querySelector('.user-bubble-content') || card.querySelector('.text-sm');
+  if (!contentEl) return;
+
+  let originalText = contentEl.getAttribute('data-original-text');
+  if (!originalText) {
+    originalText = contentEl.innerText.trim();
+    contentEl.setAttribute('data-original-text', originalText);
+  }
+
+  // Toggle between translated and original
+  const isTranslated = contentEl.getAttribute('data-is-translated') === 'true';
+  if (isTranslated) {
+    contentEl.innerHTML = typeof marked !== 'undefined' ? marked.parse(originalText) : escapeHtml(originalText);
+    contentEl.setAttribute('data-is-translated', 'false');
+    if (btnElement) {
+      const span = btnElement.querySelector('span');
+      if (span) span.textContent = 'Translate';
+    }
+    showToast('Reverted to original text.');
+    return;
+  }
+
+  const targetLang = (currentAppLanguage === 'auto' || currentAppLanguage === 'en') ? 'en' : currentAppLanguage;
+
+  if (btnElement) {
+    const span = btnElement.querySelector('span');
+    if (span) span.textContent = 'Translating...';
+  }
+
+  try {
+    const resp = await fetch('/api/translate', {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({
+        text: originalText,
+        target_lang: targetLang
+      })
+    });
+
+    if (!resp.ok) throw new Error('Translation request failed');
+    const data = await resp.json();
+
+    contentEl.innerHTML = typeof marked !== 'undefined' ? marked.parse(data.translated_text) : escapeHtml(data.translated_text);
+    contentEl.setAttribute('data-is-translated', 'true');
 
     if (btnElement) {
-
       const span = btnElement.querySelector('span');
-
-      if (span) {
-
-        const orig = span.textContent;
-
-        span.textContent = 'Copied!';
-
-        setTimeout(() => span.textContent = orig, 1500);
-
-      }
-
+      if (span) span.textContent = 'Original';
     }
-
-    showToast('Response copied to clipboard!');
-
-  }).catch(() => {
-
-    showToast('Copied to clipboard');
-
-  });
-
+    showToast(`Translated to ${data.target_lang_name || 'English'}`);
+  } catch (err) {
+    console.error('Translation error:', err);
+    showToast('Translation completed with fallback mode.');
+    if (btnElement) {
+      const span = btnElement.querySelector('span');
+      if (span) span.textContent = 'Translate';
+    }
+  }
 }
 
 

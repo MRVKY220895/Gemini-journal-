@@ -141,8 +141,26 @@
       </button>
     </nav>
 
-    <!-- Right Area: Theme Toggle Shortcut + Consolidated User Profile Trigger -->
+    <!-- Right Area: Multi-Language + Theme Toggle Shortcut + Consolidated User Profile Trigger -->
     <div class="flex items-center gap-1.5 shrink-0">
+      <!-- Multi-Language Selector Dropdown -->
+      <div class="relative inline-block">
+        <select id="global-language-select" onchange="changeAppLanguage(this.value)" class="bg-slate-900/90 dark:bg-white/5 hover:bg-slate-800 dark:hover:bg-white/10 border border-slate-700/50 dark:border-white/10 text-slate-200 text-xs rounded-full px-2 py-1 cursor-pointer outline-none transition-all shadow-sm font-medium" title="Choose Native Language / Auto-Detect">
+          <option value="auto">🌐 Auto-Detect</option>
+          <option value="en">🇬🇧 English</option>
+          <option value="ta">🇮🇳 தமிழ் (Tamil)</option>
+          <option value="hi">🇮🇳 हिंदी (Hindi)</option>
+          <option value="te">🇮🇳 తెలుగు (Telugu)</option>
+          <option value="es">🇪🇸 Español</option>
+          <option value="fr">🇫🇷 Français</option>
+          <option value="de">🇩🇪 Deutsch</option>
+          <option value="ja">🇯🇵 日本語</option>
+          <option value="zh">🇨🇳 中文</option>
+          <option value="ar">🇸🇦 العربية</option>
+          <option value="pt">🇧🇷 Português</option>
+        </select>
+      </div>
+
       <!-- 1-Tap Theme Mode Switcher in Global Bar -->
       <button onclick="toggleTheme()" id="btn-global-theme" class="w-8 h-8 rounded-full bg-slate-900/90 dark:bg-white/5 hover:bg-slate-800 dark:hover:bg-white/10 border border-slate-700/50 dark:border-white/10 flex items-center justify-center text-amber-400 hover:text-amber-300 transition-all cursor-pointer shadow-sm active:scale-95" title="Toggle Light / Dark Mode">
         <i data-lucide="sun" id="global-theme-icon" class="w-4 h-4 text-amber-400"></i>
