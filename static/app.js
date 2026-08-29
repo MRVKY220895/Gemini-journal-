@@ -10,51 +10,38 @@
 
 
 
+function safeJSONParse(val, fallback) {
+  try {
+    if (!val || val === 'undefined' || val === 'null') return fallback;
+    return JSON.parse(val);
+  } catch (e) {
+    return fallback;
+  }
+}
+
 // Application State
-
 const state = {
-
   currentUser: {
-
     uid: localStorage.getItem('gemini_journal_uid') || 'user_alice',
-
     name: localStorage.getItem('gemini_journal_name') || 'Alice (Demo Sandbox)',
-
     token: localStorage.getItem('gemini_journal_token') || 'demo_user_alice',
-
     gender: localStorage.getItem('mind_cave_user_gender') || 'female'
-
   },
-
   currentPersona: 'cbt_reflector',
-
   currentSessionId: null,
-
   radarChart: null,
-
   lineChart: null,
-
   firebaseApp: null,
-
   firebaseAuth: null,
-
   timelineRange: localStorage.getItem('mind_cave_timeline_range') || 'day_standard',
-
   selectedDiaryDate: new Date(),
-
   mediaMode: localStorage.getItem('mind_cave_media_mode') || 'photos',
-
   diaryRangeMode: 'single', // 'single' | 'week' | 'all'
-
   isSpeakingSummary: false,
-
   isRecordingVoice: false,
-
   speechRecognition: null,
-
   speechUtterance: null,
-
-  agendaItems: JSON.parse(localStorage.getItem('mind_cave_agenda_items') || 'null') || (localStorage.getItem('mind_cave_is_reset') ? [] : [
+  agendaItems: safeJSONParse(localStorage.getItem('mind_cave_agenda_items'), null) || (localStorage.getItem('mind_cave_is_reset') ? [] : [
     {
       id: 'task_1',
       type: 'todo',
@@ -86,7 +73,7 @@ const state = {
       gcalSynced: true
     }
   ]),
-  todayGoals: JSON.parse(localStorage.getItem('mind_cave_today_goals') || 'null') || (localStorage.getItem('mind_cave_is_reset') ? [] : [
+  todayGoals: safeJSONParse(localStorage.getItem('mind_cave_today_goals'), null) || (localStorage.getItem('mind_cave_is_reset') ? [] : [
     {
       id: 'g1',
       title: 'Ship Core System Architecture & Validate Test Boundaries',
@@ -121,11 +108,11 @@ const state = {
       notes: 'In progress'
     }
   ]),
-  todayGoal: JSON.parse(localStorage.getItem('mind_cave_today_goal') || 'null') || (localStorage.getItem('mind_cave_is_reset') ? { text: '', completed: false } : {
+  todayGoal: safeJSONParse(localStorage.getItem('mind_cave_today_goal'), null) || (localStorage.getItem('mind_cave_is_reset') ? { text: '', completed: false } : {
     text: "Ship Core System Architecture & complete evening 30m mindful walk",
     completed: false
   }),
-  habitsList: JSON.parse(localStorage.getItem('mind_cave_habits_list') || 'null') || (localStorage.getItem('mind_cave_is_reset') ? [] : [
+  habitsList: safeJSONParse(localStorage.getItem('mind_cave_habits_list'), null) || (localStorage.getItem('mind_cave_is_reset') ? [] : [
     { id: 'h1', title: 'Hydrate (Drink Water)', emoji: '💧', type: 'counter', targetCount: 8, currentCount: 5, unit: 'glasses', streak: 12, target: '8 glasses', isTimelineShortcut: true, history: [true, true, true, true, true, true, false] },
     { id: 'h2', title: '15m Mindfulness & CBT', emoji: '🧘', type: 'boolean', streak: 7, target: '15 mins', isTimelineShortcut: true, history: [true, true, true, false, true, true, true] },
     { id: 'h3', title: '30m Zone-2 Cardio / Walk', emoji: '🚶', type: 'counter', targetCount: 30, currentCount: 30, unit: 'mins', streak: 5, target: '30 mins', isTimelineShortcut: true, history: [true, true, true, true, false, true, true] },
@@ -133,8 +120,8 @@ const state = {
     { id: 'h5', title: '8h Circadian Sleep Protocol', emoji: '🌙', type: 'boolean', streak: 6, target: '8 hours', isTimelineShortcut: false, history: [true, true, true, true, true, true, true] },
     { id: 'h6', title: '90m Deep Work Block', emoji: '💻', type: 'counter', targetCount: 2, currentCount: 2, unit: 'blocks', streak: 14, target: '2 blocks', isTimelineShortcut: false, history: [true, true, true, true, true, true, true] }
   ]),
-  archivedHabits: JSON.parse(localStorage.getItem('mind_cave_archived_habits') || '[]'),
-  bucketList: JSON.parse(localStorage.getItem('mind_cave_bucket_list') || 'null') || (localStorage.getItem('mind_cave_is_reset') ? [] : [
+  archivedHabits: safeJSONParse(localStorage.getItem('mind_cave_archived_habits'), []),
+  bucketList: safeJSONParse(localStorage.getItem('mind_cave_bucket_list'), null) || (localStorage.getItem('mind_cave_is_reset') ? [] : [
     { id: 'b1', title: 'Scuba dive the Great Barrier Reef', category: 'travel', year: '2027', achieved: false },
     { id: 'b2', title: 'Publish Open-Source AI Architecture Benchmark', category: 'career', year: '2026', achieved: true },
     { id: 'b3', title: 'Trek the Annapurna Circuit in Himalayas', category: 'adventure', year: '2027', achieved: false },
@@ -142,7 +129,7 @@ const state = {
     { id: 'b5', title: 'Solo Roadtrip across New Zealand South Island', category: 'travel', year: '2028', achieved: false },
     { id: 'b6', title: 'Build a private off-grid mountain cabin sanctuary', category: 'wellness', year: '2029', achieved: false }
   ]),
-  bucketCategories: JSON.parse(localStorage.getItem('mind_cave_bucket_categories') || 'null') || [
+  bucketCategories: safeJSONParse(localStorage.getItem('mind_cave_bucket_categories'), null) || [
     { id: 'travel', name: 'Travel & World Exploration', color: 'cyan' },
     { id: 'career', name: 'Career & Mastery', color: 'indigo' },
     { id: 'adventure', name: 'Adventure & Sports', color: 'amber' },
