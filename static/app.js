@@ -54,133 +54,73 @@ const state = {
 
   speechUtterance: null,
 
-  agendaItems: JSON.parse(localStorage.getItem('mind_cave_agenda_items') || 'null') || [
-
+  agendaItems: JSON.parse(localStorage.getItem('mind_cave_agenda_items') || 'null') || (localStorage.getItem('mind_cave_is_reset') ? [] : [
     {
-
       id: 'task_1',
-
       type: 'todo',
-
       title: 'Review System Architecture with Core Engineering',
-
       date: (new Date()).toISOString().split('T')[0],
-
       time: '14:30',
-
       priority: 'high',
-
       completed: false,
-
       gcalSynced: true
-
     },
-
     {
-
       id: 'task_2',
-
       type: 'reminder',
-
       title: 'Take 15-min Circadian Stroll & Deep Breathing',
-
       date: (new Date()).toISOString().split('T')[0],
-
       time: '16:00',
-
       priority: 'normal',
-
       completed: true,
-
       gcalSynced: true
-
     },
-
     {
-
       id: 'task_3',
-
       type: 'milestone',
-
       title: 'Quarterly Mind & Goal Alignment Milestone',
-
       date: (new Date()).toISOString().split('T')[0],
-
       time: '19:00',
-
       priority: 'high',
-
       completed: false,
-
       gcalSynced: true
-
     }
-
-  ],
-
-  todayGoals: JSON.parse(localStorage.getItem('mind_cave_today_goals') || 'null') || [
-
+  ]),
+  todayGoals: JSON.parse(localStorage.getItem('mind_cave_today_goals') || 'null') || (localStorage.getItem('mind_cave_is_reset') ? [] : [
     {
-
       id: 'g1',
-
       title: 'Ship Core System Architecture & Validate Test Boundaries',
-
       completed: true,
-
       startTime: '09:30',
-
       endTime: '12:00',
-
       duration: '2h 30m',
-
       category: 'north_star',
-
       categoryLabel: 'North Star',
-
       notes: 'Clean zero-warning build & 7/7 pytest verification'
-
     },
-
     {
-
       id: 'g2',
-
       title: '30m Mindful Nature Walk & Somatic Breathing',
-
       completed: true,
-
       startTime: '13:30',
-
       endTime: '14:15',
-
       duration: '45m',
-
       category: 'wellness',
-
       categoryLabel: 'Wellness',
-
       notes: 'Zone 2 cardio completed'
-
     },
-
     {
-
       id: 'g3',
-
       title: 'Refactor Longitudinal Trajectory & Daily Harmony Engine',
-
       completed: false,
-
       startTime: '16:00',
-
       endTime: '18:00',
       duration: '2h',
       category: 'deep_work',
       categoryLabel: 'Deep Work',
       notes: 'In progress'
     }
-  ],
+  ]),
   todayGoal: JSON.parse(localStorage.getItem('mind_cave_today_goal') || 'null') || (localStorage.getItem('mind_cave_is_reset') ? { text: '', completed: false } : {
     text: "Ship Core System Architecture & complete evening 30m mindful walk",
     completed: false
