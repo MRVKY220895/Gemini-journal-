@@ -1772,13 +1772,12 @@ function appendErrorCard(errorMessage, retryPrompt) {
   `;
 
   container.appendChild(errorDiv);
-
   container.scrollTop = container.scrollHeight;
+  lucide.createIcons();
+}
 
-  function appendChatMessage(role, content, authorName, modelTag, cognitiveData = null, originalPrompt = "", isRecord = true) {
-
+function appendChatMessage(role, content, authorName, modelTag, cognitiveData = null, originalPrompt = "", isRecord = true) {
   const container = document.getElementById('chat-messages');
-
   if (!container) return;
 
 
