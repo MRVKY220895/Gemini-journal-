@@ -1202,8 +1202,56 @@ html:not(.dark) .chat-msg-ai-card {
 }
 
 html.light .chat-msg-ai-card .markdown-body,
-html:not(.dark) .chat-msg-ai-card .markdown-body {
+html.light .chat-msg-ai-card .markdown-body p,
+html.light .chat-msg-ai-card .markdown-body li,
+html.light .chat-msg-ai-card .markdown-body span,
+html.light .chat-msg-ai-card .markdown-body div,
+html.light .markdown-body,
+html.light .markdown-body p,
+html.light .markdown-body li,
+html.light .markdown-body span,
+html.light .markdown-body div,
+html:not(.dark) .chat-msg-ai-card .markdown-body,
+html:not(.dark) .chat-msg-ai-card .markdown-body p,
+html:not(.dark) .chat-msg-ai-card .markdown-body li,
+html:not(.dark) .chat-msg-ai-card .markdown-body span,
+html:not(.dark) .chat-msg-ai-card .markdown-body div,
+html:not(.dark) .markdown-body,
+html:not(.dark) .markdown-body p,
+html:not(.dark) .markdown-body li,
+html:not(.dark) .markdown-body span,
+html:not(.dark) .markdown-body div {
   color: #1e293b !important;
+}
+
+html.light .markdown-body h1,
+html.light .markdown-body h2,
+html.light .markdown-body h3,
+html.light .markdown-body h4,
+html.light .markdown-body strong,
+html.light .chat-msg-ai-card h1,
+html.light .chat-msg-ai-card h2,
+html.light .chat-msg-ai-card h3,
+html.light .chat-msg-ai-card h4,
+html.light .chat-msg-ai-card strong,
+html:not(.dark) .markdown-body h1,
+html:not(.dark) .markdown-body h2,
+html:not(.dark) .markdown-body h3,
+html:not(.dark) .markdown-body h4,
+html:not(.dark) .markdown-body strong,
+html:not(.dark) .chat-msg-ai-card h1,
+html:not(.dark) .chat-msg-ai-card h2,
+html:not(.dark) .chat-msg-ai-card h3,
+html:not(.dark) .chat-msg-ai-card h4,
+html:not(.dark) .chat-msg-ai-card strong {
+  color: #0f172a !important;
+}
+
+html.light .markdown-body blockquote,
+html:not(.dark) .markdown-body blockquote {
+  color: #334155 !important;
+  background: rgba(2, 132, 199, 0.08) !important;
+  border-left-color: #0284c7 !important;
 }
 
 /* Light Mode Bento Prompt Starter Cards */
