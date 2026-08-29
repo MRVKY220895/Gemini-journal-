@@ -163,7 +163,7 @@ class GeminiService:
                     "parts": [{"text": final_input}]
                 })
 
-                candidate_models = ["gemini-3.5-flash", "gemini-3.7-flash", "gemini-3.6-flash", "gemini-3.1-flash-lite"]
+                candidate_models = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.5-pro"]
                 for model_name in candidate_models:
                     try:
                         response = self._genai_client.models.generate_content(
@@ -172,7 +172,7 @@ class GeminiService:
                             config={
                                 "system_instruction": system_instruction,
                                 "temperature": 0.7,
-                                "max_output_tokens": 1000
+                                "max_output_tokens": 4096
                             }
                         )
                         if response and response.text:
@@ -196,7 +196,10 @@ class GeminiService:
                     chat.history.append({"role": role, "parts": [msg["content"]]})
 
                 final_input = f"{system_instruction}\n\n<user_journal_entry>\n{self.sanitize_input(last_user_msg)}\n</user_journal_entry>"
-                resp = chat.send_message(final_input)
+                resp = chat.send_message(
+                    final_input,
+                    generation_config={"max_output_tokens": 4096, "temperature": 0.7}
+                )
                 return {
                     "role": "model",
                     "content": resp.text.strip(),
