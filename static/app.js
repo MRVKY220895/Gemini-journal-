@@ -457,29 +457,26 @@ function selectPersona(personaId) {
 
 function startNewSession() {
   state.currentSessionId = `session_${Date.now()}`;
+  const heading = document.getElementById('session-topic-heading');
+  if (heading) heading.textContent = 'A Moment of Reflection';
+
   const chatMessages = document.getElementById('chat-messages');
   chatMessages.innerHTML = `
     <div class="chat-msg-ai-card">
-      <div class="flex items-center justify-between mb-3">
-        <div class="flex items-center gap-2.5">
-          <div class="w-7 h-7 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-md shadow-cyan-500/20 text-white">
-            <i data-lucide="sparkles" class="w-4 h-4"></i>
+      <div class="flex items-center justify-between mb-3 pb-2 border-b border-white/5">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded-lg bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center text-white">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
           </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="text-sm font-bold text-white">Gemini Cognitive Studio</span>
-              <span class="text-[10px] bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded-full font-mono font-semibold">Gemini 2.5 Flash</span>
-            </div>
-            <span class="text-[11px] text-slate-400">Security-Guarded & Isolated Cloud Firestore</span>
-          </div>
+          <span class="text-xs font-semibold text-slate-200">Reflective Partner</span>
         </div>
-        <span class="text-[10px] text-emerald-400 bg-emerald-950/40 border border-emerald-500/30 px-2 py-0.5 rounded-full font-mono flex items-center gap-1">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Zero Leakage
+        <span class="text-[11px] text-slate-400 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Listening
         </span>
       </div>
 
-      <div class="markdown-body text-sm text-slate-200">
-        <p>New thread initialized for <strong>${escapeHtml(state.currentUser.name)}</strong>. What is on your mind today? Feel free to brainstorm an architecture, unpack cognitive distortions, or reflect on your day.</p>
+      <div class="markdown-body text-sm text-slate-200 leading-relaxed">
+        <p>New reflective space initialized for <strong>${escapeHtml(state.currentUser.name)}</strong>. What thoughts or feelings would you like to explore today?</p>
       </div>
     </div>
   `;
@@ -500,14 +497,20 @@ function handleTextareaKeydown(event) {
 }
 
 async function sendChatMessage(event) {
-  event.preventDefault();
+  if (event) event.preventDefault();
   const input = document.getElementById('chat-input');
   const message = input.value.trim();
   if (!message) return;
 
+  // Track last prompt for retry
+  state.lastUserPrompt = message;
+
   // Append User message to UI immediately
   appendChatMessage('user', message, state.currentUser.name);
   input.value = '';
+
+  // Update dynamic topic title if first message
+  updateSessionTitle(message);
 
   const sendBtn = document.getElementById('btn-send');
   sendBtn.disabled = true;
@@ -526,27 +529,118 @@ async function sendChatMessage(event) {
     });
 
     if (!response.ok) {
-      throw new Error(`Chat API error: ${response.statusText}`);
+      throw new Error(`Chat API responded with status ${response.status}: ${response.statusText}`);
     }
 
     const data = await response.json();
     state.currentSessionId = data.session_id;
 
-    // Append AI Response with full cognitive metadata and tags
-    appendChatMessage('ai', data.message.content, 'Gemini Reflective Partner', data.model_used, data.cognitive_data, message);
+    // Append Calm, Editorial AI Response
+    appendChatMessage('ai', data.message.content, 'Reflective Partner', data.model_used, data.cognitive_data, message);
 
-    // Update Live Cognitive Bar
-    if (data.cognitive_data) {
-      updateLiveCognitiveBar(data.cognitive_data);
-    }
+    // Update Contextual Reflection Chips based on AI response and user emotion
+    updateContextualSuggestions(message, data.cognitive_data);
 
   } catch (error) {
     console.error('Chat error:', error);
-    appendChatMessage('ai', `⚠️ Error communicating with Gemini backend: ${error.message}`, 'System');
+    appendErrorCard(error.message, message);
   } finally {
     sendBtn.disabled = false;
     sendBtn.classList.remove('opacity-50');
   }
+}
+
+function retryLastMessage() {
+  if (!state.lastUserPrompt) return;
+  const input = document.getElementById('chat-input');
+  input.value = state.lastUserPrompt;
+  sendChatMessage();
+}
+
+function updateSessionTitle(userMessage) {
+  const heading = document.getElementById('session-topic-heading');
+  if (!heading) return;
+  const lower = userMessage.toLowerCase();
+  if (lower.includes('happy') || lower.includes('joy') || lower.includes('excited') || lower.includes('grateful')) {
+    heading.textContent = 'A Moment of Joy & Contentment';
+  } else if (lower.includes('anxious') || lower.includes('anxiety') || lower.includes('stress') || lower.includes('overwhelm') || lower.includes('deadline')) {
+    heading.textContent = 'Untangling Stress & Overwhelm';
+  } else if (lower.includes('architect') || lower.includes('build') || lower.includes('system') || lower.includes('code') || lower.includes('idea')) {
+    heading.textContent = 'Creative Ideation & Architecture';
+  } else if (lower.includes('sad') || lower.includes('down') || lower.includes('grief') || lower.includes('lonely')) {
+    heading.textContent = 'Space for Gentle Reflection';
+  } else {
+    heading.textContent = userMessage.length > 35 ? userMessage.substring(0, 32) + '...' : userMessage;
+  }
+}
+
+function updateContextualSuggestions(userMessage, cognitiveData) {
+  const container = document.getElementById('contextual-prompt-chips');
+  if (!container) return;
+
+  const lower = userMessage.toLowerCase();
+  let suggestions = [];
+
+  if (lower.includes('happy') || lower.includes('joy') || lower.includes('excited') || lower.includes('good')) {
+    suggestions = [
+      { icon: '✨', text: 'How does this happiness feel in your body right now?' },
+      { icon: '🌿', text: 'What contributed to this positive feeling today?' },
+      { icon: '💾', text: 'Save this moment as a gratitude anchor' }
+    ];
+  } else if (lower.includes('anxious') || lower.includes('stress') || lower.includes('overwhelm') || lower.includes('deadline') || lower.includes('fear')) {
+    suggestions = [
+      { icon: '⚡', text: 'What is the single most actionable next step?' },
+      { icon: '🔄', text: 'Help me reframe this worst-case assumption' },
+      { icon: '🌬️', text: 'Guide me through a 2-minute centering reflection' }
+    ];
+  } else if (lower.includes('architect') || lower.includes('system') || lower.includes('build') || lower.includes('project') || lower.includes('strategy')) {
+    suggestions = [
+      { icon: '💡', text: 'What hidden assumptions might I be making?' },
+      { icon: '🎯', text: 'Break this down into 3 concrete milestones' },
+      { icon: '🔍', text: 'Where are the key security and edge-case risks?' }
+    ];
+  } else {
+    suggestions = [
+      { icon: '🌿', text: 'Explore this feeling a little deeper' },
+      { icon: '💭', text: 'What do you think is at the root of this?' },
+      { icon: '📝', text: 'Summarize key takeaways for my journal' }
+    ];
+  }
+
+  container.innerHTML = suggestions.map(s => `
+    <button onclick="insertPrompt('${escapeHtml(s.text).replace(/'/g, "\\'")}')" class="text-xs text-slate-300 hover:text-white bg-slate-900/90 hover:bg-slate-800 px-3 py-1.5 rounded-full border border-white/10 transition-all shrink-0 flex items-center gap-1.5 shadow-sm">
+      <span>${s.icon}</span> <span>${escapeHtml(s.text)}</span>
+    </button>
+  `).join('');
+}
+
+function appendErrorCard(errorMessage, retryPrompt) {
+  const container = document.getElementById('chat-messages');
+  const errorDiv = document.createElement('div');
+  errorDiv.className = 'w-full my-2';
+  errorDiv.innerHTML = `
+    <div class="chat-msg-ai-card border-rose-500/25 bg-rose-950/20">
+      <div class="flex items-center gap-2 font-semibold text-rose-300 text-sm mb-1.5">
+        <i data-lucide="sparkles" class="w-4 h-4 text-rose-400"></i>
+        <span>Unable to generate reflection</span>
+      </div>
+      <p class="text-xs text-slate-300 mb-3">Gemini couldn't complete this response right now. Please check your connection or try again.</p>
+      
+      <div class="flex items-center gap-3">
+        <button onclick="retryLastMessage()" class="text-xs bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 px-3 py-1.5 rounded-lg border border-rose-500/30 font-medium transition-all flex items-center gap-1.5">
+          <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Try again
+        </button>
+        
+        <details class="text-[11px] text-slate-400">
+          <summary class="cursor-pointer hover:text-slate-300">Technical Details ▾</summary>
+          <pre class="mt-2 p-2 rounded bg-black/60 text-[10px] text-slate-400 font-mono overflow-x-auto border border-white/5">${escapeHtml(errorMessage)}</pre>
+        </details>
+      </div>
+    </div>
+  `;
+  container.appendChild(errorDiv);
+  container.scrollTop = container.scrollHeight;
+  lucide.createIcons();
 }
 
 function appendChatMessage(role, content, authorName, modelTag, cognitiveData = null, originalPrompt = "") {
@@ -560,7 +654,7 @@ function appendChatMessage(role, content, authorName, modelTag, cognitiveData = 
   if (isUser) {
     msgDiv.innerHTML = `
       <div class="chat-msg-user-card">
-        <div class="flex items-center justify-between gap-3 mb-1.5 text-xs text-blue-300 font-semibold">
+        <div class="flex items-center justify-between gap-3 mb-1 text-[11px] text-blue-300 font-semibold">
           <span>${escapeHtml(authorName)}</span>
           <span class="text-[10px] text-slate-400 font-mono">You</span>
         </div>
@@ -569,104 +663,120 @@ function appendChatMessage(role, content, authorName, modelTag, cognitiveData = 
     `;
   } else {
     const distortions = cognitiveData?.detected_distortions || [];
-    const tags = cognitiveData?.semantic_tags || ['#SelfReflection'];
+    const tags = cognitiveData?.semantic_tags || ['#EmotionalClarity'];
+    const emotion = cognitiveData?.primary_emotion || 'Balanced';
 
     msgDiv.innerHTML = `
       <div class="chat-msg-ai-card">
-        <!-- Header -->
+        <!-- Card Header: Clean & Human -->
         <div class="flex items-center justify-between mb-3.5 pb-2.5 border-b border-white/5">
-          <div class="flex items-center gap-2.5">
-            <div class="w-7 h-7 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-md shadow-cyan-500/25 text-white">
-              <i data-lucide="sparkles" class="w-4 h-4"></i>
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-6 rounded-lg bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center text-white">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
             </div>
-            <div>
-              <div class="flex items-center gap-2">
-                <span class="text-sm font-bold text-white">${escapeHtml(authorName)}</span>
-                <span class="text-[10px] bg-blue-500/10 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded-full font-mono font-semibold">
-                  ${modelTag || 'gemini-2.5-flash'}
-                </span>
-              </div>
-              <span class="text-[11px] text-slate-400 capitalize">${(state.currentPersona || '').replace('_', ' ')} Guide</span>
-            </div>
+            <span class="text-sm font-bold text-slate-100">Reflective Partner</span>
+            <span class="text-[11px] text-emerald-400 flex items-center gap-1 font-mono ml-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Reflecting
+            </span>
           </div>
 
-          ${cognitiveData && cognitiveData.primary_emotion ? `
-            <span class="text-xs bg-purple-950/40 text-purple-300 border border-purple-500/30 px-2.5 py-1 rounded-full font-medium flex items-center gap-1.5 shadow-sm">
-              <span>💙</span> ${escapeHtml(cognitiveData.primary_emotion)}
-            </span>
-          ` : ''}
+          <span class="text-xs bg-slate-900 text-slate-300 border border-white/10 px-2.5 py-0.5 rounded-full font-medium">
+            ${escapeHtml(emotion)}
+          </span>
         </div>
 
-        <!-- Expandable MindPulse Matrix Reasoning Pill (Perplexity Style) -->
-        ${cognitiveData ? `
-          <div class="mb-3.5">
-            <button type="button" onclick="toggleReasoningAccordion('${turnId}')" class="reasoning-pill-btn">
-              <div class="flex items-center gap-2 text-xs text-slate-300 font-medium">
-                <i data-lucide="brain" class="w-3.5 h-3.5 text-cyan-400"></i>
-                <span>MindPulse Cognitive Matrix</span>
-                ${distortions.length > 0 ? `
-                  <span class="bg-amber-950/70 text-amber-300 border border-amber-500/40 px-2 py-0.2 rounded-full text-[10px] font-bold">
-                    ⚠️ ${distortions.length} Distortion Pattern(s)
-                  </span>
-                ` : `
-                  <span class="text-emerald-400 text-[10px] font-mono">✨ Balanced Emotional Vector</span>
-                `}
-              </div>
-              <i data-lucide="chevron-down" id="reasoning-icon-${turnId}" class="w-3.5 h-3.5 text-slate-400 transition-transform"></i>
-            </button>
-
-            <div id="reasoning-body-${turnId}" class="hidden p-3 rounded-xl bg-black/40 border border-white/5 space-y-2.5 mb-3">
-              <div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5 text-center">
-                ${Object.entries(cognitiveData.mood_scores || {}).map(([k, v]) => `
-                  <div class="bg-slate-900/80 p-1.5 rounded-lg border border-white/5">
-                    <div class="text-[9px] text-slate-400 uppercase font-mono">${k}</div>
-                    <div class="text-xs font-bold text-blue-400 font-mono">${v}%</div>
-                  </div>
-                `).join('')}
-              </div>
-              ${cognitiveData.cognitive_reframing ? `
-                <div class="text-xs text-slate-300 bg-blue-950/30 p-2.5 rounded-lg border border-blue-500/20 leading-relaxed">
-                  <strong class="text-blue-400">🔄 Clinical Reframing:</strong> ${escapeHtml(cognitiveData.cognitive_reframing)}
-                </div>
-              ` : ''}
-            </div>
-          </div>
-        ` : ''}
-
-        <!-- Markdown Body -->
+        <!-- Markdown Body (The Hero) -->
         <div class="markdown-body text-sm text-slate-200 leading-relaxed">
           ${marked.parse(content)}
         </div>
 
+        <!-- Progressive Disclosure: Technical & MindPulse Insights -->
+        <div class="mt-3.5 pt-2.5 border-t border-white/5">
+          <details class="group">
+            <summary class="cursor-pointer flex items-center gap-1.5 text-[11px] text-slate-400 hover:text-slate-200 select-none py-1">
+              <i data-lucide="brain" class="w-3 h-3 text-cyan-400"></i>
+              <span>MindPulse Insight & Architecture Details</span>
+              <i data-lucide="chevron-down" class="w-3 h-3 transition-transform group-open:rotate-180 ml-auto"></i>
+            </summary>
+            
+            <div class="mt-2.5 p-3 rounded-xl bg-black/40 border border-white/5 space-y-2 text-xs">
+              <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400 border-b border-white/5 pb-2">
+                <span>Model: <strong class="text-blue-300 font-mono">${escapeHtml(modelTag || 'gemini-3.5-flash')}</strong></span>
+                <span>Privacy: <strong class="text-emerald-400 font-mono">Isolated Cloud Firestore</strong></span>
+              </div>
+
+              ${cognitiveData?.mood_scores ? `
+                <div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5 text-center pt-1">
+                  ${Object.entries(cognitiveData.mood_scores).map(([k, v]) => `
+                    <div class="bg-slate-900/80 p-1.5 rounded-lg border border-white/5">
+                      <div class="text-[9px] text-slate-400 uppercase font-mono">${k}</div>
+                      <div class="text-xs font-bold text-cyan-400 font-mono">${v}%</div>
+                    </div>
+                  `).join('')}
+                </div>
+              ` : ''}
+
+              ${cognitiveData?.cognitive_reframing ? `
+                <div class="text-xs text-slate-300 bg-blue-950/20 p-2 rounded-lg border border-blue-500/15 leading-relaxed">
+                  <strong class="text-blue-300">🔄 Reframing:</strong> ${escapeHtml(cognitiveData.cognitive_reframing)}
+                </div>
+              ` : ''}
+            </div>
+          </details>
+        </div>
+
         <!-- Footer Action Toolbar -->
-        <div class="mt-4 pt-3 border-t border-white/5 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div class="mt-3 pt-2.5 border-t border-white/5 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <!-- Tags & Distortions -->
           <div class="flex flex-wrap items-center gap-1.5">
             ${distortions.map(d => `
-              <span class="bg-amber-950/60 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-full text-[10px] font-semibold flex items-center gap-1">
+              <span class="bg-amber-950/50 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full text-[10px] font-medium flex items-center gap-1">
                 ⚠️ ${escapeHtml(d)}
               </span>
             `).join('')}
             ${tags.map(t => `
-              <span class="bg-blue-950/60 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded-full text-[10px] font-mono">
+              <span class="bg-blue-950/40 text-blue-300 border border-blue-500/20 px-2 py-0.5 rounded-full text-[10px] font-mono">
                 ${escapeHtml(t)}
               </span>
             `).join('')}
           </div>
 
+          <!-- Action Buttons -->
           <div class="flex items-center gap-2">
-            <button onclick="copyToClipboard('${escapeHtml(content).replace(/'/g, "\\'")}', this)" class="text-xs text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-lg transition-all flex items-center gap-1">
-              <i data-lucide="copy" class="w-3 h-3 text-slate-400"></i>
-              <span>Copy</span>
+            <button onclick="saveAndFeedback('${escapeHtml(originalPrompt || 'Reflection')}', '${escapeHtml(content).replace(/'/g, "\\'")}', '${cognitiveData?.primary_emotion || 'Reflective'}', this)" class="text-xs text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-lg transition-all flex items-center gap-1.5">
+              <i data-lucide="heart" class="w-3 h-3 text-rose-400"></i>
+              <span>Save to Journal</span>
             </button>
-            <button onclick="saveQuickJournal('${escapeHtml(originalPrompt || 'Reflection')}', '${escapeHtml(content).replace(/'/g, "\\'")}', '${cognitiveData?.primary_emotion || 'Reflective'}')" class="text-xs text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-lg transition-all flex items-center gap-1">
-              <i data-lucide="bookmark" class="w-3 h-3 text-cyan-400"></i>
-              <span>Save Vault</span>
+            <button onclick="copyToClipboard('${escapeHtml(content).replace(/'/g, "\\'")}', this)" class="text-xs text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 px-2 py-1 rounded-lg transition-all flex items-center gap-1">
+              <i data-lucide="copy" class="w-3 h-3"></i>
+              <span>Copy</span>
             </button>
           </div>
         </div>
       </div>
     `;
   }
+
+  container.appendChild(msgDiv);
+  container.scrollTop = container.scrollHeight;
+  lucide.createIcons();
+}
+
+async function saveAndFeedback(title, content, mood, btnElement) {
+  try {
+    await saveQuickJournal(title, content, mood);
+    if (btnElement) {
+      const span = btnElement.querySelector('span');
+      if (span) {
+        span.textContent = '✓ Saved to Journal';
+        btnElement.classList.add('text-emerald-300', 'bg-emerald-950/40', 'border-emerald-500/30');
+      }
+    }
+    showToast('Saved to your private Journal Vault!');
+  } catch (e) {
+    showToast('Failed to save reflection');
+  }
+}
 
   container.appendChild(msgDiv);
   container.scrollTop = container.scrollHeight;
