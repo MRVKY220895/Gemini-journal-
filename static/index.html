@@ -5,7 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mind Cave — Cognitive Sanctuary & Reflective Studio</title>
   
-  <!-- Tailwind CSS CDN -->
+  <!-- Tailwind CSS -->
+  <script>
+    // Suppress CDN dev warning in browser console
+    const _origWarn = console.warn;
+    console.warn = function(...args) {
+      if (args[0] && typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com')) return;
+      _origWarn.apply(console, args);
+    };
+  </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -107,11 +115,6 @@
   <!-- Main Content Container -->
   <main class="studio-container flex-1 flex flex-col">
 
-    <!-- ===================================================================== -->
-    <!-- TAB 1: STUDIO (MULTI-TURN AI INTERACTION & JOURNALING) -->
-    <!-- ===================================================================== -->
-    <section id="view-studio" class="flex-1 flex flex-col justify-between w-full min-h-[calc(100vh-120px)] relative">
-      
     <!-- ===================================================================== -->
     <!-- TAB 1: STUDIO (MULTI-TURN AI INTERACTION & JOURNALING) -->
     <!-- ===================================================================== -->
@@ -759,8 +762,6 @@
           <!-- Rendered via JS -->
         </div>
       </div>
-
-    </section>
 
     </section>
 
