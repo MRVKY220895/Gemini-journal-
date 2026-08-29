@@ -1714,14 +1714,14 @@ function getChronologicalEvents(journals) {
     }
   });
 
-  // Sort strictly by Date + Time
+  // Sort strictly by Date + Time (Newest / Most Recent at top)
   events.sort((a, b) => {
     if (state.diaryRangeMode !== 'single') {
       const dateA = a.entryDate ? a.entryDate.getTime() : 0;
       const dateB = b.entryDate ? b.entryDate.getTime() : 0;
-      if (dateA !== dateB) return dateA - dateB;
+      if (dateA !== dateB) return dateB - dateA; // Newest date first
     }
-    return a.time.localeCompare(b.time);
+    return b.time.localeCompare(a.time); // Newest time first
   });
 
   return events;
