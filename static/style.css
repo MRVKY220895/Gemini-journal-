@@ -1780,6 +1780,97 @@ html:not(.dark) .consolidated-date-pill {
 }
 
 /* ==========================================================================
+   LIGHT MODE MODAL CONTROLS & FORM INPUTS (HIGH CONTRAST & READABILITY)
+   ========================================================================== */
+
+html.light input[type="text"],
+html.light input[type="date"],
+html.light input[type="time"],
+html.light input[type="password"],
+html.light select,
+html.light textarea,
+html:not(.dark) input[type="text"],
+html:not(.dark) input[type="date"],
+html:not(.dark) input[type="time"],
+html:not(.dark) input[type="password"],
+html:not(.dark) select,
+html:not(.dark) textarea {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+html.light input[type="date"]::-webkit-calendar-picker-indicator,
+html.light input[type="time"]::-webkit-calendar-picker-indicator,
+html:not(.dark) input[type="date"]::-webkit-calendar-picker-indicator,
+html:not(.dark) input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.2);
+  cursor: pointer;
+}
+
+html.light #task-modal .double-bezel-inner,
+html.light #goal-modal .double-bezel-inner,
+html.light #habit-modal .double-bezel-inner,
+html.light #bucket-modal .double-bezel-inner,
+html.light #blocker-modal .double-bezel-inner,
+html.light #journal-modal .double-bezel-inner,
+html.light #gemini-key-modal .double-bezel-inner,
+html.light #scrapbook-modal .double-bezel-inner,
+html:not(.dark) #task-modal .double-bezel-inner,
+html:not(.dark) #goal-modal .double-bezel-inner,
+html:not(.dark) #habit-modal .double-bezel-inner,
+html:not(.dark) #bucket-modal .double-bezel-inner,
+html:not(.dark) #blocker-modal .double-bezel-inner,
+html:not(.dark) #journal-modal .double-bezel-inner,
+html:not(.dark) #gemini-key-modal .double-bezel-inner,
+html:not(.dark) #scrapbook-modal .double-bezel-inner {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-color: rgba(15, 23, 42, 0.12) !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Light Mode GCal Sync Checkbox label */
+html.light label:has(#task-gcal-sync-check),
+html:not(.dark) label:has(#task-gcal-sync-check) {
+  background: rgba(239, 246, 255, 0.9) !important;
+  border-color: rgba(59, 130, 246, 0.3) !important;
+}
+
+html.light label:has(#task-gcal-sync-check) span,
+html:not(.dark) label:has(#task-gcal-sync-check) span {
+  color: #1d4ed8 !important;
+}
+
+/* Memory Cards in Light Mode */
+html.light .memory-card,
+html.light #memory-photos-grid > div,
+html:not(.dark) .memory-card,
+html:not(.dark) #memory-photos-grid > div {
+  background: #ffffff !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+}
+
+html.light .memory-card h5,
+html.light #memory-photos-grid h5,
+html.light .memory-card p,
+html.light #memory-photos-grid p,
+html:not(.dark) .memory-card h5,
+html:not(.dark) #memory-photos-grid h5,
+html:not(.dark) .memory-card p,
+html:not(.dark) #memory-photos-grid p {
+  color: #1e293b !important;
+}
+
+html.light .memory-meta-tag,
+html:not(.dark) .memory-meta-tag {
+  color: #b45309 !important;
+  background: rgba(254, 243, 199, 0.8) !important;
+  border-color: rgba(245, 158, 11, 0.3) !important;
+}
+
+/* ==========================================================================
    LIFE AGENDA: TO-DOS, REMINDERS & IMPORTANT DATES
    ========================================================================== */
 

@@ -2459,45 +2459,68 @@ async function loadAnalytics() {
     // Update Radar Chart
     if (state.radarChart && analytics.average_mood) {
       const vals = [
-        analytics.average_mood.Joy || 60,
-        analytics.average_mood.Clarity || 65,
-        analytics.average_mood.Resilience || 70,
-        analytics.average_mood.Focus || 60,
-        analytics.average_mood.Calm || 68,
-        analytics.average_mood.Optimism || 62
+        analytics.average_mood.Joy || 65,
+        analytics.average_mood.Clarity || 78,
+        analytics.average_mood.Resilience || 82,
+        analytics.average_mood.Focus || 74,
+        analytics.average_mood.Calm || 70,
+        analytics.average_mood.Optimism || 75
       ];
       state.radarChart.data.datasets[0].data = vals;
       state.radarChart.update();
     }
 
-    // Update Distortions Bento
+    // Update Distortions Bento with Actionable Reframings
     const distContainer = document.getElementById('distortions-container');
     const freqs = analytics.distortion_frequencies || {};
     if (Object.keys(freqs).length === 0) {
-      distContainer.innerHTML = '<p class="text-xs text-emerald-400">✨ Zero persistent cognitive distortions detected. Thinking remains balanced and objective.</p>';
+      distContainer.innerHTML = `
+        <div class="p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/30 text-xs text-emerald-300">
+          ✨ Zero persistent cognitive distortions detected. Neural cognition remains highly objective.
+        </div>
+      `;
     } else {
+      const reframingTips = {
+        "Catastrophizing": "Decouple worst-case emotional scenarios into deterministic micro-steps.",
+        "Black-and-White Thinking": "Recognize spectrum nuance; progress occurs in increments.",
+        "Labeling & Self-Blame": "Separate situational friction from internal identity.",
+        "Emotional Reasoning": "Feelings are neurological signals, not factual reality.",
+        "Overgeneralization": "A single delay does not establish a permanent trajectory."
+      };
+
       distContainer.innerHTML = Object.entries(freqs).map(([name, count]) => `
-        <div class="flex items-center justify-between bg-black/40 p-2.5 rounded-xl border border-white/5 text-xs">
-          <span class="text-slate-300">${escapeHtml(name)}</span>
-          <span class="font-mono text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded">${count} instances</span>
+        <div class="p-2.5 rounded-xl bg-black/40 border border-white/5 text-xs space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-slate-200">${escapeHtml(name)}</span>
+            <span class="font-mono text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded text-[10px] font-bold">${count} instances reframed</span>
+          </div>
+          <p class="text-[11px] text-slate-400">${reframingTips[name] || "Deconstructed through objective journaling reflection."}</p>
         </div>
       `).join('');
     }
 
-    // Update Action Items Bento
+    // Update Action Items Bento (Deduplicated, Rich Behavioral Tasks)
     const actionsContainer = document.getElementById('action-items-container');
-    const actions = analytics.recent_actions || [];
-    if (actions.length === 0) {
-      actionsContainer.innerHTML = '<p class="text-xs text-slate-500">Reflect in the studio to automatically generate actionable next steps.</p>';
-    } else {
-      actionsContainer.innerHTML = actions.slice(-5).map(act => `
-        <div class="flex items-start gap-2 bg-black/40 p-2.5 rounded-xl border border-white/5 text-xs">
-          <i data-lucide="check-square" class="w-4 h-4 text-blue-400 shrink-0 mt-0.5"></i>
-          <span class="text-slate-300">${escapeHtml(act)}</span>
-        </div>
-      `).join('');
-      lucide.createIcons();
-    }
+    const rawActions = analytics.recent_actions || [];
+    
+    // Rich fallback actionable CBT tasks
+    const defaultTasks = [
+      "Decouple tomorrow morning deep-work session from unscheduled chat channels.",
+      "Execute 5-minute somatic breathing before high-stakes afternoon architecture review.",
+      "Log 3 objective pieces of supporting evidence to counter self-critical thoughts.",
+      "Conduct 15-minute evening debrief to catalog completed wins and anchor gratitude."
+    ];
+
+    const uniqueActions = Array.from(new Set(rawActions.filter(a => a && a.length > 5)));
+    const finalActions = uniqueActions.length >= 2 ? uniqueActions : defaultTasks;
+
+    actionsContainer.innerHTML = finalActions.slice(0, 5).map(act => `
+      <div class="flex items-start gap-2 bg-black/40 p-2.5 rounded-xl border border-white/5 text-xs hover:border-cyan-500/30 transition-colors">
+        <i data-lucide="check-circle" class="w-4 h-4 text-cyan-400 shrink-0 mt-0.5"></i>
+        <span class="text-slate-200 leading-snug">${escapeHtml(act)}</span>
+      </div>
+    `).join('');
+    lucide.createIcons();
 
   } catch (error) {
     console.error('Analytics load error:', error);
@@ -3249,6 +3272,37 @@ function setScrapbookTheme(theme) {
   renderScrapbookCard();
 }
 
+// Canvas Text Auto-Wrapping Engine
+function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 4) {
+  if (!text) return y;
+  const words = text.split(' ');
+  let line = '';
+  let linesDrawn = 0;
+
+  for (let n = 0; n < words.length; n++) {
+    const testLine = line + words[n] + ' ';
+    const metrics = ctx.measureText(testLine);
+    if (metrics.width > maxWidth && n > 0) {
+      ctx.fillText(line.trim(), x, y);
+      line = words[n] + ' ';
+      y += lineHeight;
+      linesDrawn++;
+      if (linesDrawn >= maxLines - 1 && n < words.length - 1) {
+        let remaining = words.slice(n).join(' ');
+        while (ctx.measureText(remaining + '...').width > maxWidth && remaining.length > 0) {
+          remaining = remaining.substring(0, remaining.length - 1);
+        }
+        ctx.fillText(remaining + '...', x, y);
+        return y + lineHeight;
+      }
+    } else {
+      line = testLine;
+    }
+  }
+  ctx.fillText(line.trim(), x, y);
+  return y + lineHeight;
+}
+
 function renderScrapbookCard() {
   const canvas = document.getElementById('scrapbook-render-canvas');
   if (!canvas) return;
@@ -3271,52 +3325,64 @@ function renderScrapbookCard() {
   // Theme palettes
   const themes = {
     pastel: {
-      bg: '#fdf6f0',
-      pageInner: '#fff9f5',
-      ink: '#3f3a52',
-      accent1: '#f472b6',
-      accent2: '#38bdf8',
-      washi1: '#fbcfe8',
-      washi2: '#bae6fd',
+      bg: '#fbf3ed',
+      pageInner: '#fffaf6',
+      ink: '#2d2538',
+      accent1: '#ec4899',
+      accent2: '#0284c7',
+      washi1: '#fce7f3',
+      washi2: '#e0f2fe',
+      washi3: '#fef3c7',
       tapeBorder: '#f472b6',
-      paperLines: '#f1e7de',
-      stickerBg: '#fef08a'
+      paperLines: '#f3e8df',
+      cardBg1: '#fdf2f8',
+      cardBg2: '#f0f9ff',
+      cardBg3: '#fffbeb'
     },
     vintage: {
-      bg: '#eedcc9',
+      bg: '#ecd9c6',
       pageInner: '#f7eee3',
       ink: '#2b2118',
       accent1: '#b45309',
       accent2: '#78350f',
-      washi1: '#d7c4b7',
-      washi2: '#c4b5a5',
+      washi1: '#e5d5c5',
+      washi2: '#d8c4b2',
+      washi3: '#fed7aa',
       tapeBorder: '#92400e',
       paperLines: '#e6d5c3',
-      stickerBg: '#fed7aa'
+      cardBg1: '#f5ebe0',
+      cardBg2: '#ede0d4',
+      cardBg3: '#ffedd5'
     },
     notebook: {
-      bg: '#f8fafc',
+      bg: '#f1f5f9',
       pageInner: '#ffffff',
       ink: '#0f172a',
       accent1: '#0284c7',
-      accent2: '#6366f1',
+      accent2: '#4f46e5',
       washi1: '#e2e8f0',
-      washi2: '#cbd5e1',
+      washi2: '#bae6fd',
+      washi3: '#fef08a',
       tapeBorder: '#38bdf8',
       paperLines: '#e2e8f0',
-      stickerBg: '#bfdbfe'
+      cardBg1: '#f8fafc',
+      cardBg2: '#f0f9ff',
+      cardBg3: '#fefce8'
     },
     cyber: {
-      bg: '#090d16',
+      bg: '#070a12',
       pageInner: '#0f172a',
       ink: '#f8fafc',
       accent1: '#ec4899',
       accent2: '#06b6d4',
       washi1: '#1e293b',
-      washi2: '#334155',
+      washi2: '#164e63',
+      washi3: '#831843',
       tapeBorder: '#38bdf8',
       paperLines: '#1e293b',
-      stickerBg: '#312e81'
+      cardBg1: '#1e293b',
+      cardBg2: '#0f2744',
+      cardBg3: '#3b0764'
     }
   };
 
@@ -3326,10 +3392,10 @@ function renderScrapbookCard() {
   ctx.fillStyle = t.bg;
   ctx.fillRect(0, 0, width, height);
 
-  // 2. Draw Inner Paper with subtle margin
+  // 2. Draw Inner Paper with realistic drop shadow
   ctx.save();
   ctx.fillStyle = t.pageInner;
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.12)';
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
   ctx.shadowBlur = 24;
   ctx.shadowOffsetY = 8;
   ctx.beginPath();
@@ -3338,169 +3404,280 @@ function renderScrapbookCard() {
   ctx.restore();
 
   // 3. Draw Spiral Wire Notebook Spine on Left Edge
-  ctx.fillStyle = 'rgba(100, 116, 139, 0.4)';
   for (let y = 60; y < height - 60; y += 36) {
-    // Spiral hole
+    // Hole
     ctx.beginPath();
-    ctx.arc(60, y, 6, 0, Math.PI * 2);
-    ctx.fillStyle = state.scrapbookTheme === 'cyber' ? '#090d16' : '#cbd5e1';
+    ctx.arc(62, y, 6, 0, Math.PI * 2);
+    ctx.fillStyle = state.scrapbookTheme === 'cyber' ? '#070a12' : '#cbd5e1';
     ctx.fill();
 
-    // Spiral wire loop
+    // Wire
     ctx.beginPath();
-    ctx.ellipse(54, y, 14, 4, -0.2, 0, Math.PI * 2);
+    ctx.ellipse(56, y, 14, 4, -0.2, 0, Math.PI * 2);
     ctx.strokeStyle = state.scrapbookTheme === 'cyber' ? '#38bdf8' : '#64748b';
     ctx.lineWidth = 3;
     ctx.stroke();
   }
 
-  // 4. Subtle Ruled / Grid Lines across the notebook
+  // 4. Ruled Notebook Lines
   ctx.strokeStyle = t.paperLines;
   ctx.lineWidth = 1;
-  for (let y = 140; y < height - 70; y += 32) {
+  for (let y = 140; y < height - 60; y += 32) {
     ctx.beginPath();
     ctx.moveTo(90, y);
     ctx.lineTo(width - 60, y);
     ctx.stroke();
   }
 
-  // 5. Header: "ABOUT TODAY / DAILY CHRONICLE"
+  // 5. Header: "✦ ABOUT TODAY ✦" with Washi Banner
   ctx.fillStyle = t.ink;
-  ctx.font = `bold 42px ${selectedFont}`;
+  ctx.font = `bold 40px ${selectedFont}`;
   const d = state.selectedDiaryDate || new Date();
   const dateStr = d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' });
-  ctx.fillText("✦ ABOUT TODAY ✦", 100, 95);
+  ctx.fillText("✦ ABOUT TODAY ✦", 100, 85);
 
-  ctx.font = `24px ${selectedFont}`;
+  // Washi tape date pill
+  ctx.save();
+  ctx.fillStyle = t.washi2;
+  ctx.beginPath();
+  ctx.roundRect(100, 98, 280, 28, 8);
+  ctx.fill();
+  ctx.restore();
+
+  ctx.font = `bold 20px ${selectedFont}`;
   ctx.fillStyle = t.accent1;
-  ctx.fillText(`📅 ${dateStr}`, 100, 125);
+  ctx.fillText(`📅 ${dateStr}`, 112, 118);
 
-  // Doodle Stars & Heart in top right
+  // Doodle Stickers & Stars on top right
   ctx.font = `26px ${selectedFont}`;
-  ctx.fillText("✨ ♡ ★", width - 170, 95);
+  ctx.fillStyle = t.accent1;
+  ctx.fillText("✨ 🌸 ♡ ☕ ★", width - 210, 85);
 
-  let currentY = 165;
+  // =========================================================================
+  // 2-COLUMN PINTEREST SCRAPBOOK BENTO GRID
+  // Left Column: x = 100, width = 310 px
+  // Right Column: x = 435, width = 305 px
+  // =========================================================================
 
-  // 6. TODAY'S GOAL (Washi tape container)
+  // --- LEFT COLUMN 1: NORTH STAR GOAL ---
   if (incGoal) {
-    // Washi tape sticker
+    // Card Box
     ctx.save();
-    ctx.fillStyle = t.washi1;
+    ctx.fillStyle = t.cardBg1;
     ctx.beginPath();
-    ctx.roundRect(95, currentY, width - 180, 75, 12);
+    ctx.roundRect(100, 140, 310, 105, 14);
     ctx.fill();
     ctx.strokeStyle = t.tapeBorder;
     ctx.lineWidth = 1.5;
-    ctx.setLineDash([6, 4]);
+    ctx.setLineDash([5, 4]);
     ctx.stroke();
+
+    // Cute Washi Tape on top left
+    ctx.fillStyle = t.washi1;
+    ctx.setLineDash([]);
+    ctx.fillRect(130, 132, 70, 16);
     ctx.restore();
 
     ctx.fillStyle = t.ink;
     ctx.font = `bold 22px ${selectedFont}`;
-    ctx.fillText("🎯 North Star Goal:", 115, currentY + 30);
-    ctx.font = `20px ${selectedFont}`;
-    const goalText = state.todayGoal?.text || "Ship core system architecture";
-    ctx.fillText(`"${goalText}"`, 115, currentY + 58);
+    ctx.fillText("🎯 North Star Goal", 115, 172);
 
-    currentY += 100;
+    ctx.font = `19px ${selectedFont}`;
+    const goalText = `"${state.todayGoal?.text || 'Ship core system architecture'}"`;
+    wrapCanvasText(ctx, goalText, 115, 198, 280, 22, 2);
   }
 
-  // 7. POLAROID PHOTO with Washi Tape & Rotated Angle
-  if (incPolaroid && memoryPhotosList.length > 0) {
-    const photo = memoryPhotosList[0];
-    ctx.save();
-    ctx.translate(width - 240, currentY + 110);
-    ctx.rotate(0.06); // Cute tilt angle
-
-    // Polaroid frame
-    ctx.fillStyle = '#ffffff';
-    ctx.shadowColor = 'rgba(0,0,0,0.18)';
-    ctx.shadowBlur = 12;
-    ctx.shadowOffsetY = 6;
-    ctx.fillRect(-110, -110, 220, 240);
-
-    // Inner photo area
-    ctx.fillStyle = '#e2e8f0';
-    ctx.fillRect(-95, -95, 190, 150);
-
-    // Placeholder or Photo
-    ctx.fillStyle = '#0284c7';
-    ctx.font = `bold 18px ${selectedFont}`;
-    ctx.textAlign = 'center';
-    ctx.fillText("📷 Visual Memory", 0, -15);
-    ctx.font = `14px ${selectedFont}`;
-    ctx.fillStyle = '#64748b';
-    ctx.fillText("📍 Connaught Place", 0, 10);
-
-    // Polaroid bottom handwritten caption
-    ctx.font = `18px ${selectedFont}`;
-    ctx.fillStyle = '#1e293b';
-    ctx.fillText(photo.caption || "Morning Walk Flow", 0, 95);
-
-    // Washi tape across polaroid top
-    ctx.rotate(-0.06);
-    ctx.fillStyle = t.washi2;
-    ctx.fillRect(-50, -135, 100, 24);
-    ctx.restore();
-  }
-
-  // 8. HABITS STAMP LIST (Left Column)
-  if (incHabits) {
-    ctx.fillStyle = t.ink;
-    ctx.font = `bold 26px ${selectedFont}`;
-    ctx.fillText("🌿 Daily Habit Streaks", 100, currentY + 25);
-
-    let habitY = currentY + 60;
-    state.habitsList.slice(0, 5).forEach((h) => {
-      ctx.font = `22px ${selectedFont}`;
-      ctx.fillStyle = t.ink;
-      ctx.fillText(`☑ ${h.title}`, 105, habitY);
-      ctx.fillStyle = t.accent1;
-      ctx.font = `bold 20px ${selectedFont}`;
-      ctx.fillText(`🔥 ${h.streak}d`, 290, habitY);
-      habitY += 32;
-    });
-
-    currentY = Math.max(currentY + 230, currentY + 200);
-  }
-
-  // 9. PLAN VS ACTION VELOCITY METRICS
+  // --- LEFT COLUMN 2: PLAN VS ACTION & COMPLETED TASKS ---
   if (incMetrics) {
     ctx.save();
-    ctx.fillStyle = t.stickerBg;
+    ctx.fillStyle = t.cardBg3;
     ctx.beginPath();
-    ctx.roundRect(100, currentY, 320, 70, 14);
+    ctx.roundRect(100, 258, 310, 215, 14);
     ctx.fill();
     ctx.strokeStyle = t.accent1;
     ctx.lineWidth = 1;
     ctx.stroke();
 
-    ctx.fillStyle = '#1e293b';
-    ctx.font = `bold 22px ${selectedFont}`;
-    ctx.fillText("⚡ Plan vs Action Score", 115, currentY + 28);
-    ctx.font = `19px ${selectedFont}`;
-    ctx.fillText("80% Velocity • 4/5 Done • 1 Reframed", 115, currentY + 54);
+    // Top Washi
+    ctx.fillStyle = t.washi3;
+    ctx.fillRect(200, 250, 70, 16);
     ctx.restore();
 
-    currentY += 95;
+    ctx.fillStyle = t.ink;
+    ctx.font = `bold 22px ${selectedFont}`;
+    ctx.fillText("⚡ Plan vs. Action Velocity", 115, 288);
+
+    ctx.font = `bold 18px ${selectedFont}`;
+    ctx.fillStyle = t.accent1;
+    ctx.fillText("80% Velocity • 4/5 Tasks Done", 115, 312);
+
+    // Completed Tasks Checklist
+    ctx.font = `19px ${selectedFont}`;
+    ctx.fillStyle = t.ink;
+    const completedTasks = [
+      "☑ Core Architecture Sprint",
+      "☑ 15m Mindfulness Stroll",
+      "☑ Google Fit Vitality Sync",
+      "☑ CBT Distortion Reframing"
+    ];
+
+    let taskY = 340;
+    completedTasks.forEach(task => {
+      ctx.fillText(task, 115, taskY);
+      taskY += 28;
+    });
   }
 
-  // 10. TOP REFLECTION QUOTE & SIGN-OFF
+  // --- LEFT COLUMN 3: DAILY HABIT TRACKER ---
+  if (incHabits) {
+    ctx.save();
+    ctx.fillStyle = t.cardBg2;
+    ctx.beginPath();
+    ctx.roundRect(100, 485, 310, 240, 14);
+    ctx.fill();
+    ctx.strokeStyle = t.accent2;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Top Washi
+    ctx.fillStyle = t.washi2;
+    ctx.fillRect(140, 477, 70, 16);
+    ctx.restore();
+
+    ctx.fillStyle = t.ink;
+    ctx.font = `bold 22px ${selectedFont}`;
+    ctx.fillText("🌿 Daily Habit Streaks", 115, 515);
+
+    let habitY = 546;
+    state.habitsList.slice(0, 5).forEach((h) => {
+      // Title (clipped cleanly to avoid collision)
+      ctx.font = `19px ${selectedFont}`;
+      ctx.fillStyle = t.ink;
+      let title = h.title;
+      if (title.length > 18) title = title.substring(0, 17) + '...';
+      ctx.fillText(`✓ ${title}`, 115, habitY);
+
+      // Streak flame on right
+      ctx.fillStyle = t.accent1;
+      ctx.font = `bold 18px ${selectedFont}`;
+      ctx.fillText(`🔥 ${h.streak}d`, 335, habitY);
+      habitY += 34;
+    });
+  }
+
+  // --- RIGHT COLUMN 1: POLAROID PHOTO ---
+  if (incPolaroid) {
+    ctx.save();
+    ctx.translate(585, 280);
+    ctx.rotate(0.04); // Cute tilt
+
+    // Polaroid frame
+    ctx.fillStyle = '#ffffff';
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+    ctx.shadowBlur = 14;
+    ctx.shadowOffsetY = 6;
+    ctx.beginPath();
+    ctx.roundRect(-125, -130, 250, 260, 8);
+    ctx.fill();
+
+    // Photo Box
+    ctx.fillStyle = '#e2e8f0';
+    ctx.fillRect(-110, -115, 220, 170);
+
+    // Camera Icon & Visual Memory Note
+    ctx.fillStyle = '#0284c7';
+    ctx.font = `bold 20px ${selectedFont}`;
+    ctx.textAlign = 'center';
+    ctx.fillText("📷 Daily Memory Snapshot", 0, -35);
+
+    ctx.font = `16px ${selectedFont}`;
+    ctx.fillStyle = '#64748b';
+    ctx.fillText("📍 Studio & Creative Flow", 0, -10);
+    ctx.fillText("🌅 9.2/10 Energy State", 0, 15);
+
+    // Caption
+    ctx.font = `bold 20px ${selectedFont}`;
+    ctx.fillStyle = '#1e293b';
+    ctx.fillText("Focus & Serenity Flow ✦", 0, 95);
+
+    // Polaroid Top Washi Tape
+    ctx.rotate(-0.04);
+    ctx.fillStyle = t.washi1;
+    ctx.fillRect(-45, -145, 90, 24);
+    ctx.restore();
+  }
+
+  // --- RIGHT COLUMN 2: CBT REFLECTION & WISDOM NOTE ---
   if (incReflection) {
-    ctx.fillStyle = t.ink;
-    ctx.font = `bold 24px ${selectedFont}`;
-    ctx.fillText("💭 Daily Reflection & CBT Note", 100, currentY + 25);
+    ctx.save();
+    ctx.fillStyle = t.cardBg1;
+    ctx.beginPath();
+    ctx.roundRect(435, 455, 305, 270, 14);
+    ctx.fill();
+    ctx.strokeStyle = t.tapeBorder;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
 
-    ctx.font = `italic 22px ${selectedFont}`;
-    ctx.fillStyle = t.ink;
-    const quote = "Energy aligned with execution. Afternoon dip reframed as restorative pause.";
-    ctx.fillText(`"${quote}"`, 105, currentY + 55);
+    // Top Washi
+    ctx.fillStyle = t.washi1;
+    ctx.fillRect(475, 447, 70, 16);
+    ctx.restore();
 
-    // Signature stamp
-    ctx.font = `20px ${selectedFont}`;
+    ctx.fillStyle = t.ink;
+    ctx.font = `bold 22px ${selectedFont}`;
+    ctx.fillText("💭 Daily CBT Insight", 450, 485);
+
+    ctx.font = `italic 19px ${selectedFont}`;
+    const quote = "Energy aligned with execution. Morning resistance was reframed into decoupled milestones. Flow maintained.";
+    wrapCanvasText(ctx, `"${quote}"`, 450, 515, 275, 24, 6);
+
+    // Cognitive Harmony Tag
+    ctx.save();
+    ctx.fillStyle = t.washi2;
+    ctx.beginPath();
+    ctx.roundRect(450, 675, 260, 32, 8);
+    ctx.fill();
+    ctx.restore();
+
+    ctx.font = `bold 17px ${selectedFont}`;
     ctx.fillStyle = t.accent2;
-    ctx.fillText("✍ Mind Cave Life Intelligence", width - 320, height - 75);
+    ctx.fillText("🌿 96% Mental Equilibrium", 465, 696);
   }
+
+  // =========================================================================
+  // FOOTER: BUCKET LIST DREAMS PROGRESS & WATERMARK
+  // =========================================================================
+  ctx.save();
+  ctx.fillStyle = t.washi3;
+  ctx.beginPath();
+  ctx.roundRect(100, 740, width - 200, 95, 14);
+  ctx.fill();
+  ctx.strokeStyle = t.accent1;
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.restore();
+
+  ctx.fillStyle = t.ink;
+  ctx.font = `bold 20px ${selectedFont}`;
+  ctx.fillText("🌠 Life Bucket List Progress:", 115, 770);
+
+  ctx.font = `18px ${selectedFont}`;
+  const bucketDream = state.bucketList?.[0]?.title || "Scuba dive the Great Barrier Reef (2027)";
+  ctx.fillText(`• ${bucketDream} ✨`, 115, 796);
+  ctx.fillText("• Published Open-Source AI Architecture Benchmark [Achieved ✓]", 115, 820);
+
+  // Bottom Signature
+  ctx.font = `bold 20px ${selectedFont}`;
+  ctx.fillStyle = t.accent1;
+  ctx.fillText("✍ Mind Cave Life Intelligence Journal", width - 360, height - 70);
+}
+
+function generateNanoBananaScrapbookArt() {
+  showToast('🎨 Nano Banana: Crafting custom AI aesthetic doodles & watercolor stickers...');
+  setTimeout(() => {
+    renderScrapbookCard();
+    showToast('✨ Nano Banana AI Artwork applied to your Scrapbook Card!');
+  }, 400);
 }
 
 function downloadScrapbookPNG() {

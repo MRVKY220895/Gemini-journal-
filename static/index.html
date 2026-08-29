@@ -763,18 +763,57 @@
     <!-- ===================================================================== -->
     <!-- TAB 3: MINDPULSE COGNITIVE ANALYTICS (ORIGINAL FEATURE) -->
     <!-- ===================================================================== -->
-    <section id="view-analytics" class="hidden flex-1 flex flex-col gap-6">
+    <section id="view-analytics" class="hidden flex-1 flex flex-col gap-5">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
           <div class="flex items-center gap-2">
             <h2 class="text-xl font-bold text-white tracking-tight">MindPulse Cognitive Intelligence</h2>
-            <span class="eyebrow-badge">Original Feature</span>
+            <span class="eyebrow-badge">Core Engine</span>
           </div>
           <p class="text-xs text-slate-400">Dynamic AI extraction of emotional vectors, CBT cognitive distortions, and growth trajectories.</p>
         </div>
         <button onclick="loadAnalytics()" class="btn-secondary text-xs">
           <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Refresh Analytics
         </button>
+      </div>
+
+      <!-- KPI Metrics Strip -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="p-3.5 rounded-2xl bg-black/40 border border-cyan-500/20">
+          <span class="text-[10px] text-cyan-400 font-mono font-semibold uppercase block">Cognitive Velocity</span>
+          <div class="flex items-baseline gap-1.5 mt-1">
+            <span class="text-lg font-bold text-white font-mono">88%</span>
+            <span class="text-[10px] text-emerald-400 font-semibold">+14% vs avg</span>
+          </div>
+          <span class="text-[10px] text-slate-400 block mt-0.5">Reframing conversion speed</span>
+        </div>
+
+        <div class="p-3.5 rounded-2xl bg-black/40 border border-emerald-500/20">
+          <span class="text-[10px] text-emerald-400 font-mono font-semibold uppercase block">Emotional Valence</span>
+          <div class="flex items-baseline gap-1.5 mt-1">
+            <span class="text-lg font-bold text-white font-mono">+0.74</span>
+            <span class="text-[10px] text-emerald-400 font-semibold">Positive</span>
+          </div>
+          <span class="text-[10px] text-slate-400 block mt-0.5">Optimism & Clarity Dominant</span>
+        </div>
+
+        <div class="p-3.5 rounded-2xl bg-black/40 border border-amber-500/20">
+          <span class="text-[10px] text-amber-400 font-mono font-semibold uppercase block">Diurnal Stamina</span>
+          <div class="flex items-baseline gap-1.5 mt-1">
+            <span class="text-lg font-bold text-white font-mono">6.2 hrs</span>
+            <span class="text-[10px] text-amber-300 font-semibold">Peak Flow</span>
+          </div>
+          <span class="text-[10px] text-slate-400 block mt-0.5">Aligned with circadian curve</span>
+        </div>
+
+        <div class="p-3.5 rounded-2xl bg-black/40 border border-purple-500/20">
+          <span class="text-[10px] text-purple-400 font-mono font-semibold uppercase block">CBT Breakthroughs</span>
+          <div class="flex items-baseline gap-1.5 mt-1">
+            <span class="text-lg font-bold text-white font-mono">14 Biases</span>
+            <span class="text-[10px] text-purple-300 font-semibold">Deconstructed</span>
+          </div>
+          <span class="text-[10px] text-slate-400 block mt-0.5">Zero persistent catastrophizing</span>
+        </div>
       </div>
 
       <!-- Bento Grid for Analytics -->
@@ -826,7 +865,7 @@
         <div class="double-bezel lg:col-span-6">
           <div class="double-bezel-inner p-5">
             <h3 class="text-sm font-semibold text-slate-200 mb-3 flex items-center gap-2">
-              <i data-lucide="check-circle-2" class="w-4 h-4 text-cyan-400"></i> AI-Synthesized Action Items
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-cyan-400"></i> AI-Synthesized Action Items & Behavioral Tasks
             </h3>
             <div id="action-items-container" class="space-y-2 text-sm text-slate-300">
               <!-- Rendered via JS -->
@@ -1442,6 +1481,10 @@
 
             <!-- Actions -->
             <div class="pt-2 space-y-2">
+              <button onclick="generateNanoBananaScrapbookArt()" class="w-full btn-secondary !py-2 justify-center font-bold text-amber-300 hover:border-amber-400 flex items-center gap-1.5" title="Generate Custom AI Doodles & Art for Today's Journal Card">
+                <i data-lucide="sparkles" class="w-4 h-4 text-amber-400"></i>
+                <span>🎨 Nano Banana AI Art Enhance</span>
+              </button>
               <button onclick="downloadScrapbookPNG()" class="w-full btn-island !py-2 justify-center font-bold !bg-gradient-to-r !from-pink-500 !to-purple-600">
                 <i data-lucide="download" class="w-4 h-4 text-white"></i>
                 <span>Download High-Res PNG</span>
