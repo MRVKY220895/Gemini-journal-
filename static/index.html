@@ -420,6 +420,9 @@
                   </span>
                 </div>
 
+                <!-- Habit Undo Banner -->
+                <div id="habit-undo-banner" class="hidden"></div>
+
                 <!-- Habits List with Bullet Dots & Checkmarks -->
                 <div id="habit-tracker-list" class="space-y-2">
                   <!-- Rendered dynamically -->
@@ -973,32 +976,74 @@
           </div>
         </div>
 
-        <!-- Row 3: Life Bucket List & Dreams Vault -->
+        <!-- Row 3: Life Bucket List & Milestone Dreams Vault with Live Target Tracker -->
         <div class="double-bezel">
-          <div class="double-bezel-inner p-4">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 border-b border-white/5 pb-2.5">
-              <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded-lg bg-pink-500/10 border border-pink-500/30 flex items-center justify-center text-pink-400">
-                  <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+          <div class="double-bezel-inner p-4 sm:p-5 space-y-3.5">
+            <!-- Header Bar -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-white/5 pb-3">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-xl bg-pink-500/10 border border-pink-500/30 flex items-center justify-center text-pink-500 shrink-0">
+                  <i data-lucide="sparkles" class="w-4 h-4 text-pink-400"></i>
                 </div>
                 <div>
-                  <h3 class="text-xs font-bold text-white flex items-center gap-2">
-                    <span>Life Bucket List & Milestone Dreams</span>
-                    <span class="text-[10px] text-pink-300 bg-pink-950/50 border border-pink-500/30 px-2 py-0.2 rounded-full font-mono" id="bucket-count-badge">
-                      8 Aspirations
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <h3 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">Life Bucket List & Milestone Dreams</h3>
+                    <span class="text-[10px] text-pink-700 dark:text-pink-300 bg-pink-50 dark:bg-pink-950/50 border border-pink-200 dark:border-pink-500/30 px-2 py-0.5 rounded-full font-mono font-bold" id="bucket-count-badge">
+                      1/6 Fulfilled (17%)
                     </span>
-                  </h3>
-                  <p class="text-[11px] text-slate-400">Long-term life experiences, milestones, and personal quests.</p>
+                  </div>
+                  <p class="text-[11px] text-slate-500 dark:text-slate-400">Track target dates, step-by-step plans, execution status, and personal quests.</p>
                 </div>
               </div>
-              <button onclick="openBucketListModal()" class="btn-secondary !py-1 !px-2.5 text-xs flex items-center gap-1 hover:border-pink-400 text-pink-300">
-                <i data-lucide="plus" class="w-3.5 h-3.5 text-pink-400"></i>
-                <span>+ Add Dream</span>
-              </button>
+
+              <div class="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+                <button onclick="openBucketListModal()" class="btn-island !bg-gradient-to-r !from-pink-500 !to-rose-500 text-xs !py-1.5 !px-3 font-semibold shadow-md shadow-pink-500/20">
+                  <span>+ Add Milestone Dream</span>
+                  <div class="btn-island-icon !w-4 !h-4">
+                    <i data-lucide="plus" class="w-3 h-3 text-white"></i>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Filter & Status Navigation Bar -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 text-xs pt-0.5">
+              <!-- Status Filter Tabs -->
+              <div class="flex items-center gap-1 overflow-x-auto no-scrollbar flex-nowrap py-0.5" id="bucket-status-filter-group">
+                <button type="button" onclick="filterBucketListByStatus('all', this)" class="bucket-filter-pill active px-2.5 py-1 rounded-xl text-[11px] font-semibold bg-pink-500/20 text-pink-400 border border-pink-500/30 shrink-0">
+                  All Dreams
+                </button>
+                <button type="button" onclick="filterBucketListByStatus('in_action', this)" class="bucket-filter-pill px-2.5 py-1 rounded-xl text-[11px] font-semibold bg-slate-100 dark:bg-black/40 text-slate-600 dark:text-slate-400 hover:text-white border border-slate-200 dark:border-white/5 shrink-0">
+                  ⚡ In Action
+                </button>
+                <button type="button" onclick="filterBucketListByStatus('planning', this)" class="bucket-filter-pill px-2.5 py-1 rounded-xl text-[11px] font-semibold bg-slate-100 dark:bg-black/40 text-slate-600 dark:text-slate-400 hover:text-white border border-slate-200 dark:border-white/5 shrink-0">
+                  📋 Planning
+                </button>
+                <button type="button" onclick="filterBucketListByStatus('vision', this)" class="bucket-filter-pill px-2.5 py-1 rounded-xl text-[11px] font-semibold bg-slate-100 dark:bg-black/40 text-slate-600 dark:text-slate-400 hover:text-white border border-slate-200 dark:border-white/5 shrink-0">
+                  ✨ Future Vision
+                </button>
+                <button type="button" onclick="filterBucketListByStatus('fulfilled', this)" class="bucket-filter-pill px-2.5 py-1 rounded-xl text-[11px] font-semibold bg-slate-100 dark:bg-black/40 text-slate-600 dark:text-slate-400 hover:text-white border border-slate-200 dark:border-white/5 shrink-0">
+                  🏆 Fulfilled
+                </button>
+              </div>
+
+              <!-- Category Filter Dropdown -->
+              <div class="flex items-center gap-1.5 shrink-0 self-end md:self-auto">
+                <span class="text-[10px] text-slate-500 dark:text-slate-400 font-mono">Category:</span>
+                <select id="bucket-category-filter" onchange="filterBucketListByCategory(this.value)" class="bg-slate-100 dark:bg-black/50 text-slate-700 dark:text-slate-300 text-[11px] px-2 py-1 rounded-lg border border-slate-200 dark:border-white/10 focus:outline-none focus:border-pink-500">
+                  <option value="all">All Domains</option>
+                  <option value="travel">Travel & World</option>
+                  <option value="career">Career & Mastery</option>
+                  <option value="adventure">Adventure & Sports</option>
+                  <option value="wellness">Wellness & Health</option>
+                  <option value="creative">Art & Creation</option>
+                  <option value="wealth">Wealth & Freedom</option>
+                </select>
+              </div>
             </div>
 
             <!-- Bucket List Grid -->
-            <div id="bucket-list-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5">
+            <div id="bucket-list-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pt-1">
               <!-- Rendered dynamically via JS -->
             </div>
           </div>
@@ -2448,14 +2493,20 @@
             <input type="checkbox" id="habit-shortcut-toggle-check" checked class="w-4 h-4 rounded text-cyan-500 bg-slate-900 border-slate-700 cursor-pointer">
           </div>
 
-          <div class="pt-2 flex justify-end gap-2">
-            <button type="button" onclick="closeNewHabitModal()" class="btn-secondary text-xs">Cancel</button>
-            <button type="submit" class="btn-island !bg-gradient-to-r !from-amber-500 !to-yellow-500">
-              <span>Save Habit</span>
-              <div class="btn-island-icon">
-                <i data-lucide="check" class="w-4 h-4 text-white"></i>
-              </div>
+          <div class="pt-2 flex items-center justify-between">
+            <button type="button" id="habit-modal-delete-btn" onclick="deleteCurrentEditingHabit()" class="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-semibold transition-colors hidden flex items-center gap-1">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              <span>Delete Habit</span>
             </button>
+            <div class="flex items-center gap-2 ml-auto">
+              <button type="button" onclick="closeNewHabitModal()" class="btn-secondary text-xs">Cancel</button>
+              <button type="submit" class="btn-island !bg-gradient-to-r !from-amber-500 !to-yellow-500">
+                <span id="habit-modal-submit-lbl">Save Habit</span>
+                <div class="btn-island-icon">
+                  <i data-lucide="check" class="w-4 h-4 text-white"></i>
+                </div>
+              </button>
+            </div>
           </div>
         </form>
       </div>
@@ -2500,49 +2551,87 @@
   </div>
 
   <!-- ===================================================================== -->
-  <!-- MODAL: ADD BUCKET LIST DREAM -->
+  <!-- MODAL: ADD / EDIT BUCKET LIST MILESTONE DREAM -->
   <!-- ===================================================================== -->
-  <div id="bucket-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-    <div class="double-bezel max-w-md w-full">
-      <div class="double-bezel-inner p-6">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-xl bg-pink-500/20 text-pink-400 flex items-center justify-center">
-              <i data-lucide="sparkles" class="w-4 h-4"></i>
+  <div id="bucket-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
+    <div class="double-bezel max-w-lg w-full my-auto">
+      <div class="double-bezel-inner p-5 sm:p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-2xl bg-gradient-to-tr from-pink-500 to-rose-600 flex items-center justify-center text-white shadow-md shadow-pink-500/20">
+              <i data-lucide="sparkles" class="w-4 h-4 text-white"></i>
             </div>
-            <h3 class="text-base font-bold text-white">Add to Life Bucket List</h3>
+            <div>
+              <h3 class="text-base font-bold text-white" id="bucket-modal-title">Life Milestone Dream Tracker</h3>
+              <p class="text-[11px] text-slate-400">Define your target date, execution plan, status, and purpose</p>
+            </div>
           </div>
-          <button onclick="closeBucketListModal()" class="text-slate-400 hover:text-white">
-            <i data-lucide="x" class="w-5 h-5"></i>
+          <button onclick="closeBucketListModal()" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
+            <i data-lucide="x" class="w-4 h-4"></i>
           </button>
         </div>
 
-        <form onsubmit="submitBucketItem(event)" class="space-y-3 text-xs">
+        <form onsubmit="submitBucketItem(event)" class="space-y-3.5 text-xs">
+          <input type="hidden" id="bucket-edit-id-input">
+
           <div>
-            <label class="text-slate-300 block mb-1">Aspiration / Dream</label>
-            <input type="text" id="bucket-title-input" required placeholder="e.g. Scuba diving in Great Barrier Reef" class="w-full bg-black/60 text-slate-200 text-xs p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-pink-500">
+            <label class="text-slate-300 block mb-1 font-semibold">Dream / Milestone Title</label>
+            <input type="text" id="bucket-title-input" required placeholder="e.g. Trek the Annapurna Circuit in Himalayas" class="w-full bg-black/60 text-slate-200 text-xs p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-pink-500">
           </div>
-          <div class="grid grid-cols-2 gap-2">
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <div>
-              <label class="text-slate-300 block mb-1">Category</label>
-              <select id="bucket-category-select" class="w-full bg-slate-900 text-slate-200 text-xs p-2 rounded-xl border border-slate-800 focus:outline-none focus:border-pink-500">
-                <option value="travel">Travel & World</option>
-                <option value="career">Mastery & Career</option>
-                <option value="adventure">Adventure & Sports</option>
-                <option value="wellness">Wellness & Self</option>
-                <option value="creative">Art & Creation</option>
+              <label class="text-slate-300 block mb-1 font-semibold">Domain Category</label>
+              <select id="bucket-category-select" class="w-full bg-slate-900 text-slate-200 text-xs p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-pink-500">
+                <option value="travel">Travel & World Exploration</option>
+                <option value="career">Mastery & Career Breakthrough</option>
+                <option value="adventure">Adventure & High-Peak Sports</option>
+                <option value="wellness">Wellness, Body & Longevity</option>
+                <option value="creative">Art, Writing & Creation</option>
+                <option value="wealth">Financial Freedom & Wealth</option>
               </select>
             </div>
             <div>
-              <label class="text-slate-300 block mb-1">Target Year / Date</label>
-              <input type="text" id="bucket-year-input" placeholder="e.g. 2027" class="w-full bg-slate-900 text-slate-200 text-xs p-2 rounded-xl border border-slate-800 focus:outline-none focus:border-pink-500">
+              <label class="text-slate-300 block mb-1 font-semibold">Execution Status</label>
+              <select id="bucket-status-select" onchange="onBucketStatusSelectChange(this.value)" class="w-full bg-slate-900 text-slate-200 text-xs p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-pink-500">
+                <option value="vision">✨ Future Vision (10%)</option>
+                <option value="planning">📋 Planning & Preparing (35%)</option>
+                <option value="in_action">⚡ In Action / Executing (60%)</option>
+                <option value="final_stretch">🎯 Final Stretch (85%)</option>
+                <option value="fulfilled">🏆 Fulfilled / Achieved (100%)</option>
+              </select>
             </div>
           </div>
 
-          <div class="pt-2 flex justify-end gap-2">
-            <button type="button" onclick="closeBucketListModal()" class="btn-secondary text-xs">Cancel</button>
-            <button type="submit" class="btn-island !bg-gradient-to-r !from-pink-500 !to-rose-500">
-              <span>Pin to Bucket List</span>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div>
+              <label class="text-slate-300 block mb-1 font-semibold">Target Completion Date</label>
+              <input type="date" id="bucket-target-date-input" class="w-full bg-slate-900 text-slate-200 text-xs p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-pink-500 font-mono cursor-pointer">
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="text-slate-300 font-semibold">Progress: <span id="bucket-progress-val-lbl" class="text-pink-400 font-mono font-bold">35%</span></label>
+              </div>
+              <input type="range" id="bucket-progress-slider" min="0" max="100" value="35" class="w-full accent-pink-500 cursor-pointer mt-1" oninput="document.getElementById('bucket-progress-val-lbl').textContent = this.value + '%'">
+            </div>
+          </div>
+
+          <div>
+            <label class="text-slate-300 block mb-1 font-semibold">Step-by-Step Action Plan & Milestones</label>
+            <textarea id="bucket-plan-input" rows="3" placeholder="1. Phase 1: Research and initial certification...&#10;2. Phase 2: Secure bookings & budget...&#10;3. Phase 3: Execute journey..." class="w-full bg-black/60 text-slate-200 text-xs p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-pink-500 leading-relaxed font-sans"></textarea>
+          </div>
+
+          <div>
+            <label class="text-slate-300 block mb-1 font-semibold">Why It Matters (Emotional & Spiritual Anchor)</label>
+            <input type="text" id="bucket-why-input" placeholder="e.g. Expand physical limits and find silence in high alpine peaks" class="w-full bg-black/60 text-slate-200 text-xs p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-pink-500 italic">
+          </div>
+
+          <div class="pt-2 flex items-center justify-between border-t border-white/5">
+            <button type="button" onclick="closeBucketListModal()" class="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-semibold transition-colors">
+              Cancel
+            </button>
+            <button type="submit" class="btn-island !bg-gradient-to-r !from-pink-500 !to-rose-500 text-xs !py-2 !px-4 font-bold shadow-lg shadow-pink-500/25">
+              <span id="bucket-modal-submit-lbl">Save Milestone Dream</span>
               <div class="btn-island-icon">
                 <i data-lucide="check" class="w-4 h-4 text-white"></i>
               </div>
@@ -3012,6 +3101,9 @@
                   <span id="modal-habit-streak-badge">12 Days Streak</span>
                 </span>
               </div>
+
+              <!-- Habit Undo Banner in Modal -->
+              <div id="modal-habit-undo-banner" class="hidden"></div>
 
               <!-- Habits List -->
               <div id="modal-habit-tracker-list" class="space-y-2">

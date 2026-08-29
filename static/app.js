@@ -3792,10 +3792,6 @@ function renderTodayGoal() {
   updateHarmonyGoalsSummary(completedGoals, totalGoals, velocityPct, completedDurationMins, categoryTimeMap);
 }
 
-  // Update Daily Harmony Directional Summary Card
-  updateHarmonyGoalsSummary(completedGoals, totalGoals, velocityPct, completedDurationMins, categoryTimeMap);
-}
-
 function updateHarmonyGoalsSummary(completedCount, totalCount, velocityPct, totalMins, catMap) {
   const totBadge = document.getElementById('harmony-total-duration-badge');
   const velBadge = document.getElementById('harmony-velocity-badge');
@@ -4050,36 +4046,46 @@ function renderHabitTracker() {
   const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
   const todayDayIdx = (new Date().getDay() + 6) % 7; // Monday = 0
 
-  const habitsHtml = state.habitsList.map(h => `
-    <div class="habit-row p-2.5 rounded-xl bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 flex items-center justify-between gap-2 hover:border-slate-300 dark:hover:border-white/10 transition-colors shadow-sm dark:shadow-none" id="habit_row_${h.id}">
-      <div class="flex items-center gap-2.5 min-w-0">
-        <span class="text-base shrink-0">${h.emoji || '💧'}</span>
-        <div class="min-w-0">
-          <div class="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate flex items-center gap-1.5">
-            <span>${escapeHtml(h.title)}</span>
-            ${h.isTimelineShortcut !== false ? '<span class="text-[9px] px-1.5 py-0.2 rounded-full bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-500/30 font-mono">Shortcut</span>' : ''}
-          </div>
-          <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono flex items-center gap-1">
-            <span class="text-amber-600 dark:text-amber-400 font-bold flex items-center gap-0.5"><i data-lucide="flame" class="w-3 h-3 text-amber-500"></i><span>${h.streak}d streak</span></span>
-            ${h.target ? `• <span>${escapeHtml(h.target)}</span>` : ''}
-          </div>
-        </div>
+  const habitsHtml = state.habitsList.length === 0
+    ? `
+      <div class="p-4 rounded-xl bg-slate-50 dark:bg-black/30 border border-dashed border-slate-300 dark:border-white/10 text-center text-xs text-slate-400 space-y-1.5">
+        <p>No active habits in your daily routine.</p>
+        <button type="button" onclick="openNewHabitModal()" class="text-cyan-500 hover:underline font-semibold font-mono text-[11px]">+ Add Your First Habit</button>
       </div>
-
-      <div class="flex items-center gap-1.5 shrink-0">
-        <div class="flex items-center gap-1">
-          ${h.history.map((isDone, idx) => `
-            <div onclick="toggleHabitDay('${h.id}', ${idx})" class="habit-dot ${isDone ? 'done' : ''} ${idx === todayDayIdx ? 'ring-1 ring-amber-400' : ''}" title="${days[idx]} - ${isDone ? 'Done' : 'Missed'}">
-              ${isDone ? '✓' : days[idx]}
+    `
+    : state.habitsList.map(h => `
+      <div class="habit-row p-2.5 rounded-xl bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 flex items-center justify-between gap-2 hover:border-slate-300 dark:hover:border-white/10 transition-colors shadow-sm dark:shadow-none" id="habit_row_${h.id}">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span class="text-base shrink-0">${h.emoji || '💧'}</span>
+          <div class="min-w-0">
+            <div class="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate flex items-center gap-1.5">
+              <span class="cursor-pointer hover:text-cyan-500 transition-colors" onclick="openNewHabitModal('${h.id}')">${escapeHtml(h.title)}</span>
+              ${h.isTimelineShortcut !== false ? '<span class="text-[9px] px-1.5 py-0.2 rounded-full bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-500/30 font-mono">Shortcut</span>' : ''}
             </div>
-          `).join('')}
+            <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono flex items-center gap-1">
+              <span class="text-amber-600 dark:text-amber-400 font-bold flex items-center gap-0.5"><i data-lucide="flame" class="w-3 h-3 text-amber-500"></i><span>${h.streak}d streak</span></span>
+              ${h.target ? `• <span>${escapeHtml(h.target)}</span>` : ''}
+            </div>
+          </div>
         </div>
-        <button type="button" onclick="openNewHabitModal('${h.id}')" class="p-1 text-slate-400 hover:text-amber-500 transition-colors ml-1" title="Edit Habit">
-          <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
-        </button>
+
+        <div class="flex items-center gap-1.5 shrink-0">
+          <div class="flex items-center gap-1">
+            ${h.history.map((isDone, idx) => `
+              <div onclick="toggleHabitDay('${h.id}', ${idx})" class="habit-dot ${isDone ? 'done' : ''} ${idx === todayDayIdx ? 'ring-1 ring-amber-400' : ''}" title="${days[idx]} - ${isDone ? 'Done' : 'Missed'}">
+                ${isDone ? '✓' : days[idx]}
+              </div>
+            `).join('')}
+          </div>
+          <button type="button" onclick="openNewHabitModal('${h.id}')" class="p-1 text-slate-400 hover:text-amber-500 transition-colors" title="Edit Habit">
+            <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+          </button>
+          <button type="button" onclick="deleteHabit('${h.id}')" class="p-1 text-slate-400 hover:text-rose-500 transition-colors" title="Delete Habit (With Undo)">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
       </div>
-    </div>
-  `).join('');
+    `).join('');
 
   containers.forEach(c => {
     c.innerHTML = habitsHtml;
@@ -4096,7 +4102,74 @@ function renderHabitTracker() {
   if (modalStreak) modalStreak.textContent = `${maxStreak || 12} Days Streak`;
   if (streakBadge) streakBadge.innerHTML = `<i data-lucide="flame" class="w-3 h-3 text-amber-500"></i><span>${maxStreak || 12} Days Streak</span>`;
 
+  renderUndoHabitBanner();
   lucide.createIcons();
+}
+
+let recentlyDeletedHabits = [];
+
+function deleteHabit(habitId) {
+  const index = state.habitsList.findIndex(h => h.id === habitId);
+  if (index === -1) return;
+
+  const deletedHabit = state.habitsList[index];
+  recentlyDeletedHabits.push({ habit: JSON.parse(JSON.stringify(deletedHabit)), index: index });
+
+  state.habitsList.splice(index, 1);
+  localStorage.setItem('mind_cave_habits_list', JSON.stringify(state.habitsList));
+
+  renderHabitTracker();
+  renderTimelineShortcuts();
+  renderShortcutsManagerList();
+
+  showToast(`Deleted habit: "${deletedHabit.title}"`);
+}
+
+function undoDeleteHabit() {
+  if (recentlyDeletedHabits.length === 0) {
+    showToast('No recently deleted habits to restore.');
+    return;
+  }
+
+  const last = recentlyDeletedHabits.pop();
+  const insertIndex = Math.min(last.index, state.habitsList.length);
+  state.habitsList.splice(insertIndex, 0, last.habit);
+
+  localStorage.setItem('mind_cave_habits_list', JSON.stringify(state.habitsList));
+  renderHabitTracker();
+  renderTimelineShortcuts();
+  renderShortcutsManagerList();
+
+  showToast(`Restored habit: "${last.habit.title}"`);
+}
+
+function renderUndoHabitBanner() {
+  const banners = [
+    document.getElementById('habit-undo-banner'),
+    document.getElementById('modal-habit-undo-banner')
+  ].filter(Boolean);
+
+  banners.forEach(b => {
+    if (recentlyDeletedHabits.length > 0) {
+      const last = recentlyDeletedHabits[recentlyDeletedHabits.length - 1];
+      b.innerHTML = `
+        <div class="p-2 px-3 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between text-xs text-amber-300">
+          <span class="truncate flex items-center gap-1.5">
+            <i data-lucide="info" class="w-3.5 h-3.5 text-amber-400 shrink-0"></i>
+            <span class="truncate">Deleted "${escapeHtml(last.habit.title)}"</span>
+          </span>
+          <button type="button" onclick="undoDeleteHabit()" class="px-2.5 py-0.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-[11px] transition-colors shrink-0 flex items-center gap-1 ml-2">
+            <i data-lucide="rotate-ccw" class="w-3 h-3 text-slate-950"></i>
+            <span>Undo</span>
+          </button>
+        </div>
+      `;
+      b.classList.remove('hidden');
+    } else {
+      b.innerHTML = '';
+      b.classList.add('hidden');
+    }
+  });
 }
 
 function toggleHabitDay(habitId, dayIndex) {
@@ -4123,6 +4196,8 @@ function openNewHabitModal(habitId = null) {
   const freqSelect = document.getElementById('habit-freq-select');
   const shortcutToggle = document.getElementById('habit-shortcut-toggle-check');
   const modalTitle = document.getElementById('habit-modal-title');
+  const deleteBtn = document.getElementById('habit-modal-delete-btn');
+  const submitLbl = document.getElementById('habit-modal-submit-lbl');
 
   if (habitId) {
     const habit = state.habitsList.find(h => h.id === habitId);
@@ -4134,6 +4209,8 @@ function openNewHabitModal(habitId = null) {
       if (freqSelect) freqSelect.value = habit.frequency || 'daily';
       if (shortcutToggle) shortcutToggle.checked = habit.isTimelineShortcut !== false;
       if (modalTitle) modalTitle.textContent = 'Edit Custom Habit';
+      if (submitLbl) submitLbl.textContent = 'Update Habit';
+      if (deleteBtn) deleteBtn.classList.remove('hidden');
     }
   } else {
     if (idInput) idInput.value = '';
@@ -4143,13 +4220,24 @@ function openNewHabitModal(habitId = null) {
     if (freqSelect) freqSelect.value = 'daily';
     if (shortcutToggle) shortcutToggle.checked = true;
     if (modalTitle) modalTitle.textContent = 'Add New Micro-Habit';
+    if (submitLbl) submitLbl.textContent = 'Save Habit';
+    if (deleteBtn) deleteBtn.classList.add('hidden');
   }
 
   modal.classList.remove('hidden');
+  lucide.createIcons();
 }
 
 function closeNewHabitModal() {
   document.getElementById('habit-modal')?.classList.add('hidden');
+}
+
+function deleteCurrentEditingHabit() {
+  const id = document.getElementById('habit-edit-id-input')?.value;
+  if (id) {
+    deleteHabit(id);
+    closeNewHabitModal();
+  }
 }
 
 function submitNewHabit(event) {
@@ -4193,15 +4281,6 @@ function submitNewHabit(event) {
   closeNewHabitModal();
   renderHabitTracker();
   renderTimelineShortcuts();
-}
-
-function deleteHabit(habitId) {
-  state.habitsList = state.habitsList.filter(h => h.id !== habitId);
-  localStorage.setItem('mind_cave_habits_list', JSON.stringify(state.habitsList));
-  renderHabitTracker();
-  renderTimelineShortcuts();
-  renderShortcutsManagerList();
-  showToast('Habit deleted.');
 }
 
 function toggleHabitTimelineShortcut(habitId) {
@@ -4374,11 +4453,65 @@ function setTaskBlockerReason(reasonKey) {
 }
 
 // =============================================================================
-// LIFE BUCKET LIST & MILESTONE DREAMS VAULT
+// LIFE BUCKET LIST & MILESTONE DREAMS VAULT (TRACKER & ACTION ENGINE)
 // =============================================================================
 
+let bucketStatusFilter = 'all';
+let bucketCategoryFilter = 'all';
+
 function initBucketList() {
+  // Normalize existing bucketList items to have rich fields if missing
+  if (state.bucketList) {
+    state.bucketList.forEach(b => {
+      if (!b.targetDate) b.targetDate = b.year ? `${b.year}-12-31` : '2027-12-31';
+      if (!b.status) b.status = b.achieved ? 'fulfilled' : 'planning';
+      if (b.progress === undefined) b.progress = b.achieved ? 100 : 35;
+      if (!b.plan) b.plan = '• Define key milestones & timeline\n• Execute phase 1 preparations\n• Review progress';
+    });
+  }
   renderBucketList();
+}
+
+function filterBucketListByStatus(status, btnEl) {
+  bucketStatusFilter = status;
+  const pills = document.querySelectorAll('.bucket-filter-pill');
+  pills.forEach(p => {
+    p.classList.remove('active', 'bg-pink-500/20', 'text-pink-400', 'border-pink-500/30');
+    p.classList.add('bg-slate-100', 'dark:bg-black/40', 'text-slate-600', 'dark:text-slate-400', 'border-slate-200', 'dark:border-white/5');
+  });
+  if (btnEl) {
+    btnEl.classList.add('active', 'bg-pink-500/20', 'text-pink-400', 'border-pink-500/30');
+    btnEl.classList.remove('bg-slate-100', 'dark:bg-black/40', 'text-slate-600', 'dark:text-slate-400', 'border-slate-200', 'dark:border-white/5');
+  }
+  renderBucketList();
+}
+
+function filterBucketListByCategory(cat) {
+  bucketCategoryFilter = cat;
+  renderBucketList();
+}
+
+function formatTargetDateCountdown(targetDateStr) {
+  if (!targetDateStr) return { text: 'Aspiration', badgeClass: 'text-amber-300' };
+  const target = new Date(targetDateStr);
+  const now = new Date();
+  if (isNaN(target.getTime())) return { text: targetDateStr, badgeClass: 'text-amber-300' };
+
+  const diffMs = target.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+  const dateFormatted = target.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+  if (diffDays < 0) {
+    return { text: `${dateFormatted} • Passed`, badgeClass: 'text-rose-400' };
+  } else if (diffDays <= 90) {
+    return { text: `${dateFormatted} • ⏳ ${diffDays}d left`, badgeClass: 'text-amber-400 animate-pulse' };
+  } else if (diffDays <= 365) {
+    const months = Math.round(diffDays / 30);
+    return { text: `${dateFormatted} • ~${months} mo`, badgeClass: 'text-cyan-400' };
+  } else {
+    const years = (diffDays / 365).toFixed(1);
+    return { text: `${dateFormatted} • ~${years} yrs`, badgeClass: 'text-slate-300' };
+  }
 }
 
 function renderBucketList() {
@@ -4386,74 +4519,294 @@ function renderBucketList() {
   if (!container) return;
 
   const catMap = {
-    travel: 'Travel',
-    career: 'Career',
-    adventure: 'Adventure',
-    wellness: 'Wellness',
-    creative: 'Creative'
+    travel: { label: 'Travel & World', color: 'text-cyan-400 bg-cyan-950/60 border-cyan-500/30' },
+    career: { label: 'Career & Mastery', color: 'text-indigo-400 bg-indigo-950/60 border-indigo-500/30' },
+    adventure: { label: 'Adventure & Sports', color: 'text-amber-400 bg-amber-950/60 border-amber-500/30' },
+    wellness: { label: 'Wellness & Health', color: 'text-emerald-400 bg-emerald-950/60 border-emerald-500/30' },
+    creative: { label: 'Art & Creation', color: 'text-purple-400 bg-purple-950/60 border-purple-500/30' },
+    wealth: { label: 'Financial Freedom', color: 'text-yellow-400 bg-yellow-950/60 border-yellow-500/30' }
   };
 
-  container.innerHTML = state.bucketList.map(b => `
-    <div class="bucket-card ${b.achieved ? 'is-achieved' : ''}" id="bucket_${b.id}">
-      <div class="flex items-center justify-between gap-1.5 mb-1.5">
-        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-black/40 border border-white/10 text-slate-300">
-          ${catMap[b.category] || b.category}
-        </span>
-        <span class="text-[10px] text-amber-300 font-mono font-bold">${b.year || 'Aspiration'}</span>
-      </div>
+  const statusMap = {
+    vision: { label: 'Future Vision', icon: 'sparkles', badge: 'bg-blue-950/60 text-blue-300 border-blue-500/30' },
+    planning: { label: 'Planning', icon: 'clipboard-list', badge: 'bg-amber-950/60 text-amber-300 border-amber-500/30' },
+    in_action: { label: 'In Action', icon: 'zap', badge: 'bg-cyan-950/60 text-cyan-300 border-cyan-500/30' },
+    final_stretch: { label: 'Final Stretch', icon: 'target', badge: 'bg-purple-950/60 text-purple-300 border-purple-500/30' },
+    fulfilled: { label: 'Fulfilled', icon: 'trophy', badge: 'bg-emerald-950/60 text-emerald-300 border-emerald-500/30' }
+  };
 
-      <h5 class="text-xs font-bold text-white mb-2 leading-snug ${b.achieved ? 'line-through text-slate-400' : ''}">${escapeHtml(b.title)}</h5>
+  let filtered = [...state.bucketList];
+  if (bucketStatusFilter !== 'all') {
+    filtered = filtered.filter(b => b.status === bucketStatusFilter || (bucketStatusFilter === 'fulfilled' && b.achieved));
+  }
+  if (bucketCategoryFilter !== 'all') {
+    filtered = filtered.filter(b => b.category === bucketCategoryFilter);
+  }
 
-      <div class="flex items-center justify-between pt-1 border-t border-white/5 text-[10px]">
-        <button type="button" onclick="toggleBucketAchieved('${b.id}')" class="font-semibold transition-colors ${b.achieved ? 'text-emerald-400' : 'text-slate-400 hover:text-pink-400'}">
-          ${b.achieved ? '✓ Achieved' : '○ Mark Achieved'}
-        </button>
-        <button type="button" onclick="deleteBucketItem('${b.id}')" class="text-slate-500 hover:text-rose-400">
-          <i data-lucide="trash-2" class="w-3 h-3"></i>
-        </button>
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="col-span-full p-6 rounded-2xl bg-white dark:bg-black/30 border border-dashed border-slate-300 dark:border-white/10 text-center text-xs text-slate-400 space-y-2">
+        <i data-lucide="compass" class="w-8 h-8 text-pink-400 mx-auto"></i>
+        <p>No milestone dreams found in this filter.</p>
+        <button type="button" onclick="openBucketListModal()" class="text-pink-500 hover:underline font-semibold font-mono text-xs">+ Pin a New Milestone Dream</button>
       </div>
-    </div>
-  `).join('');
+    `;
+    lucide.createIcons();
+    return;
+  }
+
+  container.innerHTML = filtered.map(b => {
+    const isDone = b.achieved || b.status === 'fulfilled';
+    const catInfo = catMap[b.category] || { label: b.category, color: 'text-slate-300 bg-black/40 border-white/10' };
+    const stInfo = statusMap[b.status] || statusMap[isDone ? 'fulfilled' : 'planning'];
+    const countdown = formatTargetDateCountdown(b.targetDate || b.year);
+    const progressVal = isDone ? 100 : (b.progress !== undefined ? b.progress : 35);
+
+    // Format plan steps
+    const planSteps = (b.plan || '')
+      .split('\n')
+      .map(s => s.trim())
+      .filter(Boolean);
+
+    return `
+      <div class="p-3.5 rounded-2xl border transition-all duration-300 flex flex-col justify-between gap-3 ${isDone ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-500/30' : 'bg-white dark:bg-slate-900/90 border-slate-200 dark:border-white/10 hover:border-pink-500/40 shadow-sm'}" id="bucket_${b.id}">
+        <div class="space-y-2.5">
+          <!-- Top Row: Category Pill & Status Badge -->
+          <div class="flex items-center justify-between gap-1.5 flex-wrap">
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full border ${catInfo.color} font-semibold">
+              ${catInfo.label}
+            </span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full border ${stInfo.badge} font-bold flex items-center gap-1">
+              <i data-lucide="${stInfo.icon}" class="w-3 h-3"></i>
+              <span>${stInfo.label}</span>
+            </span>
+          </div>
+
+          <!-- Title & Emotional Anchor -->
+          <div>
+            <h4 class="text-sm font-bold text-slate-900 dark:text-white leading-snug cursor-pointer hover:text-pink-500 transition-colors ${isDone ? 'line-through opacity-70' : ''}" onclick="openBucketListModal('${b.id}')" title="Click to edit dream">
+              ${escapeHtml(b.title)}
+            </h4>
+            ${b.why ? `<p class="text-[11px] text-slate-500 dark:text-slate-400 italic mt-0.5 leading-tight">"${escapeHtml(b.why)}"</p>` : ''}
+          </div>
+
+          <!-- Target Date & Countdown Tracker -->
+          <div class="p-2 rounded-xl bg-slate-50 dark:bg-black/40 border border-slate-100 dark:border-white/5 flex items-center justify-between text-[11px]">
+            <span class="text-slate-500 dark:text-slate-400 flex items-center gap-1">
+              <i data-lucide="calendar" class="w-3.5 h-3.5 text-pink-500"></i>
+              <span>Target:</span>
+            </span>
+            <span class="font-mono font-bold ${countdown.badgeClass}">
+              ${countdown.text}
+            </span>
+          </div>
+
+          <!-- Live Progress Bar -->
+          <div class="space-y-1">
+            <div class="flex justify-between text-[10px] font-mono">
+              <span class="text-slate-500 dark:text-slate-400">Execution Velocity</span>
+              <span class="font-bold ${isDone ? 'text-emerald-500' : 'text-pink-500'}">${progressVal}%</span>
+            </div>
+            <div class="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+              <div class="h-full rounded-full transition-all duration-500 ${isDone ? 'bg-emerald-500' : 'bg-gradient-to-r from-pink-500 to-amber-400'}" style="width: ${progressVal}%;"></div>
+            </div>
+          </div>
+
+          <!-- Step-by-Step Action Plan (Collapsible details) -->
+          ${planSteps.length > 0 ? `
+            <div class="pt-1.5 border-t border-slate-100 dark:border-white/5 space-y-1">
+              <span class="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">Action Plan:</span>
+              <ul class="space-y-0.5 text-[11px] text-slate-600 dark:text-slate-300">
+                ${planSteps.map(step => `
+                  <li class="flex items-start gap-1.5 leading-tight">
+                    <span class="text-pink-500 font-bold shrink-0 mt-0.5">•</span>
+                    <span class="truncate">${escapeHtml(step.replace(/^[0-9]+\.\s*/, ''))}</span>
+                  </li>
+                `).join('')}
+              </ul>
+            </div>
+          ` : ''}
+        </div>
+
+        <!-- Card Action Footer -->
+        <div class="pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-xs gap-1">
+          <div class="flex items-center gap-1.5">
+            <button type="button" onclick="toggleBucketAchieved('${b.id}')" class="px-2 py-1 rounded-lg text-[11px] font-bold border transition-colors flex items-center gap-1 ${isDone ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/30' : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-white/10 hover:border-pink-400'}">
+              <i data-lucide="${isDone ? 'check-circle' : 'circle'}" class="w-3 h-3 text-pink-500"></i>
+              <span>${isDone ? 'Fulfilled' : 'Mark Done'}</span>
+            </button>
+            ${!isDone ? `
+              <button type="button" onclick="advanceBucketStatus('${b.id}')" class="px-2 py-1 rounded-lg text-[10px] font-semibold bg-pink-50 dark:bg-pink-950/40 text-pink-600 dark:text-pink-300 border border-pink-200 dark:border-pink-500/20 hover:border-pink-500/40 transition-colors" title="Advance status to next milestone stage">
+                <span>Advance Stage →</span>
+              </button>
+            ` : ''}
+          </div>
+
+          <div class="flex items-center gap-1 shrink-0">
+            <button type="button" onclick="openBucketListModal('${b.id}')" class="p-1 text-slate-400 hover:text-pink-500 transition-colors" title="Edit Milestone">
+              <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+            </button>
+            <button type="button" onclick="deleteBucketItem('${b.id}')" class="p-1 text-slate-400 hover:text-rose-500 transition-colors" title="Delete Milestone">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
 
   lucide.createIcons();
 
+  // Update Summary Badge
   const countBadge = document.getElementById('bucket-count-badge');
   if (countBadge) {
-    const done = state.bucketList.filter(b => b.achieved).length;
-    countBadge.textContent = `${done}/${state.bucketList.length} Fulfilled`;
+    const done = state.bucketList.filter(b => b.achieved || b.status === 'fulfilled').length;
+    const total = state.bucketList.length;
+    const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+    countBadge.textContent = `${done}/${total} Fulfilled (${pct}%)`;
   }
 }
 
-function openBucketListModal() {
-  document.getElementById('bucket-modal')?.classList.remove('hidden');
+function openBucketListModal(editId = null) {
+  const modal = document.getElementById('bucket-modal');
+  const titleEl = document.getElementById('bucket-modal-title');
+  const submitLbl = document.getElementById('bucket-modal-submit-lbl');
+  const idInput = document.getElementById('bucket-edit-id-input');
+  const titleInput = document.getElementById('bucket-title-input');
+  const catSelect = document.getElementById('bucket-category-select');
+  const statusSelect = document.getElementById('bucket-status-select');
+  const dateInput = document.getElementById('bucket-target-date-input');
+  const progressSlider = document.getElementById('bucket-progress-slider');
+  const progressLbl = document.getElementById('bucket-progress-val-lbl');
+  const planInput = document.getElementById('bucket-plan-input');
+  const whyInput = document.getElementById('bucket-why-input');
+
+  if (editId) {
+    const item = state.bucketList.find(b => b.id === editId);
+    if (item) {
+      if (idInput) idInput.value = item.id;
+      if (titleInput) titleInput.value = item.title;
+      if (catSelect) catSelect.value = item.category || 'travel';
+      if (statusSelect) statusSelect.value = item.status || (item.achieved ? 'fulfilled' : 'planning');
+      if (dateInput) dateInput.value = item.targetDate || '';
+      if (progressSlider) progressSlider.value = item.progress !== undefined ? item.progress : (item.achieved ? 100 : 35);
+      if (progressLbl) progressLbl.textContent = `${progressSlider ? progressSlider.value : 35}%`;
+      if (planInput) planInput.value = item.plan || '';
+      if (whyInput) whyInput.value = item.why || '';
+      if (titleEl) titleEl.textContent = 'Edit Milestone Dream';
+      if (submitLbl) submitLbl.textContent = 'Update Milestone';
+    }
+  } else {
+    if (idInput) idInput.value = '';
+    if (titleInput) titleInput.value = '';
+    if (catSelect) catSelect.value = 'travel';
+    if (statusSelect) statusSelect.value = 'planning';
+    
+    // Default target date: 1 year from today
+    const nextYear = new Date();
+    nextYear.setFullYear(nextYear.getFullYear() + 1);
+    if (dateInput) dateInput.value = nextYear.toISOString().split('T')[0];
+    
+    if (progressSlider) progressSlider.value = 35;
+    if (progressLbl) progressLbl.textContent = '35%';
+    if (planInput) planInput.value = '1. Phase 1: Research & budget preparation\n2. Phase 2: Booking & logistics\n3. Phase 3: Milestone execution';
+    if (whyInput) whyInput.value = '';
+    if (titleEl) titleEl.textContent = 'Life Milestone Dream Tracker';
+    if (submitLbl) submitLbl.textContent = 'Pin to Bucket List';
+  }
+
+  if (modal) modal.classList.remove('hidden');
+  lucide.createIcons();
 }
 
 function closeBucketListModal() {
   document.getElementById('bucket-modal')?.classList.add('hidden');
 }
 
+function onBucketStatusSelectChange(val) {
+  const slider = document.getElementById('bucket-progress-slider');
+  const lbl = document.getElementById('bucket-progress-val-lbl');
+  const recMap = {
+    vision: 15,
+    planning: 35,
+    in_action: 60,
+    final_stretch: 85,
+    fulfilled: 100
+  };
+  if (slider && recMap[val] !== undefined) {
+    slider.value = recMap[val];
+    if (lbl) lbl.textContent = `${recMap[val]}%`;
+  }
+}
+
 function submitBucketItem(event) {
   event.preventDefault();
-  const title = document.getElementById('bucket-title-input').value.trim();
-  const category = document.getElementById('bucket-category-select').value;
-  const year = document.getElementById('bucket-year-input').value.trim();
+  const id = document.getElementById('bucket-edit-id-input')?.value;
+  const title = document.getElementById('bucket-title-input')?.value.trim();
+  const category = document.getElementById('bucket-category-select')?.value || 'travel';
+  const status = document.getElementById('bucket-status-select')?.value || 'planning';
+  const targetDate = document.getElementById('bucket-target-date-input')?.value || '';
+  const progress = parseInt(document.getElementById('bucket-progress-slider')?.value || '35', 10);
+  const plan = document.getElementById('bucket-plan-input')?.value.trim() || '';
+  const why = document.getElementById('bucket-why-input')?.value.trim() || '';
 
   if (!title) return;
 
-  const newItem = {
-    id: `b_${Date.now()}`,
-    title: title,
-    category: category,
-    year: year || '2027',
-    achieved: false
-  };
+  const year = targetDate ? targetDate.split('-')[0] : '2027';
+  const isFulfilled = status === 'fulfilled' || progress === 100;
 
-  state.bucketList.unshift(newItem);
+  if (id) {
+    const existing = state.bucketList.find(b => b.id === id);
+    if (existing) {
+      existing.title = title;
+      existing.category = category;
+      existing.status = status;
+      existing.targetDate = targetDate;
+      existing.year = year;
+      existing.progress = progress;
+      existing.plan = plan;
+      existing.why = why;
+      existing.achieved = isFulfilled;
+      showToast(`Updated milestone: "${title}"`);
+    }
+  } else {
+    const newItem = {
+      id: `b_${Date.now()}`,
+      title: title,
+      category: category,
+      status: status,
+      targetDate: targetDate,
+      year: year,
+      progress: progress,
+      plan: plan,
+      why: why,
+      achieved: isFulfilled
+    };
+    state.bucketList.unshift(newItem);
+    showToast(`Pinned dream: "${title}" to your Bucket List!`);
+  }
+
   localStorage.setItem('mind_cave_bucket_list', JSON.stringify(state.bucketList));
-
   closeBucketListModal();
   renderBucketList();
-  showToast(`Pinned dream: "${title}" to your Bucket List!`);
+}
+
+function advanceBucketStatus(id) {
+  const item = state.bucketList.find(b => b.id === id);
+  if (!item) return;
+
+  const sequence = ['vision', 'planning', 'in_action', 'final_stretch', 'fulfilled'];
+  const currentIdx = sequence.indexOf(item.status || 'planning');
+  const nextIdx = Math.min(currentIdx + 1, sequence.length - 1);
+  item.status = sequence[nextIdx];
+
+  const progressMap = { vision: 15, planning: 35, in_action: 60, final_stretch: 85, fulfilled: 100 };
+  item.progress = progressMap[item.status];
+  item.achieved = item.status === 'fulfilled';
+
+  localStorage.setItem('mind_cave_bucket_list', JSON.stringify(state.bucketList));
+  renderBucketList();
+  showToast(`Stage advanced to: ${item.status.replace('_', ' ').toUpperCase()} (${item.progress}%)`);
 }
 
 function toggleBucketAchieved(id) {
@@ -4461,16 +4814,23 @@ function toggleBucketAchieved(id) {
   if (!item) return;
 
   item.achieved = !item.achieved;
+  if (item.achieved) {
+    item.status = 'fulfilled';
+    item.progress = 100;
+  } else {
+    item.status = 'in_action';
+    item.progress = 60;
+  }
   localStorage.setItem('mind_cave_bucket_list', JSON.stringify(state.bucketList));
   renderBucketList();
-  showToast(item.achieved ? 'Congratulations! Dream milestone achieved!' : 'Milestone returned to active bucket list.');
+  showToast(item.achieved ? 'Congratulations! Dream milestone fulfilled!' : 'Milestone returned to active pipeline.');
 }
 
 function deleteBucketItem(id) {
   state.bucketList = state.bucketList.filter(b => b.id !== id);
   localStorage.setItem('mind_cave_bucket_list', JSON.stringify(state.bucketList));
   renderBucketList();
-  showToast('Item removed from Bucket List.');
+  showToast('Milestone removed from Bucket List.');
 }
 
 // =============================================================================
