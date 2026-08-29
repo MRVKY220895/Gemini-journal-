@@ -379,6 +379,13 @@ if os.path.exists(static_dir):
     async def serve_index():
         return FileResponse(os.path.join(static_dir, "index.html"))
 
+    @app.get("/favicon.ico")
+    async def serve_favicon():
+        fav_path = os.path.join(static_dir, "favicon.ico")
+        if os.path.exists(fav_path):
+            return FileResponse(fav_path)
+        return FileResponse(os.path.join(static_dir, "index.html"))
+
 
 if __name__ == "__main__":
     import uvicorn

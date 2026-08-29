@@ -566,6 +566,15 @@ function signOutUser() {
 // =============================================================================
 
 function switchTab(tabId) {
+  // If target is one of the journal sub-pages
+  const journalSubPages = ['chrono', 'harmony', 'memory_lane', 'memory', 'photos', 'sanctuary'];
+  if (journalSubPages.includes(tabId)) {
+    const trackTarget = tabId === 'photos' ? 'memory' : tabId;
+    switchTab('journals');
+    switchJournalTrack(trackTarget);
+    return;
+  }
+
   const views = ['studio', 'journals', 'analytics', 'security'];
   views.forEach(v => {
     const viewEl = document.getElementById(`view-${v}`);
@@ -2327,6 +2336,9 @@ function testPushNotification() {
         });
       }
     });
+  }
+}
+
 // =============================================================================
 // RICH MEDIA ATTACHMENTS STATE (P1)
 // =============================================================================
