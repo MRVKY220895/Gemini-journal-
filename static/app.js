@@ -4045,47 +4045,62 @@ function renderHabitTracker() {
 
   const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
   const todayDayIdx = (new Date().getDay() + 6) % 7; // Monday = 0
+  const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  const currentDayName = dayNames[todayDayIdx];
 
   const habitsHtml = state.habitsList.length === 0
     ? `
       <div class="p-4 rounded-xl bg-slate-50 dark:bg-black/30 border border-dashed border-slate-300 dark:border-white/10 text-center text-xs text-slate-400 space-y-1.5">
-        <p>No active habits in your daily routine.</p>
+        <p>No active habits scheduled for today.</p>
         <button type="button" onclick="openNewHabitModal()" class="text-cyan-500 hover:underline font-semibold font-mono text-[11px]">+ Add Your First Habit</button>
       </div>
     `
-    : state.habitsList.map(h => `
-      <div class="habit-row p-2.5 rounded-xl bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 flex items-center justify-between gap-2 hover:border-slate-300 dark:hover:border-white/10 transition-colors shadow-sm dark:shadow-none" id="habit_row_${h.id}">
-        <div class="flex items-center gap-2.5 min-w-0">
-          <span class="text-base shrink-0">${h.emoji || '💧'}</span>
-          <div class="min-w-0">
-            <div class="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate flex items-center gap-1.5">
-              <span class="cursor-pointer hover:text-cyan-500 transition-colors" onclick="openNewHabitModal('${h.id}')">${escapeHtml(h.title)}</span>
-              ${h.isTimelineShortcut !== false ? '<span class="text-[9px] px-1.5 py-0.2 rounded-full bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-500/30 font-mono">Shortcut</span>' : ''}
-            </div>
-            <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono flex items-center gap-1">
-              <span class="text-amber-600 dark:text-amber-400 font-bold flex items-center gap-0.5"><i data-lucide="flame" class="w-3 h-3 text-amber-500"></i><span>${h.streak}d streak</span></span>
-              ${h.target ? `• <span>${escapeHtml(h.target)}</span>` : ''}
-            </div>
-          </div>
-        </div>
+    : state.habitsList.map(h => {
+      const isDoneToday = Boolean(h.history && h.history[todayDayIdx]);
 
-        <div class="flex items-center gap-1.5 shrink-0">
-          <div class="flex items-center gap-1">
-            ${h.history.map((isDone, idx) => `
-              <div onclick="toggleHabitDay('${h.id}', ${idx})" class="habit-dot ${isDone ? 'done' : ''} ${idx === todayDayIdx ? 'ring-1 ring-amber-400' : ''}" title="${days[idx]} - ${isDone ? 'Done' : 'Missed'}">
-                ${isDone ? '✓' : days[idx]}
+      return `
+        <div class="habit-row p-2.5 rounded-xl border transition-all duration-200 flex items-center justify-between gap-2.5 shadow-sm ${isDoneToday ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-500/30' : 'bg-white dark:bg-black/40 border-slate-200 dark:border-white/5 hover:border-cyan-400/40'}" id="habit_row_${h.id}">
+          <div class="flex items-center gap-2.5 min-w-0 flex-1">
+            <span class="text-lg shrink-0">${h.emoji || '💧'}</span>
+            <div class="min-w-0 flex-1">
+              <div class="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate flex items-center gap-1.5">
+                <span class="cursor-pointer hover:text-cyan-500 transition-colors ${isDoneToday ? 'font-bold' : ''}" onclick="openNewHabitModal('${h.id}')" title="Click to edit">${escapeHtml(h.title)}</span>
+                ${h.isTimelineShortcut !== false ? '<span class="text-[9px] px-1.5 py-0.2 rounded-full bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-500/30 font-mono">Shortcut</span>' : ''}
               </div>
-            `).join('')}
+              <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono flex items-center gap-1.5 mt-0.5">
+                <span class="text-amber-600 dark:text-amber-400 font-bold flex items-center gap-0.5"><i data-lucide="flame" class="w-3 h-3 text-amber-500"></i><span>${h.streak}d streak</span></span>
+                ${h.target ? `<span class="text-slate-400">•</span> <span class="text-slate-600 dark:text-slate-300">${escapeHtml(h.target)}</span>` : ''}
+              </div>
+            </div>
           </div>
-          <button type="button" onclick="openNewHabitModal('${h.id}')" class="p-1 text-slate-400 hover:text-amber-500 transition-colors" title="Edit Habit">
-            <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
-          </button>
-          <button type="button" onclick="deleteHabit('${h.id}')" class="p-1 text-slate-400 hover:text-rose-500 transition-colors" title="Delete Habit (With Undo)">
-            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-          </button>
+
+          <!-- Today Only Action or Optional Week Matrix -->
+          <div class="flex items-center gap-1.5 shrink-0">
+            ${showWeeklyHabitMatrix ? `
+              <div class="flex items-center gap-1 mr-1">
+                ${h.history.map((isDone, idx) => `
+                  <div onclick="toggleHabitDay('${h.id}', ${idx})" class="habit-dot ${isDone ? 'done' : ''} ${idx === todayDayIdx ? 'ring-1 ring-amber-400 font-bold' : ''}" title="${days[idx]} - ${isDone ? 'Done' : 'Missed'}">
+                    ${isDone ? '✓' : days[idx]}
+                  </div>
+                `).join('')}
+              </div>
+            ` : `
+              <!-- 1-Tap Today Action Button -->
+              <button type="button" onclick="toggleHabitToday('${h.id}')" class="px-2.5 py-1 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${isDoneToday ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20 hover:bg-emerald-600' : 'bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:border-cyan-400 hover:text-cyan-500'}" title="Toggle completion for Today (${currentDayName})">
+                <i data-lucide="${isDoneToday ? 'check-circle' : 'circle'}" class="w-3.5 h-3.5 ${isDoneToday ? 'text-white' : 'text-slate-400'}"></i>
+                <span>${isDoneToday ? 'Done Today' : 'Mark Done'}</span>
+              </button>
+            `}
+            <button type="button" onclick="openNewHabitModal('${h.id}')" class="p-1 text-slate-400 hover:text-amber-500 transition-colors" title="Edit Habit">
+              <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+            </button>
+            <button type="button" onclick="deleteHabit('${h.id}')" class="p-1 text-slate-400 hover:text-rose-500 transition-colors" title="Delete Habit (With Undo)">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
 
   containers.forEach(c => {
     c.innerHTML = habitsHtml;
@@ -4093,17 +4108,32 @@ function renderHabitTracker() {
 
   // Update Done count pills & streak badges
   const doneCount = state.habitsList.filter(h => h.history[todayDayIdx]).length;
+  const totalHabits = state.habitsList.length;
+  const habitPct = totalHabits > 0 ? Math.round((doneCount / totalHabits) * 100) : 0;
+
   const pill = document.getElementById('habit-progress-pill');
-  if (pill) pill.innerHTML = `<i data-lucide="flame" class="w-3 h-3 text-amber-500"></i><span>${doneCount}/${state.habitsList.length} Done Today</span>`;
+  if (pill) pill.innerHTML = `<i data-lucide="check-circle" class="w-3 h-3 text-cyan-500"></i><span>${doneCount}/${totalHabits} Done Today (${habitPct}%)</span>`;
 
   const modalStreak = document.getElementById('modal-habit-streak-badge');
   const streakBadge = document.getElementById('habit-streak-badge');
   const maxStreak = Math.max(...state.habitsList.map(h => h.streak || 0), 0);
-  if (modalStreak) modalStreak.textContent = `${maxStreak || 12} Days Streak`;
-  if (streakBadge) streakBadge.innerHTML = `<i data-lucide="flame" class="w-3 h-3 text-amber-500"></i><span>${maxStreak || 12} Days Streak</span>`;
+  if (modalStreak) modalStreak.textContent = `${maxStreak || 14} Days Streak`;
+  if (streakBadge) streakBadge.innerHTML = `<i data-lucide="flame" class="w-3 h-3 text-amber-500"></i><span>${maxStreak || 14} Days Streak</span>`;
 
   renderUndoHabitBanner();
   lucide.createIcons();
+}
+
+let showWeeklyHabitMatrix = false;
+
+function toggleHabitWeeklyView() {
+  showWeeklyHabitMatrix = !showWeeklyHabitMatrix;
+  renderHabitTracker();
+}
+
+function toggleHabitToday(habitId) {
+  const todayDayIdx = (new Date().getDay() + 6) % 7; // Monday = 0
+  toggleHabitDay(habitId, todayDayIdx);
 }
 
 let recentlyDeletedHabits = [];
