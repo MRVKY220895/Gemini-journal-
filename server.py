@@ -273,62 +273,98 @@ async def chat_interaction(
     Multi-turn AI chat interaction with Gemini.
     Strictly isolated to current_user.uid.
     """
-    # 1. Fetch or create session strictly scoped to user
     session_id = req.session_id or f"session_{int(time.time())}"
-    
-    # 2. Save user message to isolated database
-    firestore_manager.save_chat_message(
-        user_id=current_user.uid,
-        session_id=session_id,
-        role="user",
-        content=req.message
-    )
 
-    # 3. Retrieve conversation history strictly for this user & session
-    history = firestore_manager.get_chat_history(
-        user_id=current_user.uid,
-        session_id=session_id
-    )
+    try:
+        # 1. Save user message to isolated database
+        try:
+            firestore_manager.save_chat_message(
+                user_id=current_user.uid,
+                session_id=session_id,
+                role="user",
+                content=req.message
+            )
+        except Exception as db_err:
+            logger.warning(f"Notice saving user message: {db_err}")
 
-    # Format history for Gemini service
-    formatted_history = [{"role": msg["role"], "content": msg["content"]} for msg in history]
+        # 2. Retrieve conversation history strictly for this user & session
+        try:
+            history = firestore_manager.get_chat_history(
+                user_id=current_user.uid,
+                session_id=session_id
+            )
+        except Exception:
+            history = []
 
-    # 4. Generate AI response via Gemini with security boundaries
-    ai_response = gemini_service.generate_chat_response(
-        messages=formatted_history,
-        persona=req.persona,
-        profile_context=req.profile_context
-    )
+        # Format history for Gemini service
+        formatted_history = [{"role": msg["role"], "content": msg["content"]} for msg in history]
+        if not formatted_history or formatted_history[-1].get("content") != req.message:
+            formatted_history.append({"role": "user", "content": req.message})
 
-    # 5. Extract MindPulse cognitive analytics if enabled
-    cognitive_data = None
-    if req.analyze_cognition:
-        cognitive_data = cognitive_engine.analyze_reflection(req.message, req.persona)
-        # Record cognitive metrics to user's analytics record
-        firestore_manager.record_analytics(
-            user_id=current_user.uid,
-            session_id=session_id,
-            mood_scores=cognitive_data["mood_scores"],
-            distortions=cognitive_data["detected_distortions"],
-            action_items=cognitive_data["action_items"]
+        # 3. Generate AI response via Gemini with security boundaries
+        ai_response = gemini_service.generate_chat_response(
+            messages=formatted_history,
+            persona=req.persona,
+            profile_context=req.profile_context
         )
 
-    # 6. Save AI reply to isolated database
-    saved_reply = firestore_manager.save_chat_message(
-        user_id=current_user.uid,
-        session_id=session_id,
-        role="model",
-        content=ai_response["content"],
-        cognitive_data=cognitive_data
-    )
+        # 4. Extract MindPulse cognitive analytics if enabled
+        cognitive_data = None
+        if req.analyze_cognition:
+            try:
+                cognitive_data = cognitive_engine.analyze_reflection(req.message, req.persona)
+                firestore_manager.record_analytics(
+                    user_id=current_user.uid,
+                    session_id=session_id,
+                    mood_scores=cognitive_data["mood_scores"],
+                    distortions=cognitive_data["detected_distortions"],
+                    action_items=cognitive_data["action_items"]
+                )
+            except Exception as cog_err:
+                logger.warning(f"Notice extracting cognition: {cog_err}")
 
-    return {
-        "session_id": session_id,
-        "message": saved_reply,
-        "cognitive_data": cognitive_data,
-        "model_used": ai_response.get("model_used", "gemini-2.5-flash"),
-        "is_live_gemini": ai_response.get("is_live_gemini", False)
-    }
+        # 5. Save AI reply to isolated database
+        saved_reply = None
+        try:
+            saved_reply = firestore_manager.save_chat_message(
+                user_id=current_user.uid,
+                session_id=session_id,
+                role="model",
+                content=ai_response.get("content", ""),
+                cognitive_data=cognitive_data
+            )
+        except Exception as reply_err:
+            logger.warning(f"Notice saving reply: {reply_err}")
+            saved_reply = {
+                "id": f"msg_{int(time.time())}",
+                "role": "model",
+                "content": ai_response.get("content", ""),
+                "created_at": time.time(),
+                "cognitive_data": cognitive_data
+            }
+
+        return {
+            "session_id": session_id,
+            "message": saved_reply,
+            "cognitive_data": cognitive_data,
+            "model_used": ai_response.get("model_used", "gemini-3.5-flash"),
+            "is_live_gemini": ai_response.get("is_live_gemini", False)
+        }
+    except Exception as e:
+        logger.error(f"Error in chat_interaction: {e}", exc_info=True)
+        fallback_resp = gemini_service._generate_simulated_reflective_response(req.message, req.persona)
+        return {
+            "session_id": session_id,
+            "message": {
+                "id": f"msg_{int(time.time())}",
+                "role": "model",
+                "content": fallback_resp["content"],
+                "created_at": time.time()
+            },
+            "cognitive_data": None,
+            "model_used": "smart-processor-resilience",
+            "is_live_gemini": False
+        }
 
 
 @app.post("/api/gemini/generate-plan")
