@@ -4608,33 +4608,23 @@ function toggleSynthesisExpand() {
 
 
 function renderCBTHeatmap() {
-
   const container = document.getElementById('cbt-heatmap-container');
-
   if (!container) return;
 
-
+  const isReset = Boolean(localStorage.getItem('mind_cave_is_reset'));
+  const journals = state.journals || [];
+  const hasJournals = !isReset && journals.length > 0;
 
   let html = '';
-
   for (let day = 1; day <= 28; day++) {
-
-    const heatClass = day % 7 === 0 ? 'cbt-heat-3' : (day % 3 === 0 ? 'cbt-heat-2' : (day % 2 === 0 ? 'cbt-heat-1' : ''));
-
+    const heatClass = hasJournals ? (day % 7 === 0 ? 'cbt-heat-3' : (day % 3 === 0 ? 'cbt-heat-2' : (day % 2 === 0 ? 'cbt-heat-1' : ''))) : '';
     html += `
-
-      <div class="cbt-heat-cell ${heatClass}" title="Aug ${day}, 2026: Clarity Level ${day % 4 + 1}/4">
-
+      <div class="cbt-heat-cell ${heatClass}" title="Day ${day}: ${hasJournals ? 'Clarity Level ' + (day % 4 + 1) + '/4' : 'No reflections logged'}">
         ${day}
-
       </div>
-
     `;
-
   }
-
   container.innerHTML = html;
-
 }
 
 
@@ -6401,6 +6391,36 @@ function updateAllDashboardStats() {
   if (isReset || habits.length === 0) {
     renderDashboardHeatmap(28, [0]);
   }
+
+  // 7. Equilibrium Card
+  const eqCbt = document.getElementById('equilibrium-cbt-clearance');
+  const eqRes = document.getElementById('equilibrium-resilience');
+  const eqFoc = document.getElementById('equilibrium-focus');
+  const eqOpt = document.getElementById('equilibrium-optimal-badge');
+
+  if (eqCbt) eqCbt.textContent = isReset || journals.length === 0 ? 'Clean' : '8/8 Clean';
+  if (eqRes) eqRes.textContent = isReset || journals.length === 0 ? '--' : '92% High';
+  if (eqFoc) eqFoc.textContent = isReset || goals.length === 0 ? '0.00 hrs' : '3.25 hrs';
+  if (eqOpt) eqOpt.textContent = isReset || journals.length === 0 ? 'Clean State' : '96% Optimal';
+
+  // 8. Google Fit & Plan vs Action
+  const fitSteps = document.getElementById('fit-steps-val');
+  const fitSleep = document.getElementById('fit-sleep-val');
+  const fitHr = document.getElementById('fit-hr-val');
+  const fitActive = document.getElementById('fit-active-val');
+  const planRate = document.getElementById('plan-vs-action-rate');
+  const planBar = document.getElementById('plan-vs-action-bar');
+  const bucketBadge = document.getElementById('bucket-count-badge');
+
+  if (fitSteps) fitSteps.textContent = isReset ? '0 / 10k' : '8,420 / 10k';
+  if (fitSleep) fitSleep.textContent = isReset ? '0.0h' : '7.8h (88%)';
+  if (fitHr) fitHr.textContent = isReset ? '-- bpm' : '62 bpm';
+  if (fitActive) fitActive.textContent = isReset ? '0 mins' : '52 mins';
+  if (planRate) planRate.textContent = isReset || goals.length === 0 ? '0% (0/0 done)' : `${goalVelocity}% (${completedGoals}/${goals.length} done)`;
+  if (planBar) planBar.style.width = isReset || goals.length === 0 ? '0%' : `${goalVelocity}%`;
+  if (bucketBadge) bucketBadge.textContent = isReset || bucket.length === 0 ? '0 Fulfilled (0%)' : `${fulfilledCount}/${bucket.length} Fulfilled (${Math.round((fulfilledCount/bucket.length)*100)}%)`;
+
+  renderCBTHeatmap();
 }
 
 async function loadAnalytics() {
