@@ -121,20 +121,20 @@ async def get_firebase_public_config():
 async def check_gemini_health():
     """Live health probe for Google Gemini API Key and Quota status."""
     key = secret_manager.get_gemini_api_key()
-    if not key or key.startswith("your_") or len(key) < 15:
+    if not key or key.startswith("your_") or key.startswith("mock_") or len(key) < 15:
         return {"status": "unconfigured", "message": "Connect Gemini API"}
     
     try:
         from google import genai
         client = genai.Client(api_key=key)
-        for model_name in ["gemini-3.6-flash", "gemini-3.5-flash", "gemini-flash-latest"]:
+        for model_name in ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.0-flash-lite", "gemini-2.5-flash"]:
             try:
                 resp = client.models.generate_content(
                     model=model_name,
                     contents="ping"
                 )
                 if resp and resp.text:
-                    return {"status": "live", "message": "Gemini 3.5 (Live)", "model": model_name}
+                    return {"status": "live", "message": "Gemini 2.0 (Live)", "model": model_name}
             except Exception as m_err:
                 err_s = str(m_err)
                 if "RESOURCE_EXHAUSTED" in err_s:
