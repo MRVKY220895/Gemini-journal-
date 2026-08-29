@@ -314,45 +314,25 @@ function updateChartsTheme(theme) {
 
 
   if (state.radarChart && state.radarChart.options) {
-
-    if (state.radarChart.options.scales?.r) {
-
-      state.radarChart.options.scales.r.grid.color = gridColor;
-
-      state.radarChart.options.scales.r.angleLines.color = gridColor;
-
-      state.radarChart.options.scales.r.pointLabels.color = textColor;
-
+    if (state.radarChart.options.scales && state.radarChart.options.scales.r) {
+      if (state.radarChart.options.scales.r.grid) state.radarChart.options.scales.r.grid.color = gridColor;
+      if (state.radarChart.options.scales.r.angleLines) state.radarChart.options.scales.r.angleLines.color = gridColor;
+      if (state.radarChart.options.scales.r.pointLabels) state.radarChart.options.scales.r.pointLabels.color = textColor;
     }
-
     state.radarChart.update();
-
   }
-
-
 
   if (state.lineChart && state.lineChart.options) {
-
-    if (state.lineChart.options.scales?.x) {
-
-      state.lineChart.options.scales.x.ticks.color = textColor;
-
-      state.lineChart.options.scales.x.grid.color = gridColor;
-
+    if (state.lineChart.options.scales && state.lineChart.options.scales.x) {
+      if (state.lineChart.options.scales.x.ticks) state.lineChart.options.scales.x.ticks.color = textColor;
+      if (state.lineChart.options.scales.x.grid) state.lineChart.options.scales.x.grid.color = gridColor;
     }
-
-    if (state.lineChart.options.scales?.y) {
-
-      state.lineChart.options.scales.y.ticks.color = textColor;
-
-      state.lineChart.options.scales.y.grid.color = gridColor;
-
+    if (state.lineChart.options.scales && state.lineChart.options.scales.y) {
+      if (state.lineChart.options.scales.y.ticks) state.lineChart.options.scales.y.ticks.color = textColor;
+      if (state.lineChart.options.scales.y.grid) state.lineChart.options.scales.y.grid.color = gridColor;
     }
-
     state.lineChart.update();
-
   }
-
 }
 
 
@@ -2047,10 +2027,9 @@ function appendChatMessage(role, content, authorName, modelTag, cognitiveData = 
 
 
   container.appendChild(msgDiv);
-
   container.scrollTop = container.scrollHeight;
-
   lucide.createIcons();
+}
 
 function restoreChatHistory() {
   const userKey = 'mind_cave_chat_history_' + (state.currentUser?.uid || 'guest');
