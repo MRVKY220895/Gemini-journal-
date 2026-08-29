@@ -191,6 +191,16 @@ async def set_gemini_api_key_endpoint(req: SetApiKeyRequest):
     }
 
 
+@app.post("/api/security/reset-all")
+async def factory_reset_endpoint(current_user: UserContext = Depends(get_current_user)):
+    """
+    Permanently wipes all user data: journals, multi-turn chat history, sessions, and analytics.
+    Irreversible action.
+    """
+    res = firestore_manager.reset_user_data(user_id=current_user.uid)
+    return res
+
+
 # =============================================================================
 # AUTHENTICATED USER ROUTES (STRICT UID ENFORCEMENT)
 # =============================================================================

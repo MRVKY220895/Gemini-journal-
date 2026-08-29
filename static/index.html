@@ -1308,6 +1308,29 @@
           </div>
         </div>
       </div>
+
+      <!-- Danger Zone: Factory Reset & Permanent Wipe -->
+      <div class="double-bezel border-rose-500/30">
+        <div class="double-bezel-inner p-5 bg-gradient-to-r from-rose-950/20 via-black/40 to-black/60 border-rose-500/20">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-400 font-mono text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                  <i data-lucide="alert-octagon" class="w-3 h-3 text-rose-400"></i> Danger Zone
+                </span>
+                <h3 class="text-sm sm:text-base font-bold text-white">Factory Reset & Permanent Wipe</h3>
+              </div>
+              <p class="text-xs text-slate-400 leading-relaxed max-w-2xl">
+                Permanently erase all journal reflections, AI Studio chats, achievable goals, habit streaks, photos, and cognitive metrics. Reset everything and start completely fresh from scratch.
+              </p>
+            </div>
+            <button onclick="openFactoryResetModal()" class="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow-lg shadow-rose-600/30 transition-all flex items-center gap-2 shrink-0 self-start sm:self-center">
+              <i data-lucide="trash-2" class="w-4 h-4 text-white"></i>
+              <span>Factory Reset Everything</span>
+            </button>
+          </div>
+        </div>
+      </div>
     </section>
 
   </main>
@@ -1505,6 +1528,14 @@
               </label>
             </div>
             <p class="text-[10px] text-slate-500 dark:text-slate-400">Toggle individual biological & vitality tracks on/off for your journal.</p>
+          </div>
+
+          <!-- Danger Zone: Factory Data Wipe -->
+          <div class="pt-3 border-t border-rose-500/20">
+            <button type="button" onclick="openFactoryResetModal()" class="w-full py-2.5 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 dark:text-rose-400 border border-rose-500/30 text-xs font-bold flex items-center justify-center gap-2 transition-colors">
+              <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-500"></i>
+              <span>Factory Reset Everything (Start From First)</span>
+            </button>
           </div>
         </div>
 
@@ -2778,8 +2809,75 @@
               <div class="text-[10px] text-slate-500 dark:text-slate-400">Automated credential checks</div>
             </div>
           </div>
+          <div class="pt-2 mt-2 border-t border-slate-200 dark:border-white/5 flex items-center justify-between">
+            <span class="text-[10px] text-rose-500 dark:text-rose-400 font-semibold flex items-center gap-1"><i data-lucide="alert-triangle" class="w-3 h-3"></i><span>Danger Zone: Permanent Factory Reset</span></span>
+            <button onclick="closeMasterMenuModal(); openFactoryResetModal();" class="text-[10px] px-2 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 dark:text-rose-400 border border-rose-500/30 font-bold transition-colors">Wipe & Reset Everything →</button>
+          </div>
         </div>
 
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: FACTORY RESET & PERMANENT DATA WIPE -->
+  <!-- ===================================================================== -->
+  <div id="factory-reset-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
+    <div class="double-bezel max-w-md w-full my-auto border-rose-500/40 shadow-2xl shadow-rose-950/50">
+      <div class="double-bezel-inner p-5 sm:p-6 bg-slate-950 border-rose-500/30 space-y-4">
+        <!-- Header -->
+        <div class="flex items-start justify-between pb-3 border-b border-rose-500/20">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-rose-500/20 border border-rose-500/40 text-rose-500 flex items-center justify-center shrink-0">
+              <i data-lucide="alert-octagon" class="w-5 h-5 text-rose-500"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-white">Factory Reset Everything</h3>
+              <p class="text-[11px] text-rose-400 font-mono font-semibold">Irreversible Complete System Wipe</p>
+            </div>
+          </div>
+          <button onclick="closeFactoryResetModal()" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- Strong Disclaimer Callout Box -->
+        <div class="p-3.5 rounded-2xl bg-rose-950/40 border border-rose-500/40 space-y-2">
+          <div class="flex items-center gap-2 text-rose-300 font-bold text-xs">
+            <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-400 shrink-0"></i>
+            <span>CRITICAL DISCLAIMER — NO RECOVERY OPTION</span>
+          </div>
+          <p class="text-[11px] text-rose-200/90 leading-relaxed">
+            This action is <strong>permanent and irreversible</strong>. Once wiped, there is <strong>strictly NO OPTION TO RECOVER</strong> your:
+          </p>
+          <ul class="text-[11px] text-rose-300 list-disc list-inside space-y-0.5 font-medium pl-1">
+            <li>Reflective journal entries & memory timestamps</li>
+            <li>Multi-turn AI Studio conversations & persona memory</li>
+            <li>Today's achievable goals & focus duration logs</li>
+            <li>Habit streaks & custom timeline shortcuts</li>
+            <li>MindPulse cognitive distortion metrics & emotion vectors</li>
+            <li>Local encryption vaults & custom API credentials</li>
+          </ul>
+        </div>
+
+        <!-- Mandatory Confirmation Step -->
+        <div class="space-y-2 pt-1">
+          <label class="text-xs font-semibold text-slate-300 block">
+            To confirm permanent wipe, type <span class="font-mono text-rose-400 font-bold bg-rose-950/60 px-1.5 py-0.5 rounded border border-rose-500/40">RESET</span> below:
+          </label>
+          <input type="text" id="reset-confirm-input" oninput="onResetConfirmInput(this.value)" placeholder="Type RESET to confirm" class="w-full bg-black/60 text-white text-xs p-2.5 rounded-xl border border-slate-700 focus:outline-none focus:border-rose-500 font-mono transition-colors">
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-white/5">
+          <button type="button" onclick="closeFactoryResetModal()" class="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-semibold transition-colors">
+            Keep My Data
+          </button>
+          <button type="button" id="btn-execute-factory-reset" onclick="executeFactoryReset()" disabled class="px-4 py-2 rounded-xl bg-rose-600/30 text-rose-400/50 border border-rose-500/20 text-xs font-bold transition-all cursor-not-allowed flex items-center gap-1.5">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            <span>Permanently Wipe Everything</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>

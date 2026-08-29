@@ -372,6 +372,26 @@ class IsolatedUserStorage:
             "timeline": timeline[-15:]
         }
 
+    def reset_user_data(self, user_id: str) -> Dict[str, Any]:
+        """
+        Permanently wipes all sessions, messages, journals, and analytics
+        strictly for the calling user. Irreversible factory reset.
+        """
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM messages WHERE user_id = ?", (user_id,))
+            cursor.execute("DELETE FROM sessions WHERE user_id = ?", (user_id,))
+            cursor.execute("DELETE FROM journals WHERE user_id = ?", (user_id,))
+            cursor.execute("DELETE FROM analytics WHERE user_id = ?", (user_id,))
+            conn.commit()
+            logger.info(f"All isolated data permanently wiped for user_id={user_id}")
+
+        return {
+            "success": True,
+            "user_id": user_id,
+            "message": "All user journals, chats, sessions, and analytics permanently erased."
+        }
+
 
 # Global isolated storage instance
 isolated_storage = IsolatedUserStorage()

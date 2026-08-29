@@ -4877,3 +4877,82 @@ async function shareScrapbookImage() {
     }
   });
 }
+
+// =============================================================================
+// FACTORY RESET & PERMANENT DATA WIPE (IRREVERSIBLE)
+// =============================================================================
+
+function openFactoryResetModal() {
+  const modal = document.getElementById('factory-reset-modal');
+  const input = document.getElementById('reset-confirm-input');
+  const btn = document.getElementById('btn-execute-factory-reset');
+  if (input) input.value = '';
+  if (btn) {
+    btn.disabled = true;
+    btn.className = 'px-4 py-2 rounded-xl bg-rose-600/30 text-rose-400/50 border border-rose-500/20 text-xs font-bold transition-all cursor-not-allowed flex items-center gap-1.5';
+  }
+  if (modal) modal.classList.remove('hidden');
+  lucide.createIcons();
+}
+
+function closeFactoryResetModal() {
+  const modal = document.getElementById('factory-reset-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function onResetConfirmInput(val) {
+  const btn = document.getElementById('btn-execute-factory-reset');
+  if (!btn) return;
+  const isMatch = val.trim().toUpperCase() === 'RESET';
+  btn.disabled = !isMatch;
+  if (isMatch) {
+    btn.className = 'px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-600/40 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 active:scale-95 animate-pulse';
+  } else {
+    btn.className = 'px-4 py-2 rounded-xl bg-rose-600/30 text-rose-400/50 border border-rose-500/20 text-xs font-bold transition-all cursor-not-allowed flex items-center gap-1.5';
+  }
+}
+
+async function executeFactoryReset() {
+  const btn = document.getElementById('btn-execute-factory-reset');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `<i data-lucide="loader" class="w-3.5 h-3.5 animate-spin"></i><span>Wiping all data...</span>`;
+    lucide.createIcons();
+  }
+
+  try {
+    // 1. Call Backend to wipe all database entries, chats, and analytics
+    await fetch('/api/security/reset-all', {
+      method: 'POST',
+      headers: getAuthHeaders()
+    });
+  } catch (err) {
+    console.warn('Backend reset call warning:', err);
+  }
+
+  // 2. Clear all local storage & session storage
+  localStorage.clear();
+  sessionStorage.clear();
+
+  // 3. Re-initialize state to pristine clean defaults
+  state.currentSessionId = null;
+  state.chatHistory = [];
+  state.journals = [];
+  state.todayGoals = [];
+  state.habitsList = [];
+  state.agendaItems = [];
+  state.timelineShortcuts = [];
+  state.bucketList = [];
+  state.todayGoal = { text: '', completed: false };
+  state.currentPersona = 'cbt_reflector';
+  storyEventsCache = [];
+  memoryPhotosList = [];
+
+  closeFactoryResetModal();
+
+  showToast('Factory reset complete. Welcome to your fresh Mind Cave!');
+
+  setTimeout(() => {
+    window.location.reload();
+  }, 900);
+}

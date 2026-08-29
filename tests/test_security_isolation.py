@@ -95,6 +95,19 @@ class TestMultiTenantDataIsolation:
         assert alice_get_resp.status_code == 200
         assert alice_get_resp.json()["entry"]["title"] == "Alice's Secret Patent Idea"
 
+        # 6. User Alice executes factory reset -> Wipes only Alice's records
+        reset_resp = client.post(
+            "/api/security/reset-all",
+            headers={"Authorization": f"Bearer {alice_token}"}
+        )
+        assert reset_resp.status_code == 200
+        assert reset_resp.json()["success"] is True
+
+        # Alice's journals are now completely wiped
+        alice_list_after = client.get("/api/journals", headers={"Authorization": f"Bearer {alice_token}"})
+        assert alice_list_after.status_code == 200
+        assert len(alice_list_after.json()["journals"]) == 0
+
 
 class TestPromptInjectionAndSecurityAuditing:
     """Validates AI Studio safety instructions and prompt injection defenses."""

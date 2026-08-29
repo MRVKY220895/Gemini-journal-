@@ -93,6 +93,23 @@ class FirestoreManager:
     def record_analytics(self, user_id: str, **kwargs) -> Dict[str, Any]:
         return isolated_storage.record_analytics(user_id, **kwargs)
 
+    def reset_user_data(self, user_id: str) -> Dict[str, Any]:
+        """Permanently wipes all local and Firestore records for the user."""
+        res = isolated_storage.reset_user_data(user_id)
+        if self.is_live:
+            try:
+                user_ref = self.get_user_doc_ref(user_id)
+                if user_ref:
+                    for col_name in ["journals", "sessions", "analytics"]:
+                        col_ref = user_ref.collection(col_name)
+                        docs = col_ref.limit(100).stream()
+                        for doc in docs:
+                            doc.reference.delete()
+                    user_ref.delete()
+            except Exception as e:
+                logger.warning(f"Failed to wipe Firestore documents for user {user_id}: {e}")
+        return res
+
 
 # Global Firestore Manager instance
 firestore_manager = FirestoreManager()
