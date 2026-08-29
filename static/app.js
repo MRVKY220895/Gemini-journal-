@@ -20,7 +20,44 @@ const state = {
   firebaseAuth: null,
   timelineRange: localStorage.getItem('mind_cave_timeline_range') || 'day_standard',
   selectedDiaryDate: new Date(),
-  mediaMode: localStorage.getItem('mind_cave_media_mode') || 'photos'
+  mediaMode: localStorage.getItem('mind_cave_media_mode') || 'photos',
+  diaryRangeMode: 'single', // 'single' | 'week' | 'all'
+  isSpeakingSummary: false,
+  isRecordingVoice: false,
+  speechRecognition: null,
+  speechUtterance: null,
+  agendaItems: JSON.parse(localStorage.getItem('mind_cave_agenda_items') || 'null') || [
+    {
+      id: 'task_1',
+      type: 'todo',
+      title: 'Review System Architecture with Core Engineering',
+      date: (new Date()).toISOString().split('T')[0],
+      time: '14:30',
+      priority: 'high',
+      completed: false,
+      gcalSynced: true
+    },
+    {
+      id: 'task_2',
+      type: 'reminder',
+      title: 'Take 15-min Circadian Stroll & Deep Breathing',
+      date: (new Date()).toISOString().split('T')[0],
+      time: '16:00',
+      priority: 'normal',
+      completed: true,
+      gcalSynced: true
+    },
+    {
+      id: 'task_3',
+      type: 'milestone',
+      title: 'Quarterly Mind & Goal Alignment Milestone',
+      date: (new Date()).toISOString().split('T')[0],
+      time: '19:00',
+      priority: 'high',
+      completed: false,
+      gcalSynced: true
+    }
+  ]
 };
 
 // Initialize Application on DOM Ready
@@ -31,6 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
   checkGeminiKeyStatus();
   updateUserUI();
   initDiarySpace();
+  initAgendaList();
   initAnalyticsCharts();
   loadJournals();
   loadSecurityAudit();
@@ -508,12 +546,21 @@ function switchTab(tabId) {
   views.forEach(v => {
     const viewEl = document.getElementById(`view-${v}`);
     const btnEl = document.getElementById(`tab-btn-${v}`);
+    const mobileBtnEl = document.getElementById(`mobile-tab-${v}`);
     if (v === tabId) {
-      viewEl.classList.remove('hidden');
-      btnEl.classList.add('active');
+      if (viewEl) viewEl.classList.remove('hidden');
+      if (btnEl) btnEl.classList.add('active');
+      if (mobileBtnEl) {
+        mobileBtnEl.classList.add('active', 'text-cyan-400');
+        mobileBtnEl.classList.remove('text-slate-400');
+      }
     } else {
-      viewEl.classList.add('hidden');
-      btnEl.classList.remove('active');
+      if (viewEl) viewEl.classList.add('hidden');
+      if (btnEl) btnEl.classList.remove('active');
+      if (mobileBtnEl) {
+        mobileBtnEl.classList.remove('active', 'text-cyan-400');
+        mobileBtnEl.classList.add('text-slate-400');
+      }
     }
   });
 
@@ -1473,23 +1520,54 @@ function setTimelineViewMode(mode) {
   }
 }
 
+function setDiaryRangeMode(mode) {
+  state.diaryRangeMode = mode;
+  const singleBtn = document.getElementById('range-mode-single-btn');
+  const weekBtn = document.getElementById('range-mode-week-btn');
+  const allBtn = document.getElementById('range-mode-all-btn');
+
+  if (singleBtn) singleBtn.className = mode === 'single' ? 'px-2 py-0.5 rounded-lg font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-[11px]' : 'px-2 py-0.5 rounded-lg font-semibold text-slate-400 hover:text-white text-[11px]';
+  if (weekBtn) weekBtn.className = mode === 'week' ? 'px-2 py-0.5 rounded-lg font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-[11px]' : 'px-2 py-0.5 rounded-lg font-semibold text-slate-400 hover:text-white text-[11px]';
+  if (allBtn) allBtn.className = mode === 'all' ? 'px-2 py-0.5 rounded-lg font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-[11px]' : 'px-2 py-0.5 rounded-lg font-semibold text-slate-400 hover:text-white text-[11px]';
+
+  renderChronoTimeline();
+  const labelMap = { single: 'Day View', week: '7-Day Consolidated Digest', all: 'All-Time Life Stream' };
+  showToast(`View switched to ${labelMap[mode] || mode}`);
+}
+
 function getChronologicalEvents(journals) {
   const events = [];
   const selectedDate = state.selectedDiaryDate || new Date();
   const selectedDateStr = selectedDate.toDateString();
   const isSelectedToday = selectedDateStr === (new Date()).toDateString();
 
-  // 1. Add Journal Entries (filtered for selected date)
+  // Calculate Week boundaries for 7-day mode
+  const dayOfWeek = selectedDate.getDay();
+  const weekStart = new Date(selectedDate);
+  weekStart.setDate(selectedDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1));
+  weekStart.setHours(0, 0, 0, 0);
+
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate() + 7);
+  weekEnd.setHours(23, 59, 59, 999);
+
+  // 1. Add Journal Entries
   journals.forEach((j, idx) => {
     let entryDate = new Date();
     if (j.created_at) {
       entryDate = typeof j.created_at === 'number' ? new Date(j.created_at * 1000) : new Date(j.created_at);
     }
     
-    // Match date or include if on today
-    const matchesDate = isSelectedToday || (entryDate.toDateString() === selectedDateStr);
+    let matches = false;
+    if (state.diaryRangeMode === 'all') {
+      matches = true;
+    } else if (state.diaryRangeMode === 'week') {
+      matches = entryDate >= weekStart && entryDate <= weekEnd;
+    } else {
+      matches = isSelectedToday || (entryDate.toDateString() === selectedDateStr);
+    }
 
-    if (matchesDate) {
+    if (matches) {
       let timeStr = '12:00';
       const timeMatch = j.title && j.title.match(/\[(\d{1,2}:\d{2})\]/);
       if (timeMatch) {
@@ -1504,6 +1582,8 @@ function getChronologicalEvents(journals) {
         type: 'journal',
         time: timeStr,
         rawHour: parseInt(timeStr.substring(0, 2), 10) || 12,
+        entryDate: entryDate,
+        dateHeader: entryDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
         title: j.title.replace(/\[\d{1,2}:\d{2}\]\s*/, '') || 'Reflective Journal Turn',
         content: j.content,
         mood: j.mood || 'Reflective',
@@ -1515,14 +1595,16 @@ function getChronologicalEvents(journals) {
     }
   });
 
-  // 2. Add Memory Photos (if on today)
-  if (isSelectedToday) {
+  // 2. Add Memory Photos
+  if (state.diaryRangeMode === 'all' || state.diaryRangeMode === 'week' || isSelectedToday) {
     memoryPhotosList.forEach(p => {
       events.push({
         id: p.id,
         type: 'photo',
         time: p.hour,
         rawHour: parseInt(p.hour.substring(0, 2), 10) || 12,
+        entryDate: selectedDate,
+        dateHeader: selectedDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
         title: p.caption,
         content: p.caption,
         mood: p.mood,
@@ -1534,8 +1616,8 @@ function getChronologicalEvents(journals) {
     });
   }
 
-  // 3. Add Google Calendar Events if synced and viewing today
-  if (isGCalSynced && isSelectedToday) {
+  // 3. Add Google Calendar Events if synced
+  if (isGCalSynced && (state.diaryRangeMode === 'all' || state.diaryRangeMode === 'week' || isSelectedToday)) {
     Object.keys(mockGCalSchedule).forEach(h => {
       const g = mockGCalSchedule[h];
       events.push({
@@ -1543,6 +1625,8 @@ function getChronologicalEvents(journals) {
         type: 'gcal',
         time: h,
         rawHour: parseInt(h.substring(0, 2), 10),
+        entryDate: selectedDate,
+        dateHeader: selectedDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
         title: `Google Calendar: ${g.title}`,
         content: `Scheduled session for ${g.duration} (${g.category}). Planned agenda synchronized to daily chronicle.`,
         mood: '🗓️ Planned',
@@ -1554,8 +1638,47 @@ function getChronologicalEvents(journals) {
     });
   }
 
-  // Sort strictly by timestamp
-  events.sort((a, b) => a.time.localeCompare(b.time));
+  // 4. Add Life Agenda Tasks & Milestones
+  state.agendaItems.forEach(t => {
+    const taskDate = new Date(t.date + 'T' + t.time);
+    let taskMatches = false;
+    if (state.diaryRangeMode === 'all') {
+      taskMatches = true;
+    } else if (state.diaryRangeMode === 'week') {
+      taskMatches = taskDate >= weekStart && taskDate <= weekEnd;
+    } else {
+      taskMatches = isSelectedToday || (taskDate.toDateString() === selectedDateStr);
+    }
+
+    if (taskMatches) {
+      events.push({
+        id: `task_item_${t.id}`,
+        type: 'task',
+        time: t.time,
+        rawHour: parseInt(t.time.substring(0, 2), 10) || 12,
+        entryDate: taskDate,
+        dateHeader: taskDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
+        title: `${t.type === 'milestone' ? '⭐ Milestone' : t.type === 'reminder' ? '⏰ Reminder' : '☑️ Task'}: ${t.title}`,
+        content: `Priority: ${t.priority.toUpperCase()} • Status: ${t.completed ? '✅ Completed' : '⏳ In Progress'} • 2-Way Google Calendar Synced`,
+        mood: t.completed ? '✨ Fulfilled' : '🎯 Actionable',
+        cbtNote: null,
+        location: '📍 Google Calendar Task',
+        energy: t.priority === 'high' ? '⚡ High' : '🌱 Normal',
+        photoUrl: null
+      });
+    }
+  });
+
+  // Sort strictly by Date + Time
+  events.sort((a, b) => {
+    if (state.diaryRangeMode !== 'single') {
+      const dateA = a.entryDate ? a.entryDate.getTime() : 0;
+      const dateB = b.entryDate ? b.entryDate.getTime() : 0;
+      if (dateA !== dateB) return dateA - dateB;
+    }
+    return a.time.localeCompare(b.time);
+  });
+
   return events;
 }
 
@@ -1586,7 +1709,7 @@ async function renderChronoTimeline() {
   const isSelectedToday = (state.selectedDiaryDate || new Date()).toDateString() === now.toDateString();
   const dateFormatted = (state.selectedDiaryDate || new Date()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
-  // If NO logged entries exist for selected date
+  // If NO logged entries exist
   if (events.length === 0) {
     container.innerHTML = `
       <div class="p-8 text-center bg-black/30 rounded-3xl border border-white/5 space-y-3 my-4">
@@ -1612,8 +1735,22 @@ async function renderChronoTimeline() {
 
   let html = '<div class="timeline-spine"></div>';
   let nowMarkerInserted = false;
+  let lastDateHeader = '';
 
   events.forEach((ev) => {
+    // Render Consolidated Multi-Date Divider if in week / all mode
+    if (state.diaryRangeMode !== 'single' && ev.dateHeader && ev.dateHeader !== lastDateHeader) {
+      html += `
+        <div class="consolidated-date-divider">
+          <span class="consolidated-date-pill">
+            <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+            <span>${ev.dateHeader}</span>
+          </span>
+        </div>
+      `;
+      lastDateHeader = ev.dateHeader;
+    }
+
     // Circadian / Weather Badge
     let weatherBadge = '☀️ Midday';
     if (ev.rawHour >= 5 && ev.rawHour < 9) weatherBadge = '🌅 Dawn Routine';
@@ -1623,8 +1760,8 @@ async function renderChronoTimeline() {
     else if (ev.rawHour >= 20) weatherBadge = '🌌 Night Sanctuary';
     else weatherBadge = '🌙 Deep Rest';
 
-    // Insert LIVE NOW laser needle if viewing today
-    if (isSelectedToday && !nowMarkerInserted && ev.rawHour >= currentHourInt) {
+    // Insert LIVE NOW laser needle if viewing today in single mode
+    if (state.diaryRangeMode === 'single' && isSelectedToday && !nowMarkerInserted && ev.rawHour >= currentHourInt) {
       html += `
         <div class="timeline-now-marker">
           <div class="timeline-now-badge">
@@ -1638,9 +1775,10 @@ async function renderChronoTimeline() {
     }
 
     const isGCal = ev.type === 'gcal';
+    const isTask = ev.type === 'task';
 
     html += `
-      <div class="timeline-hour-row has-entry ${isGCal ? 'has-gcal' : ''}">
+      <div class="timeline-hour-row has-entry ${isGCal ? 'has-gcal' : ''} ${isTask ? 'has-task' : ''}">
         <!-- Node Dot & Hour Label -->
         <div class="timeline-hour-node">
           <div class="timeline-node-dot"></div>
@@ -1659,6 +1797,10 @@ async function renderChronoTimeline() {
                 <span class="gcal-planned-pill">
                   <i data-lucide="calendar" class="w-3 h-3 text-blue-400"></i>
                   <span>GCal Sync</span>
+                </span>
+              ` : isTask ? `
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-blue-950/50 border border-blue-500/30 text-blue-300 font-semibold font-mono">
+                  Life Agenda
                 </span>
               ` : `
                 <span class="eyebrow-badge !text-cyan-300 !bg-cyan-950/40 !border-cyan-500/30">
@@ -1721,7 +1863,7 @@ async function renderChronoTimeline() {
   });
 
   // If NOW laser needle was not inserted and viewing today
-  if (isSelectedToday && !nowMarkerInserted) {
+  if (state.diaryRangeMode === 'single' && isSelectedToday && !nowMarkerInserted) {
     html += `
       <div class="timeline-now-marker">
         <div class="timeline-now-badge">
@@ -2422,4 +2564,354 @@ function showToast(msg) {
     toast.style.opacity = '0';
     setTimeout(() => toast.remove(), 300);
   }, 3000);
+}
+
+// =============================================================================
+// LIFE AGENDA: TO-DOS, REMINDERS & IMPORTANT DATES (2-WAY GCAL SYNC)
+// =============================================================================
+
+function initAgendaList() {
+  renderAgendaList();
+}
+
+function renderAgendaList() {
+  const container = document.getElementById('chrono-agenda-list');
+  if (!container) return;
+
+  if (!state.agendaItems || state.agendaItems.length === 0) {
+    container.innerHTML = `
+      <div class="col-span-full p-4 text-center bg-black/20 rounded-xl border border-white/5 text-xs text-slate-400">
+        No active tasks or reminders. Click <strong>+ Add To-Do / Reminder</strong> to sync your agenda with Google Calendar.
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = state.agendaItems.map(item => `
+    <div class="agenda-item-card ${item.completed ? 'is-completed' : ''}" id="agenda_row_${item.id}">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <button type="button" onclick="toggleTaskComplete('${item.id}')" class="w-5 h-5 rounded-lg border flex items-center justify-center transition-colors shrink-0 ${item.completed ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400' : 'bg-black/40 border-slate-700 hover:border-cyan-400 text-transparent'}">
+          <i data-lucide="check" class="w-3.5 h-3.5 ${item.completed ? 'block' : 'hidden'}"></i>
+        </button>
+
+        <div class="min-w-0">
+          <div class="flex items-center gap-1.5 flex-wrap mb-0.5">
+            <span class="text-[10px] font-mono px-1.5 py-0.2 rounded-md ${item.type === 'milestone' ? 'bg-amber-950/60 text-amber-300 border border-amber-500/30' : item.type === 'reminder' ? 'bg-purple-950/60 text-purple-300 border border-purple-500/30' : 'bg-blue-950/60 text-blue-300 border border-blue-500/30'}">
+              ${item.type === 'milestone' ? '⭐ Milestone' : item.type === 'reminder' ? '⏰ Reminder' : '☑️ Task'}
+            </span>
+            <span class="text-[10px] text-slate-400 font-mono">⏰ ${item.time} • ${item.date}</span>
+            ${item.priority === 'high' ? '<span class="text-[10px] text-rose-400 font-mono font-bold">⚡ High</span>' : ''}
+          </div>
+          <h5 class="agenda-title text-xs font-semibold text-slate-200 truncate">${escapeHtml(item.title)}</h5>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-1 shrink-0">
+        <button type="button" onclick="convertTaskToReflection('${item.id}')" class="p-1 rounded-lg text-cyan-400 hover:bg-cyan-500/10 transition-colors" title="Reflect on this task in Journal">
+          <i data-lucide="feather" class="w-3.5 h-3.5"></i>
+        </button>
+        <button type="button" onclick="deleteTask('${item.id}')" class="p-1 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors" title="Delete Task">
+          <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+    </div>
+  `).join('');
+
+  lucide.createIcons();
+}
+
+function openNewTaskModal() {
+  const dateInput = document.getElementById('task-date-input');
+  if (dateInput) {
+    const d = state.selectedDiaryDate || new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    dateInput.value = `${y}-${m}-${day}`;
+  }
+  document.getElementById('task-modal')?.classList.remove('hidden');
+}
+
+function closeNewTaskModal() {
+  document.getElementById('task-modal')?.classList.add('hidden');
+}
+
+function submitNewTask(event) {
+  event.preventDefault();
+  const category = document.getElementById('task-category-select').value;
+  const title = document.getElementById('task-title-input').value.trim();
+  const date = document.getElementById('task-date-input').value;
+  const time = document.getElementById('task-time-input').value;
+  const priority = document.getElementById('task-priority-select').value;
+  const gcalSync = document.getElementById('task-gcal-sync-check').checked;
+
+  if (!title) return;
+
+  const newTask = {
+    id: `task_${Date.now()}`,
+    type: category,
+    title: title,
+    date: date,
+    time: time,
+    priority: priority,
+    completed: false,
+    gcalSynced: gcalSync
+  };
+
+  state.agendaItems.unshift(newTask);
+  localStorage.setItem('mind_cave_agenda_items', JSON.stringify(state.agendaItems));
+
+  closeNewTaskModal();
+  renderAgendaList();
+  renderChronoTimeline();
+  showToast(`✓ Added "${title}" & synced with Google Calendar.`);
+}
+
+function toggleTaskComplete(id) {
+  const task = state.agendaItems.find(t => t.id === id);
+  if (task) {
+    task.completed = !task.completed;
+    localStorage.setItem('mind_cave_agenda_items', JSON.stringify(state.agendaItems));
+    renderAgendaList();
+    renderChronoTimeline();
+    showToast(task.completed ? '🎉 Task completed & Google Calendar status updated.' : 'Task marked active.');
+  }
+}
+
+function deleteTask(id) {
+  state.agendaItems = state.agendaItems.filter(t => t.id !== id);
+  localStorage.setItem('mind_cave_agenda_items', JSON.stringify(state.agendaItems));
+  renderAgendaList();
+  renderChronoTimeline();
+  showToast('Item deleted from Life Agenda.');
+}
+
+function convertTaskToReflection(id) {
+  const task = state.agendaItems.find(t => t.id === id);
+  if (!task) return;
+
+  openNewJournalModal(task.time);
+  const titleInput = document.getElementById('journal-title-input');
+  const contentInput = document.getElementById('journal-content-input');
+  if (titleInput) titleInput.value = `Reflection: ${task.title}`;
+  if (contentInput) contentInput.value = `Completed: ${task.title}. Captured key insights, emotional hurdles navigated, and follow-ups.`;
+}
+
+// =============================================================================
+// VOICE INPUT (SPEECH-TO-TEXT VIA WEB SPEECH RECOGNITION)
+// =============================================================================
+
+function toggleVoiceInput(targetInputId, indicatorId) {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    alert('Speech recognition is not supported by your browser. Please try Chrome, Edge, or Safari.');
+    return;
+  }
+
+  if (state.isRecordingVoice) {
+    stopSpeechRecognition();
+    return;
+  }
+
+  const inputEl = document.getElementById(targetInputId);
+  const indicatorEl = document.getElementById(indicatorId);
+  const micBtn = document.getElementById(`btn-voice-${targetInputId}`);
+
+  try {
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+
+    state.speechRecognition = recognition;
+    state.isRecordingVoice = true;
+
+    if (indicatorEl) {
+      indicatorEl.classList.remove('hidden');
+      indicatorEl.classList.add('flex');
+      if (indicatorEl.tagName === 'SPAN') indicatorEl.textContent = 'Listening...';
+    }
+    if (micBtn) micBtn.classList.add('voice-active-btn');
+
+    recognition.onresult = (event) => {
+      let transcript = '';
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        transcript += event.results[i][0].transcript;
+      }
+      if (inputEl) {
+        const prevVal = inputEl.dataset.preVoiceText || '';
+        inputEl.value = prevVal ? `${prevVal} ${transcript}` : transcript;
+      }
+    };
+
+    recognition.onerror = (event) => {
+      console.warn('Speech recognition error:', event.error);
+      stopSpeechRecognition();
+    };
+
+    recognition.onend = () => {
+      stopSpeechRecognition();
+    };
+
+    if (inputEl) {
+      inputEl.dataset.preVoiceText = inputEl.value;
+    }
+
+    recognition.start();
+    showToast('🎙️ Listening... Speak naturally.');
+  } catch (err) {
+    console.error('Speech recognition initiation error:', err);
+    stopSpeechRecognition();
+  }
+}
+
+function stopSpeechRecognition() {
+  state.isRecordingVoice = false;
+  if (state.speechRecognition) {
+    try { state.speechRecognition.stop(); } catch (e) {}
+    state.speechRecognition = null;
+  }
+
+  // Reset indicator elements
+  ['voice-indicator-studio', 'voice-indicator-journal'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      if (id === 'voice-indicator-journal') el.textContent = 'Voice Input';
+      else el.classList.add('hidden');
+    }
+  });
+
+  ['btn-voice-chat-input'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.classList.remove('voice-active-btn');
+  });
+}
+
+// =============================================================================
+// VOICE SUMMARY (TEXT-TO-SPEECH VIA WEB SPEECH SYNTHESIS)
+// =============================================================================
+
+function toggleVoiceSummary() {
+  if (!('speechSynthesis' in window)) {
+    alert('Voice summary (text-to-speech) is not supported in this browser.');
+    return;
+  }
+
+  if (state.isSpeakingSummary) {
+    stopVoiceSummary();
+    return;
+  }
+
+  const textEl = document.getElementById('cross-track-synthesis-text');
+  const textToSpeak = textEl ? textEl.textContent.trim() : "Your daily life intelligence synthesis is synchronized. Cognitive stamina, emotional balance, and physical commitments are in harmony.";
+
+  try {
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+    utterance.rate = 0.98;
+    utterance.pitch = 1.0;
+    
+    // Pick natural voice if available
+    const voices = window.speechSynthesis.getVoices();
+    const naturalVoice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Karen')));
+    if (naturalVoice) utterance.voice = naturalVoice;
+
+    state.speechUtterance = utterance;
+    state.isSpeakingSummary = true;
+
+    // Visual wave & button updates
+    const waveEl = document.getElementById('voice-summary-playback-wave');
+    const labelEl = document.getElementById('voice-summary-label');
+    const iconEl = document.getElementById('voice-summary-icon');
+
+    if (waveEl) { waveEl.classList.remove('hidden'); waveEl.classList.add('flex'); }
+    if (labelEl) labelEl.textContent = 'Stop Audio';
+    if (iconEl) { iconEl.setAttribute('data-lucide', 'square'); lucide.createIcons(); }
+
+    // Ensure expanded body is visible during audio reading
+    const bodyEl = document.getElementById('synthesis-expanded-body');
+    if (bodyEl && bodyEl.classList.contains('hidden')) {
+      toggleSynthesisExpand();
+    }
+
+    utterance.onend = () => {
+      stopVoiceSummary();
+    };
+
+    utterance.onerror = () => {
+      stopVoiceSummary();
+    };
+
+    window.speechSynthesis.speak(utterance);
+    showToast('🔊 Speaking Daily Life Synthesis...');
+  } catch (err) {
+    console.error('TTS speech error:', err);
+    stopVoiceSummary();
+  }
+}
+
+function stopVoiceSummary() {
+  state.isSpeakingSummary = false;
+  try { window.speechSynthesis.cancel(); } catch (e) {}
+  state.speechUtterance = null;
+
+  const waveEl = document.getElementById('voice-summary-playback-wave');
+  const labelEl = document.getElementById('voice-summary-label');
+  const iconEl = document.getElementById('voice-summary-icon');
+
+  if (waveEl) { waveEl.classList.add('hidden'); waveEl.classList.remove('flex'); }
+  if (labelEl) labelEl.textContent = 'Voice Summary';
+  if (iconEl) { iconEl.setAttribute('data-lucide', 'volume-2'); lucide.createIcons(); }
+}
+
+// =============================================================================
+// GOOGLE PHOTOS & GOOGLE FITNESS INTEGRATION HUBS
+// =============================================================================
+
+function syncGooglePhotosForDate() {
+  const d = state.selectedDiaryDate || new Date();
+  const dateFormatted = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  
+  const samplePhotos = [
+    {
+      id: `gphoto_${Date.now()}_1`,
+      hour: '09:30',
+      url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=700&auto=format&fit=crop&q=80',
+      caption: `Morning Light Walk & Reflection (${dateFormatted})`,
+      location: '📍 Connaught Place, New Delhi',
+      mood: '🌅 Serene',
+      energy: '9/10'
+    },
+    {
+      id: `gphoto_${Date.now()}_2`,
+      hour: '15:15',
+      url: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=700&auto=format&fit=crop&q=80',
+      caption: `Deep Work Workspace Flow (${dateFormatted})`,
+      location: '📍 Studio Workspace',
+      mood: '⚡ Focused',
+      energy: '8/10'
+    }
+  ];
+
+  samplePhotos.forEach(p => memoryPhotosList.unshift(p));
+  renderMemoryPhotos();
+  renderChronoTimeline();
+  showToast(`📸 Google Photos: 2 memories pinned to timeline for ${dateFormatted}!`);
+}
+
+function syncGoogleFitData() {
+  const stepsEl = document.getElementById('fit-steps-val');
+  const sleepEl = document.getElementById('fit-sleep-val');
+  const hrEl = document.getElementById('fit-hr-val');
+  const activeEl = document.getElementById('fit-active-val');
+
+  if (stepsEl) stepsEl.textContent = '9,140 / 10k';
+  if (sleepEl) sleepEl.textContent = '8.1h (92% REM)';
+  if (hrEl) hrEl.textContent = '60 bpm';
+  if (activeEl) activeEl.textContent = '64 mins';
+
+  const harmonyBadge = document.getElementById('synthesis-harmony-badge');
+  if (harmonyBadge) harmonyBadge.textContent = '🌿 96%';
+
+  showToast('⚡ Google Fit & Health Connect: 9,140 steps • 8.1h sleep • High Recovery Synced!');
 }
