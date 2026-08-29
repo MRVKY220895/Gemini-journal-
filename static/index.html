@@ -103,6 +103,11 @@
         <span id="user-display-name" class="font-medium text-slate-200 truncate max-w-[90px] sm:max-w-[120px] whitespace-nowrap">Guest User</span>
         <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400 shrink-0"></i>
       </button>
+      <!-- Notifications Trigger Button -->
+      <button onclick="openNotificationsModal()" id="notifications-btn" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-semibold border transition-all duration-200 whitespace-nowrap bg-slate-900/90 hover:bg-slate-800 border-slate-800 text-slate-200" title="Reminders & Notifications">
+        <i data-lucide="bell" class="w-3.5 h-3.5 text-amber-400"></i>
+        <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+      </button>
 
       <!-- Theme Switcher (Light / Dark) -->
       <button onclick="toggleTheme()" id="theme-toggle-btn" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-semibold border transition-all duration-200 whitespace-nowrap theme-toggle-pill" title="Toggle Light / Dark Theme">
@@ -249,19 +254,13 @@
           <h2 class="text-lg font-bold tracking-tight mt-0.5" style="color: var(--text-primary)">Mind Cave Journal</h2>
         </div>
 
-        <div class="journal-header-actions flex items-center gap-2">
+        <div class="journal-header-actions flex items-center gap-2 flex-wrap">
           <!-- Aesthetic Scrapbook Social Card Exporter -->
           <button onclick="openScrapbookModal()" class="btn-secondary text-xs !py-1.5 !px-2.5 flex items-center gap-1.5 hover:border-pink-400 text-pink-300" title="Export Aesthetic Social Journal / Scrapbook Page (Pinterest & Instagram)">
             <i data-lucide="palette" class="w-3.5 h-3.5 text-pink-400"></i>
-            <span class="hidden sm:inline">Scrapbook Card</span>
+            <span class="hidden sm:inline">Scrapbook</span>
           </button>
 
-          <!-- AI Voice Summary -->
-          <button onclick="toggleVoiceSummary()" id="btn-voice-summary" class="btn-secondary text-xs !py-1.5 !px-2.5 flex items-center gap-1.5" title="Listen to AI Daily Synthesis">
-            <i data-lucide="volume-2" class="w-3.5 h-3.5 text-cyan-400" id="voice-summary-icon"></i>
-            <span id="voice-summary-label" class="hidden sm:inline">Voice Summary</span>
-          </button>
-          
           <!-- 2-Way GCal Sync Badge -->
           <button onclick="toggleGCalSync()" id="btn-gcal-sync" class="btn-secondary text-xs !py-1.5 !px-2.5 flex items-center gap-1.5">
             <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
@@ -296,61 +295,72 @@
         </button>
       </div>
 
-      <!-- ─── Slim AI Synthesis Strip ─── -->
-      <div class="synthesis-strip" id="ai-synthesis-strip">
-        <div class="synthesis-strip-left">
-          <div class="synthesis-strip-icon">
-            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+      <!-- ─── Prominent Daily Harmony & Holistic Life Synthesis ─── -->
+      <div class="p-4 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 shadow-sm flex flex-col gap-3" id="ai-synthesis-strip">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-slate-100 dark:border-white/5">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-cyan-500/20">
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white">Daily Harmony & Holistic Synthesis</h3>
+                <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30">🌿 96% Equilibrium</span>
+              </div>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400">Cross-track synthesis of cognitive state, physical stamina, and agenda flow</p>
+            </div>
           </div>
-          <span class="synthesis-strip-title">Daily Harmony</span>
-          <span class="synthesis-harmony-badge" id="synthesis-harmony-badge">🌿 96%</span>
-        </div>
-        <div class="synthesis-strip-chips">
-          <div class="synthesis-mini-chip">
-            <span style="color:var(--chrono-accent)">📅</span>
-            <span id="synth-time-chip">3 Focus Blocks</span>
-          </div>
-          <div class="synthesis-mini-chip">
-            <span style="color:var(--cbt-accent)">🧠</span>
-            <span id="synth-cbt-chip">1 Reframed</span>
-          </div>
-          <div class="synthesis-mini-chip" id="synthesis-bio-chip">
-            <span style="color:var(--cycle-accent)">🌙</span>
-            <span id="synth-bio-chip">Peak Stamina</span>
-          </div>
-          <div class="synthesis-mini-chip">
-            <span style="color:var(--memory-accent)">🏃</span>
-            <span id="synth-fit-chip">8.4k Steps</span>
-          </div>
-        </div>
-        <div class="synthesis-strip-right flex items-center gap-1.5">
-          <button onclick="regenerateDailySynthesis()" class="synthesis-refresh-btn" title="Refresh AI Synthesis">
-            <i data-lucide="refresh-cw" class="w-3 h-3"></i>
-          </button>
-          <button onclick="toggleSynthesisExpand()" class="synthesis-expand-btn" id="synthesis-expand-btn" title="Expand synthesis">
-            <i data-lucide="chevron-down" class="w-3.5 h-3.5" id="synthesis-expand-icon"></i>
-          </button>
-        </div>
-      </div>
 
-      <!-- Expandable synthesis body -->
-      <div id="synthesis-expanded-body" class="synthesis-expanded-body hidden">
-        <div class="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-white/5">
-          <span class="text-[11px] font-semibold text-cyan-300 flex items-center gap-1.5">
-            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-cyan-400"></i>
-            <span>Cross-Track Holistic Life Synthesis</span>
-          </span>
-          <div id="voice-summary-playback-wave" class="hidden items-center gap-1">
-            <span class="audio-wave-bar"></span>
-            <span class="audio-wave-bar"></span>
-            <span class="audio-wave-bar"></span>
-            <span class="audio-wave-bar"></span>
-            <span class="text-[10px] text-cyan-300 font-mono ml-1">Speaking...</span>
+          <div class="flex items-center gap-2">
+            <button onclick="toggleVoiceSummary()" id="btn-voice-summary" class="btn-secondary text-xs !py-1.5 !px-3 flex items-center gap-1.5 text-cyan-600 dark:text-cyan-400 hover:opacity-80" title="Listen to AI Daily Synthesis">
+              <i data-lucide="volume-2" class="w-3.5 h-3.5 text-cyan-500" id="voice-summary-icon"></i>
+              <span id="voice-summary-label">Listen (Voice Summary)</span>
+            </button>
+            <button onclick="regenerateDailySynthesis()" class="btn-secondary text-xs !py-1.5 !px-2.5 flex items-center gap-1" title="Refresh AI Synthesis">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+              <span class="hidden sm:inline">Refresh</span>
+            </button>
           </div>
         </div>
-        <p id="cross-track-synthesis-text" class="text-xs leading-relaxed" style="color: var(--text-secondary)">
-          Your afternoon energy aligns with deep work execution. Morning deadlines showed minor catastrophizing, which was reframed through your reflective prompt. Physical stamina, Google Fit recovery, and calendar commitments remain in full equilibrium.
-        </p>
+
+        <!-- 4 Vital Stat Chips -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5 flex items-center gap-2">
+            <span class="text-base">📅</span>
+            <div>
+              <span class="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-mono block">Schedule</span>
+              <span class="text-xs font-bold text-slate-800 dark:text-slate-200" id="synth-time-chip">3 Focus Blocks</span>
+            </div>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5 flex items-center gap-2">
+            <span class="text-base">🧠</span>
+            <div>
+              <span class="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-mono block">Cognition</span>
+              <span class="text-xs font-bold text-slate-800 dark:text-slate-200" id="synth-cbt-chip">1 Reframe Done</span>
+            </div>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5 flex items-center gap-2">
+            <span class="text-base">🌙</span>
+            <div>
+              <span class="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-mono block">Diurnal Bio</span>
+              <span class="text-xs font-bold text-slate-800 dark:text-slate-200" id="synth-bio-chip">Peak Stamina</span>
+            </div>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5 flex items-center gap-2">
+            <span class="text-base">🏃</span>
+            <div>
+              <span class="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-mono block">Activity</span>
+              <span class="text-xs font-bold text-slate-800 dark:text-slate-200" id="synth-fit-chip">8.4k Steps</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Synthesis Narrative -->
+        <div class="p-3 rounded-xl bg-cyan-50/50 dark:bg-cyan-950/20 border border-cyan-200/60 dark:border-cyan-500/20">
+          <p id="cross-track-synthesis-text" class="text-xs leading-relaxed text-slate-700 dark:text-slate-300">
+            Your afternoon energy aligns with deep work execution. Morning deadlines showed minor catastrophizing, which was reframed through your reflective prompt. Physical stamina, Google Fit recovery, and calendar commitments remain in full equilibrium.
+          </p>
+        </div>
       </div>
 
       <!-- =================================================================== -->
@@ -387,6 +397,71 @@
                 <i data-lucide="share-2" class="w-3 h-3 text-pink-400"></i> <span>Share</span>
               </button>
             </div>
+          </div>
+        </div>
+
+        <!-- 1-TAP INTERACTIVE HABIT TRACKER & DAILY RHYTHM -->
+        <div class="p-3.5 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 shadow-sm flex flex-col gap-2.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                <i data-lucide="check-circle" class="w-4 h-4 text-emerald-500"></i> Daily Habits & Vitals (1-Tap Log)
+              </span>
+              <span id="habit-streak-badge" class="text-xs px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-bold border border-amber-200 dark:border-amber-500/30">
+                🔥 12 Days Streak
+              </span>
+            </div>
+            <span class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Tap to toggle instantly</span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <!-- Habit 1: Hydration -->
+            <button type="button" onclick="logHabit('water')" class="p-2.5 rounded-xl border transition-all text-left flex items-center justify-between bg-slate-50 dark:bg-black/40 border-slate-200 dark:border-white/10 hover:border-cyan-400" id="habit-btn-water">
+              <div class="flex items-center gap-2">
+                <span class="text-lg">💧</span>
+                <div>
+                  <div class="text-xs font-bold text-slate-800 dark:text-white">Water</div>
+                  <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono" id="habit-water-count">6/8 Glasses</div>
+                </div>
+              </div>
+              <span class="text-xs font-bold text-cyan-600 dark:text-cyan-400 bg-cyan-100 dark:bg-cyan-950/60 px-2 py-0.5 rounded-md">+1</span>
+            </button>
+
+            <!-- Habit 2: 10m Meditation -->
+            <button type="button" onclick="logHabit('meditation')" class="p-2.5 rounded-xl border transition-all text-left flex items-center justify-between bg-slate-50 dark:bg-black/40 border-slate-200 dark:border-white/10 hover:border-emerald-400" id="habit-btn-meditation">
+              <div class="flex items-center gap-2">
+                <span class="text-lg">🧘</span>
+                <div>
+                  <div class="text-xs font-bold text-slate-800 dark:text-white">Mindfulness</div>
+                  <div class="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold" id="habit-meditation-status">Done (10m)</div>
+                </div>
+              </div>
+              <i data-lucide="check-circle" class="w-4 h-4 text-emerald-500" id="habit-meditation-icon"></i>
+            </button>
+
+            <!-- Habit 3: 30m Walk -->
+            <button type="button" onclick="logHabit('walk')" class="p-2.5 rounded-xl border transition-all text-left flex items-center justify-between bg-slate-50 dark:bg-black/40 border-slate-200 dark:border-white/10 hover:border-emerald-400" id="habit-btn-walk">
+              <div class="flex items-center gap-2">
+                <span class="text-lg">🚶</span>
+                <div>
+                  <div class="text-xs font-bold text-slate-800 dark:text-white">Walk / Run</div>
+                  <div class="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold" id="habit-walk-status">Done (35m)</div>
+                </div>
+              </div>
+              <i data-lucide="check-circle" class="w-4 h-4 text-emerald-500" id="habit-walk-icon"></i>
+            </button>
+
+            <!-- Habit 4: 15m Reading / Deep Focus -->
+            <button type="button" onclick="logHabit('reading')" class="p-2.5 rounded-xl border transition-all text-left flex items-center justify-between bg-slate-50 dark:bg-black/40 border-slate-200 dark:border-white/10 hover:border-purple-400" id="habit-btn-reading">
+              <div class="flex items-center gap-2">
+                <span class="text-lg">📖</span>
+                <div>
+                  <div class="text-xs font-bold text-slate-800 dark:text-white">Reading</div>
+                  <div class="text-[10px] text-slate-500 dark:text-slate-400 font-semibold" id="habit-reading-status">Pending (15m)</div>
+                </div>
+              </div>
+              <i data-lucide="circle" class="w-4 h-4 text-slate-400" id="habit-reading-icon"></i>
+            </button>
           </div>
         </div>
         
@@ -1697,6 +1772,90 @@
           <button type="button" onclick="setTaskBlockerReason('procrastination')" class="w-full p-2.5 rounded-xl border border-slate-800 hover:border-amber-500 bg-black/40 text-left flex items-center justify-between text-slate-200 transition-colors">
             <span class="flex items-center gap-2"><span>🌧️</span> <span>Emotional Resistance / Overwhelm</span></span>
             <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-500"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: NOTIFICATIONS & REMINDERS PREFERENCES -->
+  <!-- ===================================================================== -->
+  <div id="notifications-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="double-bezel max-w-md w-full">
+      <div class="double-bezel-inner p-6 space-y-4">
+        <div class="flex items-center justify-between border-b border-black/5 dark:border-white/5 pb-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-500 flex items-center justify-center">
+              <i data-lucide="bell" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-slate-900 dark:text-white">Notifications & Reminders</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Stay centered throughout your day</p>
+            </div>
+          </div>
+          <button onclick="closeNotificationsModal()" class="text-slate-400 hover:text-slate-900 dark:hover:text-white p-1">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div class="space-y-3">
+          <!-- Reminder 1 -->
+          <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10">
+            <div class="flex items-center gap-2.5">
+              <span class="text-lg">🌅</span>
+              <div>
+                <div class="text-xs font-bold text-slate-900 dark:text-white">Morning Intent & North Star Goal</div>
+                <div class="text-[11px] text-slate-500 dark:text-slate-400">08:00 AM daily check-in</div>
+              </div>
+            </div>
+            <input type="checkbox" id="notif-morning-check" checked class="w-4 h-4 rounded text-blue-600 cursor-pointer">
+          </div>
+
+          <!-- Reminder 2 -->
+          <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10">
+            <div class="flex items-center gap-2.5">
+              <span class="text-lg">🌿</span>
+              <div>
+                <div class="text-xs font-bold text-slate-900 dark:text-white">Midday Mindfulness / CBT Reframe</div>
+                <div class="text-[11px] text-slate-500 dark:text-slate-400">01:30 PM cognitive recharge</div>
+              </div>
+            </div>
+            <input type="checkbox" id="notif-midday-check" checked class="w-4 h-4 rounded text-blue-600 cursor-pointer">
+          </div>
+
+          <!-- Reminder 3 -->
+          <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10">
+            <div class="flex items-center gap-2.5">
+              <span class="text-lg">🌙</span>
+              <div>
+                <div class="text-xs font-bold text-slate-900 dark:text-white">Evening Reflection & Habit Log</div>
+                <div class="text-[11px] text-slate-500 dark:text-slate-400">08:30 PM daily synthesis</div>
+              </div>
+            </div>
+            <input type="checkbox" id="notif-evening-check" checked class="w-4 h-4 rounded text-blue-600 cursor-pointer">
+          </div>
+
+          <!-- Reminder 4 -->
+          <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10">
+            <div class="flex items-center gap-2.5">
+              <span class="text-lg">📅</span>
+              <div>
+                <div class="text-xs font-bold text-slate-900 dark:text-white">Google Calendar 10m Alerts</div>
+                <div class="text-[11px] text-slate-500 dark:text-slate-400">Sync with upcoming schedule</div>
+              </div>
+            </div>
+            <input type="checkbox" id="notif-gcal-check" checked class="w-4 h-4 rounded text-blue-600 cursor-pointer">
+          </div>
+        </div>
+
+        <div class="pt-2 flex items-center gap-2">
+          <button type="button" onclick="testPushNotification()" class="btn-secondary text-xs flex-1 !py-2 flex items-center justify-center gap-1.5">
+            <i data-lucide="bell-ring" class="w-3.5 h-3.5 text-amber-500"></i>
+            <span>Test Notification</span>
+          </button>
+          <button type="button" onclick="saveNotificationPreferences()" class="btn-island text-xs flex-1 !py-2 flex items-center justify-center">
+            <span>Save Preferences</span>
           </button>
         </div>
       </div>

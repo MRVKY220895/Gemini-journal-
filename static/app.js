@@ -2198,40 +2198,136 @@ function renderMemoryPhotos() {
   const container = document.getElementById('memory-photos-grid');
   if (!container) return;
 
-  if (state.mediaMode === 'compact') {
-    container.innerHTML = memoryPhotosList.map(p => `
-      <div class="p-3.5 rounded-2xl bg-black/40 border border-white/10 flex items-center justify-between gap-3 hover:border-amber-500/30 transition-colors">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl overflow-hidden shrink-0 border border-white/10">
-            <img src="${p.url}" alt="${escapeHtml(p.caption)}" class="w-full h-full object-cover">
-          </div>
-          <div>
-            <span class="text-[10px] text-amber-300 font-mono block">${p.hour} • ${escapeHtml(p.location)}</span>
-            <h5 class="text-xs font-bold text-white">${escapeHtml(p.caption)}</h5>
-          </div>
+  container.innerHTML = memoryPhotosList.map(p => `
+    <div class="flex flex-col rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 bg-white dark:bg-black/40 shadow-sm hover:shadow-md transition-all duration-300 group">
+      <div class="relative w-full h-44 overflow-hidden bg-slate-900">
+        <img src="${p.url}" alt="${escapeHtml(p.caption)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+        <div class="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-black/70 backdrop-blur-md border border-white/10 text-[10px] text-amber-300 font-mono">
+          ${p.hour}
         </div>
-        <div class="flex items-center gap-2 shrink-0 text-[11px]">
-          <span class="eyebrow-badge !text-cyan-300 !bg-cyan-950/40">${p.mood}</span>
-          <span class="font-mono text-amber-400 font-bold">⚡ ${p.energy}</span>
+        <div class="absolute top-2.5 right-2.5 px-2.5 py-0.5 rounded-full bg-black/70 backdrop-blur-md border border-white/10 text-[10px] text-cyan-300 font-medium">
+          ${p.mood}
         </div>
       </div>
-    `).join('');
-  } else {
-    container.innerHTML = memoryPhotosList.map(p => `
-      <div class="memory-photo-card group">
-        <img src="${p.url}" alt="${escapeHtml(p.caption)}">
-        <div class="memory-photo-overlay">
-          <span class="text-[10px] text-amber-300 font-mono mb-0.5">${p.hour} • ${escapeHtml(p.location)}</span>
-          <p class="text-xs font-semibold text-white line-clamp-2">${escapeHtml(p.caption)}</p>
-          <div class="flex items-center justify-between mt-1 text-[10px] text-slate-300">
-            <span>${p.mood}</span>
-            <span class="font-mono text-cyan-300">⚡ ${p.energy}</span>
-          </div>
+      <div class="p-3.5 flex flex-col justify-between flex-1 gap-2">
+        <div>
+          <span class="text-[10px] text-slate-500 dark:text-slate-400 font-mono block mb-1">📍 ${escapeHtml(p.location)}</span>
+          <h5 class="text-sm font-bold text-slate-900 dark:text-white leading-snug line-clamp-2">${escapeHtml(p.caption)}</h5>
+        </div>
+        <div class="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-white/5 text-xs">
+          <span class="text-amber-600 dark:text-amber-400 font-mono text-[11px] font-semibold">⚡ ${p.energy}</span>
+          <button onclick="openScrapbookModal()" class="text-xs text-pink-600 dark:text-pink-400 hover:opacity-80 flex items-center gap-1 font-semibold">
+            <i data-lucide="share-2" class="w-3 h-3"></i> <span>Scrapbook</span>
+          </button>
         </div>
       </div>
-    `).join('');
+    </div>
+  `).join('');
+  lucide.createIcons();
+}
+
+// =============================================================================
+// 1-TAP HABIT TRACKING STATE & ENGINE
+// =============================================================================
+let habitState = {
+  waterCount: 6,
+  waterTarget: 8,
+  meditation: true,
+  walk: true,
+  reading: false,
+  streak: 12
+};
+
+function logHabit(habitType) {
+  if (habitType === 'water') {
+    habitState.waterCount = (habitState.waterCount % habitState.waterTarget) + 1;
+    const el = document.getElementById('habit-water-count');
+    if (el) el.textContent = `${habitState.waterCount}/${habitState.waterTarget} Glasses`;
+    showToast(`💧 Logged 1 glass of water (${habitState.waterCount}/${habitState.waterTarget})`);
+  } else if (habitType === 'meditation') {
+    habitState.meditation = !habitState.meditation;
+    const stEl = document.getElementById('habit-meditation-status');
+    const icon = document.getElementById('habit-meditation-icon');
+    if (stEl) {
+      stEl.textContent = habitState.meditation ? 'Done (10m)' : 'Pending';
+      stEl.className = habitState.meditation ? 'text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-[10px] text-slate-500 font-semibold';
+    }
+    if (icon) {
+      icon.setAttribute('data-lucide', habitState.meditation ? 'check-circle' : 'circle');
+      icon.className = habitState.meditation ? 'w-4 h-4 text-emerald-500' : 'w-4 h-4 text-slate-400';
+    }
+    showToast(habitState.meditation ? '🧘 Mindfulness logged!' : '🧘 Mindfulness reset');
+  } else if (habitType === 'walk') {
+    habitState.walk = !habitState.walk;
+    const stEl = document.getElementById('habit-walk-status');
+    const icon = document.getElementById('habit-walk-icon');
+    if (stEl) {
+      stEl.textContent = habitState.walk ? 'Done (35m)' : 'Pending';
+      stEl.className = habitState.walk ? 'text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-[10px] text-slate-500 font-semibold';
+    }
+    if (icon) {
+      icon.setAttribute('data-lucide', habitState.walk ? 'check-circle' : 'circle');
+      icon.className = habitState.walk ? 'w-4 h-4 text-emerald-500' : 'w-4 h-4 text-slate-400';
+    }
+    showToast(habitState.walk ? '🚶 Mindful walk logged!' : '🚶 Mindful walk reset');
+  } else if (habitType === 'reading') {
+    habitState.reading = !habitState.reading;
+    const stEl = document.getElementById('habit-reading-status');
+    const icon = document.getElementById('habit-reading-icon');
+    if (stEl) {
+      stEl.textContent = habitState.reading ? 'Done (15m)' : 'Pending (15m)';
+      stEl.className = habitState.reading ? 'text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-[10px] text-slate-500 font-semibold';
+    }
+    if (icon) {
+      icon.setAttribute('data-lucide', habitState.reading ? 'check-circle' : 'circle');
+      icon.className = habitState.reading ? 'w-4 h-4 text-emerald-500' : 'w-4 h-4 text-slate-400';
+    }
+    showToast(habitState.reading ? '📖 15m Reading logged!' : '📖 Reading reset');
+  }
+
+  // Update streak live
+  const allComplete = habitState.waterCount >= habitState.waterTarget && habitState.meditation && habitState.walk && habitState.reading;
+  const streakBadge = document.getElementById('habit-streak-badge');
+  if (streakBadge) {
+    streakBadge.textContent = allComplete ? '🔥 13 Days Streak (All Complete!)' : `🔥 ${habitState.streak} Days Streak`;
   }
   lucide.createIcons();
+}
+
+// =============================================================================
+// NOTIFICATIONS & REMINDERS PREFERENCES MODAL
+// =============================================================================
+function openNotificationsModal() {
+  const modal = document.getElementById('notifications-modal');
+  if (modal) modal.classList.remove('hidden');
+}
+
+function closeNotificationsModal() {
+  const modal = document.getElementById('notifications-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function saveNotificationPreferences() {
+  closeNotificationsModal();
+  showToast('🔔 Notification and reminder preferences saved.');
+}
+
+function testPushNotification() {
+  showToast('🔔 [Reminder Test]: 01:30 PM — Time for a 2-minute mindful reflection & water check-in!');
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification('Mind Cave Daily Reminder', {
+      body: 'Time for a 2-minute mindful reflection & water check-in!',
+      icon: '/static/favicon.ico'
+    });
+  } else if ('Notification' in window && Notification.permission !== 'denied') {
+    Notification.requestPermission().then(permission => {
+      if (permission === 'granted') {
+        new Notification('Mind Cave Daily Reminder', {
+          body: 'Time for a 2-minute mindful reflection & water check-in!'
+        });
+      }
+    });
+  }
 }
 
 async function submitNewJournal(event) {
