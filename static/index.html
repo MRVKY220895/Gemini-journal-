@@ -303,8 +303,13 @@
                 </span>
               </div>
 
-              <!-- Right: Voice & Submit Controls -->
+              <!-- Right: New Session (+), Voice & Submit Controls -->
               <div class="flex items-center gap-1.5">
+                <!-- New Session (+) Button -->
+                <button type="button" onclick="startNewSession()" id="btn-composer-new-session" class="w-8 h-8 rounded-full bg-white/5 hover:bg-purple-500/20 text-purple-400 hover:text-purple-300 border border-white/10 hover:border-purple-500/30 flex items-center justify-center transition-all cursor-pointer" title="Start New Reflection Session (+)">
+                  <i data-lucide="plus" class="w-4 h-4 text-purple-400"></i>
+                </button>
+
                 <!-- Voice Input (Speech-to-Text) Button -->
                 <button type="button" onclick="toggleVoiceInput('chat-input', 'voice-indicator-studio')" id="btn-voice-chat-input" class="w-8 h-8 rounded-full bg-white/5 hover:bg-cyan-500/20 text-slate-400 hover:text-cyan-300 border border-white/10 flex items-center justify-center transition-all" title="Add via Voice (Speech-to-Text)">
                   <i data-lucide="mic" class="w-4 h-4"></i>

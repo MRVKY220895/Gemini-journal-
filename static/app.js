@@ -1836,19 +1836,19 @@ function appendChatMessage(role, content, authorName, modelTag, cognitiveData = 
 
           <!-- Action Buttons -->
           <div class="flex items-center gap-1.5">
-            <button onclick="translateCardMessage('${turnId}', this)" class="text-xs text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-lg transition-all flex items-center gap-1" title="Translate Native ⇄ English">
+            <button type="button" onclick="translateCardMessage('${turnId}', this)" class="text-xs text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 cursor-pointer" title="Translate Native ⇄ English">
               <i data-lucide="globe" class="w-3 h-3 text-emerald-400"></i>
               <span>Translate</span>
             </button>
-            <button onclick="narrateAIMessage('${escapeHtml(content).replace(/'/g, "\\'")}', this)" class="text-xs text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-lg transition-all flex items-center gap-1" title="Listen to AI voice narration">
+            <button type="button" onclick="narrateMessageFromCard('${turnId}', this)" class="text-xs text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 cursor-pointer" title="Listen to AI voice narration">
               <i data-lucide="volume-2" class="w-3 h-3 text-cyan-400"></i>
               <span>Listen</span>
             </button>
-            <button onclick="saveAndFeedback('${escapeHtml(originalPrompt || 'Reflection')}', '${escapeHtml(content).replace(/'/g, "\\'")}', '${cognitiveData?.primary_emotion || 'Reflective'}', this)" class="text-xs text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-lg transition-all flex items-center gap-1.5">
+            <button type="button" onclick="saveMessageFromCard('${turnId}', '${escapeHtml(cognitiveData?.primary_emotion || 'Reflective')}', this)" class="text-xs text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer" title="Save to Journal">
               <i data-lucide="heart" class="w-3 h-3 text-rose-400"></i>
               <span>Save to Journal</span>
             </button>
-            <button onclick="copyToClipboard('${escapeHtml(content).replace(/'/g, "\\'")}', this)" class="text-xs text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-lg transition-all flex items-center gap-1">
+            <button type="button" onclick="copyMessageFromCard('${turnId}', this)" class="text-xs text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 cursor-pointer" title="Copy response">
               <i data-lucide="copy" class="w-3 h-3 text-slate-400"></i>
               <span>Copy</span>
             </button>
@@ -2150,6 +2150,30 @@ function toggleReasoningAccordion(turnId) {
 }
 
 
+
+function narrateMessageFromCard(turnId, btnElement) {
+  const card = document.getElementById(turnId);
+  if (!card) return;
+  const contentEl = card.querySelector('.prose') || card.querySelector('.user-bubble-content') || card;
+  const text = contentEl.innerText || '';
+  narrateAIMessage(text, btnElement);
+}
+
+function saveMessageFromCard(turnId, emotion, btnElement) {
+  const card = document.getElementById(turnId);
+  if (!card) return;
+  const contentEl = card.querySelector('.prose') || card.querySelector('.user-bubble-content') || card;
+  const text = contentEl.innerText || '';
+  saveAndFeedback('AI Reflection Session', text, emotion || 'Reflective', btnElement);
+}
+
+function copyMessageFromCard(turnId, btnElement) {
+  const card = document.getElementById(turnId);
+  if (!card) return;
+  const contentEl = card.querySelector('.prose') || card.querySelector('.user-bubble-content') || card;
+  const text = contentEl.innerText || '';
+  copyToClipboard(text, btnElement);
+}
 
 function copyToClipboard(text, btnElement) {
   navigator.clipboard.writeText(text).then(() => {
@@ -6457,29 +6481,22 @@ async function loadAnalytics() {
 
 
     // Update Radar Chart
-
-    if (state.radarChart && analytics.average_mood) {
-
-      const vals = [
-
-        analytics.average_mood.Joy || 65,
-
-        analytics.average_mood.Clarity || 78,
-
-        analytics.average_mood.Resilience || 82,
-
-        analytics.average_mood.Focus || 74,
-
-        analytics.average_mood.Calm || 70,
-
-        analytics.average_mood.Optimism || 75
-
-      ];
-
-      state.radarChart.data.datasets[0].data = vals;
-
+    if (state.radarChart) {
+      const isReset = localStorage.getItem('mind_cave_is_reset') === 'true' || !state.journals || state.journals.length === 0;
+      if (isReset) {
+        state.radarChart.data.datasets[0].data = [0, 0, 0, 0, 0, 0];
+      } else if (analytics.average_mood) {
+        const vals = [
+          analytics.average_mood.Joy || 0,
+          analytics.average_mood.Clarity || 0,
+          analytics.average_mood.Resilience || 0,
+          analytics.average_mood.Focus || 0,
+          analytics.average_mood.Calm || 0,
+          analytics.average_mood.Optimism || 0
+        ];
+        state.radarChart.data.datasets[0].data = vals;
+      }
       state.radarChart.update();
-
     }
 
 
