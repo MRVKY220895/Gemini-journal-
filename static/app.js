@@ -4058,11 +4058,17 @@ function updateArchivedHabitsBadges() {
 
   const inlineBadge = document.getElementById('archived-habits-badge-inline');
   const modalBadge = document.getElementById('archived-habits-badge-modal');
+  const sanctuaryBadge = document.getElementById('archived-habits-badge-sanctuary');
+  const sanctuaryFooterBadge = document.getElementById('archived-habits-badge-sanctuary-footer');
   const modalCountBadge = document.getElementById('archived-habits-count-badge');
 
   const text = count > 0 ? `Archive (${count})` : 'Archive';
+  const footerText = count > 0 ? `Archive Vault (${count})` : 'Archive Vault';
+
   if (inlineBadge) inlineBadge.textContent = text;
   if (modalBadge) modalBadge.textContent = text;
+  if (sanctuaryBadge) sanctuaryBadge.textContent = text;
+  if (sanctuaryFooterBadge) sanctuaryFooterBadge.textContent = footerText;
   if (modalCountBadge) modalCountBadge.textContent = `${count} Archived`;
 }
 
