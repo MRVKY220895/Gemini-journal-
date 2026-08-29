@@ -112,74 +112,78 @@
     <!-- ===================================================================== -->
     <section id="view-studio" class="flex-1 flex flex-col justify-between w-full min-h-[calc(100vh-120px)] relative">
       
-      <!-- Top Temporal Header & Persona Controls -->
-      <div class="flex flex-col items-center justify-center text-center pt-1 pb-2">
-        <span class="eyebrow-badge mb-2">Today • August 29, 2026</span>
-        <h2 id="session-topic-heading" class="text-base font-bold text-slate-100 tracking-tight">Personal Reflective Space</h2>
-
-        <!-- Dedicated Segmented Tracks for Modes & Actions -->
-        <div class="flex items-center gap-2.5 mt-3 flex-wrap justify-center" id="persona-selector">
-          <!-- Modes Track -->
+    <!-- ===================================================================== -->
+    <!-- TAB 1: STUDIO (MULTI-TURN AI INTERACTION & JOURNALING) -->
+    <!-- ===================================================================== -->
+    <section id="view-studio" class="flex-1 flex flex-col justify-between w-full min-h-[calc(100vh-120px)] relative">
+      
+      <!-- Streamlined Studio Top Control Ribbon -->
+      <div class="studio-top-ribbon flex flex-col sm:flex-row items-center justify-between gap-2.5 pb-2.5 border-b border-white/5 shrink-0">
+        <!-- Left: Persona Modes Pill Group -->
+        <div class="flex items-center gap-1.5 flex-wrap justify-center sm:justify-start" id="persona-selector">
           <div class="modes-track flex items-center gap-1">
-            <button onclick="selectPersona('cbt_reflector')" data-persona="cbt_reflector" class="persona-btn active">
+            <button onclick="selectPersona('cbt_reflector')" data-persona="cbt_reflector" class="persona-btn active" title="Cognitive Reframing & Psychological Reflection">
               <span>🌿</span> <span>Reflect</span>
             </button>
-            <button onclick="selectPersona('socratic_brainstormer')" data-persona="socratic_brainstormer" class="persona-btn">
+            <button onclick="selectPersona('socratic_brainstormer')" data-persona="socratic_brainstormer" class="persona-btn" title="Socratic Brainstorming & Assumption Challenging">
               <span>💡</span> <span>Brainstorm</span>
             </button>
-            <button onclick="selectPersona('executive_strategist')" data-persona="executive_strategist" class="persona-btn">
+            <button onclick="selectPersona('executive_strategist')" data-persona="executive_strategist" class="persona-btn" title="Executive Strategy & Execution Velocity">
               <span>🎯</span> <span>Strategize</span>
             </button>
-            <button onclick="selectPersona('shadow_work_analyst')" data-persona="shadow_work_analyst" class="persona-btn">
+            <button onclick="selectPersona('shadow_work_analyst')" data-persona="shadow_work_analyst" class="persona-btn" title="Shadow Work & Subconscious Exploration">
               <span>🌌</span> <span>Shadow Work</span>
             </button>
           </div>
+        </div>
 
-          <!-- Actions Track -->
-          <div class="action-track flex items-center">
-            <button onclick="startNewSession()" class="persona-btn hover:!bg-white/10 !text-slate-300 hover:!text-white flex items-center gap-1.5 font-medium">
-              <i data-lucide="plus" class="w-3.5 h-3.5 text-cyan-400"></i>
-              <span>New Session</span>
-            </button>
-          </div>
+        <!-- Right: Session Actions & Topic Badge -->
+        <div class="flex items-center gap-2">
+          <span id="session-topic-heading" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300 truncate max-w-[180px] sm:max-w-[240px]">
+            Personal Reflective Space
+          </span>
+          <button onclick="startNewSession()" class="btn-secondary text-xs !py-1 !px-2.5 flex items-center gap-1 hover:border-cyan-400 text-cyan-300" title="Start Clean Chat Session">
+            <i data-lucide="plus" class="w-3.5 h-3.5 text-cyan-400"></i>
+            <span class="hidden sm:inline">New Session</span>
+          </button>
         </div>
       </div>
 
       <!-- Chat Feed / Hero Canvas Container -->
-      <div id="chat-messages" class="flex-1 flex flex-col justify-center overflow-y-auto space-y-6 px-1 py-4 mb-2">
+      <div id="chat-messages" class="flex-1 flex flex-col justify-center overflow-y-auto space-y-4 px-1 py-3 mb-2">
         <!-- Initial Ethereal Hero Stage (Rendered via startNewSession / Default) -->
-        <div id="empty-hero-stage" class="flex flex-col items-center justify-center text-center my-auto py-6">
-          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 text-white mb-4">
-            <i data-lucide="sparkles" class="w-6 h-6"></i>
+        <div id="empty-hero-stage" class="flex flex-col items-center justify-center text-center my-auto py-4">
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 text-white mb-3">
+            <i data-lucide="sparkles" class="w-5 h-5"></i>
           </div>
-          <h1 class="text-2xl sm:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-slate-400 tracking-tight mb-2">
+          <h1 class="text-xl sm:text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-slate-400 tracking-tight mb-1.5">
             Where would you like to begin?
           </h1>
-          <p class="text-xs sm:text-sm text-slate-400 max-w-md mb-8 leading-relaxed">
-            Your private cognitive sanctuary. Unpack thoughts, challenge cognitive biases, or explore ideas with Gemini 3.5 Flash.
+          <p class="text-xs text-slate-400 max-w-md mb-6 leading-relaxed">
+            Your private cognitive sanctuary. Unpack thoughts, challenge cognitive biases, or explore ideas with Gemini 2.5 Flash.
           </p>
 
           <!-- Bento Prompt Starters -->
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-3xl">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 w-full max-w-3xl">
             <button onclick="insertPrompt('Help me untangle what is making me feel overwhelmed with my work today.')" class="prompt-starter-card group">
-              <div class="w-8 h-8 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                <i data-lucide="sparkles" class="w-4 h-4"></i>
+              <div class="w-7 h-7 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
               </div>
-              <div class="text-xs font-bold text-white mb-1">Untangle Overwhelm</div>
+              <div class="text-xs font-bold text-white mb-0.5">Untangle Overwhelm</div>
               <div class="text-[11px] text-slate-400 leading-snug">Deconstruct cognitive distortions and pinpoint root causes.</div>
             </button>
             <button onclick="insertPrompt('I want to celebrate a win and anchor my sense of gratitude.')" class="prompt-starter-card group">
-              <div class="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                <i data-lucide="heart" class="w-4 h-4"></i>
+              <div class="w-7 h-7 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <i data-lucide="heart" class="w-3.5 h-3.5"></i>
               </div>
-              <div class="text-xs font-bold text-white mb-1">Anchor Gratitude</div>
+              <div class="text-xs font-bold text-white mb-0.5">Anchor Gratitude</div>
               <div class="text-[11px] text-slate-400 leading-snug">Deepen moments of joy and strengthen resilience.</div>
             </button>
             <button onclick="insertPrompt('Brainstorm an architecture strategy and challenge my assumptions.')" class="prompt-starter-card group">
-              <div class="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                <i data-lucide="compass" class="w-4 h-4"></i>
+              <div class="w-7 h-7 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <i data-lucide="compass" class="w-3.5 h-3.5"></i>
               </div>
-              <div class="text-xs font-bold text-white mb-1">Socratic Ideation</div>
+              <div class="text-xs font-bold text-white mb-0.5">Socratic Ideation</div>
               <div class="text-[11px] text-slate-400 leading-snug">Examine hidden blind spots and structure execution.</div>
             </button>
           </div>

@@ -929,7 +929,11 @@ function appendChatMessage(role, content, authorName, modelTag, cognitiveData = 
           </div>
 
           <!-- Action Buttons -->
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-1.5">
+            <button onclick="narrateAIMessage('${escapeHtml(content).replace(/'/g, "\\'")}', this)" class="text-xs text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-lg transition-all flex items-center gap-1" title="Listen to AI voice narration">
+              <i data-lucide="volume-2" class="w-3 h-3 text-cyan-400"></i>
+              <span>Listen</span>
+            </button>
             <button onclick="saveAndFeedback('${escapeHtml(originalPrompt || 'Reflection')}', '${escapeHtml(content).replace(/'/g, "\\'")}', '${cognitiveData?.primary_emotion || 'Reflective'}', this)" class="text-xs text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-lg transition-all flex items-center gap-1.5">
               <i data-lucide="heart" class="w-3 h-3 text-rose-400"></i>
               <span>Save to Journal</span>
@@ -947,6 +951,20 @@ function appendChatMessage(role, content, authorName, modelTag, cognitiveData = 
   container.appendChild(msgDiv);
   container.scrollTop = container.scrollHeight;
   lucide.createIcons();
+}
+
+function narrateAIMessage(text, btnElement) {
+  if (!('speechSynthesis' in window)) {
+    showToast('Speech synthesis not supported in this browser.');
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const cleanText = text.replace(/[*#_`~\[\]]/g, '');
+  const utterance = new SpeechSynthesisUtterance(cleanText);
+  utterance.rate = 1.0;
+  utterance.pitch = 1.0;
+  window.speechSynthesis.speak(utterance);
+  showToast('🔊 Speaking AI response...');
 }
 
 async function saveAndFeedback(title, content, mood, btnElement) {
