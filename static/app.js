@@ -362,51 +362,35 @@ function closeGeminiKeyModal() {
 
 
 async function checkGeminiKeyStatus() {
-
   try {
-
-    const resp = await fetch('/api/security/audit');
-
+    const resp = await fetch('/api/gemini/health');
     const data = await resp.json();
 
-    const isConfigured = data.key_management.gemini_api_key_masked !== '[NOT SET]';
-
-
-
     const dot = document.getElementById('gemini-key-dot');
-
     const label = document.getElementById('gemini-key-label');
 
-
-
     if (dot && label) {
-
-      if (isConfigured) {
-
+      if (data.status === 'live') {
         dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0';
-
         label.textContent = 'Gemini 3.5 (Live)';
-
         label.className = 'font-mono text-[11px] text-emerald-300 font-semibold whitespace-nowrap';
-
-      } else {
-
+      } else if (data.status === 'quota_exhausted') {
         dot.className = 'w-2 h-2 rounded-full bg-amber-400 shrink-0';
-
+        label.textContent = 'Quota Exhausted (429)';
+        label.className = 'font-mono text-[11px] text-amber-300 font-semibold whitespace-nowrap';
+      } else if (data.status === 'blocked') {
+        dot.className = 'w-2 h-2 rounded-full bg-rose-400 shrink-0';
+        label.textContent = 'Key Blocked (403)';
+        label.className = 'font-mono text-[11px] text-rose-300 font-semibold whitespace-nowrap';
+      } else {
+        dot.className = 'w-2 h-2 rounded-full bg-slate-400 shrink-0';
         label.textContent = 'Connect Gemini API';
-
-        label.className = 'font-mono text-[11px] text-amber-300 whitespace-nowrap';
-
+        label.className = 'font-mono text-[11px] text-slate-300 whitespace-nowrap';
       }
-
     }
-
   } catch (err) {
-
     console.debug('Key status check notice:', err);
-
   }
-
 }
 
 

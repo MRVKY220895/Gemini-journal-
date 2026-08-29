@@ -111,6 +111,42 @@ async def get_firebase_public_config():
     }
 
 
+@app.get("/api/gemini/health")
+async def check_gemini_health():
+    """Live health probe for Google Gemini API Key and Quota status."""
+    key = secret_manager.get_gemini_api_key()
+    if not key or key.startswith("your_") or len(key) < 15:
+        return {"status": "unconfigured", "message": "Connect Gemini API"}
+    
+    try:
+        from google import genai
+        client = genai.Client(api_key=key)
+        for model_name in ["gemini-3.6-flash", "gemini-3.5-flash", "gemini-flash-latest"]:
+            try:
+                resp = client.models.generate_content(
+                    model=model_name,
+                    contents="ping"
+                )
+                if resp and resp.text:
+                    return {"status": "live", "message": "Gemini 3.5 (Live)", "model": model_name}
+            except Exception as m_err:
+                err_s = str(m_err)
+                if "RESOURCE_EXHAUSTED" in err_s:
+                    return {"status": "quota_exhausted", "message": "Quota Exhausted (429)"}
+                if "API_KEY_SERVICE_BLOCKED" in err_s or "PERMISSION_DENIED" in err_s:
+                    return {"status": "blocked", "message": "Key Blocked (403)"}
+                continue
+    except Exception as e:
+        err_s = str(e)
+        if "RESOURCE_EXHAUSTED" in err_s:
+            return {"status": "quota_exhausted", "message": "Quota Exhausted (429)"}
+        if "PERMISSION_DENIED" in err_s:
+            return {"status": "blocked", "message": "Key Blocked (403)"}
+        return {"status": "error", "message": "API Error"}
+    
+    return {"status": "unconfigured", "message": "Connect Gemini API"}
+
+
 @app.get("/api/security/audit")
 async def security_audit():
     """
