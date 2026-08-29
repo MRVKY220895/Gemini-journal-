@@ -1,0 +1,44 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // =========================================================================
+    // ZERO-TRUST SECURITY RULES: STRICT USER ISOLATION
+    // =========================================================================
+
+    // Default Deny: Disallow reading or writing any document at root or unknown paths
+    match /{document=**} {
+      allow read, write: false;
+    }
+
+    // Isolated User Storage: Every user may ONLY read and write their own documents
+    match /users/{userId} {
+      // Allow user to manage their own profile metadata
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      // Isolated Journals Collection
+      match /journals/{journalId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Isolated Multi-turn Conversations & Message History
+      match /sessions/{sessionId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+
+        match /messages/{messageId} {
+          allow read, write: if request.auth != null && request.auth.uid == userId;
+        }
+      }
+
+      // Isolated Cognitive Analytics & MindPulse Insights
+      match /analytics/{metricId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Isolated Client-Side Encrypted Vault Records
+      match /vault/{vaultItemId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+  }
+}

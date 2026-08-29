@@ -1,0 +1,377 @@
+"""
+Isolated User Storage Layer.
+Guarantees absolute per-user data isolation. Every query and mutation is
+strictly filtered and partitioned by the cryptographically verified user_id.
+Zero cross-tenant leakage.
+"""
+
+import os
+import sqlite3
+import json
+import uuid
+import time
+import logging
+from typing import List, Dict, Any, Optional
+
+logger = logging.getLogger("storage.user_storage")
+
+
+class IsolatedUserStorage:
+    """
+    Storage manager with strict user_id boundary enforcement.
+    Stores data in isolated user collections.
+    """
+
+    def __init__(self, db_path: str = "data/isolated_store.db"):
+        self.db_path = db_path
+        os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
+        self._init_db()
+
+    def _get_connection(self) -> sqlite3.Connection:
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row
+        return conn
+
+    def _init_db(self):
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+
+            # Sessions table (Partitioned by user_id)
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS sessions (
+                    id TEXT PRIMARY KEY,
+                    user_id TEXT NOT NULL,
+                    title TEXT NOT NULL,
+                    persona TEXT NOT NULL,
+                    created_at REAL NOT NULL,
+                    updated_at REAL NOT NULL
+                )
+            """)
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id)")
+
+            # Messages table (Partitioned by user_id & session_id)
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS messages (
+                    id TEXT PRIMARY KEY,
+                    user_id TEXT NOT NULL,
+                    session_id TEXT NOT NULL,
+                    role TEXT NOT NULL,
+                    content TEXT NOT NULL,
+                    cognitive_data TEXT,
+                    created_at REAL NOT NULL,
+                    FOREIGN KEY(session_id) REFERENCES sessions(id) ON DELETE CASCADE
+                )
+            """)
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_messages_user ON messages(user_id, session_id)")
+
+            # Journals table (Partitioned by user_id)
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS journals (
+                    id TEXT PRIMARY KEY,
+                    user_id TEXT NOT NULL,
+                    title TEXT NOT NULL,
+                    content TEXT NOT NULL,
+                    persona TEXT DEFAULT 'cbt_reflector',
+                    tags TEXT DEFAULT '[]',
+                    mood TEXT DEFAULT 'neutral',
+                    insights_json TEXT,
+                    is_encrypted INTEGER DEFAULT 0,
+                    created_at REAL NOT NULL,
+                    updated_at REAL NOT NULL
+                )
+            """)
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_journals_user ON journals(user_id)")
+
+            # Cognitive Analytics table (Partitioned by user_id)
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS analytics (
+                    id TEXT PRIMARY KEY,
+                    user_id TEXT NOT NULL,
+                    session_id TEXT,
+                    mood_scores TEXT NOT NULL,
+                    distortions TEXT,
+                    action_items TEXT,
+                    created_at REAL NOT NULL
+                )
+            """)
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_analytics_user ON analytics(user_id)")
+
+            conn.commit()
+            logger.info("Isolated User Storage database initialized with strict tenant indexes.")
+
+    # =========================================================================
+    # SESSIONS & MULTI-TURN CHAT (USER ISOLATED)
+    # =========================================================================
+
+    def create_or_get_session(self, user_id: str, session_id: Optional[str], persona: str = "cbt_reflector", title: Optional[str] = None) -> Dict[str, Any]:
+        """Creates or retrieves a chat session, strictly verifying user ownership."""
+        now = time.time()
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            if session_id:
+                cursor.execute("SELECT * FROM sessions WHERE id = ? AND user_id = ?", (session_id, user_id))
+                row = cursor.fetchone()
+                if row:
+                    return dict(row)
+
+            # Generate new session
+            new_id = session_id or str(uuid.uuid4())
+            sess_title = title or f"Session {time.strftime('%b %d, %H:%M')}"
+            cursor.execute(
+                "INSERT INTO sessions (id, user_id, title, persona, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
+                (new_id, user_id, sess_title, persona, now, now)
+            )
+            conn.commit()
+            return {
+                "id": new_id,
+                "user_id": user_id,
+                "title": sess_title,
+                "persona": persona,
+                "created_at": now,
+                "updated_at": now
+            }
+
+    def list_sessions(self, user_id: str) -> List[Dict[str, Any]]:
+        """List all chat sessions belonging ONLY to the authenticated user."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM sessions WHERE user_id = ? ORDER BY updated_at DESC", (user_id,))
+            return [dict(row) for row in cursor.fetchall()]
+
+    def save_message(self, user_id: str, session_id: str, role: str, content: str, cognitive_data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Saves a message strictly tagged with the user's verified UID."""
+        msg_id = str(uuid.uuid4())
+        now = time.time()
+        cog_str = json.dumps(cognitive_data) if cognitive_data else None
+
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            # Verify session belongs to user
+            cursor.execute("SELECT id FROM sessions WHERE id = ? AND user_id = ?", (session_id, user_id))
+            if not cursor.fetchone():
+                self.create_or_get_session(user_id, session_id)
+
+            cursor.execute(
+                "INSERT INTO messages (id, user_id, session_id, role, content, cognitive_data, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (msg_id, user_id, session_id, role, content, cog_str, now)
+            )
+            # Update session timestamp
+            cursor.execute("UPDATE sessions SET updated_at = ? WHERE id = ? AND user_id = ?", (now, session_id, user_id))
+            conn.commit()
+
+        return {
+            "id": msg_id,
+            "user_id": user_id,
+            "session_id": session_id,
+            "role": role,
+            "content": content,
+            "cognitive_data": cognitive_data,
+            "created_at": now
+        }
+
+    def get_messages(self, user_id: str, session_id: str) -> List[Dict[str, Any]]:
+        """Retrieve conversation history strictly for the authenticated user."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT * FROM messages WHERE user_id = ? AND session_id = ? ORDER BY created_at ASC",
+                (user_id, session_id)
+            )
+            results = []
+            for row in cursor.fetchall():
+                d = dict(row)
+                if d.get("cognitive_data"):
+                    try:
+                        d["cognitive_data"] = json.loads(d["cognitive_data"])
+                    except Exception:
+                        pass
+                results.append(d)
+            return results
+
+    # =========================================================================
+    # JOURNALS (USER ISOLATED)
+    # =========================================================================
+
+    def create_journal(
+        self,
+        user_id: str,
+        title: str,
+        content: str,
+        persona: str = "cbt_reflector",
+        tags: Optional[List[str]] = None,
+        mood: str = "neutral",
+        insights: Optional[Dict[str, Any]] = None,
+        is_encrypted: bool = False
+    ) -> Dict[str, Any]:
+        """Create a new journal entry strictly isolated to the user."""
+        journal_id = str(uuid.uuid4())
+        now = time.time()
+        tags_str = json.dumps(tags or [])
+        insights_str = json.dumps(insights or {})
+
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                """INSERT INTO journals 
+                   (id, user_id, title, content, persona, tags, mood, insights_json, is_encrypted, created_at, updated_at) 
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (journal_id, user_id, title, content, persona, tags_str, mood, insights_str, 1 if is_encrypted else 0, now, now)
+            )
+            conn.commit()
+
+        return {
+            "id": journal_id,
+            "user_id": user_id,
+            "title": title,
+            "content": content,
+            "persona": persona,
+            "tags": tags or [],
+            "mood": mood,
+            "insights": insights or {},
+            "is_encrypted": is_encrypted,
+            "created_at": now,
+            "updated_at": now
+        }
+
+    def list_journals(self, user_id: str, limit: int = 50) -> List[Dict[str, Any]]:
+        """List all journal entries belonging ONLY to the requesting user."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT * FROM journals WHERE user_id = ? ORDER BY created_at DESC LIMIT ?",
+                (user_id, limit)
+            )
+            entries = []
+            for row in cursor.fetchall():
+                d = dict(row)
+                d["tags"] = json.loads(d.get("tags") or "[]")
+                d["insights"] = json.loads(d.get("insights_json") or "{}")
+                d["is_encrypted"] = bool(d.get("is_encrypted"))
+                del d["insights_json"]
+                entries.append(d)
+            return entries
+
+    def get_journal(self, user_id: str, journal_id: str) -> Optional[Dict[str, Any]]:
+        """Get a single journal entry, strictly checking that user_id matches."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT * FROM journals WHERE id = ? AND user_id = ?",
+                (journal_id, user_id)
+            )
+            row = cursor.fetchone()
+            if not row:
+                return None
+            d = dict(row)
+            d["tags"] = json.loads(d.get("tags") or "[]")
+            d["insights"] = json.loads(d.get("insights_json") or "{}")
+            d["is_encrypted"] = bool(d.get("is_encrypted"))
+            del d["insights_json"]
+            return d
+
+    def delete_journal(self, user_id: str, journal_id: str) -> bool:
+        """Delete a journal entry strictly matching user_id."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM journals WHERE id = ? AND user_id = ?", (journal_id, user_id))
+            conn.commit()
+            return cursor.rowcount > 0
+
+    # =========================================================================
+    # COGNITIVE ANALYTICS & INSIGHTS (USER ISOLATED)
+    # =========================================================================
+
+    def record_analytics(
+        self,
+        user_id: str,
+        mood_scores: Dict[str, float],
+        distortions: Optional[List[str]] = None,
+        action_items: Optional[List[str]] = None,
+        session_id: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Record cognitive metrics for the user."""
+        metric_id = str(uuid.uuid4())
+        now = time.time()
+        mood_str = json.dumps(mood_scores)
+        dist_str = json.dumps(distortions or [])
+        actions_str = json.dumps(action_items or [])
+
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                """INSERT INTO analytics 
+                   (id, user_id, session_id, mood_scores, distortions, action_items, created_at) 
+                   VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                (metric_id, user_id, session_id, mood_str, dist_str, actions_str, now)
+            )
+            conn.commit()
+
+        return {
+            "id": metric_id,
+            "user_id": user_id,
+            "session_id": session_id,
+            "mood_scores": mood_scores,
+            "distortions": distortions or [],
+            "action_items": action_items or [],
+            "created_at": now
+        }
+
+    def get_analytics_summary(self, user_id: str) -> Dict[str, Any]:
+        """
+        Aggregate cognitive trends (emotions, distortion frequency, recent action items)
+        strictly for the calling user.
+        """
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT * FROM analytics WHERE user_id = ? ORDER BY created_at ASC",
+                (user_id,)
+            )
+            records = cursor.fetchall()
+
+        if not records:
+            return {
+                "total_entries": 0,
+                "average_mood": {"Joy": 60, "Clarity": 65, "Resilience": 70, "Focus": 65, "Calm": 70, "Optimism": 60},
+                "distortion_frequencies": {},
+                "recent_actions": [],
+                "timeline": []
+            }
+
+        mood_aggregates = {"Joy": 0.0, "Clarity": 0.0, "Resilience": 0.0, "Focus": 0.0, "Calm": 0.0, "Optimism": 0.0}
+        distortion_counts = {}
+        all_actions = []
+        timeline = []
+
+        count = len(records)
+        for r in records:
+            moods = json.loads(r["mood_scores"] or "{}")
+            distortions = json.loads(r["distortions"] or "[]")
+            actions = json.loads(r["action_items"] or "[]")
+
+            for k in mood_aggregates:
+                mood_aggregates[k] += float(moods.get(k, 50.0))
+
+            for d in distortions:
+                distortion_counts[d] = distortion_counts.get(d, 0) + 1
+
+            all_actions.extend(actions)
+            timeline.append({
+                "timestamp": r["created_at"],
+                "date": time.strftime("%b %d", time.localtime(r["created_at"])),
+                "mood_scores": moods
+            })
+
+        avg_mood = {k: round(v / count, 1) for k, v in mood_aggregates.items()}
+
+        return {
+            "total_entries": count,
+            "average_mood": avg_mood,
+            "distortion_frequencies": distortion_counts,
+            "recent_actions": all_actions[-10:],
+            "timeline": timeline[-15:]
+        }
+
+
+# Global isolated storage instance
+isolated_storage = IsolatedUserStorage()
