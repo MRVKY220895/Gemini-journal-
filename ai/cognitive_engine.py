@@ -25,7 +25,7 @@ COGNITIVE_DISTORTION_PATTERNS = {
     "Catastrophizing": [
         r"\b(ruined|disaster|worst thing|worst case|doomed|wreck|nightmare|everything is falling apart|hopeless|end of the world)\b"
     ],
-    "All-or-Nothing": [
+    "All-or-Nothing Thinking": [
         r"\b(always|never|every single time|complete failure|total mess|ruined everything|perfect or nothing|nobody|everybody|nothing ever)\b"
     ],
     "Mind Reading": [
@@ -50,6 +50,34 @@ THEMATIC_TAG_PATTERNS = {
     "#CareerAndFocus": [r"\b(work|project|code|job|boss|team|client|goal|career|productivity|deliverable)\b"],
     "#IdeationAndCreation": [r"\b(brainstorm|idea|build|create|design|innovate|architecture|concept)\b"],
     "#MindfulGratitude": [r"\b(grateful|thankful|peace|grounded|calm|appreciate|breath|present)\b"]
+}
+
+REPUTABLE_CBT_GUIDES = {
+    "Labeling & Self-Blame": {
+        "title": "Identity vs. Behavior Decoupling",
+        "technique": "Continuum & Responsibility Charting",
+        "action": "Separate your core character from a temporary obstacle. Rephrase 'I am failing' to 'I am navigating a complex problem.'"
+    },
+    "Catastrophizing": {
+        "title": "Decatastrophizing Triple Matrix",
+        "technique": "Worst, Best & Most Likely Scenario Mapping",
+        "action": "Write down: 1) What is the worst outcome? 2) What is the best outcome? 3) What is the realistic middle outcome?"
+    },
+    "All-or-Nothing Thinking": {
+        "title": "Dialectical Spectrum Thinking",
+        "technique": "Percentage Progress Scale",
+        "action": "Rate today's effort on a 0-100% scale. Acknowledging a 60% effort completely invalidates binary 'failure'."
+    },
+    "Should Statements": {
+        "title": "Values-Based Intentionality",
+        "technique": "Replacing Demands with Desires",
+        "action": "Replace 'I should have done this' with 'I prefer to do this because it aligns with my long-term goals.'"
+    },
+    "Emotional Reasoning": {
+        "title": "Empirical Reality Testing",
+        "technique": "Fact vs. Feeling Separation",
+        "action": "Feelings are neurological signals, not legal evidence. List 3 objective, verifiable facts that contradict this feeling."
+    }
 }
 
 
@@ -119,17 +147,20 @@ class CognitiveEngine:
         else:
             primary_emotion = "Seeking Direction"
 
-        # 5. Targeted Cognitive Reframing
-        if "Labeling & Self-Blame" in detected_distortions or "dumb" in lowered:
-            reframing = "Feeling confused or making a mistake is an event, not your identity. Separate 'I feel challenged' from 'I am dumb'."
-        elif "Catastrophizing" in detected_distortions:
-            reframing = "Notice if you are predicting the worst-case scenario. What is the most realistic, probable outcome?"
-        elif "All-or-Nothing" in detected_distortions:
-            reframing = "Growth happens in shades of grey. Acknowledge the micro-progress made rather than demanding perfection."
-        elif "Should Statements" in detected_distortions:
-            reframing = "Replace 'I should' with 'I choose to' or 'I would prefer to', reducing self-imposed pressure."
-        else:
-            reframing = "Focus on what is directly within your circle of control today."
+        # 5. Targeted Cognitive Reframing Guide
+        coaching_protocols = []
+        for d in detected_distortions:
+            if d in REPUTABLE_CBT_GUIDES:
+                coaching_protocols.append(REPUTABLE_CBT_GUIDES[d])
+
+        if not coaching_protocols:
+            coaching_protocols.append({
+                "title": "Mindful Intentional Presence",
+                "technique": "Anchoring & Focus Alignment",
+                "action": "Identify the single highest-leverage priority for your current energy window and execute without multitasking."
+            })
+
+        reframing = coaching_protocols[0]["action"]
 
         # 6. Action Items Synthesis
         action_items = []
@@ -144,6 +175,7 @@ class CognitiveEngine:
             "mood_scores": mood_scores,
             "primary_emotion": primary_emotion,
             "detected_distortions": detected_distortions,
+            "coaching_protocols": coaching_protocols,
             "semantic_tags": semantic_tags,
             "cognitive_reframing": reframing,
             "action_items": action_items,

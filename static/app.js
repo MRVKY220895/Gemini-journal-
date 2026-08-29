@@ -2653,6 +2653,25 @@ async function loadAnalytics() {
 // SECURITY AUDIT & GOOGLE AI STUDIO INSPECTOR
 // =============================================================================
 
+function launchGuidedCBT(type) {
+  switchTab('studio');
+  selectPersona('cbt_reflector');
+  let promptText = '';
+  if (type === 'decatastrophize') {
+    promptText = "Guide me through a Decatastrophizing exercise for something causing me anxiety: 1) What's the worst case? 2) What's the best case? 3) What is the most realistic outcome?";
+  } else if (type === 'continuum') {
+    promptText = "Help me apply Continuum Thinking to a situation where I feel like I either succeeded completely or failed totally.";
+  } else if (type === 'microsprint') {
+    promptText = "Break down my most overwhelming goal into a single atomic 5-minute action step that I can do immediately.";
+  }
+  const input = document.getElementById('chat-input');
+  if (input) {
+    input.value = promptText;
+    input.focus();
+  }
+  showToast('✨ Guided cognitive reframing prompt loaded into Studio.');
+}
+
 async function loadSecurityAudit() {
   const container = document.getElementById('security-audit-cards');
   try {
