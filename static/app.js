@@ -2336,82 +2336,44 @@ function updateLiveCognitiveBar(cogData) {
 
 
 // Mock Google Calendar Planned Events
-
-const mockGCalSchedule = {
-
+const mockGCalSchedule = localStorage.getItem('mind_cave_is_reset') ? {} : {
   '08:00': { title: 'Team Architecture Standup', duration: '30m', category: 'Team Sync' },
-
   '09:00': { title: 'Deep Work: Core AI Engine', duration: '2h', category: 'Focus Block' },
-
   '12:00': { title: 'Team Lunch & Mindful Walk', duration: '1h', category: 'Wellness' },
-
   '15:00': { title: 'Client Product Walkthrough', duration: '45m', category: 'External' },
-
   '17:00': { title: 'Daily Engineering Review', duration: '30m', category: 'Wrap-up' }
-
 };
 
-
-
 // Mock Memory Photos
-
-let memoryPhotosList = [
-
+let memoryPhotosList = JSON.parse(localStorage.getItem('mind_cave_memory_photos') || 'null') || (localStorage.getItem('mind_cave_is_reset') ? [] : [
   {
-
     id: 'photo_1',
-
     hour: '08:15',
-
     url: 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=600&q=80',
-
     caption: 'Morning coffee & quiet planning before the sprint',
-
     location: 'Cafe Botanica, Central Square',
-
     mood: 'Calm',
-
     energy: '8/10'
-
   },
-
   {
-
     id: 'photo_2',
-
     hour: '12:30',
-
     url: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=600&q=80',
-
     caption: 'Whiteboarding session on multi-track cognitive sync',
-
     location: 'Design Studio Room 4B',
-
     mood: 'Energized',
-
     energy: '9/10'
-
   },
-
   {
-
     id: 'photo_3',
-
     hour: '18:45',
-
     url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80',
-
     caption: 'Sunset run to clear mental cache and anchor gratitude',
-
     location: 'Riverbank Promenade',
-
     mood: 'Joyful',
-
     energy: '8/10'
-
   }
-
-];
+]);
 
 
 
