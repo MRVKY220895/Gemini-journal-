@@ -1898,95 +1898,102 @@ async function renderChronoTimeline() {
 
         <!-- Editorial Diary Page Card -->
         <div class="chrono-block-card type-${ev.type} ${isGoal ? 'border-amber-500/30 dark:border-amber-500/25' : ''}">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-2.5 pb-2 border-b border-black/5 dark:border-white/5">
-            <div class="flex items-center gap-2 flex-wrap">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2.5 mb-2 pb-2 border-b border-black/5 dark:border-white/5">
+            <div class="flex items-center gap-1.5 flex-wrap">
               <!-- Event Category Pill -->
               ${isGoal ? `
-                <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full ${ev.isCompleted ? 'bg-amber-50 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-500/30' : 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border-blue-200 dark:border-blue-500/30'} border">
-                  <i data-lucide="${ev.isCompleted ? 'check-circle' : 'target'}" class="w-3.5 h-3.5 text-amber-500"></i>
+                <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full ${ev.isCompleted ? 'bg-amber-50 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-500/30' : 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border-blue-200 dark:border-blue-500/30'} border shrink-0">
+                  <i data-lucide="${ev.isCompleted ? 'check-circle' : 'target'}" class="w-3 h-3 text-amber-500"></i>
                   <span>${escapeHtml(ev.categoryLabel || "Today's Goal")}</span>
                 </span>
               ` : isGCal ? `
-                <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200 dark:border-blue-500/30">
-                  <i data-lucide="calendar" class="w-3.5 h-3.5 text-blue-500"></i>
+                <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200 dark:border-blue-500/30 shrink-0">
+                  <i data-lucide="calendar" class="w-3 h-3 text-blue-500"></i>
                   <span>Google Calendar</span>
                 </span>
               ` : isTask ? `
-                <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full ${ev.isCompleted ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/30' : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-500/30'} border">
-                  <i data-lucide="${ev.isCompleted ? 'check-circle' : 'target'}" class="w-3.5 h-3.5"></i>
+                <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full ${ev.isCompleted ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/30' : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-500/30'} border shrink-0">
+                  <i data-lucide="${ev.isCompleted ? 'check-circle' : 'target'}" class="w-3 h-3"></i>
                   <span>${ev.isCompleted ? 'Completed Task' : (ev.taskType === 'milestone' ? 'Goal Milestone' : 'Action Item')}</span>
                 </span>
               ` : ev.type === 'photo' ? `
-                <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 border border-purple-200 dark:border-purple-500/30">
-                  <i data-lucide="image" class="w-3.5 h-3.5 text-purple-500"></i>
+                <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 border border-purple-200 dark:border-purple-500/30 shrink-0">
+                  <i data-lucide="image" class="w-3 h-3 text-purple-500"></i>
                   <span>Visual Memory</span>
                 </span>
               ` : `
-                <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30">
-                  <i data-lucide="feather" class="w-3.5 h-3.5 text-emerald-500"></i>
+                <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30 shrink-0">
+                  <i data-lucide="feather" class="w-3 h-3 text-emerald-500"></i>
                   <span>${escapeHtml(ev.mood || 'Reflection')}</span>
                 </span>
               `}
 
-              <span class="text-[11px] font-mono px-2 py-0.5 rounded-full bg-slate-100 dark:bg-black/40 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10">
+              <span class="text-[10px] sm:text-[11px] font-mono px-2 py-0.5 rounded-full bg-slate-100 dark:bg-black/40 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 shrink-0">
                 ${weatherBadge}
               </span>
 
               ${ev.energy ? `
-                <span class="text-[11px] text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-500/30 px-2 py-0.5 rounded-full font-mono font-semibold">
+                <span class="text-[10px] sm:text-[11px] text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-500/30 px-2 py-0.5 rounded-full font-mono font-semibold shrink-0">
                   ${ev.energy}
                 </span>
               ` : ''}
             </div>
 
-            <div class="flex items-center gap-2">
-              <span class="text-[11px] text-slate-500 dark:text-slate-400 font-mono">${escapeHtml(ev.location)}</span>
-              ${isGoal ? `
-                <button onclick="openTodayGoalModal('${ev.goalId}')" class="text-xs font-semibold text-amber-600 dark:text-amber-400 hover:opacity-80 flex items-center gap-1 transition-colors px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30" title="Edit Goal Details">
-                  <i data-lucide="edit-2" class="w-3 h-3"></i> <span>Edit</span>
-                </button>
-              ` : isTask ? `
-                <button onclick="convertTaskToReflection('${ev.taskId}')" class="text-xs font-semibold text-cyan-600 dark:text-cyan-400 hover:opacity-80 flex items-center gap-1 transition-colors px-2.5 py-1 rounded-lg bg-cyan-50 dark:bg-cyan-500/10 border border-cyan-200 dark:border-cyan-500/30" title="Reflect on this task">
-                  <i data-lucide="sparkles" class="w-3 h-3"></i> <span>Reflect</span>
-                </button>
-                <button onclick="deleteTask('${ev.taskId}')" class="text-xs text-slate-400 hover:text-rose-500 transition-colors p-1" title="Delete Task">
-                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                </button>
-              ` : `
-                <button onclick="openNewJournalModal('${ev.time}')" class="text-xs font-semibold text-cyan-600 dark:text-cyan-400 hover:opacity-80 flex items-center gap-1 transition-colors px-2.5 py-1 rounded-lg bg-cyan-50 dark:bg-cyan-500/10 border border-cyan-200 dark:border-cyan-500/30">
-                  <i data-lucide="edit-3" class="w-3 h-3"></i> <span>Add Note</span>
-                </button>
-              `}
+            <div class="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto pt-0.5 sm:pt-0">
+              <span class="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-mono truncate max-w-[140px] sm:max-w-[200px] flex items-center gap-1">
+                <i data-lucide="map-pin" class="w-3 h-3 shrink-0"></i>
+                <span class="truncate">${escapeHtml(ev.location)}</span>
+              </span>
+              <div class="flex items-center gap-1 shrink-0">
+                ${isGoal ? `
+                  <button onclick="openTodayGoalModal('${ev.goalId}')" class="text-[11px] font-semibold text-amber-600 dark:text-amber-400 hover:opacity-80 flex items-center gap-1 transition-colors px-2 py-0.5 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30" title="Edit Goal Details">
+                    <i data-lucide="edit-2" class="w-3 h-3"></i> <span>Edit</span>
+                  </button>
+                ` : isTask ? `
+                  <button onclick="convertTaskToReflection('${ev.taskId}')" class="text-[11px] font-semibold text-cyan-600 dark:text-cyan-400 hover:opacity-80 flex items-center gap-1 transition-colors px-2 py-0.5 rounded-lg bg-cyan-50 dark:bg-cyan-500/10 border border-cyan-200 dark:border-cyan-500/30" title="Reflect on this task">
+                    <i data-lucide="sparkles" class="w-3 h-3"></i> <span>Reflect</span>
+                  </button>
+                  <button onclick="deleteTask('${ev.taskId}')" class="text-xs text-slate-400 hover:text-rose-500 transition-colors p-1" title="Delete Task">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                  </button>
+                ` : `
+                  <button onclick="openNewJournalModal('${ev.time}')" class="text-[11px] font-semibold text-cyan-600 dark:text-cyan-400 hover:opacity-80 flex items-center gap-1 transition-colors px-2 py-0.5 rounded-lg bg-cyan-50 dark:bg-cyan-500/10 border border-cyan-200 dark:border-cyan-500/30">
+                    <i data-lucide="edit-3" class="w-3 h-3"></i> <span>Add Note</span>
+                  </button>
+                `}
+              </div>
             </div>
           </div>
 
           <!-- Entry Details -->
-          <div class="space-y-2 pt-0.5">
+          <div class="space-y-1.5 pt-0.5">
             ${isGoal ? `
-              <div class="flex items-center gap-3">
-                <button type="button" onclick="toggleGoalItemComplete('${ev.goalId}')" class="w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all shrink-0 cursor-pointer ${ev.isCompleted ? 'bg-amber-500 border-amber-500 text-white' : 'bg-transparent border-slate-300 dark:border-slate-600 hover:border-amber-500 text-transparent'}" title="Toggle Goal Complete">
+              <div class="flex items-start gap-2.5">
+                <button type="button" onclick="toggleGoalItemComplete('${ev.goalId}')" class="w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all shrink-0 cursor-pointer mt-0.5 ${ev.isCompleted ? 'bg-amber-500 border-amber-500 text-white' : 'bg-transparent border-slate-300 dark:border-slate-600 hover:border-amber-500 text-transparent'}" title="Toggle Goal Complete">
                   <i data-lucide="check" class="w-3.5 h-3.5 ${ev.isCompleted ? 'block' : 'hidden'}"></i>
                 </button>
-                <div>
-                  <h4 class="chrono-card-title text-base font-bold ${ev.isCompleted ? 'line-through opacity-60' : ''}">${escapeHtml(ev.title)}</h4>
-                  ${ev.startTime && ev.endTime ? `<div class="text-[11px] font-mono text-amber-600 dark:text-amber-400 mt-0.5">⏰ ${ev.startTime} - ${ev.endTime} (Duration: ${ev.duration || 'Calculated'})</div>` : ev.duration ? `<div class="text-[11px] font-mono text-amber-600 dark:text-amber-400 mt-0.5">⏱️ Duration: ${ev.duration}</div>` : ''}
+                <div class="min-w-0 flex-1">
+                  <h4 class="chrono-card-title text-sm sm:text-base font-bold leading-snug ${ev.isCompleted ? 'line-through opacity-60' : ''}">${escapeHtml(ev.title)}</h4>
+                  ${ev.startTime && ev.endTime ? `<div class="text-[11px] font-mono text-amber-600 dark:text-amber-400 mt-0.5 flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3 shrink-0"></i><span>${ev.startTime} - ${ev.endTime} (${ev.duration || 'Calculated'})</span></div>` : ev.duration ? `<div class="text-[11px] font-mono text-amber-600 dark:text-amber-400 mt-0.5 flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3 shrink-0"></i><span>Duration: ${ev.duration}</span></div>` : ''}
                 </div>
               </div>
             ` : isTask ? `
-              <div class="flex items-center gap-3">
-                <button type="button" onclick="toggleTaskComplete('${ev.taskId}')" class="w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all shrink-0 cursor-pointer ${ev.isCompleted ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-transparent border-slate-300 dark:border-slate-600 hover:border-emerald-500 text-transparent'}" title="Click to mark done/undone">
+              <div class="flex items-start gap-2.5">
+                <button type="button" onclick="toggleTaskComplete('${ev.taskId}')" class="w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all shrink-0 cursor-pointer mt-0.5 ${ev.isCompleted ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-transparent border-slate-300 dark:border-slate-600 hover:border-emerald-500 text-transparent'}" title="Click to mark done/undone">
                   <i data-lucide="check" class="w-3.5 h-3.5 ${ev.isCompleted ? 'block' : 'hidden'}"></i>
                 </button>
-                <h4 class="chrono-card-title text-base font-bold ${ev.isCompleted ? 'line-through opacity-50' : ''}">${escapeHtml(ev.title)}</h4>
+                <div class="min-w-0 flex-1">
+                  <h4 class="chrono-card-title text-sm sm:text-base font-bold leading-snug ${ev.isCompleted ? 'line-through opacity-50' : ''}">${escapeHtml(ev.title)}</h4>
+                </div>
               </div>
             ` : `
-              <h4 class="chrono-card-title text-base font-bold">${escapeHtml(ev.title)}</h4>
+              <h4 class="chrono-card-title text-sm sm:text-base font-bold leading-snug">${escapeHtml(ev.title)}</h4>
             `}
             
-            <p class="chrono-card-text text-sm leading-relaxed">${escapeHtml(ev.content)}</p>
+            <p class="chrono-card-text text-xs sm:text-sm leading-relaxed">${escapeHtml(ev.content)}</p>
             
             ${ev.cbtNote ? `
-              <div class="p-3 rounded-xl bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-500/20 text-xs text-purple-800 dark:text-purple-300 italic mt-2 flex items-start gap-2">
+              <div class="p-2.5 sm:p-3 rounded-xl bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-500/20 text-xs text-purple-800 dark:text-purple-300 italic mt-2 flex items-start gap-2">
                 <i data-lucide="brain" class="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5"></i>
                 <span><strong>Reflection Note:</strong> "${escapeHtml(ev.cbtNote)}"</span>
               </div>

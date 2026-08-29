@@ -2118,7 +2118,20 @@ html:not(.dark) .agenda-item-card:hover {
 
 @media (max-width: 768px) {
   body {
-    padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .floating-nav {
+    padding: 0.35rem 0.65rem !important;
+  }
+
+  .double-bezel {
+    padding: 0.25rem !important;
+    border-radius: 1.25rem !important;
+  }
+
+  .double-bezel-inner {
+    border-radius: 1.125rem !important;
   }
 
   .mobile-bottom-nav {
@@ -2135,6 +2148,41 @@ html:not(.dark) .agenda-item-card:hover {
     background: rgba(255, 255, 255, 0.95) !important;
     border-color: rgba(15, 23, 42, 0.12) !important;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+  }
+
+  /* Compact Timeline Geometry on Mobile */
+  .timeline-container {
+    padding-left: 2.35rem !important;
+    padding-right: 0 !important;
+  }
+
+  .timeline-spine {
+    left: 0.85rem !important;
+  }
+
+  .timeline-hour-node {
+    left: -2.35rem !important;
+    width: 1.75rem !important;
+  }
+
+  .timeline-hour-label {
+    font-size: 0.625rem !important;
+    letter-spacing: -0.02em !important;
+  }
+
+  .timeline-node-dot {
+    width: 0.625rem !important;
+    height: 0.625rem !important;
+  }
+
+  .chrono-block-card {
+    padding: 0.85rem 0.95rem !important;
+    border-radius: 1rem !important;
+  }
+
+  .journal-track-nav .track-tab-btn {
+    padding: 0.35rem 0.65rem !important;
+    font-size: 0.75rem !important;
   }
 }
 
