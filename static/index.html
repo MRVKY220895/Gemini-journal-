@@ -105,23 +105,23 @@
   <div class="fixed bottom-12 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse-slow"></div>
 
   <!-- Top Floating Glass Navigation Header -->
-  <header class="floating-nav flex items-center justify-between gap-2 mb-2 sm:mb-4 px-3 sm:px-4 py-2 sm:py-2.5 md:relative fixed top-0 left-0 right-0 w-full md:max-w-6xl md:mx-auto z-50 md:rounded-full md:mt-2 bg-slate-950/90 backdrop-blur-2xl border-b border-white/10 md:border md:border-white/10 shadow-lg pt-[max(0.6rem,env(safe-area-inset-top,0.6rem))] md:pt-2.5">
+  <header class="floating-nav flex items-center justify-between gap-1 sm:gap-2 mb-2 sm:mb-4 px-2 sm:px-4 py-1.5 sm:py-2.5 md:relative fixed top-0 left-0 right-0 w-full md:max-w-6xl md:mx-auto z-50 md:rounded-full md:mt-2 bg-slate-950/90 backdrop-blur-2xl border-b border-white/10 md:border md:border-white/10 shadow-lg pt-[max(0.4rem,env(safe-area-inset-top,0.4rem))] md:pt-2.5">
     <!-- Left Area: Master Menu Button + Brand / Logo -->
-    <div class="flex items-center gap-2 sm:gap-2.5 shrink-0">
+    <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
       <!-- Master Hierarchical Menu Button (Far Left Corner) -->
-      <button onclick="openMasterMenuModal()" id="btn-master-menu" class="flex items-center gap-1.5 bg-gradient-to-r from-cyan-950/80 to-blue-950/80 hover:from-cyan-900 hover:to-blue-900 px-2.5 py-1.5 rounded-full border border-cyan-500/40 text-xs font-bold text-cyan-300 hover:text-white transition-all shadow-md shadow-cyan-950/30 active:scale-95 cursor-pointer" title="Open Master Directory & Settings">
+      <button onclick="openMasterMenuModal()" id="btn-master-menu" class="flex items-center gap-1 sm:gap-1.5 bg-gradient-to-r from-cyan-950/80 to-blue-950/80 hover:from-cyan-900 hover:to-blue-900 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-full border border-cyan-500/40 text-[11px] sm:text-xs font-bold text-cyan-300 hover:text-white transition-all shadow-md shadow-cyan-950/30 active:scale-95 cursor-pointer shrink-0" title="Open Master Directory & Settings">
         <i data-lucide="menu" class="w-3.5 h-3.5 text-cyan-400"></i>
-        <span class="text-[11px] sm:text-xs">Menu</span>
+        <span class="inline">Menu</span>
       </button>
 
       <span class="w-[1px] h-4 bg-white/10 hidden sm:inline-block"></span>
 
       <!-- Brand / Logo -->
-      <div class="flex items-center gap-1.5 sm:gap-2 cursor-pointer" onclick="switchTab('studio')">
-        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-tr from-cyan-400 via-blue-500 to-indigo-600 flex items-center justify-center shadow-md shadow-cyan-500/25 text-white">
-          <i data-lucide="sparkles" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+      <div class="flex items-center gap-1 sm:gap-2 cursor-pointer shrink-0" onclick="switchTab('studio')">
+        <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-gradient-to-tr from-cyan-400 via-blue-500 to-indigo-600 flex items-center justify-center shadow-md shadow-cyan-500/25 text-white">
+          <i data-lucide="sparkles" class="w-3 h-3 sm:w-4 sm:h-4"></i>
         </div>
-        <span class="text-xs sm:text-sm font-bold tracking-tight text-white whitespace-nowrap">Mind Cave</span>
+        <span class="text-xs sm:text-sm font-bold tracking-tight text-white whitespace-nowrap hidden sm:inline">Mind Cave</span>
       </div>
     </div>
 
@@ -142,35 +142,35 @@
     </nav>
 
     <!-- Right Area: Multi-Language + Theme Toggle Shortcut + Consolidated User Profile Trigger -->
-    <div class="flex items-center gap-1.5 shrink-0">
+    <div class="flex items-center gap-1 sm:gap-1.5 shrink-0">
       <!-- Multi-Language Selector Dropdown -->
       <div class="relative inline-block">
-        <select id="global-language-select" onchange="changeAppLanguage(this.value)" class="bg-slate-900/90 dark:bg-white/5 hover:bg-slate-800 dark:hover:bg-white/10 border border-slate-700/50 dark:border-white/10 text-slate-200 text-xs rounded-full px-2 py-1 cursor-pointer outline-none transition-all shadow-sm font-medium" title="Choose Native Language / Auto-Detect">
-          <option value="auto">🌐 Auto-Detect</option>
-          <option value="en">🇬🇧 English</option>
-          <option value="ta">🇮🇳 தமிழ் (Tamil)</option>
-          <option value="hi">🇮🇳 हिंदी (Hindi)</option>
-          <option value="te">🇮🇳 తెలుగు (Telugu)</option>
-          <option value="es">🇪🇸 Español</option>
-          <option value="fr">🇫🇷 Français</option>
-          <option value="de">🇩🇪 Deutsch</option>
-          <option value="ja">🇯🇵 日本語</option>
+        <select id="global-language-select" onchange="changeAppLanguage(this.value)" class="bg-slate-900/90 dark:bg-white/5 hover:bg-slate-800 dark:hover:bg-white/10 border border-slate-700/50 dark:border-white/10 text-slate-200 text-[11px] sm:text-xs rounded-full px-1.5 sm:px-2 py-1 cursor-pointer outline-none transition-all shadow-sm font-medium max-w-[76px] sm:max-w-none truncate" title="Choose Native Language / Auto-Detect">
+          <option value="auto">🌐 Auto</option>
+          <option value="en">🇬🇧 EN</option>
+          <option value="ta">🇮🇳 தமிழ்</option>
+          <option value="hi">🇮🇳 हिंदी</option>
+          <option value="te">🇮🇳 తెలుగు</option>
+          <option value="es">🇪🇸 ES</option>
+          <option value="fr">🇫🇷 FR</option>
+          <option value="de">🇩🇪 DE</option>
+          <option value="ja">🇯🇵 JA</option>
           <option value="zh">🇨🇳 中文</option>
           <option value="ar">🇸🇦 العربية</option>
-          <option value="pt">🇧🇷 Português</option>
+          <option value="pt">🇧🇷 PT</option>
         </select>
       </div>
 
       <!-- 1-Tap Theme Mode Switcher in Global Bar -->
-      <button onclick="toggleTheme()" id="btn-global-theme" class="w-8 h-8 rounded-full bg-slate-900/90 dark:bg-white/5 hover:bg-slate-800 dark:hover:bg-white/10 border border-slate-700/50 dark:border-white/10 flex items-center justify-center text-amber-400 hover:text-amber-300 transition-all cursor-pointer shadow-sm active:scale-95" title="Toggle Light / Dark Mode">
-        <i data-lucide="sun" id="global-theme-icon" class="w-4 h-4 text-amber-400"></i>
+      <button onclick="toggleTheme()" id="btn-global-theme" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-900/90 dark:bg-white/5 hover:bg-slate-800 dark:hover:bg-white/10 border border-slate-700/50 dark:border-white/10 flex items-center justify-center text-amber-400 hover:text-amber-300 transition-all cursor-pointer shadow-sm active:scale-95 shrink-0" title="Toggle Light / Dark Mode">
+        <i data-lucide="sun" id="global-theme-icon" class="w-3.5 h-3.5 text-amber-400"></i>
       </button>
 
       <!-- Consolidated User Profile & Settings Trigger -->
-      <button onclick="openAuthModal()" id="user-pill" class="flex items-center gap-1.5 bg-slate-900/90 hover:bg-slate-800 px-2.5 py-1.5 rounded-full border border-slate-800 text-xs whitespace-nowrap cursor-pointer transition-colors shadow-sm" title="Account & Biological Profile Settings">
+      <button onclick="openAuthModal()" id="user-pill" class="flex items-center gap-1 sm:gap-1.5 bg-slate-900/90 hover:bg-slate-800 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-full border border-slate-800 text-[11px] sm:text-xs whitespace-nowrap cursor-pointer transition-colors shadow-sm shrink-0" title="Account & Biological Profile Settings">
         <div id="user-avatar-indicator" class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></div>
-        <span id="user-display-name" class="font-medium text-slate-200 truncate max-w-[80px] sm:max-w-[120px] whitespace-nowrap text-xs">Guest</span>
-        <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400 shrink-0"></i>
+        <span id="user-display-name" class="font-medium text-slate-200 truncate max-w-[55px] sm:max-w-[120px] whitespace-nowrap text-[11px] sm:text-xs">Guest</span>
+        <i data-lucide="chevron-down" class="w-2.5 h-2.5 sm:w-3 sm:h-3 text-slate-400 shrink-0"></i>
       </button>
     </div>
   </header>
