@@ -30,18 +30,20 @@ class SecretManager:
     """
 
     def __init__(self, project_id: Optional[str] = None):
-        self.project_id = project_id or os.getenv("GCP_PROJECT_ID")
-        self.use_gcp_secret_manager = os.getenv("USE_SECRET_MANAGER", "false").lower() in ("true", "1", "yes")
+        self.project_id = project_id or os.getenv("GCP_PROJECT_ID") or os.getenv("GOOGLE_CLOUD_PROJECT")
+        # Auto-enable Secret Manager if GCP_PROJECT_ID is present or running in Cloud Run (K_SERVICE)
+        is_cloud_run = bool(os.getenv("K_SERVICE"))
+        self.use_gcp_secret_manager = os.getenv("USE_SECRET_MANAGER", "true" if (self.project_id or is_cloud_run) else "false").lower() in ("true", "1", "yes")
         self._cached_secrets: Dict[str, str] = {}
         self._client = None
 
-        if self.use_gcp_secret_manager and self.project_id:
+        if self.use_gcp_secret_manager:
             try:
                 from google.cloud import secretmanager
                 self._client = secretmanager.SecretManagerServiceClient()
-                logger.info(f"Initialized Google Cloud Secret Manager client for project: {self.project_id}")
+                logger.info(f"Initialized Google Cloud Secret Manager client (Project: {self.project_id or 'Auto-detected'})")
             except Exception as e:
-                logger.warning(f"Failed to initialize GCP Secret Manager: {e}. Falling back to environment variables.")
+                logger.debug(f"GCP Secret Manager client notice: {e}. Checking environment variables.")
                 self._client = None
 
     def get_secret(self, secret_id: str, default: Optional[str] = None) -> Optional[str]:
