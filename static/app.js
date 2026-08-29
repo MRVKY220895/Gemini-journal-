@@ -805,13 +805,6 @@ async function saveAndFeedback(title, content, mood, btnElement) {
     }
     showToast('Saved to your private Journal Vault!');
   } catch (e) {
-    showToast('Failed to save reflection');
-  }
-}
-
-  container.appendChild(msgDiv);
-  container.scrollTop = container.scrollHeight;
-  lucide.createIcons();
 }
 
 function toggleReasoningAccordion(turnId) {
