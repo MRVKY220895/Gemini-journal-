@@ -235,23 +235,75 @@ class GeminiService:
         return self._generate_simulated_reflective_response(last_user_msg, persona)
 
     def _generate_simulated_reflective_response(self, user_text: str, persona: str) -> Dict[str, Any]:
-        """Provides rich, realistic cognitive responses for testing without API keys."""
+        """Provides dynamic, rich cognitive responses tailored directly to the user's specific input."""
+        lower = user_text.lower().strip()
+        
+        # CBT / Reflective Partner
         if persona == "cbt_reflector":
-            return {
-                "role": "model",
-                "content": (
-                    f"### 🌿 Mindful Reflection\n\n"
-                    f"Thank you for sharing your thoughts so openly. It sounds like you are navigating some nuanced emotions around this.\n\n"
-                    f"**Key Observations:**\n"
-                    f"- **Emotional Core:** Acknowledging the weight of what you're experiencing is the first step in emotional integration.\n"
-                    f"- **Cognitive Exploration:** When you notice feeling unsettled, what underlying assumption or expectation might be driving that feeling?\n\n"
-                    f"**Reframing Prompt:**\n"
-                    f"> *If a close friend were in your exact shoes right now, what compassionate perspective would you offer them?*\n\n"
-                    f"How does that perspective resonate with you?"
-                ),
-                "model_used": "gemini-simulation-cbt",
-                "is_live_gemini": False
-            }
+            if any(w in lower for w in ["sad", "unhappy", "crying", "down", "depressed", "heavy", "hurt"]):
+                return {
+                    "role": "model",
+                    "content": (
+                        f"### 🌿 Mindful Reflection & Emotional Grounding\n\n"
+                        f"I hear you, and I want to sit with you in this feeling. Feeling sad or heavy is a deeply valid human experience, not something that needs an immediate fix.\n\n"
+                        f"**Key Observations:**\n"
+                        f"- **Emotional Validation:** Sadness often points to something that truly matters to you — a connection, an expectation, or an unmet need.\n"
+                        f"- **Somatic Awareness:** Notice where this sadness rests in your body right now — is it in your chest, throat, or shoulders?\n\n"
+                        f"**Gentle Inquiry:**\n"
+                        f"> *If your sadness had a voice without any pressure to cheer up, what is it trying to express or protect right now?*\n\n"
+                        f"Take all the space you need. What feels like the most supportive thing for you right now?"
+                    ),
+                    "model_used": "gemini-smart-processor-cbt",
+                    "is_live_gemini": False
+                }
+            elif any(w in lower for w in ["anxious", "anxiety", "stressed", "stress", "overwhelmed", "panic", "fear"]):
+                return {
+                    "role": "model",
+                    "content": (
+                        f"### 🌿 Cognitive Grounding & Deconstruction\n\n"
+                        f"It sounds like there is a lot of internal pressure building up. Let's slow things down together.\n\n"
+                        f"**Cognitive Unpacking:**\n"
+                        f"- **The Urgency Trap:** Anxiety often convinces us that everything must be resolved immediately.\n"
+                        f"- **Control Separation:** What portion of this situation is within your direct circle of control today?\n\n"
+                        f"**Reframing Step:**\n"
+                        f"> *What is the absolute single next breath or physical action you can take right now?*\n\n"
+                        f"Let's break down the noise into one manageable piece."
+                    ),
+                    "model_used": "gemini-smart-processor-cbt",
+                    "is_live_gemini": False
+                }
+            elif any(w in lower for w in ["happy", "joy", "proud", "grateful", "excited", "win", "good"]):
+                return {
+                    "role": "model",
+                    "content": (
+                        f"### ✨ Anchoring Joy & Gratitude\n\n"
+                        f"It is wonderful to celebrate and anchor this positive momentum!\n\n"
+                        f"**Key Reflections:**\n"
+                        f"- **Positive Neuroplasticity:** Taking 30 seconds to truly savor this feeling encodes resilience in your memory.\n"
+                        f"- **Recognition:** What personal strength or decision made this positive moment possible?\n\n"
+                        f"**Gratitude Anchor:**\n"
+                        f"> *How can you honor this feeling so you can return to it when things get demanding?*"
+                    ),
+                    "model_used": "gemini-smart-processor-cbt",
+                    "is_live_gemini": False
+                }
+            else:
+                snippet = user_text[:80] + ("..." if len(user_text) > 80 else "")
+                return {
+                    "role": "model",
+                    "content": (
+                        f"### 🌿 Mindful Reflection\n\n"
+                        f"Thank you for sharing: *\"{snippet}\"*\n\n"
+                        f"**Key Observations:**\n"
+                        f"- **Core Theme:** Unpacking the thoughts and underlying expectations driving this situation.\n"
+                        f"- **Cognitive Exploration:** What assumption or belief feels most central to what you just described?\n\n"
+                        f"**Reframing Prompt:**\n"
+                        f"> *If a close friend were in your exact shoes right now, what compassionate perspective would you offer them?*\n\n"
+                        f"How does that perspective resonate with you?"
+                    ),
+                    "model_used": "gemini-smart-processor-cbt",
+                    "is_live_gemini": False
+                }
         elif persona == "socratic_brainstormer":
             return {
                 "role": "model",

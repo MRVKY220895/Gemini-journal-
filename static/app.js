@@ -230,6 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadJournals();
   loadSecurityAudit();
   loadAIStudioConfig();
+  restoreChatHistory();
 });
 
 // =============================================================================
@@ -1320,10 +1321,9 @@ function switchTab(tabId) {
 
   }
 
+  if (tabId === 'studio') restoreChatHistory();
   if (tabId === 'analytics') loadAnalytics();
-
   if (tabId === 'security') loadSecurityAudit();
-
 }
 
 
@@ -1359,25 +1359,20 @@ function selectPersona(personaId) {
 
 
 function startNewSession() {
-
   state.currentSessionId = `session_${Date.now()}`;
+  state.chatHistory = [];
+  const userKey = 'mind_cave_chat_history_' + (state.currentUser?.uid || 'guest');
+  localStorage.removeItem(userKey);
 
   const heading = document.getElementById('session-topic-heading');
-
   if (heading) heading.textContent = 'Personal Reflective Space';
 
-
-
   const contextualChips = document.getElementById('contextual-prompt-chips');
-
   if (contextualChips) contextualChips.classList.add('hidden');
 
-
-
   const chatMessages = document.getElementById('chat-messages');
-
+  if (!chatMessages) return;
   chatMessages.className = "flex-1 flex flex-col justify-center overflow-y-auto space-y-6 px-1 py-4 mb-2";
-
   chatMessages.innerHTML = `
 
     <div id="empty-hero-stage" class="flex flex-col items-center justify-center text-center my-auto py-6">
@@ -1780,15 +1775,13 @@ function appendErrorCard(errorMessage, retryPrompt) {
 
   container.scrollTop = container.scrollHeight;
 
-  lucide.createIcons();
-
-}
-
-
-
-function appendChatMessage(role, content, authorName, modelTag, cognitiveData = null, originalPrompt = "") {
+  function appendChatMessage(role, content, authorName, modelTag, cognitiveData = null, originalPrompt = "", isRecord = true) {
 
   const container = document.getElementById('chat-messages');
+
+  if (!container) return;
+
+
 
   const hero = document.getElementById('empty-hero-stage');
 
@@ -1799,6 +1792,20 @@ function appendChatMessage(role, content, authorName, modelTag, cognitiveData = 
     container.classList.remove('justify-center');
 
     container.classList.add('justify-start');
+
+  }
+
+
+
+  if (isRecord) {
+
+    if (!Array.isArray(state.chatHistory)) state.chatHistory = [];
+
+    state.chatHistory.push({ role, content, authorName, modelTag, cognitiveData, originalPrompt, timestamp: Date.now() });
+
+    const userKey = 'mind_cave_chat_history_' + (state.currentUser?.uid || 'guest');
+
+    localStorage.setItem(userKey, JSON.stringify(state.chatHistory));
 
   }
 
@@ -1838,45 +1845,47 @@ function appendChatMessage(role, content, authorName, modelTag, cognitiveData = 
 
   } else {
 
+    // Process markdown to HTML
+
+    const formattedHtml = typeof marked !== 'undefined' ? marked.parse(content) : escapeHtml(content).replace(/\n/g, '<br>');
+
     const distortions = cognitiveData?.detected_distortions || [];
 
-    const tags = cognitiveData?.semantic_tags || ['#EmotionalClarity'];
-
-    const emotion = cognitiveData?.primary_emotion || 'Balanced';
+    const tags = cognitiveData?.suggested_tags || ['#Reflection'];
 
 
 
     msgDiv.innerHTML = `
 
-      <div class="chat-msg-ai-card">
+      <div class="chat-msg-ai-card group">
 
-        <!-- Card Header: Clean & Human -->
+        <!-- Header -->
 
-        <div class="flex items-center justify-between mb-3.5 pb-2.5 border-b border-white/5">
+        <div class="flex items-center justify-between gap-2 mb-3">
 
           <div class="flex items-center gap-2">
 
-            <div class="w-6 h-6 rounded-lg bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center text-white">
+            <div class="w-6 h-6 rounded-lg bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center text-white text-xs shadow-sm">
 
               <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
 
             </div>
 
-            <span class="text-sm font-bold text-slate-100">Reflective Partner</span>
+            <span class="text-xs font-bold text-slate-900 dark:text-white">${escapeHtml(authorName)}</span>
 
-            <span class="text-[11px] text-emerald-400 flex items-center gap-1 font-mono ml-1">
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 font-mono border border-cyan-500/20 flex items-center gap-1">
 
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Reflecting
+              <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+
+              <span>${modelTag?.includes('gemini') ? 'Reflecting' : 'Reflecting'}</span>
 
             </span>
 
           </div>
 
+          <span class="text-[10px] font-mono text-slate-400 bg-black/40 px-2 py-0.5 rounded border border-white/5">
 
-
-          <span class="text-xs bg-slate-900 text-slate-300 border border-white/10 px-2.5 py-0.5 rounded-full font-medium">
-
-            ${escapeHtml(emotion)}
+            ${escapeHtml(cognitiveData?.primary_emotion || 'Seeking Direction')}
 
           </span>
 
@@ -1884,39 +1893,39 @@ function appendChatMessage(role, content, authorName, modelTag, cognitiveData = 
 
 
 
-        <!-- Markdown Body (The Hero) -->
+        <!-- Content Body -->
 
-        <div class="markdown-body text-sm text-slate-200 leading-relaxed">
+        <div class="prose prose-invert prose-sm max-w-none text-slate-200 leading-relaxed space-y-2">
 
-          ${marked.parse(content)}
+          ${formattedHtml}
 
         </div>
 
 
 
-        <!-- Progressive Disclosure: Technical & MindPulse Insights -->
+        <!-- Collapsible MindPulse Cognitive Analytics -->
 
-        <div class="mt-3.5 pt-2.5 border-t border-white/5">
+        <div class="mt-3 pt-2.5 border-t border-white/5">
 
-          <details class="group">
+          <details class="text-[11px] text-slate-400 group/details">
 
-            <summary class="cursor-pointer flex items-center gap-1.5 text-[11px] text-slate-400 hover:text-slate-200 select-none py-1">
+            <summary class="cursor-pointer hover:text-cyan-400 transition-colors flex items-center gap-1.5 font-medium list-none">
 
-              <i data-lucide="brain" class="w-3 h-3 text-cyan-400"></i>
+              <i data-lucide="activity" class="w-3.5 h-3.5 text-cyan-400"></i>
 
               <span>MindPulse Insight & Architecture Details</span>
 
-              <i data-lucide="chevron-down" class="w-3 h-3 transition-transform group-open:rotate-180 ml-auto"></i>
+              <i data-lucide="chevron-down" class="w-3 h-3 ml-auto group-open/details:rotate-180 transition-transform"></i>
 
             </summary>
 
             
 
-            <div class="mt-2.5 p-3 rounded-xl bg-black/40 border border-white/5 space-y-2 text-xs">
+            <div class="mt-2.5 p-3 rounded-xl bg-black/40 border border-white/5 space-y-2.5">
 
-              <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400 border-b border-white/5 pb-2">
+              <div class="flex items-center justify-between text-[10px] text-slate-400 border-b border-white/5 pb-2">
 
-                <span>Model: <strong class="text-blue-300 font-mono">${escapeHtml(modelTag || 'gemini-3.5-flash')}</strong></span>
+                <span>Model Engine: <strong class="text-cyan-300 font-mono">${escapeHtml(modelTag || 'gemini-2.5-flash')}</strong></span>
 
                 <span>Privacy: <strong class="text-emerald-400 font-mono">Isolated Cloud Firestore</strong></span>
 
@@ -2044,9 +2053,32 @@ function appendChatMessage(role, content, authorName, modelTag, cognitiveData = 
 
   lucide.createIcons();
 
+function restoreChatHistory() {
+  const userKey = 'mind_cave_chat_history_' + (state.currentUser?.uid || 'guest');
+  const saved = localStorage.getItem(userKey);
+  if (!saved) return;
+  try {
+    const history = JSON.parse(saved);
+    if (Array.isArray(history) && history.length > 0) {
+      state.chatHistory = history;
+      const container = document.getElementById('chat-messages');
+      if (container) {
+        const hero = document.getElementById('empty-hero-stage');
+        if (hero) hero.remove();
+        container.className = "flex-1 flex flex-col justify-start overflow-y-auto space-y-6 px-1 py-4 mb-2";
+        container.innerHTML = '';
+        history.forEach(item => {
+          appendChatMessage(item.role, item.content, item.authorName, item.modelTag, item.cognitiveData, item.originalPrompt, false);
+        });
+        const lastUser = history.filter(h => h.role === 'user').slice(-1)[0];
+        if (lastUser) updateSessionTitle(lastUser.content);
+        container.scrollTop = container.scrollHeight;
+      }
+    }
+  } catch (e) {
+    console.warn('Failed to restore chat history:', e);
+  }
 }
-
-
 
 function narrateAIMessage(text, btnElement) {
 
