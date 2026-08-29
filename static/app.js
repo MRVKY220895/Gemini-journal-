@@ -21,6 +21,7 @@ const state = {
 
 // Initialize Application on DOM Ready
 document.addEventListener('DOMContentLoaded', () => {
+  initTheme();
   initFirebaseAuth();
   checkGeminiKeyStatus();
   updateUserUI();
@@ -29,6 +30,73 @@ document.addEventListener('DOMContentLoaded', () => {
   loadSecurityAudit();
   loadAIStudioConfig();
 });
+
+// =============================================================================
+// THEME MANAGEMENT (LIGHT & DARK MODES)
+// =============================================================================
+
+function initTheme() {
+  const savedTheme = localStorage.getItem('mind_cave_theme') || 'dark';
+  applyTheme(savedTheme);
+}
+
+function applyTheme(theme) {
+  const html = document.documentElement;
+  const icon = document.getElementById('theme-toggle-icon');
+  
+  if (theme === 'light') {
+    html.classList.remove('dark');
+    html.classList.add('light');
+    if (icon) {
+      icon.setAttribute('data-lucide', 'moon');
+      icon.className = 'w-3.5 h-3.5 text-indigo-500';
+    }
+  } else {
+    html.classList.remove('light');
+    html.classList.add('dark');
+    if (icon) {
+      icon.setAttribute('data-lucide', 'sun');
+      icon.className = 'w-3.5 h-3.5 text-amber-400';
+    }
+  }
+  localStorage.setItem('mind_cave_theme', theme);
+  lucide.createIcons();
+  updateChartsTheme(theme);
+}
+
+function toggleTheme() {
+  const current = document.documentElement.classList.contains('light') ? 'light' : 'dark';
+  const next = current === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  showToast(`Switched to ${next === 'light' ? '☀️ Light' : '🌙 Dark'} Mode`);
+}
+
+function updateChartsTheme(theme) {
+  const isLight = theme === 'light';
+  const textColor = isLight ? '#475569' : '#94a3b8';
+  const gridColor = isLight ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.08)';
+
+  if (state.radarChart && state.radarChart.options) {
+    if (state.radarChart.options.scales?.r) {
+      state.radarChart.options.scales.r.grid.color = gridColor;
+      state.radarChart.options.scales.r.angleLines.color = gridColor;
+      state.radarChart.options.scales.r.pointLabels.color = textColor;
+    }
+    state.radarChart.update();
+  }
+
+  if (state.lineChart && state.lineChart.options) {
+    if (state.lineChart.options.scales?.x) {
+      state.lineChart.options.scales.x.ticks.color = textColor;
+      state.lineChart.options.scales.x.grid.color = gridColor;
+    }
+    if (state.lineChart.options.scales?.y) {
+      state.lineChart.options.scales.y.ticks.color = textColor;
+      state.lineChart.options.scales.y.grid.color = gridColor;
+    }
+    state.lineChart.update();
+  }
+}
 
 // =============================================================================
 // GEMINI API KEY & REAL CONVERSATIONS SETUP

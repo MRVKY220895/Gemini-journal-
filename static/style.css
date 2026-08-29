@@ -690,3 +690,324 @@ body {
   justify-content: flex-end;
   padding: 0.75rem;
 }
+
+/* ==========================================================================
+   LIGHT THEME OVERRIDES (html.light / html:not(.dark))
+   ========================================================================== */
+
+html.light,
+html:not(.dark) {
+  --bg-oled: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-surface-elevated: #f1f5f9;
+  --bg-card: rgba(255, 255, 255, 0.95);
+  --border-subtle: rgba(15, 23, 42, 0.08);
+  --border-glass: rgba(15, 23, 42, 0.12);
+  --border-highlight: rgba(15, 23, 42, 0.2);
+  
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+
+  --chrono-bg: rgba(6, 182, 212, 0.12);
+  --chrono-border: rgba(6, 182, 212, 0.4);
+  --cbt-bg: rgba(168, 85, 247, 0.12);
+  --cbt-border: rgba(168, 85, 247, 0.4);
+  --cycle-bg: rgba(244, 63, 94, 0.12);
+  --cycle-border: rgba(244, 63, 94, 0.4);
+  --memory-bg: rgba(245, 158, 11, 0.12);
+  --memory-border: rgba(245, 158, 11, 0.4);
+}
+
+html.light body,
+html:not(.dark) body {
+  background-color: #f8fafc;
+  color: #0f172a;
+  background-image: 
+    radial-gradient(circle at 15% 10%, rgba(56, 189, 248, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 85% 15%, rgba(99, 102, 241, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 50% 90%, rgba(16, 185, 129, 0.05) 0%, transparent 55%);
+}
+
+/* Light Mode Card & Layout Overrides */
+html.light .double-bezel,
+html:not(.dark) .double-bezel {
+  background: rgba(15, 23, 42, 0.03);
+  border-color: rgba(15, 23, 42, 0.08);
+  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+html.light .double-bezel-inner,
+html:not(.dark) .double-bezel-inner {
+  background: #ffffff;
+  border-color: rgba(15, 23, 42, 0.06);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+html.light .floating-nav,
+html:not(.dark) .floating-nav {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(15, 23, 42, 0.1);
+  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
+}
+
+html.light .floating-nav span.text-white,
+html:not(.dark) .floating-nav span.text-white,
+html.light .floating-nav h1,
+html:not(.dark) .floating-nav h1,
+html.light h1.text-white,
+html:not(.dark) h1.text-white,
+html.light h2.text-white,
+html:not(.dark) h2.text-white,
+html.light h3.text-white,
+html:not(.dark) h3.text-white,
+html.light h4.text-white,
+html:not(.dark) h4.text-white,
+html.light .text-slate-100,
+html:not(.dark) .text-slate-100,
+html.light .text-slate-200,
+html:not(.dark) .text-slate-200 {
+  color: #0f172a !important;
+}
+
+html.light .text-slate-300,
+html:not(.dark) .text-slate-300,
+html.light .text-slate-400,
+html:not(.dark) .text-slate-400 {
+  color: #475569 !important;
+}
+
+html.light .modes-track,
+html:not(.dark) .modes-track,
+html.light .action-track,
+html:not(.dark) .action-track,
+html.light nav.bg-black\/50,
+html:not(.dark) nav.bg-black\/50,
+html.light nav.bg-black\/40,
+html:not(.dark) nav.bg-black\/40 {
+  background: rgba(241, 245, 249, 0.9) !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+html.light .persona-btn,
+html:not(.dark) .persona-btn,
+html.light .tab-btn,
+html:not(.dark) .tab-btn,
+html.light .track-tab-btn,
+html:not(.dark) .track-tab-btn {
+  color: #475569 !important;
+}
+
+html.light .persona-btn:hover,
+html:not(.dark) .persona-btn:hover,
+html.light .tab-btn:hover,
+html:not(.dark) .tab-btn:hover,
+html.light .track-tab-btn:hover,
+html:not(.dark) .track-tab-btn:hover {
+  color: #0f172a !important;
+  background: rgba(0, 0, 0, 0.05) !important;
+}
+
+html.light .persona-btn.active,
+html:not(.dark) .persona-btn.active,
+html.light .tab-btn.active,
+html:not(.dark) .tab-btn.active {
+  color: #1e40af !important;
+  background: #ffffff !important;
+  border-color: rgba(59, 130, 246, 0.3) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+}
+
+html.light .btn-secondary,
+html:not(.dark) .btn-secondary {
+  background: rgba(241, 245, 249, 0.9);
+  color: #0f172a;
+  border-color: rgba(15, 23, 42, 0.1);
+}
+
+html.light .btn-secondary:hover,
+html:not(.dark) .btn-secondary:hover {
+  background: #e2e8f0;
+}
+
+html.light .composer-outer,
+html:not(.dark) .composer-outer {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(15, 23, 42, 0.1);
+  box-shadow: 0 20px 48px -12px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04);
+}
+
+html.light .composer-inner,
+html:not(.dark) .composer-inner {
+  background: #ffffff;
+  border-color: rgba(15, 23, 42, 0.06);
+}
+
+html.light #chat-input,
+html:not(.dark) #chat-input {
+  color: #0f172a !important;
+}
+
+html.light #chat-input::placeholder,
+html:not(.dark) #chat-input::placeholder {
+  color: #94a3b8 !important;
+}
+
+html.light .chat-msg-user-card,
+html:not(.dark) .chat-msg-user-card {
+  background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%) !important;
+  border: 1px solid rgba(59, 130, 246, 0.25) !important;
+  color: #0f172a !important;
+  box-shadow: 0 4px 16px -2px rgba(59, 130, 246, 0.15) !important;
+}
+
+html.light .chat-msg-user-card .text-slate-100,
+html:not(.dark) .chat-msg-user-card .text-slate-100,
+html.light .chat-msg-user-card .text-slate-200,
+html:not(.dark) .chat-msg-user-card .text-slate-200 {
+  color: #0f172a !important;
+}
+
+html.light .chat-msg-ai-card,
+html:not(.dark) .chat-msg-ai-card {
+  background: #ffffff !important;
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+  color: #0f172a !important;
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.06) !important;
+}
+
+html.light .chat-msg-ai-card .markdown-body,
+html:not(.dark) .chat-msg-ai-card .markdown-body {
+  color: #1e293b !important;
+}
+
+html.light .prompt-starter-card,
+html:not(.dark) .prompt-starter-card {
+  background: #ffffff !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.04) !important;
+}
+
+html.light .prompt-starter-card:hover,
+html:not(.dark) .prompt-starter-card:hover {
+  background: #f8fafc !important;
+  border-color: rgba(56, 189, 248, 0.5) !important;
+  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.08) !important;
+}
+
+html.light .prompt-starter-card .text-white,
+html:not(.dark) .prompt-starter-card .text-white {
+  color: #0f172a !important;
+}
+
+html.light .chrono-block-card,
+html:not(.dark) .chrono-block-card {
+  background: #ffffff !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.04) !important;
+}
+
+html.light .chrono-block-card:hover,
+html:not(.dark) .chrono-block-card:hover {
+  background: #f8fafc !important;
+  border-color: rgba(15, 23, 42, 0.16) !important;
+}
+
+html.light input[type="text"],
+html:not(.dark) input[type="text"],
+html.light input[type="password"],
+html:not(.dark) input[type="password"],
+html.light input[type="email"],
+html:not(.dark) input[type="email"],
+html.light textarea,
+html:not(.dark) textarea,
+html.light select,
+html:not(.dark) select {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+  border-color: rgba(15, 23, 42, 0.12) !important;
+}
+
+html.light input::placeholder,
+html:not(.dark) input::placeholder,
+html.light textarea::placeholder,
+html:not(.dark) textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+html.light #ai-studio-code-view,
+html:not(.dark) #ai-studio-code-view,
+html.light pre,
+html:not(.dark) pre {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+}
+
+html.light #user-pill,
+html:not(.dark) #user-pill {
+  background: rgba(241, 245, 249, 0.9) !important;
+  border-color: rgba(15, 23, 42, 0.1) !important;
+}
+
+html.light #user-display-name,
+html:not(.dark) #user-display-name {
+  color: #0f172a !important;
+}
+
+html.light .cbt-heat-cell,
+html:not(.dark) .cbt-heat-cell {
+  background: rgba(15, 23, 42, 0.04);
+  border-color: rgba(15, 23, 42, 0.06);
+  color: #64748b;
+}
+
+html.light .mood-chip,
+html:not(.dark) .mood-chip {
+  background: rgba(15, 23, 42, 0.04);
+  border-color: rgba(15, 23, 42, 0.08);
+}
+
+/* Modal Light Mode Refinements */
+html.light #auth-modal,
+html:not(.dark) #auth-modal,
+html.light #journal-modal,
+html:not(.dark) #journal-modal,
+html.light #gemini-key-modal,
+html:not(.dark) #gemini-key-modal {
+  background: rgba(15, 23, 42, 0.5) !important;
+}
+
+html.light #auth-modal .double-bezel-inner,
+html:not(.dark) #auth-modal .double-bezel-inner,
+html.light #journal-modal .double-bezel-inner,
+html:not(.dark) #journal-modal .double-bezel-inner,
+html.light #gemini-key-modal .double-bezel-inner,
+html:not(.dark) #gemini-key-modal .double-bezel-inner {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+}
+
+html.light .bg-slate-900\/70,
+html:not(.dark) .bg-slate-900\/70,
+html.light .bg-slate-900\/60,
+html:not(.dark) .bg-slate-900\/60,
+html.light .bg-black\/40,
+html:not(.dark) .bg-black\/40,
+html.light .bg-black\/60,
+html:not(.dark) .bg-black\/60 {
+  background: rgba(241, 245, 249, 0.8) !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+}
+
+html.light .border-slate-800,
+html:not(.dark) .border-slate-800 {
+  border-color: rgba(15, 23, 42, 0.1) !important;
+}
+
+html.light .text-slate-500,
+html:not(.dark) .text-slate-500 {
+  color: #64748b !important;
+}
