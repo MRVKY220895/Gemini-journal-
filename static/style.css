@@ -1035,27 +1035,35 @@ html:not(.dark) #empty-hero-stage h1 {
 }
 
 html.light #session-topic-heading,
-html:not(.dark) #session-topic-heading,
-html.light h1, html:not(.dark) h1,
-html.light h2, html:not(.dark) h2,
-html.light h3, html:not(.dark) h3,
-html.light h4, html:not(.dark) h4,
+html.light h1,
+html.light h2,
+html.light h3,
+html.light h4,
 html.light .font-bold.text-white,
-html:not(.dark) .font-bold.text-white,
 html.light .font-semibold.text-white,
-html:not(.dark) .font-semibold.text-white,
 html.light .text-slate-100,
-html:not(.dark) .text-slate-100,
-html.light .text-slate-200,
-html:not(.dark) .text-slate-200 {
+html.light .text-slate-200 {
   color: #0f172a !important;
 }
 
+html.dark #session-topic-heading,
+html.dark h1,
+html.dark h2,
+html.dark h3,
+html.dark h4,
+html.dark .font-bold.text-white,
+html.dark .font-semibold.text-white {
+  color: #f8fafc !important;
+}
+
 html.light .text-slate-300,
-html:not(.dark) .text-slate-300,
-html.light .text-slate-400,
-html:not(.dark) .text-slate-400 {
+html.light .text-slate-400 {
   color: #475569 !important;
+}
+
+html.dark .text-slate-300,
+html.dark .text-slate-400 {
+  color: #94a3b8 !important;
 }
 
 /* Light Mode Badges & Pills */
@@ -2238,5 +2246,80 @@ html:not(.dark) .bucket-card {
 .font-patrick { font-family: 'Patrick Hand', cursive; }
 .font-kalam { font-family: 'Kalam', cursive; }
 .font-architect { font-family: 'Architects Daughter', cursive; }
+
+/* =============================================================================
+   MASTER NAVIGATION DIRECTORY MODAL THEME STYLING & CONTRAST
+   ============================================================================= */
+
+/* Dark Mode Master Menu Modal */
+html.dark #master-menu-modal .glass-modal {
+  background: #0b0f19 !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: #f8fafc !important;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.85) !important;
+}
+
+html.dark #master-menu-modal h3,
+html.dark #master-menu-modal h4,
+html.dark #master-menu-modal .menu-title,
+html.dark #master-menu-modal .menu-header-title {
+  color: #ffffff !important;
+}
+
+html.dark #master-menu-modal .menu-section-box {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+}
+
+html.dark #master-menu-modal .menu-subitem-btn {
+  background: rgba(0, 0, 0, 0.45) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #f8fafc !important;
+}
+
+html.dark #master-menu-modal .menu-subitem-btn:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(56, 189, 248, 0.4) !important;
+}
+
+/* Light Mode Master Menu Modal */
+html.light #master-menu-modal .glass-modal,
+html:not(.dark) #master-menu-modal .glass-modal {
+  background: #ffffff !important;
+  border: 1px solid rgba(15, 23, 42, 0.12) !important;
+  color: #0f172a !important;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.2) !important;
+}
+
+html.light #master-menu-modal h3,
+html.light #master-menu-modal h4,
+html.light #master-menu-modal .menu-title,
+html.light #master-menu-modal .menu-header-title,
+html:not(.dark) #master-menu-modal h3,
+html:not(.dark) #master-menu-modal h4,
+html:not(.dark) #master-menu-modal .menu-title,
+html:not(.dark) #master-menu-modal .menu-header-title {
+  color: #0f172a !important;
+}
+
+html.light #master-menu-modal .menu-section-box,
+html:not(.dark) #master-menu-modal .menu-section-box {
+  background: #f8fafc !important;
+  border: 1px solid rgba(15, 23, 42, 0.09) !important;
+}
+
+html.light #master-menu-modal .menu-subitem-btn,
+html:not(.dark) #master-menu-modal .menu-subitem-btn {
+  background: #ffffff !important;
+  border: 1px solid rgba(15, 23, 42, 0.1) !important;
+  color: #0f172a !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+
+html.light #master-menu-modal .menu-subitem-btn:hover,
+html:not(.dark) #master-menu-modal .menu-subitem-btn:hover {
+  background: #f1f5f9 !important;
+  border-color: rgba(2, 132, 199, 0.4) !important;
+}
 
 
