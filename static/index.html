@@ -415,6 +415,10 @@
                     <h5 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider font-mono">Daily Habits & Streaks</h5>
                   </div>
                   <div class="flex items-center gap-2">
+                    <button type="button" onclick="refreshHabitsTracker(this)" class="text-[10px] text-slate-500 hover:text-cyan-500 dark:text-slate-400 dark:hover:text-cyan-300 font-mono flex items-center gap-1 transition-colors group" title="Refresh & Recalculate Habit Streaks">
+                      <i data-lucide="refresh-cw" class="w-3 h-3 text-cyan-500 group-hover:rotate-180 transition-transform duration-500"></i>
+                      <span>Refresh</span>
+                    </button>
                     <button type="button" onclick="openArchivedHabitsModal()" class="text-[10px] text-slate-500 hover:text-cyan-500 dark:text-slate-400 dark:hover:text-cyan-300 font-mono flex items-center gap-1 transition-colors" title="View & Recover Archived Habits">
                       <i data-lucide="archive" class="w-3 h-3 text-cyan-500"></i>
                       <span id="archived-habits-badge-inline">Archive</span>
@@ -935,10 +939,16 @@
                     </div>
                     <h3 class="text-xs font-bold text-white">Daily Habit Tracker & Streaks</h3>
                   </div>
-                  <span class="text-[10px] text-amber-400 bg-amber-950/60 border border-amber-500/30 px-2 py-0.5 rounded-full font-mono font-bold flex items-center gap-1" id="sanctuary-habit-progress-pill">
-                    <i data-lucide="flame" class="w-3 h-3 text-amber-400"></i>
-                    <span>5/6 Done Today</span>
-                  </span>
+                  <div class="flex items-center gap-2">
+                    <button type="button" onclick="refreshHabitsTracker(this)" class="text-[10px] text-slate-400 hover:text-cyan-300 font-mono flex items-center gap-1 transition-colors group" title="Refresh & Recalculate Habit Streaks">
+                      <i data-lucide="refresh-cw" class="w-3 h-3 text-cyan-400 group-hover:rotate-180 transition-transform duration-500"></i>
+                      <span>Refresh</span>
+                    </button>
+                    <span class="text-[10px] text-amber-400 bg-amber-950/60 border border-amber-500/30 px-2 py-0.5 rounded-full font-mono font-bold flex items-center gap-1" id="sanctuary-habit-progress-pill">
+                      <i data-lucide="flame" class="w-3 h-3 text-amber-400"></i>
+                      <span>5/6 Done Today</span>
+                    </span>
+                  </div>
                 </div>
                 <p class="text-[11px] text-slate-400 mb-3">Micro-habits compounding daily cognitive clarity and vitality.</p>
 
@@ -3276,6 +3286,10 @@
                   <h4 class="text-xs font-bold text-white uppercase tracking-wider font-mono">Daily Habits & Streaks</h4>
                 </div>
                 <div class="flex items-center gap-2">
+                  <button type="button" onclick="refreshHabitsTracker(this)" class="text-[10px] text-slate-400 hover:text-cyan-300 font-mono flex items-center gap-1 transition-colors group" title="Refresh & Recalculate Habit Streaks">
+                    <i data-lucide="refresh-cw" class="w-3 h-3 text-cyan-400 group-hover:rotate-180 transition-transform duration-500"></i>
+                    <span>Refresh</span>
+                  </button>
                   <button type="button" onclick="toggleHabitWeeklyView()" class="text-[10px] text-slate-400 hover:text-cyan-300 font-mono flex items-center gap-1 transition-colors">
                     <i data-lucide="calendar" class="w-3 h-3 text-cyan-400"></i>
                     <span>7-Day View</span>

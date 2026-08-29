@@ -39,6 +39,12 @@ COGNITIVE_DISTORTION_PATTERNS = {
     ],
     "Discounting the Positive": [
         r"\b(just luck|anyone could do it|doesn't count|not good enough|doesn't matter|fluke)\b"
+    ],
+    "Fortune Telling": [
+        r"\b(i know it will fail|it's going to go wrong|no point trying|will never work|bound to fail)\b"
+    ],
+    "Personalization": [
+        r"\b(all my fault|i ruined it for everyone|because of me they are unhappy|i'm to blame)\b"
     ]
 }
 
@@ -49,7 +55,8 @@ THEMATIC_TAG_PATTERNS = {
     "#OverwhelmAndStress": [r"\b(deadline|stress|anxiety|pressure|tired|exhausted|burnout|too much|hectic)\b"],
     "#CareerAndFocus": [r"\b(work|project|code|job|boss|team|client|goal|career|productivity|deliverable)\b"],
     "#IdeationAndCreation": [r"\b(brainstorm|idea|build|create|design|innovate|architecture|concept)\b"],
-    "#MindfulGratitude": [r"\b(grateful|thankful|peace|grounded|calm|appreciate|breath|present)\b"]
+    "#MindfulGratitude": [r"\b(grateful|thankful|peace|grounded|calm|appreciate|breath|present)\b"],
+    "#HabitPacing": [r"\b(habit|routine|streak|discipline|procrastinat|stamina|burnout|flow state)\b"]
 }
 
 REPUTABLE_CBT_GUIDES = {
@@ -77,6 +84,16 @@ REPUTABLE_CBT_GUIDES = {
         "title": "Empirical Reality Testing",
         "technique": "Fact vs. Feeling Separation",
         "action": "Feelings are neurological signals, not legal evidence. List 3 objective, verifiable facts that contradict this feeling."
+    },
+    "Fortune Telling": {
+        "title": "Probability Hypothesis Testing",
+        "technique": "Evidence-Based Forecasting",
+        "action": "Treat the predicted negative outcome as a testable scientific hypothesis rather than a predetermined certainty."
+    },
+    "Personalization": {
+        "title": "Circle of Control Pie Chart",
+        "technique": "Multi-Factor Causal Attribution",
+        "action": "Draw a pie chart attributing all external variables (timing, market, other contributors) beyond personal control."
     }
 }
 

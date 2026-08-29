@@ -4196,6 +4196,54 @@ function renderHabitTracker() {
   lucide.createIcons();
 }
 
+function refreshHabitsTracker(btnEl = null) {
+  if (btnEl) {
+    const icon = btnEl.querySelector('i') || btnEl.querySelector('svg');
+    if (icon) icon.classList.add('animate-spin');
+  }
+
+  // Synchronize habits from storage if any external tab updated them
+  try {
+    const saved = localStorage.getItem('mind_cave_habits_list');
+    if (saved) {
+      state.habitsList = JSON.parse(saved);
+    }
+  } catch (e) {
+    console.warn('Storage sync fallback:', e);
+  }
+
+  // Recalculate streak values dynamically
+  const todayDayIdx = (new Date().getDay() + 6) % 7;
+  state.habitsList.forEach(h => {
+    if (h.type === 'counter' && h.targetCount) {
+      h.currentCount = Number(h.currentCount) || 0;
+      h.targetCount = Number(h.targetCount) || 1;
+    }
+    if (Array.isArray(h.history)) {
+      let currentStreak = 0;
+      for (let i = todayDayIdx; i >= 0; i--) {
+        if (h.history[i]) currentStreak++;
+        else if (i !== todayDayIdx) break;
+      }
+      h.streak = Math.max(h.streak || 0, currentStreak);
+    }
+  });
+
+  localStorage.setItem('mind_cave_habits_list', JSON.stringify(state.habitsList));
+  renderHabitTracker();
+  renderTimelineShortcuts();
+  if (typeof renderGoalsFocusDeck === 'function') renderGoalsFocusDeck();
+
+  showToast('🔄 Daily Habits & Streaks refreshed and synchronized!');
+
+  if (btnEl) {
+    setTimeout(() => {
+      const icon = btnEl.querySelector('i') || btnEl.querySelector('svg');
+      if (icon) icon.classList.remove('animate-spin');
+    }, 600);
+  }
+}
+
 function incrementHabitCount(habitId, delta = 1) {
   const todayDayIdx = (new Date().getDay() + 6) % 7; // Monday = 0
   const habit = state.habitsList.find(h => h.id === habitId);
