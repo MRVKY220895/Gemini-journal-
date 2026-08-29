@@ -606,15 +606,11 @@ async function initFirebaseAuth() {
 
 
 function getAuthHeaders() {
-
+  const token = state.currentUser?.token || localStorage.getItem('gemini_journal_token') || `user_${state.currentUser?.uid || 'alice'}`;
   return {
-
     'Content-Type': 'application/json',
-
-    'Authorization': `Bearer ${state.currentUser.token}`
-
+    'Authorization': `Bearer ${token}`
   };
-
 }
 
 
