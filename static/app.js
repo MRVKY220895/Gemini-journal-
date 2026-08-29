@@ -363,20 +363,10 @@ function closeGeminiKeyModal() {
 
 async function checkGeminiKeyStatus() {
   try {
-    let data = null;
-    const resp = await fetch('/api/gemini/health').catch(() => null);
-    if (resp && resp.ok) {
-      data = await resp.json().catch(() => null);
-    } else {
-      const auditResp = await fetch('/api/security/audit').catch(() => null);
-      if (auditResp && auditResp.ok) {
-        const auditData = await auditResp.json().catch(() => null);
-        const isConfigured = auditData?.key_management?.gemini_api_key_masked !== '[NOT SET]';
-        data = { status: isConfigured ? 'live' : 'unconfigured' };
-      }
-    }
-
-    if (!data) return;
+    const auditResp = await fetch('/api/security/audit');
+    if (!auditResp.ok) return;
+    const auditData = await auditResp.json();
+    const isConfigured = auditData?.key_management?.gemini_api_key_masked !== '[NOT SET]';
 
     const dot = document.getElementById('gemini-key-dot');
     const label = document.getElementById('gemini-key-label');
