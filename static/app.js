@@ -6190,13 +6190,12 @@ function setMasterDashboardHorizon(horizon) {
     data.habitRate = '0% Rate';
     data.topStreak = 'No active habits (0d)';
     data.heatmapIntensity = [0];
-    data.growthBadge = '0% Growth';
     data.resilienceStat = '0%';
-    data.resilienceSub: 'No baseline',
-    data.clarityStat: '0%',
-    data.claritySub: 'No baseline',
-    data.velocityStat: 'Baseline Zero',
-    data.velocitySub: 'Ready for entries',
+    data.resilienceSub = 'No baseline';
+    data.clarityStat = '0%';
+    data.claritySub = 'No baseline';
+    data.velocityStat = 'Baseline Zero';
+    data.velocitySub = 'Ready for entries';
     data.resilienceData = [0, 0, 0, 0, 0, 0, 0];
     data.clarityData = [0, 0, 0, 0, 0, 0, 0];
     data.radarData = [0, 0, 0, 0, 0, 0];
