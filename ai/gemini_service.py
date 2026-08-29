@@ -71,10 +71,12 @@ class GeminiService:
 
     def _is_valid_live_key(self) -> bool:
         k = secret_manager.get_gemini_api_key()
-        return bool(k and not k.startswith("your_") and not k.startswith("mock_") and len(k) > 20)
+        is_gcp = bool(os.getenv("K_SERVICE") or os.getenv("GCP_PROJECT_ID"))
+        return bool(is_gcp or (k and not k.startswith("your_") and not k.startswith("mock_") and len(k) > 15))
 
     def _init_client(self):
-        api_key = secret_manager.get_gemini_api_key() if self._is_valid_live_key() else None
+        k = secret_manager.get_gemini_api_key()
+        api_key = k if (k and not k.startswith("your_") and not k.startswith("mock_") and len(k) > 15) else None
 
         # Attempt 1: Modern google-genai SDK with API Key
         if api_key:
