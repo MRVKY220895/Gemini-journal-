@@ -1772,11 +1772,14 @@
 
           <!-- Custom Web Config Details (Collapsible) -->
           <div id="firebase-config-box" class="hidden p-3 rounded-xl bg-slate-50 dark:bg-black/60 border border-slate-200 dark:border-slate-800 text-[11px] space-y-2 mt-2">
-            <p class="text-slate-500 dark:text-slate-400 text-[10px]">Enter Firebase Web App credentials (from Firebase Console):</p>
-            <input type="text" id="cfg-fb-api-key" placeholder="apiKey (AIza...)" class="w-full bg-white dark:bg-slate-950 p-2 rounded-lg text-xs border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white font-mono">
+            <p class="text-slate-500 dark:text-slate-400 text-[10px]">Enter Firebase Web App credentials (from Firebase Console → Project Settings → Web App):</p>
+            <input type="text" id="cfg-fb-api-key" placeholder="apiKey (AIza... from Firebase Web App)" class="w-full bg-white dark:bg-slate-950 p-2 rounded-lg text-xs border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white font-mono">
             <input type="text" id="cfg-fb-auth-domain" placeholder="authDomain (project.firebaseapp.com)" class="w-full bg-white dark:bg-slate-950 p-2 rounded-lg text-xs border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white font-mono">
             <input type="text" id="cfg-fb-project-id" placeholder="projectId" class="w-full bg-white dark:bg-slate-950 p-2 rounded-lg text-xs border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white font-mono">
-            <button type="button" onclick="saveCustomFirebaseConfig()" class="btn-secondary text-[11px] !py-1.5 w-full !justify-center font-semibold">Initialize Custom Firebase Project</button>
+            <div class="grid grid-cols-2 gap-2 pt-1">
+              <button type="button" onclick="saveCustomFirebaseConfig()" class="btn-island text-[11px] !py-1.5 w-full !justify-center font-semibold !bg-blue-600">Save Config</button>
+              <button type="button" onclick="clearCustomFirebaseConfig()" class="btn-secondary text-[11px] !py-1.5 w-full !justify-center font-semibold text-rose-500 hover:text-rose-600">Clear / Reset</button>
+            </div>
           </div>
         </div>
 

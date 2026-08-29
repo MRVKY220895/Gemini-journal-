@@ -100,11 +100,14 @@ async def health_check():
 @app.get("/api/firebase/config")
 async def get_firebase_public_config():
     """Returns public Firebase Web Client parameters if configured."""
+    api_key = os.getenv("FIREBASE_WEB_API_KEY", "AIzaSyDkK-P5M8ZELCVqYmF7UDMtuibS3fwgEXo")
+    project_id = os.getenv("FIREBASE_PROJECT_ID", os.getenv("GCP_PROJECT_ID", "project-eb461b9f-34ae-46e3-b00"))
+    auth_domain = os.getenv("FIREBASE_AUTH_DOMAIN", f"{project_id}.firebaseapp.com")
     return {
-        "apiKey": os.getenv("FIREBASE_WEB_API_KEY", ""),
-        "authDomain": os.getenv("FIREBASE_AUTH_DOMAIN", ""),
-        "projectId": os.getenv("FIREBASE_PROJECT_ID", os.getenv("GCP_PROJECT_ID", "")),
-        "is_configured": bool(os.getenv("FIREBASE_WEB_API_KEY") or os.getenv("FIREBASE_AUTH_DOMAIN"))
+        "apiKey": api_key,
+        "authDomain": auth_domain,
+        "projectId": project_id,
+        "is_configured": bool(api_key)
     }
 
 

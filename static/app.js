@@ -513,29 +513,16 @@ async function initFirebaseAuth() {
     // Check if custom config exists in localStorage, otherwise query server
 
     let config = null;
+    const resp = await fetch('/api/firebase/config');
+    const serverConfig = await resp.json();
 
-    const savedConfig = localStorage.getItem('firebase_web_config');
-
-    if (savedConfig) {
-
-      try { config = JSON.parse(savedConfig); } catch (e) {}
-
-    }
-
-
-
-    if (!config) {
-
-      const resp = await fetch('/api/firebase/config');
-
-      const serverConfig = await resp.json();
-
-      if (serverConfig.is_configured) {
-
-        config = serverConfig;
-
+    if (serverConfig && serverConfig.is_configured) {
+      config = serverConfig;
+    } else {
+      const savedConfig = localStorage.getItem('firebase_web_config');
+      if (savedConfig) {
+        try { config = JSON.parse(savedConfig); } catch (e) {}
       }
-
     }
 
 
@@ -927,33 +914,25 @@ function toggleFirebaseConfigBox() {
 
 
 function saveCustomFirebaseConfig() {
-
   const apiKey = document.getElementById('cfg-fb-api-key').value.trim();
-
   const authDomain = document.getElementById('cfg-fb-auth-domain').value.trim();
-
   const projectId = document.getElementById('cfg-fb-project-id').value.trim();
 
-
-
   if (!apiKey) {
-
-    alert('Please enter at least a Firebase Web API Key.');
-
+    alert('Please enter at least a Firebase Web API Key (from Firebase Console → Project Settings → Web App).');
     return;
-
   }
 
-
-
   const cfg = { apiKey, authDomain, projectId };
-
   localStorage.setItem('firebase_web_config', JSON.stringify(cfg));
-
   showToast('Saved custom Firebase configuration. Initializing...');
-
   location.reload();
+}
 
+function clearCustomFirebaseConfig() {
+  localStorage.removeItem('firebase_web_config');
+  showToast('Cleared custom Firebase configuration. Reverting to default...');
+  setTimeout(() => location.reload(), 600);
 }
 
 
@@ -1015,9 +994,14 @@ async function signInWithFirebaseGoogle() {
     showToast(`Signed in with Google as ${state.currentUser.name}`);
 
   } catch (err) {
-
-    alert(`Google Sign-In Error: ${err.message}`);
-
+    if (err.code === 'auth/api-key-not-valid' || (err.message && err.message.includes('api-key-not-valid'))) {
+      const reset = confirm("Firebase Error: The Web API key configured for Firebase Authentication is invalid.\n\nNote: Do NOT enter your Gemini AI Studio API Key here. Enter your Firebase Web App API Key (from Firebase Console → Project Settings → Web App).\n\nWould you like to clear the custom configuration now?");
+      if (reset) {
+        clearCustomFirebaseConfig();
+      }
+    } else {
+      alert(`Google Sign-In Error: ${err.message}`);
+    }
   }
 
 }
