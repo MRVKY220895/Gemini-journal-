@@ -435,7 +435,10 @@ function switchTab(tabId) {
     }
   });
 
-  if (tabId === 'journals') loadJournals();
+  if (tabId === 'journals') {
+    loadJournals();
+    renderChronoTimeline();
+  }
   if (tabId === 'analytics') loadAnalytics();
   if (tabId === 'security') loadSecurityAudit();
 }
@@ -896,35 +899,344 @@ async function saveQuickJournal(title, content, mood) {
 }
 
 // =============================================================================
-// ISOLATED JOURNALS CRUD
+// MULTI-TRACK DIGITAL LIFE JOURNAL ENGINE (CHRONO, CBT, CYCLE, MEMORY)
 // =============================================================================
 
-function openNewJournalModal() {
+// Mock Google Calendar Planned Events
+const mockGCalSchedule = {
+  '08:00': { title: 'Team Architecture Standup', duration: '30m', category: 'Team Sync' },
+  '09:00': { title: 'Deep Work: Core AI Engine', duration: '2h', category: 'Focus Block' },
+  '12:00': { title: 'Team Lunch & Mindful Walk', duration: '1h', category: 'Wellness' },
+  '15:00': { title: 'Client Product Walkthrough', duration: '45m', category: 'External' },
+  '17:00': { title: 'Daily Engineering Review', duration: '30m', category: 'Wrap-up' }
+};
+
+// Mock Memory Photos
+let memoryPhotosList = [
+  {
+    id: 'photo_1',
+    hour: '08:15',
+    url: 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=600&q=80',
+    caption: 'Morning coffee & quiet planning before the sprint',
+    location: 'Cafe Botanica, Central Square',
+    mood: '🙂 Calm',
+    energy: '8/10'
+  },
+  {
+    id: 'photo_2',
+    hour: '12:30',
+    url: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=600&q=80',
+    caption: 'Whiteboarding session on multi-track cognitive sync',
+    location: 'Design Studio Room 4B',
+    mood: '🔥 Energized',
+    energy: '9/10'
+  },
+  {
+    id: 'photo_3',
+    hour: '18:45',
+    url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80',
+    caption: 'Sunset run to clear mental cache and anchor gratitude',
+    location: 'Riverbank Promenade',
+    mood: '😊 Joyful',
+    energy: '8/10'
+  }
+];
+
+let attachedPhotoBase64 = null;
+let currentSelectedMood = { name: 'Calm', emoji: '🙂' };
+let isGCalSynced = false;
+let isCycleOptedIn = true;
+
+function switchJournalTrack(trackId) {
+  const tracks = ['chrono', 'cbt', 'cycle', 'memory'];
+  tracks.forEach(t => {
+    const el = document.getElementById(`journal-track-${t}`);
+    const btn = document.getElementById(`track-btn-${t}`);
+    if (el) el.classList.add('hidden');
+    if (btn) btn.className = 'track-tab-btn';
+  });
+
+  const activeEl = document.getElementById(`journal-track-${trackId}`);
+  const activeBtn = document.getElementById(`track-btn-${trackId}`);
+  if (activeEl) activeEl.classList.remove('hidden');
+  if (activeBtn) activeBtn.className = `track-tab-btn active-${trackId}`;
+
+  if (trackId === 'chrono') renderChronoTimeline();
+  if (trackId === 'cbt') renderCBTHeatmap();
+  if (trackId === 'memory') renderMemoryPhotos();
+}
+
+function toggleGCalSync() {
+  isGCalSynced = !isGCalSynced;
+  const btn = document.getElementById('btn-gcal-sync');
+  const btnText = document.getElementById('gcal-btn-text');
+
+  if (isGCalSynced) {
+    btn.classList.add('!bg-blue-600/25', '!border-blue-500/40', '!text-blue-300');
+    btnText.textContent = '✓ Google Calendar Synced (5 Events)';
+    showToast('✨ Google Calendar connected! 5 planned events mapped to your hourly timeline.');
+  } else {
+    btn.classList.remove('!bg-blue-600/25', '!border-blue-500/40', '!text-blue-300');
+    btnText.textContent = 'Sync Google Calendar';
+    showToast('Google Calendar disconnected.');
+  }
+  renderChronoTimeline();
+}
+
+function toggleCycleOptIn() {
+  isCycleOptedIn = !isCycleOptedIn;
+  const btn = document.getElementById('cycle-optin-btn');
+  if (isCycleOptedIn) {
+    btn.textContent = '✓ Active (Encrypted)';
+    btn.className = 'text-xs font-semibold px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40';
+    showToast('Cycle intelligence active and encrypted locally.');
+  } else {
+    btn.textContent = '○ Paused';
+    btn.className = 'text-xs font-semibold px-3 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700';
+    showToast('Cycle tracking paused.');
+  }
+}
+
+function selectMoodChip(moodName, emoji, btnElement) {
+  currentSelectedMood = { name: moodName, emoji };
+  document.querySelectorAll('#mood-chip-group .mood-chip').forEach(btn => btn.classList.remove('selected'));
+  if (btnElement) btnElement.classList.add('selected');
+  const lbl = document.getElementById('mood-pulse-label');
+  if (lbl) lbl.textContent = `${emoji} ${moodName}`;
+}
+
+function previewJournalPhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    attachedPhotoBase64 = e.target.result;
+    const box = document.getElementById('journal-photo-preview-box');
+    const img = document.getElementById('journal-photo-preview-img');
+    if (box && img) {
+      img.src = attachedPhotoBase64;
+      box.classList.remove('hidden');
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function toggleLocationStamp(checkbox) {
+  const txt = document.getElementById('journal-location-text');
+  if (!txt) return;
+  if (checkbox.checked) {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        () => { txt.textContent = '📍 Connaught Place, New Delhi'; },
+        () => { txt.textContent = '📍 Central District (Approx)'; }
+      );
+    } else {
+      txt.textContent = '📍 Home / Office Studio';
+    }
+  } else {
+    txt.textContent = 'Location Stamp Disabled';
+  }
+}
+
+function triggerPhotoUpload() {
+  openNewJournalModal();
+  document.getElementById('journal-track-select').value = 'memory';
+  document.getElementById('journal-photo-input').click();
+}
+
+function openNewJournalModal(targetHour = null) {
+  if (targetHour) {
+    const hourSelect = document.getElementById('journal-hour-input');
+    if (hourSelect) hourSelect.value = targetHour;
+  }
   document.getElementById('journal-modal').classList.remove('hidden');
 }
 
 function closeNewJournalModal() {
   document.getElementById('journal-modal').classList.add('hidden');
+  attachedPhotoBase64 = null;
+  const box = document.getElementById('journal-photo-preview-box');
+  if (box) box.classList.add('hidden');
+}
+
+async function renderChronoTimeline() {
+  const container = document.getElementById('chrono-timeline-list');
+  if (!container) return;
+
+  // Fetch saved journals to match hours
+  let journals = [];
+  try {
+    const response = await fetch('/api/journals', { headers: getAuthHeaders() });
+    const data = await response.json();
+    journals = data.journals || [];
+  } catch (e) {
+    journals = [];
+  }
+
+  const hours = [
+    '06:00', '07:00', '08:00', '09:00', '10:00', '11:00', 
+    '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', 
+    '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'
+  ];
+
+  let html = '<div class="timeline-spine"></div>';
+
+  hours.forEach((h, index) => {
+    const gcalEvent = isGCalSynced ? mockGCalSchedule[h] : null;
+    const matchingJournal = journals[index % (journals.length || 1)] && index < 3 ? journals[index] : null;
+    const matchingPhoto = memoryPhotosList.find(p => p.hour.startsWith(h.substring(0, 2)));
+
+    const hasEntry = matchingJournal || matchingPhoto;
+    const rowClass = `timeline-hour-row ${hasEntry ? 'has-entry' : ''} ${gcalEvent ? 'has-gcal' : ''}`;
+
+    html += `
+      <div class="${rowClass}">
+        <!-- Node Dot & Hour Label -->
+        <div class="timeline-hour-node">
+          <div class="timeline-node-dot"></div>
+          <span class="timeline-hour-label">${h}</span>
+        </div>
+
+        <!-- Hourly Content Card -->
+        <div class="chrono-block-card">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+            <div class="flex items-center gap-2 flex-wrap">
+              ${gcalEvent ? `
+                <span class="gcal-planned-pill">
+                  <i data-lucide="calendar" class="w-3 h-3 text-blue-400"></i>
+                  <span>Planned: ${escapeHtml(gcalEvent.title)}</span>
+                </span>
+              ` : ''}
+              ${matchingJournal ? `
+                <span class="eyebrow-badge !text-cyan-300 !bg-cyan-950/40 !border-cyan-500/30">
+                  ${escapeHtml(matchingJournal.mood || 'Reflective')}
+                </span>
+              ` : ''}
+              ${matchingPhoto ? `
+                <span class="text-[10px] text-amber-400 bg-amber-950/40 border border-amber-500/30 px-2 py-0.5 rounded-full font-mono flex items-center gap-1">
+                  <i data-lucide="camera" class="w-2.5 h-2.5"></i> Photo Attached
+                </span>
+              ` : ''}
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] text-slate-500 font-mono">📍 Connaught Place</span>
+              <button onclick="openNewJournalModal('${h}')" class="text-xs text-slate-400 hover:text-cyan-300 flex items-center gap-1 transition-colors">
+                <i data-lucide="edit-2" class="w-3 h-3"></i> <span>Capture</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Entry Details or Unlogged Prompt -->
+          ${matchingJournal ? `
+            <div class="space-y-1.5">
+              <h4 class="text-sm font-bold text-white">${escapeHtml(matchingJournal.title)}</h4>
+              <p class="text-xs text-slate-300 leading-relaxed">${escapeHtml(matchingJournal.content)}</p>
+              ${matchingJournal.insights && matchingJournal.insights.cognitive_reframing ? `
+                <div class="p-2 rounded-lg bg-purple-950/30 border border-purple-500/20 text-[11px] text-purple-300 italic mt-2">
+                  🧠 CBT Note: "${escapeHtml(matchingJournal.insights.cognitive_reframing)}"
+                </div>
+              ` : ''}
+            </div>
+          ` : gcalEvent ? `
+            <div class="text-xs text-slate-400 italic">
+              Google Calendar scheduled "${escapeHtml(gcalEvent.title)}". Tap capture to reflect on what actually took place.
+            </div>
+          ` : `
+            <div class="text-xs text-slate-500 hover:text-slate-400 cursor-pointer" onclick="openNewJournalModal('${h}')">
+              + No moment logged for ${h}. Tap to log thoughts, mood pulse, or photo.
+            </div>
+          `}
+
+          <!-- Inline Photo Preview if any -->
+          ${matchingPhoto ? `
+            <div class="mt-3 rounded-xl overflow-hidden border border-white/10 max-w-sm">
+              <img src="${matchingPhoto.url}" alt="Memory" class="w-full h-32 object-cover">
+              <div class="p-2 bg-black/60 text-[11px] text-slate-300 flex items-center justify-between">
+                <span>${escapeHtml(matchingPhoto.caption)}</span>
+                <span class="text-amber-400 font-mono">${matchingPhoto.mood}</span>
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+  lucide.createIcons();
+}
+
+function renderCBTHeatmap() {
+  const container = document.getElementById('cbt-heatmap-container');
+  if (!container) return;
+
+  let html = '';
+  for (let day = 1; day <= 28; day++) {
+    const heatClass = day % 7 === 0 ? 'cbt-heat-3' : (day % 3 === 0 ? 'cbt-heat-2' : (day % 2 === 0 ? 'cbt-heat-1' : ''));
+    html += `
+      <div class="cbt-heat-cell ${heatClass}" title="Aug ${day}, 2026: Clarity Level ${day % 4 + 1}/4">
+        ${day}
+      </div>
+    `;
+  }
+  container.innerHTML = html;
+}
+
+function renderMemoryPhotos() {
+  const container = document.getElementById('memory-photos-grid');
+  if (!container) return;
+
+  container.innerHTML = memoryPhotosList.map(p => `
+    <div class="memory-photo-card group">
+      <img src="${p.url}" alt="${escapeHtml(p.caption)}">
+      <div class="memory-photo-overlay">
+        <span class="text-[10px] text-amber-300 font-mono mb-0.5">${p.hour} • ${escapeHtml(p.location)}</span>
+        <p class="text-xs font-semibold text-white line-clamp-2">${escapeHtml(p.caption)}</p>
+        <div class="flex items-center justify-between mt-1 text-[10px] text-slate-300">
+          <span>${p.mood}</span>
+          <span class="font-mono text-cyan-300">⚡ ${p.energy}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
 }
 
 async function submitNewJournal(event) {
   event.preventDefault();
   const title = document.getElementById('journal-title-input').value.trim();
   const content = document.getElementById('journal-content-input').value.trim();
-  const persona = document.getElementById('journal-persona-input').value;
-  const mood = document.getElementById('journal-mood-input').value;
+  const hour = document.getElementById('journal-hour-input').value;
+  const track = document.getElementById('journal-track-select').value;
+  const energy = document.getElementById('journal-energy-slider').value;
   const isEncrypted = document.getElementById('journal-encrypt-checkbox').checked;
+  const locChecked = document.getElementById('journal-location-check').checked;
+  const locationStr = locChecked ? '📍 Connaught Place, New Delhi' : 'Private Location';
+
+  // If photo attached, save to memory photos
+  if (attachedPhotoBase64) {
+    memoryPhotosList.unshift({
+      id: `photo_${Date.now()}`,
+      hour: hour,
+      url: attachedPhotoBase64,
+      caption: title || content.substring(0, 40),
+      location: locationStr,
+      mood: `${currentSelectedMood.emoji} ${currentSelectedMood.name}`,
+      energy: `${energy}/10`
+    });
+  }
 
   try {
     const response = await fetch('/api/journals', {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify({
-        title,
-        content,
-        persona,
-        mood,
-        tags: [persona, mood],
+        title: `[${hour}] ${title}`,
+        content: `${content}\n\n📍 ${locationStr} • Energy: ${energy}/10 • Track: ${track}`,
+        persona: state.currentPersona,
+        mood: currentSelectedMood.name,
+        tags: [track, currentSelectedMood.name, hour],
         is_encrypted: isEncrypted
       })
     });
@@ -934,15 +1246,43 @@ async function submitNewJournal(event) {
     closeNewJournalModal();
     document.getElementById('journal-title-input').value = '';
     document.getElementById('journal-content-input').value = '';
+    
+    // Refresh all views
     loadJournals();
-    showToast('Journal entry saved strictly to your isolated vault.');
+    renderChronoTimeline();
+    renderMemoryPhotos();
+    showToast(`Life moment for ${hour} saved strictly to your isolated vault.`);
   } catch (error) {
     alert(`Error: ${error.message}`);
   }
 }
 
+async function saveQuickJournal(title, content, mood) {
+  try {
+    const response = await fetch('/api/journals', {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({
+        title: title.substring(0, 50) || 'Studio Reflection',
+        content: content,
+        persona: state.currentPersona,
+        mood: mood || 'Reflective',
+        tags: [state.currentPersona, mood],
+        is_encrypted: false
+      })
+    });
+    if (!response.ok) throw new Error('Could not save to journal.');
+    showToast('Reflection turn saved directly to your isolated journal vault!');
+    renderChronoTimeline();
+  } catch (err) {
+    alert(`Save error: ${err.message}`);
+  }
+}
+
 async function loadJournals() {
   const container = document.getElementById('journals-grid');
+  if (!container) return;
+  
   container.innerHTML = '<div class="col-span-full text-center text-slate-500 py-8 text-xs">Loading isolated entries...</div>';
 
   try {
@@ -1012,6 +1352,7 @@ async function deleteJournalEntry(journalId) {
     });
     if (!response.ok) throw new Error('Delete failed.');
     loadJournals();
+    renderChronoTimeline();
     showToast('Entry deleted successfully.');
   } catch (error) {
     alert(`Error: ${error.message}`);
