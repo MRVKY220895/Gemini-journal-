@@ -53,13 +53,13 @@ async function checkGeminiKeyStatus() {
 
     if (dot && label) {
       if (isConfigured) {
-        dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
-        label.textContent = 'Gemini 2.5 (Live)';
-        label.className = 'font-mono text-[11px] text-emerald-300 font-semibold';
+        dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0';
+        label.textContent = 'Gemini 3.5 (Live)';
+        label.className = 'font-mono text-[11px] text-emerald-300 font-semibold whitespace-nowrap';
       } else {
-        dot.className = 'w-2 h-2 rounded-full bg-amber-400';
+        dot.className = 'w-2 h-2 rounded-full bg-amber-400 shrink-0';
         label.textContent = 'Connect Gemini API';
-        label.className = 'font-mono text-[11px] text-amber-300';
+        label.className = 'font-mono text-[11px] text-amber-300 whitespace-nowrap';
       }
     }
   } catch (err) {
