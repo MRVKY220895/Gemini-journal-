@@ -248,7 +248,12 @@ function getAuthHeaders() {
 function updateUserUI() {
   const nameEl = document.getElementById('user-display-name');
   if (nameEl) {
-    nameEl.textContent = state.currentUser.name;
+    let displayName = state.currentUser.name || 'Guest User';
+    if (displayName.includes('@')) {
+      displayName = displayName.split('@')[0];
+    }
+    nameEl.textContent = displayName;
+    nameEl.parentElement.setAttribute('title', `Signed in as ${state.currentUser.name} (Click for Settings)`);
   }
   const modalLbl = document.getElementById('modal-current-user-lbl');
   if (modalLbl) {
