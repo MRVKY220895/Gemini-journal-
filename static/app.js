@@ -1117,27 +1117,82 @@ function selectDiaryDate(isoDateStr) {
   renderChronoTimeline();
 }
 
+function getTrackPreferences(gender) {
+  const customCycle = localStorage.getItem('mind_cave_track_cycle_enabled');
+  const customCirc = localStorage.getItem('mind_cave_track_circadian_enabled');
+
+  let cycleEnabled = true;
+  let circEnabled = false;
+
+  if (gender === 'female') {
+    cycleEnabled = customCycle !== null ? customCycle === 'true' : true;
+    circEnabled = customCirc !== null ? customCirc === 'true' : false;
+  } else if (gender === 'male') {
+    cycleEnabled = customCycle !== null ? customCycle === 'true' : false;
+    circEnabled = customCirc !== null ? customCirc === 'true' : true;
+  } else {
+    // non_binary, unspecified (Others)
+    cycleEnabled = customCycle !== null ? customCycle === 'true' : true;
+    circEnabled = customCirc !== null ? customCirc === 'true' : true;
+  }
+
+  return { cycleEnabled, circEnabled };
+}
+
 function applyGenderTrackVisibility(gender) {
   const cycleBtn = document.getElementById('track-btn-cycle');
   const circBtn = document.getElementById('track-btn-circadian');
+  const toggleCycle = document.getElementById('profile-toggle-cycle');
+  const toggleCirc = document.getElementById('profile-toggle-circadian');
+  const synthBioChip = document.getElementById('synthesis-bio-chip');
 
-  if (gender === 'female') {
-    if (cycleBtn) cycleBtn.classList.remove('hidden');
-    if (circBtn) circBtn.classList.add('hidden');
-  } else if (gender === 'male') {
-    if (cycleBtn) cycleBtn.classList.add('hidden');
-    if (circBtn) circBtn.classList.remove('hidden');
-  } else {
-    if (cycleBtn) cycleBtn.classList.remove('hidden');
-    if (circBtn) circBtn.classList.remove('hidden');
+  const { cycleEnabled, circEnabled } = getTrackPreferences(gender);
+
+  if (cycleBtn) cycleBtn.classList.toggle('hidden', !cycleEnabled);
+  if (circBtn) circBtn.classList.toggle('hidden', !circEnabled);
+
+  if (toggleCycle) toggleCycle.checked = cycleEnabled;
+  if (toggleCirc) toggleCirc.checked = circEnabled;
+
+  // Update AI Synthesis Bio chip dynamically
+  if (synthBioChip) {
+    if (cycleEnabled) {
+      synthBioChip.classList.remove('hidden');
+      synthBioChip.innerHTML = `<span style="color:var(--cycle-accent)">🌙</span><span id="synth-bio-chip">Luteal Phase</span>`;
+    } else if (circEnabled) {
+      synthBioChip.classList.remove('hidden');
+      synthBioChip.innerHTML = `<span style="color:var(--memory-accent)">⚡</span><span id="synth-bio-chip">Circadian Peak</span>`;
+    } else {
+      synthBioChip.classList.add('hidden');
+    }
   }
+}
+
+function toggleTrackPreference(trackId, isChecked) {
+  localStorage.setItem(`mind_cave_track_${trackId}_enabled`, isChecked ? 'true' : 'false');
+  applyGenderTrackVisibility(state.currentUser.gender);
+  showToast(`${trackId === 'cycle' ? '🌙 Cycle Intelligence' : '⚡ Circadian Energy'} track ${isChecked ? 'enabled' : 'hidden'}.`);
 }
 
 function updateUserGender(gender) {
   state.currentUser.gender = gender;
   localStorage.setItem('mind_cave_user_gender', gender);
+
+  // Set smart default track states for chosen gender
+  if (gender === 'female') {
+    localStorage.setItem('mind_cave_track_cycle_enabled', 'true');
+    localStorage.setItem('mind_cave_track_circadian_enabled', 'false');
+  } else if (gender === 'male') {
+    localStorage.setItem('mind_cave_track_cycle_enabled', 'false');
+    localStorage.setItem('mind_cave_track_circadian_enabled', 'true');
+  } else {
+    // Non-Binary / Other / Unspecified
+    localStorage.setItem('mind_cave_track_cycle_enabled', 'true');
+    localStorage.setItem('mind_cave_track_circadian_enabled', 'true');
+  }
+
   applyGenderTrackVisibility(gender);
-  showToast(`Profile updated: ${gender === 'female' ? '🌙 Cycle Intelligence active' : gender === 'male' ? '⚡ Circadian Energy active' : '✨ Personalized Tracks active'}`);
+  showToast(`Profile updated: ${gender === 'female' ? '👩 Female (Cycle Active)' : gender === 'male' ? '👨 Male (Circadian Active)' : '✨ Non-Binary / Other (Custom Active)'}`);
 }
 
 function changeTimeRange(rangeVal) {
