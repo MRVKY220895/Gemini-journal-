@@ -1353,6 +1353,14 @@ function toggleSingleMomentPhoto(btn) {
   }
 }
 
+function triggerQuickPhotoMoment() {
+  openNewJournalModal();
+  const trackSel = document.getElementById('journal-track-select');
+  if (trackSel) trackSel.value = 'memory';
+  const fileInp = document.getElementById('journal-photo-input');
+  if (fileInp) fileInp.click();
+}
+
 function getTrackPreferences(gender) {
   const customCycle = localStorage.getItem('mind_cave_track_cycle_enabled');
   const customCirc = localStorage.getItem('mind_cave_track_circadian_enabled');
