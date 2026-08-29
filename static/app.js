@@ -9,14 +9,17 @@ const state = {
   currentUser: {
     uid: localStorage.getItem('gemini_journal_uid') || 'user_alice',
     name: localStorage.getItem('gemini_journal_name') || 'Alice (Demo Sandbox)',
-    token: localStorage.getItem('gemini_journal_token') || 'demo_user_alice'
+    token: localStorage.getItem('gemini_journal_token') || 'demo_user_alice',
+    gender: localStorage.getItem('mind_cave_user_gender') || 'female'
   },
   currentPersona: 'cbt_reflector',
   currentSessionId: null,
   radarChart: null,
   lineChart: null,
   firebaseApp: null,
-  firebaseAuth: null
+  firebaseAuth: null,
+  timelineRange: localStorage.getItem('mind_cave_timeline_range') || 'day_standard',
+  selectedDiaryDate: new Date()
 };
 
 // Initialize Application on DOM Ready
@@ -25,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initFirebaseAuth();
   checkGeminiKeyStatus();
   updateUserUI();
+  initDiarySpace();
   initAnalyticsCharts();
   loadJournals();
   loadSecurityAudit();
@@ -1014,9 +1018,169 @@ let attachedPhotoBase64 = null;
 let currentSelectedMood = { name: 'Calm', emoji: '🙂' };
 let isGCalSynced = false;
 let isCycleOptedIn = true;
+let liveDiaryClockInterval = null;
+
+// =============================================================================
+// DIARY SPACE & LOCAL TIME INITIALIZATION
+// =============================================================================
+
+function initDiarySpace() {
+  updateLiveDiaryClock();
+  if (liveDiaryClockInterval) clearInterval(liveDiaryClockInterval);
+  liveDiaryClockInterval = setInterval(updateLiveDiaryClock, 10000);
+
+  renderDiaryWeeklyRibbon();
+  applyGenderTrackVisibility(state.currentUser.gender);
+
+  // Set Profile Selectors if elements exist
+  const genderSelect = document.getElementById('profile-gender-select');
+  if (genderSelect) genderSelect.value = state.currentUser.gender || 'female';
+
+  const spanSelect = document.getElementById('profile-span-select');
+  if (spanSelect) spanSelect.value = state.timelineRange || 'day_standard';
+
+  const rangeSelect = document.getElementById('chrono-range-select');
+  if (rangeSelect) rangeSelect.value = state.timelineRange || 'day_standard';
+
+  setMomentTimeToNow();
+}
+
+function updateLiveDiaryClock() {
+  const now = new Date();
+  const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+  const dateStr = now.toLocaleDateString('en-US', options);
+  
+  let hours = now.getHours();
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  const displayHours = hours % 12 || 12;
+  const timeStr = `${displayHours}:${minutes} ${ampm}`;
+
+  // Timezone Detection
+  let tzName = 'Local';
+  try {
+    tzName = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Local';
+  } catch (e) {}
+
+  const clockEl = document.getElementById('chrono-live-clock');
+  if (clockEl) clockEl.textContent = `● LIVE: ${timeStr}`;
+
+  const tzEl = document.getElementById('chrono-user-tz-badge');
+  if (tzEl) tzEl.textContent = `📍 ${tzName}`;
+
+  const titleEl = document.getElementById('diary-current-date-title');
+  if (titleEl) {
+    titleEl.innerHTML = `<i data-lucide="book-marked" class="w-4 h-4 text-cyan-400"></i> <span>${dateStr}</span>`;
+    lucide.createIcons();
+  }
+}
+
+function renderDiaryWeeklyRibbon() {
+  const container = document.getElementById('diary-week-ribbon-container');
+  if (!container) return;
+
+  const now = new Date();
+  const dayOfWeek = now.getDay(); // 0 is Sunday
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  
+  // Find Monday of current week
+  const monday = new Date(now);
+  const diff = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+  monday.setDate(diff);
+
+  let html = '';
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    const isToday = d.toDateString() === now.toDateString();
+    const dayName = days[d.getDay()];
+    const dayNum = d.getDate();
+
+    html += `
+      <div class="diary-day-pill ${isToday ? 'active' : ''}" onclick="selectDiaryDate('${d.toISOString()}')">
+        <span class="day-name text-[10px] text-slate-400 uppercase tracking-wider">${dayName}</span>
+        <span class="day-number text-sm font-bold text-slate-200 mt-0.5">${dayNum}</span>
+        ${isToday ? '<span class="w-1 h-1 rounded-full bg-cyan-400 mt-1"></span>' : ''}
+      </div>
+    `;
+  }
+
+  container.innerHTML = html;
+}
+
+function selectDiaryDate(isoDateStr) {
+  state.selectedDiaryDate = new Date(isoDateStr);
+  showToast(`Viewing Chronicle for ${state.selectedDiaryDate.toLocaleDateString()}`);
+  renderChronoTimeline();
+}
+
+function applyGenderTrackVisibility(gender) {
+  const cycleBtn = document.getElementById('track-btn-cycle');
+  const circBtn = document.getElementById('track-btn-circadian');
+
+  if (gender === 'female') {
+    if (cycleBtn) cycleBtn.classList.remove('hidden');
+    if (circBtn) circBtn.classList.add('hidden');
+  } else if (gender === 'male') {
+    if (cycleBtn) cycleBtn.classList.add('hidden');
+    if (circBtn) circBtn.classList.remove('hidden');
+  } else {
+    if (cycleBtn) cycleBtn.classList.remove('hidden');
+    if (circBtn) circBtn.classList.remove('hidden');
+  }
+}
+
+function updateUserGender(gender) {
+  state.currentUser.gender = gender;
+  localStorage.setItem('mind_cave_user_gender', gender);
+  applyGenderTrackVisibility(gender);
+  showToast(`Profile updated: ${gender === 'female' ? '🌙 Cycle Intelligence active' : gender === 'male' ? '⚡ Circadian Energy active' : '✨ Personalized Tracks active'}`);
+}
+
+function changeTimeRange(rangeVal) {
+  state.timelineRange = rangeVal;
+  localStorage.setItem('mind_cave_timeline_range', rangeVal);
+  
+  const selA = document.getElementById('chrono-range-select');
+  if (selA) selA.value = rangeVal;
+  const selB = document.getElementById('profile-span-select');
+  if (selB) selB.value = rangeVal;
+
+  renderChronoTimeline();
+  showToast(`Timeline span updated: ${rangeVal === 'full_24h' ? 'Full 24 Hours' : rangeVal === 'active_focus' ? 'Active Focus (08-20h)' : 'Day Span (06-23h)'}`);
+}
+
+function scrollToCurrentHour() {
+  const nowMarker = document.querySelector('.timeline-now-marker') || document.querySelector('.timeline-hour-row.is-current-hour');
+  if (nowMarker) {
+    nowMarker.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    showToast('Jumped to current local time');
+  }
+}
+
+function setMomentTimeToNow() {
+  const now = new Date();
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const timeInput = document.getElementById('journal-exact-time-input');
+  if (timeInput) timeInput.value = `${hours}:${minutes}`;
+
+  const hourDropdown = document.getElementById('journal-hour-input');
+  if (hourDropdown) {
+    const matchHour = `${hours}:00`;
+    if (hourDropdown.querySelector(`option[value="${matchHour}"]`)) {
+      hourDropdown.value = matchHour;
+    }
+  }
+}
+
+function syncExactTimeFromHour(hourVal) {
+  const timeInput = document.getElementById('journal-exact-time-input');
+  if (timeInput) timeInput.value = hourVal;
+}
 
 function switchJournalTrack(trackId) {
-  const tracks = ['chrono', 'cbt', 'cycle', 'memory'];
+  const tracks = ['chrono', 'cbt', 'cycle', 'circadian', 'memory'];
   tracks.forEach(t => {
     const el = document.getElementById(`journal-track-${t}`);
     const btn = document.getElementById(`track-btn-${t}`);
@@ -1117,6 +1281,10 @@ function openNewJournalModal(targetHour = null) {
   if (targetHour) {
     const hourSelect = document.getElementById('journal-hour-input');
     if (hourSelect) hourSelect.value = targetHour;
+    const timeInput = document.getElementById('journal-exact-time-input');
+    if (timeInput) timeInput.value = targetHour;
+  } else {
+    setMomentTimeToNow();
   }
   document.getElementById('journal-modal').classList.remove('hidden');
 }
@@ -1132,7 +1300,7 @@ async function renderChronoTimeline() {
   const container = document.getElementById('chrono-timeline-list');
   if (!container) return;
 
-  // Fetch saved journals to match hours
+  // Fetch saved journals
   let journals = [];
   try {
     const response = await fetch('/api/journals', { headers: getAuthHeaders() });
@@ -1142,45 +1310,90 @@ async function renderChronoTimeline() {
     journals = [];
   }
 
-  const hours = [
-    '06:00', '07:00', '08:00', '09:00', '10:00', '11:00', 
-    '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', 
-    '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'
-  ];
+  // Generate hours array based on timelineRange
+  let hours = [];
+  if (state.timelineRange === 'full_24h') {
+    for (let i = 0; i < 24; i++) hours.push(String(i).padStart(2, '0') + ':00');
+  } else if (state.timelineRange === 'active_focus') {
+    for (let i = 8; i <= 20; i++) hours.push(String(i).padStart(2, '0') + ':00');
+  } else {
+    // Default Day Span (06:00 to 23:00)
+    for (let i = 6; i <= 23; i++) hours.push(String(i).padStart(2, '0') + ':00');
+  }
+
+  const now = new Date();
+  const currentHourInt = now.getHours();
+  const currentMinStr = String(now.getMinutes()).padStart(2, '0');
+  const currentHourFormatted = String(currentHourInt).padStart(2, '0') + ':00';
+  const displayAmpm = currentHourInt >= 12 ? 'PM' : 'AM';
+  const display12H = (currentHourInt % 12 || 12) + ':' + currentMinStr + ' ' + displayAmpm;
 
   let html = '<div class="timeline-spine"></div>';
+  let nowMarkerInserted = false;
 
   hours.forEach((h, index) => {
+    const hourInt = parseInt(h.substring(0, 2), 10);
+    const isCurrentHour = hourInt === currentHourInt;
+
+    // Circadian / Weather Anchor Icon
+    let weatherBadge = '☀️ Midday';
+    if (hourInt >= 5 && hourInt < 9) weatherBadge = '🌅 Dawn Routine';
+    else if (hourInt >= 9 && hourInt < 13) weatherBadge = '⚡ Focus Block';
+    else if (hourInt >= 13 && hourInt < 17) weatherBadge = '🎯 Execution';
+    else if (hourInt >= 17 && hourInt < 20) weatherBadge = '🌇 Golden Hour';
+    else if (hourInt >= 20) weatherBadge = '🌌 Night Sanctuary';
+    else weatherBadge = '🌙 Deep Rest';
+
+    // Insert LIVE NOW laser needle at exact current position
+    if (!nowMarkerInserted && hourInt >= currentHourInt) {
+      html += `
+        <div class="timeline-now-marker">
+          <div class="timeline-now-badge">
+            <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
+            <span>● ${display12H} (NOW)</span>
+          </div>
+          <div class="timeline-now-line"></div>
+        </div>
+      `;
+      nowMarkerInserted = true;
+    }
+
     const gcalEvent = isGCalSynced ? mockGCalSchedule[h] : null;
-    const matchingJournal = journals[index % (journals.length || 1)] && index < 3 ? journals[index] : null;
+    const matchingJournal = journals.find(j => j.title && j.title.includes(h)) || (journals[index % (journals.length || 1)] && index < 2 ? journals[index] : null);
     const matchingPhoto = memoryPhotosList.find(p => p.hour.startsWith(h.substring(0, 2)));
 
     const hasEntry = matchingJournal || matchingPhoto;
-    const rowClass = `timeline-hour-row ${hasEntry ? 'has-entry' : ''} ${gcalEvent ? 'has-gcal' : ''}`;
+    const rowClass = `timeline-hour-row ${hasEntry ? 'has-entry' : ''} ${gcalEvent ? 'has-gcal' : ''} ${isCurrentHour ? 'is-current-hour' : ''}`;
 
     html += `
       <div class="${rowClass}">
         <!-- Node Dot & Hour Label -->
         <div class="timeline-hour-node">
           <div class="timeline-node-dot"></div>
-          <span class="timeline-hour-label">${h}</span>
+          <span class="timeline-hour-label font-mono">${h}</span>
         </div>
 
-        <!-- Hourly Content Card -->
-        <div class="chrono-block-card">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+        <!-- Editorial Diary Entry Card -->
+        <div class="chrono-block-card ${isCurrentHour ? 'is-active-moment' : ''}">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2.5">
             <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-black/40 border border-white/10 text-slate-300">
+                ${weatherBadge}
+              </span>
+
               ${gcalEvent ? `
                 <span class="gcal-planned-pill">
                   <i data-lucide="calendar" class="w-3 h-3 text-blue-400"></i>
-                  <span>Planned: ${escapeHtml(gcalEvent.title)}</span>
+                  <span>GCal: ${escapeHtml(gcalEvent.title)}</span>
                 </span>
               ` : ''}
+
               ${matchingJournal ? `
                 <span class="eyebrow-badge !text-cyan-300 !bg-cyan-950/40 !border-cyan-500/30">
                   ${escapeHtml(matchingJournal.mood || 'Reflective')}
                 </span>
               ` : ''}
+
               ${matchingPhoto ? `
                 <span class="text-[10px] text-amber-400 bg-amber-950/40 border border-amber-500/30 px-2 py-0.5 rounded-full font-mono flex items-center gap-1">
                   <i data-lucide="camera" class="w-2.5 h-2.5"></i> Photo Attached
@@ -1189,39 +1402,40 @@ async function renderChronoTimeline() {
             </div>
 
             <div class="flex items-center gap-2">
-              <span class="text-[10px] text-slate-500 font-mono">📍 Connaught Place</span>
-              <button onclick="openNewJournalModal('${h}')" class="text-xs text-slate-400 hover:text-cyan-300 flex items-center gap-1 transition-colors">
-                <i data-lucide="edit-2" class="w-3 h-3"></i> <span>Capture</span>
+              <span class="text-[10px] text-slate-400 font-mono">📍 Connaught Place</span>
+              <button onclick="openNewJournalModal('${h}')" class="text-xs font-semibold text-cyan-400 hover:text-cyan-300 flex items-center gap-1 transition-colors px-2 py-1 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30">
+                <i data-lucide="edit-3" class="w-3 h-3"></i> <span>Log</span>
               </button>
             </div>
           </div>
 
           <!-- Entry Details or Unlogged Prompt -->
           ${matchingJournal ? `
-            <div class="space-y-1.5">
-              <h4 class="text-sm font-bold text-white">${escapeHtml(matchingJournal.title)}</h4>
-              <p class="text-xs text-slate-300 leading-relaxed">${escapeHtml(matchingJournal.content)}</p>
+            <div class="space-y-1.5 pt-1">
+              <h4 class="text-sm font-bold text-white tracking-tight">${escapeHtml(matchingJournal.title)}</h4>
+              <p class="text-xs text-slate-300 leading-relaxed font-sans">${escapeHtml(matchingJournal.content)}</p>
               ${matchingJournal.insights && matchingJournal.insights.cognitive_reframing ? `
-                <div class="p-2 rounded-lg bg-purple-950/30 border border-purple-500/20 text-[11px] text-purple-300 italic mt-2">
-                  🧠 CBT Note: "${escapeHtml(matchingJournal.insights.cognitive_reframing)}"
+                <div class="p-2.5 rounded-xl bg-purple-950/30 border border-purple-500/20 text-[11px] text-purple-300 italic mt-2">
+                  🧠 CBT Reframing: "${escapeHtml(matchingJournal.insights.cognitive_reframing)}"
                 </div>
               ` : ''}
             </div>
           ` : gcalEvent ? `
-            <div class="text-xs text-slate-400 italic">
-              Google Calendar scheduled "${escapeHtml(gcalEvent.title)}". Tap capture to reflect on what actually took place.
+            <div class="text-xs text-slate-400 italic py-1">
+              Google Calendar scheduled "${escapeHtml(gcalEvent.title)}". Tap log to record what actually took place.
             </div>
           ` : `
-            <div class="text-xs text-slate-500 hover:text-slate-400 cursor-pointer" onclick="openNewJournalModal('${h}')">
-              + No moment logged for ${h}. Tap to log thoughts, mood pulse, or photo.
+            <div class="text-xs text-slate-500 hover:text-slate-400 cursor-pointer py-1 flex items-center gap-1.5" onclick="openNewJournalModal('${h}')">
+              <i data-lucide="plus-circle" class="w-3.5 h-3.5 text-slate-500"></i>
+              <span>Unwritten moment for ${h}. Tap to record thoughts, energy, or photos.</span>
             </div>
           `}
 
-          <!-- Inline Photo Preview if any -->
+          <!-- Inline Photo Memory Preview -->
           ${matchingPhoto ? `
-            <div class="mt-3 rounded-xl overflow-hidden border border-white/10 max-w-sm">
+            <div class="mt-3 rounded-2xl overflow-hidden border border-white/10 max-w-sm shadow-md">
               <img src="${matchingPhoto.url}" alt="Memory" class="w-full h-32 object-cover">
-              <div class="p-2 bg-black/60 text-[11px] text-slate-300 flex items-center justify-between">
+              <div class="p-2 bg-black/70 text-[11px] text-slate-300 flex items-center justify-between">
                 <span>${escapeHtml(matchingPhoto.caption)}</span>
                 <span class="text-amber-400 font-mono">${matchingPhoto.mood}</span>
               </div>
@@ -1275,7 +1489,8 @@ async function submitNewJournal(event) {
   event.preventDefault();
   const title = document.getElementById('journal-title-input').value.trim();
   const content = document.getElementById('journal-content-input').value.trim();
-  const hour = document.getElementById('journal-hour-input').value;
+  const exactTime = document.getElementById('journal-exact-time-input')?.value;
+  const hour = exactTime || document.getElementById('journal-hour-input').value;
   const track = document.getElementById('journal-track-select').value;
   const energy = document.getElementById('journal-energy-slider').value;
   const isEncrypted = document.getElementById('journal-encrypt-checkbox').checked;
@@ -1319,7 +1534,7 @@ async function submitNewJournal(event) {
     loadJournals();
     renderChronoTimeline();
     renderMemoryPhotos();
-    showToast(`Life moment for ${hour} saved strictly to your isolated vault.`);
+    showToast(`Chronicle moment for ${hour} saved strictly to your isolated vault.`);
   } catch (error) {
     alert(`Error: ${error.message}`);
   }

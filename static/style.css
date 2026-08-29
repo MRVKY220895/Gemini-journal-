@@ -492,20 +492,99 @@ body {
   box-shadow: 0 0 16px -4px rgba(245, 158, 11, 0.4);
 }
 
+/* Editorial Diary Weekly Ribbon */
+.diary-week-ribbon {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.diary-day-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.85rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  min-width: 3.75rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.diary-day-pill:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.diary-day-pill.active {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(99, 102, 241, 0.2));
+  border-color: #06b6d4;
+  box-shadow: 0 4px 16px -2px rgba(6, 182, 212, 0.3);
+}
+
+.diary-day-pill.active .day-name {
+  color: #a5f3fc;
+  font-weight: 700;
+}
+
+.diary-day-pill.active .day-number {
+  color: #ffffff;
+  font-weight: 800;
+}
+
 /* Timeline Vertical Spine */
 .timeline-container {
   position: relative;
-  padding-left: 3rem;
+  padding-left: 3.25rem;
+  padding-right: 0.5rem;
 }
 
 .timeline-spine {
   position: absolute;
   top: 1rem;
   bottom: 1rem;
-  left: 1.25rem;
+  left: 1.35rem;
   width: 2px;
-  background: linear-gradient(to bottom, rgba(6, 182, 212, 0.6), rgba(168, 85, 247, 0.4), rgba(244, 63, 94, 0.3), rgba(245, 158, 11, 0.5));
+  background: linear-gradient(to bottom, rgba(6, 182, 212, 0.7), rgba(168, 85, 247, 0.5), rgba(244, 63, 94, 0.4), rgba(245, 158, 11, 0.6));
   border-radius: 9999px;
+}
+
+/* Live Current Time Marker (Laser Needle) */
+.timeline-now-marker {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.25rem 0;
+  z-index: 20;
+}
+
+.timeline-now-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: linear-gradient(135deg, #06b6d4, #3b82f6);
+  color: #ffffff;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  box-shadow: 0 0 16px rgba(6, 182, 212, 0.6);
+  white-space: nowrap;
+  font-mono;
+}
+
+.timeline-now-line {
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(90deg, #06b6d4 0%, rgba(6, 182, 212, 0.4) 50%, transparent 100%);
+  border-radius: 9999px;
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
 }
 
 /* Timeline Hour Row */
@@ -517,9 +596,9 @@ body {
 
 .timeline-hour-node {
   position: absolute;
-  left: -3rem;
+  left: -3.25rem;
   top: 0.25rem;
-  width: 2.5rem;
+  width: 2.75rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -533,6 +612,13 @@ body {
   border: 2px solid #64748b;
   transition: all 0.25s ease;
   z-index: 10;
+}
+
+.timeline-hour-row.is-current-hour .timeline-node-dot {
+  border-color: #06b6d4;
+  background: #06b6d4;
+  box-shadow: 0 0 16px #06b6d4;
+  animation: pulse-glow 2s infinite;
 }
 
 .timeline-hour-row.has-entry .timeline-node-dot {
@@ -553,21 +639,49 @@ body {
   margin-top: 0.25rem;
 }
 
-/* Planned vs Actual Card */
+/* Editorial Diary Page Card */
 .chrono-block-card {
-  background: rgba(15, 23, 42, 0.65);
+  background: rgba(15, 23, 42, 0.7);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 1.25rem;
-  padding: 1rem 1.25rem;
+  padding: 1.125rem 1.375rem;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.35);
+  position: relative;
+  overflow: hidden;
   transition: all 0.25s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
+.chrono-block-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 3px;
+  background: transparent;
+  transition: background 0.2s ease;
+}
+
 .chrono-block-card:hover {
-  border-color: rgba(255, 255, 255, 0.16);
-  background: rgba(15, 23, 42, 0.85);
+  border-color: rgba(255, 255, 255, 0.18);
+  background: rgba(15, 23, 42, 0.88);
   transform: translateY(-1px);
+  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.5);
+}
+
+.chrono-block-card:hover::before {
+  background: #06b6d4;
+}
+
+.chrono-block-card.is-active-moment {
+  border-color: rgba(6, 182, 212, 0.4);
+  box-shadow: 0 0 24px -4px rgba(6, 182, 212, 0.25);
+}
+
+.chrono-block-card.is-active-moment::before {
+  background: #06b6d4;
 }
 
 /* Planned GCal Badge */
