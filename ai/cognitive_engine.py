@@ -88,15 +88,20 @@ class CognitiveEngine:
                     f"Journal Entry:\n{text}"
                 )
 
-                response = client.models.generate_content(
-                    model="gemini-2.5-flash",
-                    contents=prompt,
-                    config={"response_mime_type": "application/json", "temperature": 0.2}
-                )
-
-                if response and response.text:
-                    parsed = json.loads(response.text.strip())
-                    return self._normalize_analysis_result(parsed, text)
+                candidate_models = ["gemini-flash-latest", "gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-1.5-flash"]
+                for model_name in candidate_models:
+                    try:
+                        response = client.models.generate_content(
+                            model=model_name,
+                            contents=prompt,
+                            config={"response_mime_type": "application/json", "temperature": 0.2}
+                        )
+                        if response and response.text:
+                            parsed = json.loads(response.text.strip())
+                            return self._normalize_analysis_result(parsed, text)
+                    except Exception as model_err:
+                        logger.debug(f"Cognitive model {model_name} attempt: {model_err}")
+                        continue
             except Exception as e:
                 logger.warning(f"Live Gemini cognitive extraction fallback: {e}")
 

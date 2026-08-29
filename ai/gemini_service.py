@@ -163,25 +163,30 @@ class GeminiService:
                     "parts": [{"text": final_input}]
                 })
 
-                response = self._genai_client.models.generate_content(
-                    model="gemini-2.5-flash",
-                    contents=formatted_contents,
-                    config={
-                        "system_instruction": system_instruction,
-                        "temperature": 0.7,
-                        "max_output_tokens": 1500
-                    }
-                )
-
-                if response and response.text:
-                    return {
-                        "role": "model",
-                        "content": response.text.strip(),
-                        "model_used": "gemini-2.5-flash",
-                        "is_live_gemini": True
-                    }
+                candidate_models = ["gemini-flash-latest", "gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-1.5-flash"]
+                for model_name in candidate_models:
+                    try:
+                        response = self._genai_client.models.generate_content(
+                            model=model_name,
+                            contents=formatted_contents,
+                            config={
+                                "system_instruction": system_instruction,
+                                "temperature": 0.7,
+                                "max_output_tokens": 1500
+                            }
+                        )
+                        if response and response.text:
+                            return {
+                                "role": "model",
+                                "content": response.text.strip(),
+                                "model_used": model_name,
+                                "is_live_gemini": True
+                            }
+                    except Exception as model_err:
+                        logger.debug(f"Model {model_name} attempt failed: {model_err}")
+                        continue
             except Exception as e:
-                logger.warning(f"Error calling modern Gemini SDK: {e}. Falling back to simulated response.")
+                logger.warning(f"Error calling modern Gemini SDK: {e}. Falling back to legacy/simulation.")
 
         if self._legacy_model and self._is_valid_live_key():
             try:
