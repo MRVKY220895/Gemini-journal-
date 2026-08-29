@@ -458,25 +458,48 @@ function selectPersona(personaId) {
 function startNewSession() {
   state.currentSessionId = `session_${Date.now()}`;
   const heading = document.getElementById('session-topic-heading');
-  if (heading) heading.textContent = 'A Moment of Reflection';
+  if (heading) heading.textContent = 'Personal Reflective Space';
+
+  const contextualChips = document.getElementById('contextual-prompt-chips');
+  if (contextualChips) contextualChips.classList.add('hidden');
 
   const chatMessages = document.getElementById('chat-messages');
+  chatMessages.className = "flex-1 flex flex-col justify-center overflow-y-auto space-y-6 px-1 py-4 mb-2";
   chatMessages.innerHTML = `
-    <div class="chat-msg-ai-card">
-      <div class="flex items-center justify-between mb-3 pb-2 border-b border-white/5">
-        <div class="flex items-center gap-2">
-          <div class="w-6 h-6 rounded-lg bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center text-white">
-            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-          </div>
-          <span class="text-xs font-semibold text-slate-200">Reflective Partner</span>
-        </div>
-        <span class="text-[11px] text-slate-400 flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Listening
-        </span>
+    <div id="empty-hero-stage" class="flex flex-col items-center justify-center text-center my-auto py-6">
+      <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 text-white mb-4">
+        <i data-lucide="sparkles" class="w-6 h-6"></i>
       </div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-slate-400 tracking-tight mb-2">
+        Where would you like to begin?
+      </h1>
+      <p class="text-xs sm:text-sm text-slate-400 max-w-md mb-8 leading-relaxed">
+        Your private cognitive sanctuary. Unpack thoughts, challenge cognitive biases, or explore ideas with Gemini 3.5 Flash.
+      </p>
 
-      <div class="markdown-body text-sm text-slate-200 leading-relaxed">
-        <p>New reflective space initialized for <strong>${escapeHtml(state.currentUser.name)}</strong>. What thoughts or feelings would you like to explore today?</p>
+      <!-- Bento Prompt Starters -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-3xl">
+        <button onclick="insertPrompt('Help me untangle what is making me feel overwhelmed with my work today.')" class="prompt-starter-card group">
+          <div class="w-8 h-8 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+          </div>
+          <div class="text-xs font-bold text-white mb-1">Untangle Overwhelm</div>
+          <div class="text-[11px] text-slate-400 leading-snug">Deconstruct cognitive distortions and pinpoint root causes.</div>
+        </button>
+        <button onclick="insertPrompt('I want to celebrate a win and anchor my sense of gratitude.')" class="prompt-starter-card group">
+          <div class="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+            <i data-lucide="heart" class="w-4 h-4"></i>
+          </div>
+          <div class="text-xs font-bold text-white mb-1">Anchor Gratitude</div>
+          <div class="text-[11px] text-slate-400 leading-snug">Deepen moments of joy and strengthen resilience.</div>
+        </button>
+        <button onclick="insertPrompt('Brainstorm an architecture strategy and challenge my assumptions.')" class="prompt-starter-card group">
+          <div class="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+            <i data-lucide="compass" class="w-4 h-4"></i>
+          </div>
+          <div class="text-xs font-bold text-white mb-1">Socratic Ideation</div>
+          <div class="text-[11px] text-slate-400 leading-snug">Examine hidden blind spots and structure execution.</div>
+        </button>
       </div>
     </div>
   `;
@@ -607,8 +630,9 @@ function updateContextualSuggestions(userMessage, cognitiveData) {
     ];
   }
 
+  container.classList.remove('hidden');
   container.innerHTML = suggestions.map(s => `
-    <button onclick="insertPrompt('${escapeHtml(s.text).replace(/'/g, "\\'")}')" class="text-xs text-slate-300 hover:text-white bg-slate-900/90 hover:bg-slate-800 px-3 py-1.5 rounded-full border border-white/10 transition-all shrink-0 flex items-center gap-1.5 shadow-sm">
+    <button onclick="insertPrompt('${escapeHtml(s.text).replace(/'/g, "\\'")}')" class="text-xs text-slate-300 hover:text-white bg-slate-900/90 hover:bg-slate-800 px-3.5 py-1.5 rounded-full border border-white/10 transition-all shrink-0 flex items-center gap-1.5 shadow-sm">
       <span>${s.icon}</span> <span>${escapeHtml(s.text)}</span>
     </button>
   `).join('');
@@ -645,6 +669,13 @@ function appendErrorCard(errorMessage, retryPrompt) {
 
 function appendChatMessage(role, content, authorName, modelTag, cognitiveData = null, originalPrompt = "") {
   const container = document.getElementById('chat-messages');
+  const hero = document.getElementById('empty-hero-stage');
+  if (hero) {
+    hero.remove();
+    container.classList.remove('justify-center');
+    container.classList.add('justify-start');
+  }
+
   const isUser = role === 'user';
   const turnId = `turn_${Date.now()}_${Math.floor(Math.random()*1000)}`;
 
