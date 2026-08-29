@@ -68,7 +68,7 @@ body {
 
 /* Master Container */
 .studio-container {
-  max-width: 960px;
+  max-width: 1040px;
   margin-left: auto;
   margin-right: auto;
   width: 100%;
@@ -174,9 +174,10 @@ body {
 /* Floating Glass Header */
 .floating-nav {
   position: sticky;
-  top: 0.875rem;
+  top: 0.75rem;
   z-index: 50;
-  max-width: 1040px;
+  max-width: 1120px;
+  width: 100%;
   margin-left: auto;
   margin-right: auto;
   backdrop-filter: blur(28px);
@@ -184,8 +185,9 @@ body {
   background: rgba(10, 14, 24, 0.88);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 9999px;
-  padding: 0.5rem 1.25rem;
+  padding: 0.45rem 1rem;
   box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.7);
+  box-sizing: border-box;
 }
 
 /* Navigation Segmented Tabs */
