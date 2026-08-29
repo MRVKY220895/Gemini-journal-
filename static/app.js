@@ -5604,143 +5604,75 @@ function initAnalyticsCharts() {
       data: {
 
         labels: ['Joy', 'Clarity', 'Resilience', 'Focus', 'Calm', 'Optimism'],
-
         datasets: [{
-
           label: 'Cognitive Vector (%)',
-
-          data: [65, 70, 75, 60, 68, 62],
-
+          data: (localStorage.getItem('mind_cave_is_reset') || (state.journals && state.journals.length === 0)) ? [0, 0, 0, 0, 0, 0] : [65, 70, 75, 60, 68, 62],
           backgroundColor: 'rgba(59, 130, 246, 0.2)',
-
           borderColor: '#3b82f6',
-
           borderWidth: 2,
-
           pointBackgroundColor: '#60a5fa',
-
           pointBorderColor: '#fff'
-
         }]
-
       },
-
       options: {
-
         responsive: true,
-
         maintainAspectRatio: false,
-
         scales: {
-
           r: {
-
             angleLines: { color: 'rgba(255, 255, 255, 0.08)' },
-
             grid: { color: 'rgba(255, 255, 255, 0.08)' },
-
             pointLabels: { color: '#94a3b8', font: { size: 11, family: 'Plus Jakarta Sans' } },
-
             suggestedMin: 0,
-
             suggestedMax: 100,
-
             ticks: { display: false }
-
           }
-
         },
-
         plugins: {
-
           legend: { display: false }
-
         }
-
       }
-
     });
-
   }
 
-
-
   // State & Data Engine for Resilience & Clarity Trajectory
-
   state.trajectoryTimeframe = 'week';
 
-
-
   // Line Chart for Resilience & Clarity Timeline
-
   const lineCtx = document.getElementById('lineTimelineChart')?.getContext('2d');
-
   if (lineCtx) {
-
+    const isClean = Boolean(localStorage.getItem('mind_cave_is_reset') || (state.journals && state.journals.length === 0));
     state.lineChart = new Chart(lineCtx, {
-
       type: 'line',
-
       data: {
-
         labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Today'],
-
         datasets: [
-
           {
-
             label: 'Resilience',
-
-            data: [64, 68, 72, 70, 78, 83, 88],
-
+            data: isClean ? [0, 0, 0, 0, 0, 0, 0] : [64, 68, 72, 70, 78, 83, 88],
             borderColor: '#10b981',
-
             backgroundColor: 'rgba(16, 185, 129, 0.12)',
-
             borderWidth: 2.5,
-
             pointBackgroundColor: '#10b981',
-
             pointBorderColor: '#ffffff',
-
             pointRadius: 4,
-
             pointHoverRadius: 6,
-
             tension: 0.35,
-
             fill: true
-
           },
-
           {
-
             label: 'Clarity',
-
-            data: [58, 64, 69, 74, 76, 82, 86],
-
+            data: isClean ? [0, 0, 0, 0, 0, 0, 0] : [58, 64, 69, 74, 76, 82, 86],
             borderColor: '#06b6d4',
-
             backgroundColor: 'rgba(6, 182, 212, 0.12)',
-
             borderWidth: 2.5,
-
             pointBackgroundColor: '#06b6d4',
-
             pointBorderColor: '#ffffff',
-
             pointRadius: 4,
-
             pointHoverRadius: 6,
-
             tension: 0.35,
-
             fill: true
-
           }
-
         ]
-
       },
 
       options: {
@@ -6219,7 +6151,57 @@ function setMasterDashboardHorizon(horizon) {
     }
   });
 
-  const data = masterDashboardDataStore[horizon];
+  const isReset = Boolean(localStorage.getItem('mind_cave_is_reset'));
+  const journals = state.journals || [];
+  const habits = state.habitsList || [];
+  const goals = state.todayGoals || [];
+  const bucket = state.bucketList || [];
+  const isClean = isReset || journals.length === 0;
+
+  const rawData = masterDashboardDataStore[horizon];
+  const data = JSON.parse(JSON.stringify(rawData));
+
+  if (isClean) {
+    data.pillars = {
+      goalsStat: '0% Done',
+      goalsSub: 'No goals logged',
+      goalsDesc: '0h Focus',
+      habitsStat: '0d Streak',
+      habitsSub: '0% Continuity',
+      habitsDesc: '0 Checkmarks',
+      milestonesStat: '0 Fulfilled',
+      milestonesSub: '0 In Action',
+      milestonesDesc: 'No dreams recorded',
+      cbtStat: 'Clean',
+      cbtSub: '0 Biases Reframed',
+      cbtDesc: 'Zero Persistent Worry',
+      vitalityStat: '0 hrs',
+      vitalitySub: 'Rest State',
+      vitalityDesc: 'No activity recorded',
+      volumeStat: '0 Moments',
+      volumeSub: '0 Words',
+      volumeDesc: '0 Photos • 0 Audio'
+    };
+    data.goalsSummary = 'No active horizon goals recorded.';
+    data.deepwork = '0 hrs (0%)';
+    data.health = '0 hrs (0%)';
+    data.career = '0 hrs (0%)';
+    data.mindset = '0 hrs (0%)';
+    data.habitRate = '0% Rate';
+    data.topStreak = 'No active habits (0d)';
+    data.heatmapIntensity = [0];
+    data.growthBadge = '0% Growth';
+    data.resilienceStat = '0%';
+    data.resilienceSub: 'No baseline',
+    data.clarityStat: '0%',
+    data.claritySub: 'No baseline',
+    data.velocityStat: 'Baseline Zero',
+    data.velocitySub: 'Ready for entries',
+    data.resilienceData = [0, 0, 0, 0, 0, 0, 0];
+    data.clarityData = [0, 0, 0, 0, 0, 0, 0];
+    data.radarData = [0, 0, 0, 0, 0, 0];
+    data.insight = '<strong>Awaiting Entries:</strong> Start your daily journal reflections to unlock live cognitive trajectory and AI synthesis.';
+  }
 
   // 2. Update 6-Pillar Metrics Strip
   const p = data.pillars;
