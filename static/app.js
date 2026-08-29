@@ -654,57 +654,32 @@ function updateUserUI() {
 
 
   // Auth Modal UI update
-
   const modalLbl = document.getElementById('modal-current-user-lbl');
-
   const modalRoleLbl = document.getElementById('modal-role-lbl');
-
   const activeUserCard = document.getElementById('active-user-status-card');
-
   const authFormsContainer = document.getElementById('auth-forms-container');
 
-
+  const isLoggedIn = Boolean(
+    state.firebaseAuth?.currentUser ||
+    (state.currentUser &&
+     state.currentUser.uid &&
+     !state.currentUser.uid.startsWith('guest') &&
+     state.currentUser.uid !== 'user_alice' &&
+     state.currentUser.name !== 'Guest' &&
+     state.currentUser.name !== 'Guest User')
+  );
 
   if (modalLbl && state.currentUser) {
+    modalLbl.textContent = state.currentUser.name || state.currentUser.email || 'Authenticated User';
+  }
 
-    modalLbl.textContent = state.currentUser.name;
-
-    
-
-    // Check if real user (not demo fallback if you want, but for now we consider any currentUser logged in)
-
-    // Actually the app uses user_alice as default fallback. Let's check if it's the default.
-
-    // If it's user_alice, maybe we don't hide the form?
-
-    // Wait, the user said "Once logged in what is the purpose of login page having email address and password?".
-
-    // This implies they successfully logged in. If they log in, they shouldn't see it. 
-
-    // Let's assume if state.currentUser exists, we show the card and hide the form, BUT we allow signing out.
-
-    // However, if the current user is 'user_alice' (the default unauthenticated state), maybe show the form.
-
-    // Let's hide the login forms only if it's a real email, or just if they are "logged in".
-
-    const isGuest = state.currentUser.uid === 'user_alice' || !state.currentUser.name.includes('@');
-
-    if (!isGuest) {
-
-      if (activeUserCard) activeUserCard.classList.remove('hidden');
-
-      if (authFormsContainer) authFormsContainer.classList.add('hidden');
-
-      if (modalRoleLbl) modalRoleLbl.textContent = isAdmin ? 'Admin Access' : 'Client AES-256 Vault Active';
-
-    } else {
-
-      if (activeUserCard) activeUserCard.classList.add('hidden');
-
-      if (authFormsContainer) authFormsContainer.classList.remove('hidden');
-
-    }
-
+  if (isLoggedIn) {
+    if (activeUserCard) activeUserCard.classList.remove('hidden');
+    if (authFormsContainer) authFormsContainer.classList.add('hidden');
+    if (modalRoleLbl) modalRoleLbl.textContent = isAdmin ? 'Admin Access • Private Vault' : 'Client AES-256 Vault Active';
+  } else {
+    if (activeUserCard) activeUserCard.classList.add('hidden');
+    if (authFormsContainer) authFormsContainer.classList.remove('hidden');
   }
 
 
@@ -1191,17 +1166,20 @@ function setCustomUserWithEmail(email) {
 
 
 function signOutUser() {
-
   if (state.firebaseAuth && state.firebaseAuth.currentUser) {
-
     state.firebaseAuth.signOut();
-
   }
-
-  setSandboxUser('user_alice');
-
-  showToast('Signed out. Switched to Alice (Demo Sandbox).');
-
+  state.currentUser = {
+    uid: 'guest_user',
+    name: 'Guest',
+    token: 'guest_token',
+    gender: localStorage.getItem('mind_cave_user_gender') || 'female'
+  };
+  localStorage.removeItem('gemini_journal_uid');
+  localStorage.removeItem('gemini_journal_name');
+  localStorage.removeItem('gemini_journal_token');
+  updateUserUI();
+  showToast('Signed out successfully.');
 }
 
 
