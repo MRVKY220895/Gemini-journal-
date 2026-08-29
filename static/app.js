@@ -447,8 +447,8 @@ async function sendChatMessage(event) {
     const data = await response.json();
     state.currentSessionId = data.session_id;
 
-    // Append AI Response
-    appendChatMessage('ai', data.message.content, 'Gemini Reflective Partner', data.model_used);
+    // Append AI Response with full cognitive metadata and tags
+    appendChatMessage('ai', data.message.content, 'Gemini Reflective Partner', data.model_used, data.cognitive_data, message);
 
     // Update Live Cognitive Bar
     if (data.cognitive_data) {
@@ -464,7 +464,7 @@ async function sendChatMessage(event) {
   }
 }
 
-function appendChatMessage(role, content, authorName, modelTag) {
+function appendChatMessage(role, content, authorName, modelTag, cognitiveData = null, originalPrompt = "") {
   const container = document.getElementById('chat-messages');
   const isUser = role === 'user';
 
@@ -475,17 +475,52 @@ function appendChatMessage(role, content, authorName, modelTag) {
 
   const headerHtml = isUser
     ? `<div class="flex items-center justify-end gap-2 mb-1.5 text-xs text-blue-300 font-semibold"><span>${escapeHtml(authorName)}</span></div>`
-    : `<div class="flex items-center gap-2 mb-2">
-        <span class="w-5 h-5 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-[10px] font-bold">AI</span>
-        <span class="text-xs font-semibold text-slate-300">${escapeHtml(authorName)}</span>
-        ${modelTag ? `<span class="text-[10px] bg-white/5 px-2 py-0.5 rounded text-slate-400 font-mono">${modelTag}</span>` : ''}
+    : `<div class="flex items-center justify-between mb-2">
+        <div class="flex items-center gap-2">
+          <span class="w-5 h-5 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-[10px] font-bold">AI</span>
+          <span class="text-xs font-semibold text-slate-300">${escapeHtml(authorName)}</span>
+          ${modelTag ? `<span class="text-[10px] bg-white/5 px-2 py-0.5 rounded text-slate-400 font-mono">${modelTag}</span>` : ''}
+        </div>
+        ${cognitiveData && cognitiveData.primary_emotion ? `
+          <span class="text-[10px] bg-purple-950/40 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded-full font-medium">
+            💙 ${escapeHtml(cognitiveData.primary_emotion)}
+          </span>
+        ` : ''}
        </div>`;
 
   const parsedContent = isUser ? `<p class="whitespace-pre-wrap">${escapeHtml(content)}</p>` : `<div class="markdown-body">${marked.parse(content)}</div>`;
 
-  msgDiv.innerHTML = `${headerHtml}${parsedContent}`;
+  // Tagging & Metadata Footer for AI responses
+  let footerHtml = '';
+  if (!isUser && cognitiveData) {
+    const distortions = cognitiveData.detected_distortions || [];
+    const tags = cognitiveData.semantic_tags || ['#SelfReflection'];
+    
+    footerHtml = `
+      <div class="mt-3 pt-3 border-t border-white/5 flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div class="flex flex-wrap items-center gap-1.5">
+          ${distortions.map(d => `
+            <span class="bg-amber-950/60 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-full text-[10px] font-semibold flex items-center gap-1">
+              ⚠️ ${escapeHtml(d)}
+            </span>
+          `).join('')}
+          ${tags.map(t => `
+            <span class="bg-blue-950/60 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded-full text-[10px] font-mono">
+              ${escapeHtml(t)}
+            </span>
+          `).join('')}
+        </div>
+        <button onclick="saveQuickJournal('${escapeHtml(originalPrompt || 'Reflection')}', '${escapeHtml(content).replace(/'/g, "\\'")}', '${cognitiveData.primary_emotion || 'Reflective'}')" class="text-[10px] text-slate-400 hover:text-white flex items-center gap-1 bg-white/5 hover:bg-white/10 px-2 py-1 rounded-lg transition-all">
+          <i data-lucide="bookmark" class="w-3 h-3 text-cyan-400"></i> Save to Vault
+        </button>
+      </div>
+    `;
+  }
+
+  msgDiv.innerHTML = `${headerHtml}${parsedContent}${footerHtml}`;
   container.appendChild(msgDiv);
   container.scrollTop = container.scrollHeight;
+  lucide.createIcons();
 }
 
 function updateLiveCognitiveBar(cogData) {
@@ -496,11 +531,9 @@ function updateLiveCognitiveBar(cogData) {
   
   const distBadge = document.getElementById('live-distortions-badge');
   if (cogData.detected_distortions && cogData.detected_distortions.length > 0) {
-    distBadge.textContent = `Pattern: ${cogData.detected_distortions.join(', ')}`;
-    distBadge.className = 'text-[11px] text-amber-400 font-mono';
+    distBadge.innerHTML = `<span class="bg-amber-950/60 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-full font-bold">⚠️ ${escapeHtml(cogData.detected_distortions.join(' • '))}</span>`;
   } else {
-    distBadge.textContent = 'Zero Distortions Detected';
-    distBadge.className = 'text-[11px] text-emerald-400 font-mono';
+    distBadge.innerHTML = `<span class="text-[11px] text-emerald-400 font-mono">✨ Zero Distortions Detected</span>`;
   }
 
   const chipsContainer = document.getElementById('live-mood-chips');
@@ -515,6 +548,27 @@ function updateLiveCognitiveBar(cogData) {
       </div>
     `;
   });
+}
+
+async function saveQuickJournal(title, content, mood) {
+  try {
+    const response = await fetch('/api/journals', {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({
+        title: title.substring(0, 50) || 'Studio Reflection',
+        content: content,
+        persona: state.currentPersona,
+        mood: mood || 'Reflective',
+        tags: [state.currentPersona, mood],
+        is_encrypted: false
+      })
+    });
+    if (!response.ok) throw new Error('Could not save to journal.');
+    showToast('Reflection turn saved directly to your isolated journal vault!');
+  } catch (err) {
+    alert(`Save error: ${err.message}`);
+  }
 }
 
 // =============================================================================

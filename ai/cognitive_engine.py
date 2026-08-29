@@ -2,7 +2,7 @@
 MindPulse: AI Cognitive Journaling & Emotion Intelligence Matrix.
 Original Feature Enhancement:
 Extracts multi-dimensional emotional state vectors, CBT cognitive distortions,
-reframing prompts, and actionable micro-commitments from user reflections.
+semantic tags, reframing prompts, and actionable micro-commitments from user reflections.
 """
 
 import json
@@ -14,17 +14,47 @@ from security.secret_manager import secret_manager
 logger = logging.getLogger("ai.cognitive_engine")
 
 COGNITIVE_DISTORTION_PATTERNS = {
-    "Catastrophizing": [r"\bruined\b", r"\bdisaster\b", r"\bworst thing\b", r"\beverything is failing\b", r"\bhopeless\b"],
-    "All-or-Nothing": [r"\balways\b", r"\bnever\b", r"\bcomplete failure\b", r"\btotal mess\b", r"\bperfect or nothing\b"],
-    "Mind Reading": [r"\bthey think I\b", r"\beveryone hates\b", r"\bthey must think\b", r"\bjudging me\b"],
-    "Emotional Reasoning": [r"\bI feel like a failure so I am\b", r"\bI feel stupid\b", r"\bfeels impossible\b"],
-    "Should Statements": [r"\bI should have\b", r"\bI must\b", r"\bI ought to\b", r"\bI have to be perfect\b"],
-    "Overgeneralization": [r"\bnothing ever works\b", r"\bevery single time\b", r"\bno one cares\b"]
+    "Labeling & Self-Blame": [
+        r"\b(i am|i'm|feeling|feel)\s+(dumb|stupid|an idiot|a loser|a failure|worthless|useless|clueless|slow|incompetent|broken)\b",
+        r"\b(dumb|stupid|idiot|loser|worthless|incompetent|unworthy)\b"
+    ],
+    "Emotional Reasoning": [
+        r"\b(feel|feeling)\s+(like a failure|dumb|stupid|hopeless|useless|terrible|lost|incapable|impossible|broken)\b",
+        r"\b(feels impossible|feel like giving up|i feel it so it must be true)\b"
+    ],
+    "Catastrophizing": [
+        r"\b(ruined|disaster|worst thing|worst case|doomed|wreck|nightmare|everything is falling apart|hopeless|end of the world)\b"
+    ],
+    "All-or-Nothing": [
+        r"\b(always|never|every single time|complete failure|total mess|ruined everything|perfect or nothing|nobody|everybody|nothing ever)\b"
+    ],
+    "Mind Reading": [
+        r"\b(they think|everyone thinks|they must think|judging me|they hate me|they look down on me|they think i'm|people assume)\b"
+    ],
+    "Should Statements": [
+        r"\b(i should have|i shouldn't have|i must|i ought to|have to be perfect|should be better|why can't i just)\b"
+    ],
+    "Overgeneralization": [
+        r"\b(nothing ever works|nobody cares|nothing goes right|always happens to me|i can never|every time i try)\b"
+    ],
+    "Discounting the Positive": [
+        r"\b(just luck|anyone could do it|doesn't count|not good enough|doesn't matter|fluke)\b"
+    ]
+}
+
+THEMATIC_TAG_PATTERNS = {
+    "#SelfWorth": [r"\b(dumb|stupid|worthless|failure|confidence|imposter|insecure|not good enough|proud|value)\b"],
+    "#EmotionalClarity": [r"\b(feel|emotion|confused|overwhelmed|anxious|sad|lost|numb|clarity|unpack|mind)\b"],
+    "#CognitiveReframing": [r"\b(reframe|thought|perspective|assumption|belief|distortion|mindset|angle)\b"],
+    "#OverwhelmAndStress": [r"\b(deadline|stress|anxiety|pressure|tired|exhausted|burnout|too much|hectic)\b"],
+    "#CareerAndFocus": [r"\b(work|project|code|job|boss|team|client|goal|career|productivity|deliverable)\b"],
+    "#IdeationAndCreation": [r"\b(brainstorm|idea|build|create|design|innovate|architecture|concept)\b"],
+    "#MindfulGratitude": [r"\b(grateful|thankful|peace|grounded|calm|appreciate|breath|present)\b"]
 }
 
 
 class CognitiveEngine:
-    """Extracts cognitive metadata and emotional intelligence from journal text."""
+    """Extracts cognitive metadata, semantic tags, and emotional intelligence from journal text."""
 
     def __init__(self):
         self.api_key = secret_manager.get_gemini_api_key()
@@ -36,21 +66,21 @@ class CognitiveEngine:
     def analyze_reflection(self, text: str, persona: str = "cbt_reflector") -> Dict[str, Any]:
         """
         Performs in-depth cognitive extraction on the user's reflection.
-        Returns mood dimensions (0-100), detected distortions, reframing, and action items.
+        Returns mood dimensions (0-100), detected distortions, semantic tags, reframing, and action items.
         """
-        # If live Gemini API key is available, attempt structured JSON schema extraction
         if self._is_valid_live_key():
             try:
                 from google import genai
                 client = genai.Client(api_key=secret_manager.get_gemini_api_key())
 
                 prompt = (
-                    "Analyze the following journal entry from a cognitive psychology perspective. "
+                    "Analyze the following journal reflection from a clinical cognitive psychology and semantic tagging perspective. "
                     "Output ONLY a valid JSON object matching this schema:\n"
                     "{\n"
                     '  "mood_scores": {"Joy": float, "Clarity": float, "Resilience": float, "Focus": float, "Calm": float, "Optimism": float},\n'
                     '  "primary_emotion": string,\n'
                     '  "detected_distortions": [string],\n'
+                    '  "semantic_tags": [string],\n'
                     '  "cognitive_reframing": string,\n'
                     '  "action_items": [string],\n'
                     '  "key_insight": string\n'
@@ -66,35 +96,42 @@ class CognitiveEngine:
 
                 if response and response.text:
                     parsed = json.loads(response.text.strip())
-                    return self._normalize_analysis_result(parsed)
+                    return self._normalize_analysis_result(parsed, text)
             except Exception as e:
                 logger.warning(f"Live Gemini cognitive extraction fallback: {e}")
 
-        # Local High-Fidelity Heuristic Analysis Fallback
+        # High-Fidelity Heuristic Analysis Fallback
         return self._heuristic_cognitive_analysis(text, persona)
 
     def _heuristic_cognitive_analysis(self, text: str, persona: str) -> Dict[str, Any]:
-        """Performs NLP-based cognitive analysis when API key is offline."""
+        """Performs robust NLP-based cognitive distortion and semantic tag analysis."""
         lowered = text.lower()
         word_count = len(re.findall(r"\w+", text))
 
-        # Detect distortions
+        # 1. Detect Cognitive Distortions
         detected_distortions = []
         for dist_name, patterns in COGNITIVE_DISTORTION_PATTERNS.items():
             if any(re.search(pat, lowered) for pat in patterns):
                 detected_distortions.append(dist_name)
 
-        # Baseline mood calculations
-        base_clarity = min(95, max(40, 50 + int(word_count * 0.4)))
-        base_resilience = 75 if not detected_distortions else max(45, 75 - (len(detected_distortions) * 10))
-        base_calm = 70 if "anxious" not in lowered and "stress" not in lowered else 40
-        base_focus = 70 if "focus" in lowered or "plan" in lowered else 60
-        base_joy = 70 if "happy" in lowered or "grateful" in lowered or "excited" in lowered else 55
-        base_optimism = 65 if "hope" in lowered or "future" in lowered else 58
+        # 2. Extract Thematic Semantic Tags
+        semantic_tags = []
+        for tag_name, patterns in THEMATIC_TAG_PATTERNS.items():
+            if any(re.search(pat, lowered) for pat in patterns):
+                semantic_tags.append(tag_name)
 
-        if "stuck" in lowered or "tired" in lowered:
-            base_calm -= 10
-            base_clarity -= 10
+        if not semantic_tags:
+            semantic_tags = ["#SelfReflection", "#CognitiveClarity"]
+
+        # 3. Dynamic Emotional Vector Calculations
+        is_self_critical = any(d in ["Labeling & Self-Blame", "Emotional Reasoning"] for d in detected_distortions)
+        
+        base_joy = 35 if is_self_critical else (75 if any(w in lowered for w in ["happy", "grateful", "excited"]) else 55)
+        base_clarity = 45 if is_self_critical else min(95, max(45, 50 + int(word_count * 0.4)))
+        base_resilience = 50 if is_self_critical else max(40, 80 - (len(detected_distortions) * 12))
+        base_calm = 40 if any(w in lowered for w in ["anxious", "stress", "panic", "dumb", "overwhelm"]) else 70
+        base_focus = 55 if is_self_critical else (75 if "plan" in lowered or "code" in lowered else 65)
+        base_optimism = 40 if is_self_critical else (70 if "hope" in lowered or "future" in lowered else 60)
 
         mood_scores = {
             "Joy": round(float(base_joy), 1),
@@ -105,34 +142,49 @@ class CognitiveEngine:
             "Optimism": round(float(base_optimism), 1)
         }
 
-        # Reframing advice
-        reframing = "Focus on what is within your direct locus of control today."
-        if "Catastrophizing" in detected_distortions:
+        # 4. Primary Emotion Classification
+        if "Labeling & Self-Blame" in detected_distortions or "dumb" in lowered:
+            primary_emotion = "Vulnerable Self-Doubt"
+        elif "OverwhelmAndStress" in "".join(semantic_tags) or "anxious" in lowered:
+            primary_emotion = "Anxious Tension"
+        elif base_clarity > 70:
+            primary_emotion = "Grounded Insight"
+        else:
+            primary_emotion = "Seeking Direction"
+
+        # 5. Targeted Cognitive Reframing
+        if "Labeling & Self-Blame" in detected_distortions or "dumb" in lowered:
+            reframing = "Feeling confused or making a mistake is an event, not your identity. Separate 'I feel challenged' from 'I am dumb'."
+        elif "Catastrophizing" in detected_distortions:
             reframing = "Notice if you are predicting the worst-case scenario. What is the most realistic, probable outcome?"
         elif "All-or-Nothing" in detected_distortions:
             reframing = "Growth happens in shades of grey. Acknowledge the micro-progress made rather than demanding perfection."
         elif "Should Statements" in detected_distortions:
-            reframing = "Replace 'I should' with 'I choose to' or 'I would prefer to', reducing self-imposed guilt."
+            reframing = "Replace 'I should' with 'I choose to' or 'I would prefer to', reducing self-imposed pressure."
+        else:
+            reframing = "Focus on what is directly within your circle of control today."
 
-        # Action items synthesis
+        # 6. Action Items Synthesis
         action_items = []
-        if "plan" in lowered or "goal" in lowered:
+        if is_self_critical:
+            action_items.append("Notice and label the inner critic as a passing thought, not objective truth.")
+            action_items.append("Identify one specific concept or problem that caused confusion and break it down.")
+        elif "plan" in lowered or "goal" in lowered:
             action_items.append("Break the core objective into 3 small sequential milestones.")
-        if detected_distortions:
-            action_items.append("Practice 3 minutes of mindful breathing when notice self-criticism arising.")
-        action_items.append("Revisit this reflection tomorrow to track emotional clarity evolution.")
+        action_items.append("Revisit this reflection tomorrow to evaluate emotional clarity evolution.")
 
         return {
             "mood_scores": mood_scores,
-            "primary_emotion": "Reflective Clarity" if base_clarity > 60 else "Seeking Direction",
+            "primary_emotion": primary_emotion,
             "detected_distortions": detected_distortions,
+            "semantic_tags": semantic_tags,
             "cognitive_reframing": reframing,
             "action_items": action_items,
-            "key_insight": f"Processed {word_count} words with balanced emotional resilience."
+            "key_insight": f"Identified {len(detected_distortions)} cognitive pattern(s) and {len(semantic_tags)} thematic area(s)."
         }
 
-    def _normalize_analysis_result(self, raw: Dict[str, Any]) -> Dict[str, Any]:
-        """Validates and bounds cognitive score structures."""
+    def _normalize_analysis_result(self, raw: Dict[str, Any], text: str) -> Dict[str, Any]:
+        """Validates, bounds, and augments structured outputs."""
         moods = raw.get("mood_scores", {})
         default_moods = {"Joy": 60.0, "Clarity": 65.0, "Resilience": 70.0, "Focus": 65.0, "Calm": 60.0, "Optimism": 65.0}
 
@@ -141,10 +193,15 @@ class CognitiveEngine:
             val = moods.get(k, default_moods[k])
             cleaned_moods[k] = round(float(max(0, min(100, val))), 1)
 
+        tags = raw.get("semantic_tags", [])
+        if not tags:
+            tags = ["#SelfReflection", "#CognitiveClarity"]
+
         return {
             "mood_scores": cleaned_moods,
             "primary_emotion": raw.get("primary_emotion", "Reflective"),
             "detected_distortions": raw.get("detected_distortions", []),
+            "semantic_tags": tags,
             "cognitive_reframing": raw.get("cognitive_reframing", "Embrace clarity and gradual progress."),
             "action_items": raw.get("action_items", ["Take one purposeful action today."]),
             "key_insight": raw.get("key_insight", "Meaningful self-awareness unlocked through reflection.")
