@@ -2711,27 +2711,40 @@ function initAnalyticsCharts() {
     });
   }
 
+  // State & Data Engine for Resilience & Clarity Trajectory
+  state.trajectoryTimeframe = 'week';
+
   // Line Chart for Resilience & Clarity Timeline
   const lineCtx = document.getElementById('lineTimelineChart')?.getContext('2d');
   if (lineCtx) {
     state.lineChart = new Chart(lineCtx, {
       type: 'line',
       data: {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Today'],
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Today'],
         datasets: [
           {
             label: 'Resilience',
-            data: [60, 65, 70, 68, 74, 80],
+            data: [64, 68, 72, 70, 78, 83, 88],
             borderColor: '#10b981',
-            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            backgroundColor: 'rgba(16, 185, 129, 0.12)',
+            borderWidth: 2.5,
+            pointBackgroundColor: '#10b981',
+            pointBorderColor: '#ffffff',
+            pointRadius: 4,
+            pointHoverRadius: 6,
             tension: 0.35,
             fill: true
           },
           {
             label: 'Clarity',
-            data: [50, 58, 64, 72, 70, 78],
+            data: [58, 64, 69, 74, 76, 82, 86],
             borderColor: '#06b6d4',
-            backgroundColor: 'rgba(6, 182, 212, 0.1)',
+            backgroundColor: 'rgba(6, 182, 212, 0.12)',
+            borderWidth: 2.5,
+            pointBackgroundColor: '#06b6d4',
+            pointBorderColor: '#ffffff',
+            pointRadius: 4,
+            pointHoverRadius: 6,
             tension: 0.35,
             fill: true
           }
@@ -2740,15 +2753,134 @@ function initAnalyticsCharts() {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        interaction: {
+          mode: 'index',
+          intersect: false
+        },
         scales: {
-          x: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' } },
-          y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' }, min: 30, max: 100 }
+          x: { 
+            grid: { color: 'rgba(255, 255, 255, 0.06)' }, 
+            ticks: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans', size: 11 } } 
+          },
+          y: { 
+            grid: { color: 'rgba(255, 255, 255, 0.06)' }, 
+            ticks: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans', size: 11 } }, 
+            min: 30, 
+            max: 100 
+          }
         },
         plugins: {
-          legend: { labels: { color: '#cbd5e1', font: { size: 11 } } }
+          legend: { 
+            labels: { 
+              color: '#cbd5e1', 
+              font: { family: 'Plus Jakarta Sans', size: 11, weight: 'bold' },
+              usePointStyle: true,
+              pointStyle: 'circle'
+            } 
+          },
+          tooltip: {
+            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+            titleColor: '#ffffff',
+            bodyColor: '#e2e8f0',
+            borderColor: 'rgba(255, 255, 255, 0.15)',
+            borderWidth: 1,
+            padding: 10,
+            callbacks: {
+              label: function(context) {
+                return ` ${context.dataset.label}: ${context.parsed.y}% Cognitive Equilibrium`;
+              }
+            }
+          }
         }
       }
     });
+  }
+}
+
+// Timeframe Trajectory Data Store (Week / Month / Year)
+const trajectoryDataStore = {
+  week: {
+    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Today'],
+    resilience: [64, 68, 72, 70, 78, 83, 88],
+    clarity: [58, 64, 69, 74, 76, 82, 86],
+    resilienceStat: '88%',
+    resilienceSub: '+14% vs 7d ago',
+    clarityStat: '86%',
+    claritySub: '+18% vs 7d ago',
+    velocityStat: 'Ascending Flow',
+    velocitySub: 'Compounding',
+    insight: '<strong>Weekly Synthesis:</strong> Cognitive resilience climbed +14% as mindful micro-habits and evening reframing decoupled somatic stress from task execution.'
+  },
+  month: {
+    labels: ['Aug 1-7', 'Aug 8-14', 'Aug 15-21', 'Aug 22-28', 'Aug 29+'],
+    resilience: [58, 65, 72, 79, 88],
+    clarity: [52, 60, 68, 77, 86],
+    resilienceStat: '82.4%',
+    resilienceSub: '+21% 30d gain',
+    clarityStat: '78.6%',
+    claritySub: '+24% 30d gain',
+    velocityStat: 'Steady Expansion',
+    velocitySub: '84% Less Bias',
+    insight: '<strong>Monthly Synthesis:</strong> 30-day cognitive analysis demonstrates an 84% reduction in Catastrophizing and All-or-Nothing cognitive distortions.'
+  },
+  year: {
+    labels: ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+    resilience: [48, 52, 57, 62, 66, 70, 74, 78, 81, 84, 86, 91],
+    clarity: [42, 46, 51, 56, 62, 67, 72, 76, 80, 83, 85, 89],
+    resilienceStat: '91%',
+    resilienceSub: '+43% annual delta',
+    clarityStat: '89%',
+    claritySub: '+47% annual delta',
+    velocityStat: 'Sovereign Mastery',
+    velocitySub: 'Transformational',
+    insight: '<strong>Annual Synthesis:</strong> Full-year longitudinal growth reveals profound cognitive rewiring — shifting from reactive anxiety into proactive executive serenity.'
+  }
+};
+
+function setTrajectoryTimeframe(timeframe) {
+  state.trajectoryTimeframe = timeframe;
+
+  // Update button active state classes
+  ['week', 'month', 'year'].forEach(tf => {
+    const btn = document.getElementById(`traj-btn-${tf}`);
+    if (btn) {
+      if (tf === timeframe) {
+        btn.className = 'px-2.5 py-1 rounded-lg font-semibold transition-all bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30';
+      } else {
+        btn.className = 'px-2.5 py-1 rounded-lg font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all';
+      }
+    }
+  });
+
+  updateTrajectoryChart();
+}
+
+function updateTrajectoryChart() {
+  const d = trajectoryDataStore[state.trajectoryTimeframe] || trajectoryDataStore.week;
+
+  // Update Stats & Insights Banner
+  const resStat = document.getElementById('traj-resilience-stat');
+  const resSub = document.getElementById('traj-resilience-sub');
+  const claStat = document.getElementById('traj-clarity-stat');
+  const claSub = document.getElementById('traj-clarity-sub');
+  const velStat = document.getElementById('traj-velocity-stat');
+  const velSub = document.getElementById('traj-velocity-sub');
+  const insightBanner = document.getElementById('trajectory-insight-banner');
+
+  if (resStat) resStat.textContent = d.resilienceStat;
+  if (resSub) resSub.textContent = d.resilienceSub;
+  if (claStat) claStat.textContent = d.clarityStat;
+  if (claSub) claSub.textContent = d.claritySub;
+  if (velStat) velStat.textContent = d.velocityStat;
+  if (velSub) velSub.textContent = d.velocitySub;
+  if (insightBanner) insightBanner.innerHTML = d.insight;
+
+  // Update Line Chart datasets & labels
+  if (state.lineChart) {
+    state.lineChart.data.labels = d.labels;
+    state.lineChart.data.datasets[0].data = d.resilience;
+    state.lineChart.data.datasets[1].data = d.clarity;
+    state.lineChart.update();
   }
 }
 

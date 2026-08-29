@@ -998,17 +998,63 @@
           </div>
         </div>
 
-        <!-- Clarity Timeline Chart Card -->
+        <!-- Clarity & Resilience Trajectory Card (Week / Month / Year) -->
         <div class="double-bezel lg:col-span-6">
           <div class="double-bezel-inner p-5 flex flex-col h-full">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
-                <i data-lucide="trending-up" class="w-4 h-4 text-emerald-400"></i> Resilience & Clarity Trajectory
-              </h3>
-              <span class="text-[11px] text-slate-400 font-mono">Temporal Progression</span>
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+              <div>
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <i data-lucide="trending-up" class="w-4 h-4 text-emerald-500 dark:text-emerald-400"></i> Resilience & Clarity Trajectory
+                </h3>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Neural equilibrium & cognitive distortion reduction over time</p>
+              </div>
+
+              <!-- Timeframe Switcher: Week / Month / Year -->
+              <div class="flex items-center gap-1 p-1 rounded-xl bg-slate-100 dark:bg-black/50 border border-slate-200 dark:border-white/10 text-xs" id="trajectory-timeframe-selector">
+                <button type="button" onclick="setTrajectoryTimeframe('week')" id="traj-btn-week" class="px-2.5 py-1 rounded-lg font-semibold transition-all bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30">Week</button>
+                <button type="button" onclick="setTrajectoryTimeframe('month')" id="traj-btn-month" class="px-2.5 py-1 rounded-lg font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">Month</button>
+                <button type="button" onclick="setTrajectoryTimeframe('year')" id="traj-btn-year" class="px-2.5 py-1 rounded-lg font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">Year</button>
+              </div>
             </div>
-            <div class="flex-1 flex items-center justify-center min-h-[280px]">
+
+            <!-- Key Metric Highlights for Selected Horizon -->
+            <div class="grid grid-cols-3 gap-2 mb-3" id="trajectory-summary-metrics">
+              <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5">
+                <div class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Resilience
+                </div>
+                <div class="text-base font-bold text-slate-900 dark:text-white mt-0.5 font-mono" id="traj-resilience-stat">88%</div>
+                <div class="text-[10px] text-slate-500 dark:text-slate-400" id="traj-resilience-sub">+14% vs baseline</div>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5">
+                <div class="text-[10px] text-cyan-600 dark:text-cyan-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span> Clarity Index
+                </div>
+                <div class="text-base font-bold text-slate-900 dark:text-white mt-0.5 font-mono" id="traj-clarity-stat">86%</div>
+                <div class="text-[10px] text-slate-500 dark:text-slate-400" id="traj-clarity-sub">+18% vs baseline</div>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5">
+                <div class="text-[10px] text-amber-600 dark:text-amber-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Velocity
+                </div>
+                <div class="text-xs font-bold text-slate-900 dark:text-white mt-1" id="traj-velocity-stat">Ascending Flow</div>
+                <div class="text-[10px] text-slate-500 dark:text-slate-400" id="traj-velocity-sub">Compounding</div>
+              </div>
+            </div>
+
+            <!-- Chart Canvas -->
+            <div class="flex-1 flex items-center justify-center min-h-[260px] w-full">
               <canvas id="lineTimelineChart"></canvas>
+            </div>
+
+            <!-- Trajectory Narrative Insight Banner -->
+            <div class="mt-3 p-2.5 rounded-xl bg-emerald-950/20 dark:bg-emerald-950/30 border border-emerald-500/25 flex items-start gap-2">
+              <span class="text-base shrink-0 mt-0.5">🌿</span>
+              <div class="text-xs leading-relaxed text-slate-700 dark:text-slate-300" id="trajectory-insight-banner">
+                <strong>Weekly Synthesis:</strong> Cognitive resilience climbed +14% as mindful micro-habits and evening reframing decoupled somatic stress from task execution.
+              </div>
             </div>
           </div>
         </div>
