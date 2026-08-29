@@ -71,6 +71,10 @@ class AttackSimulationRequest(BaseModel):
     payload: str = Field(..., min_length=1)
 
 
+class SetApiKeyRequest(BaseModel):
+    api_key: str = Field(..., min_length=10)
+
+
 # =============================================================================
 # PUBLIC & SECURITY DIAGNOSTIC ROUTES
 # =============================================================================
@@ -166,6 +170,24 @@ async def simulate_prompt_injection(req: AttackSimulationRequest):
         "sanitized_payload": sanitized,
         "containment_wrapper": f"<user_journal_entry>\n{sanitized}\n</user_journal_entry>",
         "defense_verdict": "BLOCKED & SAFELY NEUTRALIZED" if is_detected else "CONTAINED IN DELIMITER BOUNDARY"
+    }
+
+
+@app.post("/api/security/set-key")
+async def set_gemini_api_key_endpoint(req: SetApiKeyRequest):
+    """Securely configures the Gemini API key at runtime for live conversations."""
+    clean_key = req.api_key.strip()
+    if len(clean_key) < 15:
+        raise HTTPException(status_code=400, detail="Invalid Gemini API key length.")
+    
+    secret_manager.set_gemini_api_key(clean_key)
+    gemini_service._init_client()
+    return {
+        "success": True,
+        "message": "Gemini API key successfully connected.",
+        "masked_key": secret_manager.mask_secret(clean_key),
+        "model": "gemini-2.5-flash",
+        "is_live_gemini": True
     }
 
 

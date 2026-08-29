@@ -81,13 +81,19 @@
 
     <!-- User Identity & Auth Action -->
     <div class="flex items-center gap-2">
+      <!-- Gemini API Key Status Pill -->
+      <button onclick="openGeminiKeyModal()" id="gemini-key-pill" class="flex items-center gap-1.5 bg-blue-950/40 hover:bg-blue-900/50 px-3 py-1.5 rounded-full border border-blue-500/30 text-xs text-blue-300 transition-all">
+        <span id="gemini-key-dot" class="w-2 h-2 rounded-full bg-amber-400"></span>
+        <span id="gemini-key-label" class="font-mono text-[11px]">Gemini API</span>
+      </button>
+
       <div id="user-pill" class="flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-full border border-slate-800 text-xs">
         <div id="user-avatar-indicator" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></div>
         <span id="user-display-name" class="font-medium text-slate-200 truncate max-w-[110px] sm:max-w-[160px]">Guest User</span>
       </div>
       <button onclick="openAuthModal()" class="btn-secondary text-xs !py-1.5 !px-3">
         <i data-lucide="user" class="w-3.5 h-3.5"></i>
-        <span id="auth-btn-label">Switch User</span>
+        <span id="auth-btn-label">Auth</span>
       </button>
     </div>
   </header>
@@ -543,6 +549,49 @@
             <button type="button" onclick="closeNewJournalModal()" class="btn-secondary text-xs">Cancel</button>
             <button type="submit" class="btn-island">
               <span>Save to Isolated Vault</span>
+              <div class="btn-island-icon">
+                <i data-lucide="check" class="w-4 h-4 text-white"></i>
+              </div>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: GOOGLE GEMINI API KEY SETUP -->
+  <!-- ===================================================================== -->
+  <div id="gemini-key-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="double-bezel max-w-md w-full">
+      <div class="double-bezel-inner p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-xl bg-blue-600/20 text-blue-400 flex items-center justify-center">
+              <i data-lucide="key" class="w-4 h-4"></i>
+            </div>
+            <h3 class="text-base font-bold text-white">Google Gemini API Key</h3>
+          </div>
+          <button onclick="closeGeminiKeyModal()" class="text-slate-400 hover:text-white">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <p class="text-xs text-slate-400 mb-4">
+          Enter your Gemini API key from <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-blue-400 underline">Google AI Studio</a> to enable real live multi-turn AI interactions (Gemini 2.5 Flash).
+        </p>
+
+        <form onsubmit="submitGeminiApiKey(event)" class="space-y-3">
+          <div>
+            <label class="text-xs text-slate-300 block mb-1">Gemini API Key</label>
+            <input type="password" id="gemini-api-key-input" placeholder="AIzaSy..." required class="w-full bg-black/60 text-slate-200 text-xs p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-blue-500 font-mono">
+            <p class="text-[10px] text-slate-500 mt-1">Stored securely in server runtime / Secret Manager. Never leaked to clients.</p>
+          </div>
+
+          <div class="pt-2 flex justify-end gap-2">
+            <button type="button" onclick="closeGeminiKeyModal()" class="btn-secondary text-xs">Cancel</button>
+            <button type="submit" class="btn-island">
+              <span>Connect Live Gemini</span>
               <div class="btn-island-icon">
                 <i data-lucide="check" class="w-4 h-4 text-white"></i>
               </div>

@@ -22,12 +22,84 @@ const state = {
 // Initialize Application on DOM Ready
 document.addEventListener('DOMContentLoaded', () => {
   initFirebaseAuth();
+  checkGeminiKeyStatus();
   updateUserUI();
   initAnalyticsCharts();
   loadJournals();
   loadSecurityAudit();
   loadAIStudioConfig();
 });
+
+// =============================================================================
+// GEMINI API KEY & REAL CONVERSATIONS SETUP
+// =============================================================================
+
+function openGeminiKeyModal() {
+  document.getElementById('gemini-key-modal')?.classList.remove('hidden');
+}
+
+function closeGeminiKeyModal() {
+  document.getElementById('gemini-key-modal')?.classList.add('hidden');
+}
+
+async function checkGeminiKeyStatus() {
+  try {
+    const resp = await fetch('/api/security/audit');
+    const data = await resp.json();
+    const isConfigured = data.key_management.gemini_api_key_masked !== '[NOT SET]';
+
+    const dot = document.getElementById('gemini-key-dot');
+    const label = document.getElementById('gemini-key-label');
+
+    if (dot && label) {
+      if (isConfigured) {
+        dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
+        label.textContent = 'Gemini 2.5 (Live)';
+        label.className = 'font-mono text-[11px] text-emerald-300 font-semibold';
+      } else {
+        dot.className = 'w-2 h-2 rounded-full bg-amber-400';
+        label.textContent = 'Connect Gemini API';
+        label.className = 'font-mono text-[11px] text-amber-300';
+      }
+    }
+  } catch (err) {
+    console.debug('Key status check notice:', err);
+  }
+}
+
+async function submitGeminiApiKey(event) {
+  event.preventDefault();
+  const input = document.getElementById('gemini-api-key-input');
+  const apiKey = input.value.trim();
+
+  if (!apiKey || apiKey.length < 15) {
+    alert('Please enter a valid Gemini API Key from Google AI Studio.');
+    return;
+  }
+
+  try {
+    const response = await fetch('/api/security/set-key', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ api_key: apiKey })
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.detail || 'Could not connect API key');
+    }
+
+    const data = await response.json();
+    closeGeminiKeyModal();
+    input.value = '';
+    checkGeminiKeyStatus();
+    loadSecurityAudit();
+
+    showToast('✨ Gemini 2.5 Flash API Connected! All conversations are now live.');
+  } catch (err) {
+    alert(`Error connecting Gemini API: ${err.message}`);
+  }
+}
 
 // =============================================================================
 // FIREBASE AUTHENTICATION & CLIENT INTEGRATION

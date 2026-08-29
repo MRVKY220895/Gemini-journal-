@@ -84,6 +84,14 @@ class SecretManager:
         """Retrieve Gemini API Key securely."""
         return self.get_secret("gemini-api-key") or self.get_secret("GEMINI_API_KEY")
 
+    def set_gemini_api_key(self, api_key: str):
+        """Sets or updates the in-memory Gemini API key at runtime."""
+        clean_key = api_key.strip()
+        self._cached_secrets["gemini-api-key"] = clean_key
+        self._cached_secrets["GEMINI_API_KEY"] = clean_key
+        os.environ["GEMINI_API_KEY"] = clean_key
+        logger.info(f"Gemini API Key updated at runtime: {self.mask_secret(clean_key)}")
+
     def get_firebase_credentials(self) -> Optional[str]:
         """Retrieve Firebase Service Account JSON / Path securely."""
         return (
