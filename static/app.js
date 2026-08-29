@@ -2327,7 +2327,244 @@ function testPushNotification() {
         });
       }
     });
+// =============================================================================
+// RICH MEDIA ATTACHMENTS STATE (P1)
+// =============================================================================
+let attachedPhotoBase64 = null;
+let attachedSketchBase64 = null;
+let attachedFileName = null;
+
+function previewJournalPhoto(input) {
+  const file = input.files?.[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    attachedPhotoBase64 = e.target.result;
+    const box = document.getElementById('journal-photo-preview-box');
+    const img = document.getElementById('journal-photo-preview-img');
+    if (box && img) {
+      img.src = attachedPhotoBase64;
+      box.classList.remove('hidden');
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeAttachedPhoto() {
+  attachedPhotoBase64 = null;
+  const box = document.getElementById('journal-photo-preview-box');
+  const input = document.getElementById('journal-photo-input');
+  if (box) box.classList.add('hidden');
+  if (input) input.value = '';
+}
+
+function handleJournalFileAttach(input) {
+  const file = input.files?.[0];
+  if (!file) return;
+  attachedFileName = file.name;
+  const box = document.getElementById('journal-file-preview-box');
+  const nameEl = document.getElementById('journal-file-preview-name');
+  if (box && nameEl) {
+    nameEl.textContent = `📎 ${file.name} (${Math.round(file.size / 1024)} KB)`;
+    box.classList.remove('hidden');
   }
+}
+
+function removeAttachedFile() {
+  attachedFileName = null;
+  const box = document.getElementById('journal-file-preview-box');
+  const input = document.getElementById('journal-file-input');
+  if (box) box.classList.add('hidden');
+  if (input) input.value = '';
+}
+
+// =============================================================================
+// CANVAS SKETCH & DOODLE PAD (RICH JOURNALING P1)
+// =============================================================================
+let sketchCanvas, sketchCtx;
+let isDrawing = false;
+let sketchColor = '#38bdf8';
+let sketchLineWidth = 3;
+
+function initSketchCanvas() {
+  sketchCanvas = document.getElementById('sketch-canvas');
+  if (!sketchCanvas) return;
+  sketchCtx = sketchCanvas.getContext('2d');
+  sketchCtx.lineCap = 'round';
+  sketchCtx.lineJoin = 'round';
+  sketchCtx.strokeStyle = sketchColor;
+  sketchCtx.lineWidth = sketchLineWidth;
+
+  sketchCanvas.addEventListener('mousedown', startDrawing);
+  sketchCanvas.addEventListener('mousemove', draw);
+  sketchCanvas.addEventListener('mouseup', stopDrawing);
+  sketchCanvas.addEventListener('mouseleave', stopDrawing);
+
+  sketchCanvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const rect = sketchCanvas.getBoundingClientRect();
+    const mouseEvent = new MouseEvent('mousedown', {
+      clientX: touch.clientX,
+      clientY: touch.clientY
+    });
+    sketchCanvas.dispatchEvent(mouseEvent);
+  });
+  sketchCanvas.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const mouseEvent = new MouseEvent('mousemove', {
+      clientX: touch.clientX,
+      clientY: touch.clientY
+    });
+    sketchCanvas.dispatchEvent(mouseEvent);
+  });
+  sketchCanvas.addEventListener('touchend', () => {
+    const mouseEvent = new MouseEvent('mouseup', {});
+    sketchCanvas.dispatchEvent(mouseEvent);
+  });
+}
+
+function startDrawing(e) {
+  isDrawing = true;
+  sketchCtx.beginPath();
+  const rect = sketchCanvas.getBoundingClientRect();
+  const x = (e.clientX - rect.left) * (sketchCanvas.width / rect.width);
+  const y = (e.clientY - rect.top) * (sketchCanvas.height / rect.height);
+  sketchCtx.moveTo(x, y);
+}
+
+function draw(e) {
+  if (!isDrawing) return;
+  const rect = sketchCanvas.getBoundingClientRect();
+  const x = (e.clientX - rect.left) * (sketchCanvas.width / rect.width);
+  const y = (e.clientY - rect.top) * (sketchCanvas.height / rect.height);
+  sketchCtx.lineTo(x, y);
+  sketchCtx.stroke();
+}
+
+function stopDrawing() {
+  if (!isDrawing) return;
+  isDrawing = false;
+  sketchCtx.closePath();
+}
+
+function setSketchColor(color) {
+  sketchColor = color;
+  if (sketchCtx) sketchCtx.strokeStyle = color;
+}
+
+function clearSketchCanvas() {
+  if (sketchCtx && sketchCanvas) {
+    sketchCtx.clearRect(0, 0, sketchCanvas.width, sketchCanvas.height);
+  }
+}
+
+function openSketchModal() {
+  const modal = document.getElementById('sketch-modal');
+  if (modal) modal.classList.remove('hidden');
+  if (!sketchCanvas) initSketchCanvas();
+}
+
+function closeSketchModal() {
+  const modal = document.getElementById('sketch-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function saveSketchToMoment() {
+  if (sketchCanvas) {
+    attachedSketchBase64 = sketchCanvas.toDataURL('image/png');
+    const box = document.getElementById('journal-sketch-preview-box');
+    const img = document.getElementById('journal-sketch-preview-img');
+    if (box && img) {
+      img.src = attachedSketchBase64;
+      box.classList.remove('hidden');
+    }
+  }
+  closeSketchModal();
+  showToast('🎨 Sketch doodle attached to moment!');
+}
+
+function removeAttachedSketch() {
+  attachedSketchBase64 = null;
+  const box = document.getElementById('journal-sketch-preview-box');
+  if (box) box.classList.add('hidden');
+}
+
+// =============================================================================
+// LONGITUDINAL MEMORY LANE & REFLECTION LOOPS
+// =============================================================================
+
+function dismissMemoryLaneCard() {
+  const card = document.getElementById('memory-lane-loop-card');
+  if (card) card.classList.add('hidden');
+  showToast('Memory Lane dismissed for today.');
+}
+
+function openMemoryReaderModal() {
+  const modal = document.getElementById('memory-reader-modal');
+  if (modal) modal.classList.remove('hidden');
+}
+
+function closeMemoryReaderModal() {
+  const modal = document.getElementById('memory-reader-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function compareMemoryWithToday() {
+  const modal = document.getElementById('memory-compare-modal');
+  if (modal) modal.classList.remove('hidden');
+}
+
+function closeMemoryCompareModal() {
+  const modal = document.getElementById('memory-compare-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function openJourneyEvolutionModal() {
+  const modal = document.getElementById('journey-evolution-modal');
+  if (modal) modal.classList.remove('hidden');
+}
+
+function closeJourneyEvolutionModal() {
+  const modal = document.getElementById('journey-evolution-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function askWhatChangedAI() {
+  switchTab('studio');
+  selectPersona('cbt_reflector');
+  const prompt = "Compare my mindset from 30 days ago (where I wrote 'I'm afraid I'll regret staying if I don't speak up during sprint planning') with my current execution velocity. Analyze my psychological growth, decisions resolved, and resilience gains.";
+  const input = document.getElementById('chat-input');
+  if (input) {
+    input.value = prompt;
+    input.focus();
+  }
+  showToast('✨ Longitudinal AI Growth prompt loaded into Studio.');
+}
+
+function jumpToYesterday() {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yStr = yesterday.toISOString().split('T')[0];
+  const picker = document.getElementById('chrono-date-picker');
+  if (picker) {
+    picker.value = yStr;
+    onDiaryDatePickerChange(yStr);
+  }
+}
+
+function filterDiaryTimeline(query) {
+  const q = (query || '').toLowerCase().trim();
+  const blocks = document.querySelectorAll('.chrono-block-card');
+  blocks.forEach(b => {
+    const text = b.textContent.toLowerCase();
+    if (!q || text.includes(q)) {
+      b.style.display = '';
+    } else {
+      b.style.display = 'none';
+    }
+  });
 }
 
 async function submitNewJournal(event) {
@@ -2341,6 +2578,7 @@ async function submitNewJournal(event) {
   const isEncrypted = document.getElementById('journal-encrypt-checkbox').checked;
   const locChecked = document.getElementById('journal-location-check').checked;
   const locationStr = locChecked ? '📍 Connaught Place, New Delhi' : 'Private Location';
+  const linkUrl = document.getElementById('journal-link-input')?.value.trim();
 
   // If photo attached, save to memory photos
   if (attachedPhotoBase64) {
@@ -2355,13 +2593,18 @@ async function submitNewJournal(event) {
     });
   }
 
+  let finalContent = `${content}\n\n📍 ${locationStr} • Energy: ${energy}/10 • Track: ${track}`;
+  if (linkUrl) finalContent += `\n🔗 Reference: ${linkUrl}`;
+  if (attachedFileName) finalContent += `\n📎 Attachment: ${attachedFileName}`;
+  if (attachedSketchBase64) finalContent += `\n🎨 Includes Canvas Sketch`;
+
   try {
     const response = await fetch('/api/journals', {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify({
         title: `[${hour}] ${title}`,
-        content: `${content}\n\n📍 ${locationStr} • Energy: ${energy}/10 • Track: ${track}`,
+        content: finalContent,
         persona: state.currentPersona,
         mood: currentSelectedMood.name,
         tags: [track, currentSelectedMood.name, hour],
@@ -2374,12 +2617,16 @@ async function submitNewJournal(event) {
     closeNewJournalModal();
     document.getElementById('journal-title-input').value = '';
     document.getElementById('journal-content-input').value = '';
+    removeAttachedPhoto();
+    removeAttachedSketch();
+    removeAttachedFile();
+    if (document.getElementById('journal-link-input')) document.getElementById('journal-link-input').value = '';
     
     // Refresh all views
     loadJournals();
     renderChronoTimeline();
     renderMemoryPhotos();
-    showToast(`Chronicle moment for ${hour} saved strictly to your isolated vault.`);
+    showToast(`Chronicle moment for ${hour} saved with rich media attachments!`);
   } catch (error) {
     alert(`Error: ${error.message}`);
   }

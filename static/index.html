@@ -465,13 +465,117 @@
           </div>
         </div>
         
-        <!-- Unified Master Command Ribbon -->
+        <!-- LONGITUDINAL MEMORY LANE & REFLECTION LOOP (THE KILLER FEATURE) -->
+        <div id="memory-lane-loop-card" class="p-4 rounded-2xl bg-gradient-to-r from-purple-950/40 via-black/40 to-indigo-950/40 border border-purple-500/30 shadow-md flex flex-col gap-3">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-2.5">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded-xl bg-purple-500/20 text-purple-300 flex items-center justify-center">
+                <i data-lucide="history" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <span class="text-[10px] text-purple-300 font-mono font-bold uppercase tracking-wider block">Longitudinal Reflection Loop • 30 Days Ago</span>
+                <h4 class="text-xs sm:text-sm font-bold text-white">Revisit Past Thoughts & Measure Growth</h4>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="openJourneyEvolutionModal()" class="text-xs text-cyan-300 hover:text-cyan-200 bg-cyan-950/50 border border-cyan-500/30 px-2.5 py-1 rounded-full flex items-center gap-1 font-semibold">
+                <i data-lucide="sparkles" class="w-3 h-3 text-cyan-400"></i>
+                <span>Day 1 → Now Journey</span>
+              </button>
+              <button onclick="dismissMemoryLaneCard()" class="text-slate-400 hover:text-white p-1" title="Dismiss for today">
+                <i data-lucide="x" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="p-3 rounded-xl bg-black/40 border border-purple-500/20">
+            <div class="flex items-center gap-2 mb-1.5">
+              <span class="text-xs text-amber-300 font-mono">📅 July 30, 2026 (30 Days Ago)</span>
+              <span class="text-[10px] px-2 py-0.2 rounded-full bg-rose-950/60 text-rose-300 border border-rose-500/30 font-medium">Overwhelmed & Hesitant</span>
+            </div>
+            <p class="text-xs text-slate-200 italic leading-relaxed">
+              "I'm not sure whether I should change directions or stay. I'm afraid I'll regret staying if I don't speak up during sprint planning..."
+            </p>
+          </div>
+
+          <div class="flex items-center gap-2 flex-wrap pt-1">
+            <button onclick="openMemoryReaderModal()" class="btn-secondary !py-1.5 !px-3 text-xs flex items-center gap-1.5">
+              <i data-lucide="book-open" class="w-3.5 h-3.5 text-purple-400"></i>
+              <span>Re-Read Entry</span>
+            </button>
+            <button onclick="compareMemoryWithToday()" class="btn-secondary !py-1.5 !px-3 text-xs flex items-center gap-1.5 text-blue-300 hover:border-blue-400">
+              <i data-lucide="columns" class="w-3.5 h-3.5 text-blue-400"></i>
+              <span>Compare with Today</span>
+            </button>
+            <button onclick="askWhatChangedAI()" class="btn-island !py-1.5 !px-3 text-xs flex items-center gap-1.5">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5 text-white"></i>
+              <span>What Changed? (AI Reflection)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- GENTLE SELF-AWARENESS JOURNAL RHYTHM CARD (NON-GAMIFIED) -->
+        <div class="p-4 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 shadow-sm flex flex-col gap-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded-xl bg-emerald-500/20 text-emerald-500 flex items-center justify-center">
+                <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h4 class="text-xs font-bold text-slate-900 dark:text-white">Your Journal Rhythm & Themes</h4>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400">Mindful self-awareness without productivity pressure</p>
+              </div>
+            </div>
+            <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-500/30">
+              18 Entries This Month
+            </span>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5">
+              <div class="text-base font-bold text-slate-900 dark:text-white font-mono">127</div>
+              <div class="text-[10px] text-slate-500 uppercase font-mono">Total Entries</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5">
+              <div class="text-base font-bold text-slate-900 dark:text-white font-mono">83</div>
+              <div class="text-[10px] text-slate-500 uppercase font-mono">Writing Days</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5">
+              <div class="text-base font-bold text-emerald-600 dark:text-emerald-400 font-mono">68%</div>
+              <div class="text-[10px] text-slate-500 uppercase font-mono">Clarity Index</div>
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-slate-100 dark:border-white/5">
+            <div class="text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-2">Most Explored Life Themes:</div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <div class="p-2 rounded-lg bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/5 flex items-center justify-between text-xs">
+                <span>💼 Career</span>
+                <span class="font-mono text-slate-500 font-bold">32</span>
+              </div>
+              <div class="p-2 rounded-lg bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/5 flex items-center justify-between text-xs">
+                <span>📚 Learning</span>
+                <span class="font-mono text-slate-500 font-bold">21</span>
+              </div>
+              <div class="p-2 rounded-lg bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/5 flex items-center justify-between text-xs">
+                <span>🧘 Mindful</span>
+                <span class="font-mono text-slate-500 font-bold">18</span>
+              </div>
+              <div class="p-2 rounded-lg bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/5 flex items-center justify-between text-xs">
+                <span>🏃 Movement</span>
+                <span class="font-mono text-slate-500 font-bold">14</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Unified Master Command Ribbon with Search & Date Quick Jumpers -->
         <div class="double-bezel">
           <div class="double-bezel-inner p-3 sm:p-3.5 flex flex-col gap-2.5">
             <!-- Command Top Bar -->
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-2.5">
               <!-- Left: Date Navigator & Stepper -->
-              <div class="flex items-center gap-1.5">
+              <div class="flex items-center gap-1.5 flex-wrap">
                 <button onclick="stepDiaryDay(-1)" class="w-7 h-7 rounded-lg bg-black/40 hover:bg-white/10 border border-white/10 text-slate-300 flex items-center justify-center transition-colors" title="Previous Day">
                   <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
                 </button>
@@ -479,7 +583,7 @@
                 <div class="flex items-center gap-1.5 bg-black/40 px-2.5 py-1 rounded-lg border border-white/10">
                   <h3 id="diary-current-date-title" class="text-xs font-bold text-white tracking-tight flex items-center gap-1.5 whitespace-nowrap">
                     <i data-lucide="book-marked" class="w-3.5 h-3.5 text-cyan-400"></i>
-                    <span>Today's Chronicle</span>
+                    <span>Chronicle</span>
                   </h3>
                   <input type="date" id="chrono-date-picker" onchange="onDiaryDatePickerChange(this.value)" class="bg-transparent text-cyan-300 text-xs font-mono focus:outline-none cursor-pointer">
                 </div>
@@ -488,35 +592,29 @@
                   <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
                 </button>
 
-                <button onclick="jumpToToday()" class="btn-secondary !py-1 !px-2 text-xs flex items-center gap-1 font-mono" title="Jump to Today">
-                  <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
-                  <span>Today</span>
-                </button>
+                <!-- Quick Date Jumpers -->
+                <div class="flex items-center gap-1">
+                  <button onclick="jumpToToday()" class="btn-secondary !py-1 !px-2 text-xs flex items-center gap-1 font-mono">
+                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+                    <span>Today</span>
+                  </button>
+                  <button onclick="jumpToYesterday()" class="btn-secondary !py-1 !px-2 text-xs font-mono text-slate-400 hover:text-white">
+                    Yesterday
+                  </button>
+                  <button onclick="setDiaryRangeMode('week')" class="btn-secondary !py-1 !px-2 text-xs font-mono text-slate-400 hover:text-white">
+                    This Week
+                  </button>
+                  <button onclick="setDiaryRangeMode('all')" class="btn-secondary !py-1 !px-2 text-xs font-mono text-slate-400 hover:text-white">
+                    This Month
+                  </button>
+                </div>
               </div>
 
-              <!-- Right: View Controls -->
-              <div class="flex items-center gap-1.5 flex-wrap self-end md:self-auto">
-                <!-- Range Switcher -->
-                <div class="flex items-center bg-black/60 p-0.5 rounded-lg border border-white/10 text-xs">
-                  <button onclick="setDiaryRangeMode('single')" id="range-mode-single-btn" class="px-2 py-0.5 rounded-md font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-[11px]">Day</button>
-                  <button onclick="setDiaryRangeMode('week')" id="range-mode-week-btn" class="px-2 py-0.5 rounded-md font-semibold text-slate-400 hover:text-white text-[11px]">7-Day Digest</button>
-                  <button onclick="setDiaryRangeMode('all')" id="range-mode-all-btn" class="px-2 py-0.5 rounded-md font-semibold text-slate-400 hover:text-white text-[11px]">All</button>
-                </div>
-
-                <!-- Media Mode Toggle -->
-                <button onclick="toggleMediaMode()" id="media-mode-toggle-btn" class="btn-secondary !py-1 !px-2 text-xs flex items-center gap-1" title="Toggle Photos/Text Mode">
-                  <i id="media-mode-icon" data-lucide="image" class="w-3.5 h-3.5 text-amber-400"></i>
-                  <span id="media-mode-label" class="hidden sm:inline">Photos</span>
-                </button>
-
-                <!-- Feed / Story Slider Toggle -->
-                <div class="flex items-center bg-black/60 p-0.5 rounded-lg border border-white/10 text-xs">
-                  <button id="view-mode-stream-btn" onclick="setTimelineViewMode('stream')" class="px-2 py-0.5 rounded-md font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 flex items-center gap-1" title="Feed Stream">
-                    <i data-lucide="list" class="w-3 h-3"></i>
-                  </button>
-                  <button id="view-mode-story-btn" onclick="setTimelineViewMode('story')" class="px-2 py-0.5 rounded-md font-semibold text-slate-400 hover:text-white flex items-center gap-1" title="Story Flow Carousel">
-                    <i data-lucide="play-circle" class="w-3 h-3"></i>
-                  </button>
+              <!-- Right: Memory Search Bar -->
+              <div class="flex items-center gap-2 min-w-[220px]">
+                <div class="relative w-full">
+                  <input type="text" id="memory-search-input" oninput="filterDiaryTimeline(this.value)" placeholder="🔍 Search: 'Last Tuesday', 'Career'..." class="w-full bg-black/50 text-slate-200 placeholder-slate-500 text-xs py-1.5 px-3 pl-7 rounded-xl border border-white/10 focus:outline-none focus:border-cyan-500">
+                  <i data-lucide="search" class="w-3 h-3 text-slate-400 absolute left-2.5 top-2.5"></i>
                 </div>
               </div>
             </div>
@@ -1362,34 +1460,90 @@
             <textarea id="journal-content-input" required rows="3" placeholder="What happened in this hour? What thoughts or feelings arose? How did you respond?" class="w-full bg-black/60 text-slate-200 text-xs p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-cyan-500 resize-none font-sans leading-relaxed"></textarea>
           </div>
 
-          <!-- Photo Attachment & Location Stamps -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div class="p-3 rounded-xl bg-slate-900/70 border border-slate-800">
-              <label class="text-slate-300 font-semibold block mb-1">Attach Photo Memory</label>
-              <input type="file" id="journal-photo-input" accept="image/*" class="text-[11px] text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:bg-cyan-600/20 file:text-cyan-300 hover:file:bg-cyan-600/30" onchange="previewJournalPhoto(this)">
-              <div id="journal-photo-preview-box" class="mt-2 hidden">
-                <img id="journal-photo-preview-img" src="" class="w-full h-24 object-cover rounded-lg border border-white/10">
+          <!-- Rich Media Attachments Toolbar: Photo, Audio, Sketch, File, Link, Location -->
+          <div class="p-3.5 rounded-2xl bg-black/40 border border-white/5 space-y-3">
+            <div class="flex items-center justify-between">
+              <label class="text-slate-300 font-semibold flex items-center gap-1.5">
+                <i data-lucide="paperclip" class="w-3.5 h-3.5 text-cyan-400"></i> Rich Media Attachments (P1)
+              </label>
+              <span class="text-[10px] text-slate-500 font-mono">Zero-Knowledge Encrypted</span>
+            </div>
+
+            <!-- 4 Quick Media Action Buttons -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <!-- Action 1: Photo / Screenshot -->
+              <label class="p-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 text-center cursor-pointer transition-colors block">
+                <i data-lucide="image" class="w-4 h-4 text-cyan-400 mx-auto mb-1"></i>
+                <span class="text-[11px] text-slate-200 block font-medium">Add Photo</span>
+                <input type="file" id="journal-photo-input" accept="image/*" class="hidden" onchange="previewJournalPhoto(this)">
+              </label>
+
+              <!-- Action 2: Voice Note -->
+              <button type="button" onclick="toggleVoiceInput('journal-content-input', 'voice-indicator-journal')" class="p-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 text-center transition-colors">
+                <i data-lucide="mic" class="w-4 h-4 text-emerald-400 mx-auto mb-1"></i>
+                <span class="text-[11px] text-slate-200 block font-medium">Voice Note</span>
+              </button>
+
+              <!-- Action 3: Sketch / Canvas Doodle -->
+              <button type="button" onclick="openSketchModal()" class="p-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 text-center transition-colors">
+                <i data-lucide="pen-tool" class="w-4 h-4 text-purple-400 mx-auto mb-1"></i>
+                <span class="text-[11px] text-slate-200 block font-medium">Sketch / Draw</span>
+              </button>
+
+              <!-- Action 4: Attach File -->
+              <label class="p-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 text-center cursor-pointer transition-colors block">
+                <i data-lucide="file-text" class="w-4 h-4 text-amber-400 mx-auto mb-1"></i>
+                <span class="text-[11px] text-slate-200 block font-medium">Attach File</span>
+                <input type="file" id="journal-file-input" class="hidden" onchange="handleJournalFileAttach(this)">
+              </label>
+            </div>
+
+            <!-- Preview Staging Area for Attached Media -->
+            <div id="journal-media-preview-container" class="space-y-2">
+              <div id="journal-photo-preview-box" class="hidden relative">
+                <img id="journal-photo-preview-img" src="" class="w-full h-28 object-cover rounded-xl border border-white/10">
+                <button type="button" onclick="removeAttachedPhoto()" class="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/80 text-white flex items-center justify-center hover:bg-rose-600">
+                  <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+
+              <div id="journal-sketch-preview-box" class="hidden relative">
+                <img id="journal-sketch-preview-img" src="" class="w-full h-28 object-contain bg-slate-900 rounded-xl border border-purple-500/30">
+                <button type="button" onclick="removeAttachedSketch()" class="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/80 text-white flex items-center justify-center hover:bg-rose-600">
+                  <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+
+              <div id="journal-file-preview-box" class="hidden p-2 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between">
+                <span id="journal-file-preview-name" class="text-[11px] text-amber-300 truncate"></span>
+                <button type="button" onclick="removeAttachedFile()" class="text-slate-400 hover:text-rose-400">
+                  <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                </button>
               </div>
             </div>
 
-            <div class="p-3 rounded-xl bg-slate-900/70 border border-slate-800 flex flex-col justify-between">
+            <!-- Web Links & Location Anchor Row -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-white/5">
               <div>
-                <label class="text-slate-300 font-semibold block mb-1">Location Anchor</label>
-                <div class="flex items-center gap-2">
+                <label class="text-slate-300 block mb-1 text-[11px]">🔗 Web Link Reference (Optional)</label>
+                <input type="url" id="journal-link-input" placeholder="https://..." class="w-full bg-slate-900 text-slate-200 text-xs p-2 rounded-xl border border-slate-800 focus:outline-none focus:border-cyan-500 font-mono">
+              </div>
+              <div>
+                <label class="text-slate-300 block mb-1 text-[11px]">📍 Location Stamp</label>
+                <div class="flex items-center gap-2 p-1.5 rounded-xl bg-slate-900 border border-slate-800">
                   <input type="checkbox" id="journal-location-check" checked class="rounded bg-slate-900 border-slate-700 text-cyan-500" onchange="toggleLocationStamp(this)">
-                  <span id="journal-location-text" class="text-[11px] text-slate-300">📍 Connaught Place, New Delhi</span>
+                  <span id="journal-location-text" class="text-[11px] text-slate-300 truncate">📍 Connaught Place, New Delhi</span>
                 </div>
               </div>
-              <p class="text-[10px] text-slate-500 mt-1">Approximate location stamped for spatial recall.</p>
             </div>
           </div>
 
           <!-- Encryption & Privacy Options -->
           <div class="flex items-center justify-between pt-1">
             <div class="flex items-center gap-2">
-              <input type="checkbox" id="journal-encrypt-checkbox" class="rounded bg-slate-900 border-slate-700 text-blue-500">
-              <label for="journal-encrypt-checkbox" class="text-[11px] text-slate-400">
-                🔒 Client-Side Zero-Knowledge Vault Encryption
+              <input type="checkbox" id="journal-encrypt-checkbox" checked class="rounded bg-slate-900 border-slate-700 text-blue-500">
+              <label for="journal-encrypt-checkbox" class="text-[11px] text-slate-300 flex items-center gap-1">
+                <i data-lucide="lock" class="w-3 h-3 text-emerald-400"></i> Client-Side AES-256 Vault Encryption
               </label>
             </div>
           </div>
@@ -1486,6 +1640,236 @@
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: SKETCH & CANVAS DOODLE PAD (RICH JOURNALING P1) -->
+  <!-- ===================================================================== -->
+  <div id="sketch-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="double-bezel max-w-lg w-full">
+      <div class="double-bezel-inner p-5 space-y-3">
+        <div class="flex items-center justify-between border-b border-white/5 pb-2.5">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center">
+              <i data-lucide="pen-tool" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-white">Canvas Sketch & Doodle Pad</h3>
+              <p class="text-[10px] text-slate-400">Draw a diagram, emotion, or visual concept</p>
+            </div>
+          </div>
+          <button onclick="closeSketchModal()" class="text-slate-400 hover:text-white">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <!-- Canvas Drawing Surface -->
+        <div class="rounded-xl overflow-hidden border border-white/10 bg-slate-950 flex items-center justify-center">
+          <canvas id="sketch-canvas" width="460" height="240" class="cursor-crosshair bg-slate-900 w-full h-[240px] touch-none"></canvas>
+        </div>
+
+        <!-- Toolbar: Colors, Pen Width & Clear -->
+        <div class="flex items-center justify-between gap-2 flex-wrap text-xs">
+          <div class="flex items-center gap-1.5" id="sketch-color-palette">
+            <button type="button" onclick="setSketchColor('#38bdf8')" class="w-6 h-6 rounded-full bg-sky-400 ring-2 ring-white/20 hover:scale-110 transition-transform"></button>
+            <button type="button" onclick="setSketchColor('#34d399')" class="w-6 h-6 rounded-full bg-emerald-400 hover:scale-110 transition-transform"></button>
+            <button type="button" onclick="setSketchColor('#fbbf24')" class="w-6 h-6 rounded-full bg-amber-400 hover:scale-110 transition-transform"></button>
+            <button type="button" onclick="setSketchColor('#f43f5e')" class="w-6 h-6 rounded-full bg-rose-500 hover:scale-110 transition-transform"></button>
+            <button type="button" onclick="setSketchColor('#c084fc')" class="w-6 h-6 rounded-full bg-purple-400 hover:scale-110 transition-transform"></button>
+            <button type="button" onclick="setSketchColor('#ffffff')" class="w-6 h-6 rounded-full bg-white hover:scale-110 transition-transform"></button>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="clearSketchCanvas()" class="btn-secondary !py-1 !px-2 text-[11px] text-rose-300 hover:border-rose-400">
+              <i data-lucide="trash-2" class="w-3 h-3"></i> <span>Clear</span>
+            </button>
+            <button type="button" onclick="saveSketchToMoment()" class="btn-island !py-1 !px-3 text-[11px]">
+              <span>Attach to Moment</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: RE-READ PAST MEMORY ENTRY -->
+  <!-- ===================================================================== -->
+  <div id="memory-reader-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="double-bezel max-w-lg w-full">
+      <div class="double-bezel-inner p-6 space-y-4">
+        <div class="flex items-center justify-between border-b border-white/5 pb-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center">
+              <i data-lucide="book-open" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-white">July 30, 2026 • Past Reflection</h3>
+              <p class="text-xs text-slate-400 font-mono">30 Days Ago • 02:30 PM</p>
+            </div>
+          </div>
+          <button onclick="closeMemoryReaderModal()" class="text-slate-400 hover:text-white">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div class="space-y-3 text-xs leading-relaxed text-slate-200">
+          <div class="p-3.5 rounded-xl bg-black/40 border border-purple-500/30">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-bold text-amber-300 text-sm">Facing Architectural Imposter Syndrome</span>
+              <span class="eyebrow-badge !text-rose-300 !bg-rose-950/50">😔 Vulnerable Doubt</span>
+            </div>
+            <p class="text-slate-300 leading-relaxed mb-2">
+              "I'm not sure whether I should change directions or stay. I'm afraid I'll regret staying if I don't speak up during sprint planning. Feeling like everyone else has clarity while I'm navigating fog."
+            </p>
+            <div class="flex items-center gap-2 text-[10px] text-slate-400 pt-2 border-t border-white/5 font-mono">
+              <span>📍 Connaught Place, New Delhi</span>
+              <span>•</span>
+              <span>⚡ Energy: 4/10</span>
+              <span>•</span>
+              <span>🧠 Reframe: Incomplete</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-white/5">
+          <button type="button" onclick="closeMemoryReaderModal()" class="btn-secondary text-xs">Close</button>
+          <button type="button" onclick="closeMemoryReaderModal(); askWhatChangedAI();" class="btn-island text-xs">
+            <span>Analyze What Changed →</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: COMPARE PAST MEMORY WITH TODAY -->
+  <!-- ===================================================================== -->
+  <div id="memory-compare-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="double-bezel max-w-2xl w-full">
+      <div class="double-bezel-inner p-6 space-y-4">
+        <div class="flex items-center justify-between border-b border-white/5 pb-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center">
+              <i data-lucide="columns" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-white">Longitudinal Mindset Comparison</h3>
+              <p class="text-xs text-slate-400">Comparing your mental state across 30 days of journaling</p>
+            </div>
+          </div>
+          <button onclick="closeMemoryCompareModal()" class="text-slate-400 hover:text-white">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+          <!-- Column 1: Then (30 Days Ago) -->
+          <div class="p-3.5 rounded-xl bg-black/40 border border-rose-500/30 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-rose-300 uppercase font-mono text-[10px]">30 Days Ago (July 30)</span>
+              <span class="text-rose-400 font-mono text-[11px]">⚡ Energy: 4/10</span>
+            </div>
+            <h4 class="font-bold text-white text-xs">Navigating Self-Doubt & Hesitation</h4>
+            <p class="text-slate-300 text-[11px] leading-relaxed italic">
+              "Afraid to speak up... wondering if my technical strategy will hold. Catastrophizing potential review pushback."
+            </p>
+            <div class="p-2 rounded-lg bg-rose-950/30 text-[10px] text-rose-300 font-mono">
+              Bias: Catastrophizing & Labeling
+            </div>
+          </div>
+
+          <!-- Column 2: Now (Today) -->
+          <div class="p-3.5 rounded-xl bg-black/40 border border-emerald-500/30 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-emerald-300 uppercase font-mono text-[10px]">Today (August 29)</span>
+              <span class="text-emerald-400 font-mono text-[11px]">⚡ Energy: 8/10</span>
+            </div>
+            <h4 class="font-bold text-white text-xs">Execution Velocity & Grounded Agency</h4>
+            <p class="text-slate-300 text-[11px] leading-relaxed">
+              "Shipped core system architecture and validated test boundaries. Transmuted anxiety into deterministic action."
+            </p>
+            <div class="p-2 rounded-lg bg-emerald-950/30 text-[10px] text-emerald-300 font-mono">
+              Eq: 96% Daily Harmony • Reframed
+            </div>
+          </div>
+        </div>
+
+        <div class="p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/30 text-xs text-slate-300 leading-relaxed">
+          <strong class="text-cyan-300 block mb-0.5">🧠 AI Longitudinal Insight:</strong>
+          In 30 days, your cognitive pattern shifted from avoidance to active problem deconstruction. You resolved 14 recurring cognitive distortions and doubled your action velocity.
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-white/5">
+          <button type="button" onclick="closeMemoryCompareModal()" class="btn-secondary text-xs">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: DAY 1 → TODAY LIFE PARTNER JOURNEY EVOLUTION -->
+  <!-- ===================================================================== -->
+  <div id="journey-evolution-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="double-bezel max-w-xl w-full">
+      <div class="double-bezel-inner p-6 space-y-4">
+        <div class="flex items-center justify-between border-b border-white/5 pb-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center text-white">
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-white">Your Life Partner Growth Journey</h3>
+              <p class="text-xs text-slate-400">Summarizing your psychological evolution from Day 1 to Today</p>
+            </div>
+          </div>
+          <button onclick="closeJourneyEvolutionModal()" class="text-slate-400 hover:text-white">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div class="space-y-3 text-xs leading-relaxed">
+          <!-- 3 Milestone Stats -->
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div class="p-2.5 rounded-xl bg-black/40 border border-white/5">
+              <div class="text-lg font-bold text-white font-mono">127</div>
+              <div class="text-[10px] text-slate-400 font-mono">Life Moments Logged</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-black/40 border border-white/5">
+              <div class="text-lg font-bold text-emerald-400 font-mono">83 Days</div>
+              <div class="text-[10px] text-slate-400 font-mono">Reflective Presence</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-black/40 border border-white/5">
+              <div class="text-lg font-bold text-cyan-400 font-mono">+42%</div>
+              <div class="text-[10px] text-slate-400 font-mono">Clarity Gain</div>
+            </div>
+          </div>
+
+          <!-- Evolutionary Narrative -->
+          <div class="p-4 rounded-xl bg-cyan-950/20 border border-cyan-500/20 text-slate-200 space-y-2">
+            <h4 class="font-bold text-cyan-300 text-xs flex items-center gap-1.5">
+              <i data-lucide="compass" class="w-3.5 h-3.5"></i> Longitudinal Transformation Summary
+            </h4>
+            <p class="text-[11px] leading-relaxed">
+              When you started on Day 1, your reflections centered on managing acute burnout and navigating career ambiguity. Over 83 writing sessions, you developed structured daily habits (Hydration, 30m Walks, Socratic Reframing), drastically reducing catastrophizing loops.
+            </p>
+            <p class="text-[11px] leading-relaxed text-slate-300">
+              You have transitioned from storing past anxieties to actively using your journal as an intellectual sparring partner and life compass.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-2 border-t border-white/5">
+          <button onclick="toggleVoiceSummary()" class="btn-secondary text-xs flex items-center gap-1.5 text-cyan-400">
+            <i data-lucide="volume-2" class="w-3.5 h-3.5"></i>
+            <span>Listen to Journey</span>
+          </button>
+          <button type="button" onclick="closeJourneyEvolutionModal()" class="btn-island text-xs">
+            <span>Close & Continue</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
