@@ -82,6 +82,19 @@
   <!-- Crisp High-Res SVG Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2306b6d4'><path d='M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z'/></svg>">
   
+  <!-- PWA Metadata -->
+  <link rel="manifest" href="/static/manifest.json">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="apple-touch-icon" href="/static/icon-192.png">
+  
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/static/sw.js');
+      });
+    }
+  </script>
+
   <!-- Custom Styling -->
   <link rel="stylesheet" href="/static/style.css">
 </head>
@@ -92,30 +105,28 @@
   <div class="fixed bottom-12 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse-slow"></div>
 
   <!-- Top Floating Glass Navigation Header -->
-  <header class="floating-nav flex items-center justify-between gap-1 sm:gap-2 mb-2.5 sm:mb-4 px-2.5 sm:px-4 py-2 sm:py-2.5">
-    <!-- Brand / Logo -->
-    <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-      <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-tr from-cyan-400 via-blue-500 to-indigo-600 flex items-center justify-center shadow-md shadow-cyan-500/25 text-white cursor-pointer" onclick="switchTab('studio')">
-        <i data-lucide="sparkles" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
-      </div>
-      <div class="flex items-center gap-1.5 cursor-pointer" onclick="switchTab('studio')">
+  <header class="floating-nav flex items-center justify-between gap-2 mb-2 sm:mb-4 px-3 sm:px-4 py-2 sm:py-2.5 md:relative fixed top-0 left-0 right-0 w-full md:max-w-6xl md:mx-auto z-50 md:rounded-full md:mt-2 bg-slate-950/90 backdrop-blur-2xl border-b border-white/10 md:border md:border-white/10 shadow-lg pt-[max(0.6rem,env(safe-area-inset-top,0.6rem))] md:pt-2.5">
+    <!-- Left Area: Master Menu Button + Brand / Logo -->
+    <div class="flex items-center gap-2 sm:gap-2.5 shrink-0">
+      <!-- Master Hierarchical Menu Button (Far Left Corner) -->
+      <button onclick="openMasterMenuModal()" id="btn-master-menu" class="flex items-center gap-1.5 bg-gradient-to-r from-cyan-950/80 to-blue-950/80 hover:from-cyan-900 hover:to-blue-900 px-2.5 py-1.5 rounded-full border border-cyan-500/40 text-xs font-bold text-cyan-300 hover:text-white transition-all shadow-md shadow-cyan-950/30 active:scale-95 cursor-pointer" title="Open Master Directory & Settings">
+        <i data-lucide="menu" class="w-3.5 h-3.5 text-cyan-400"></i>
+        <span class="text-[11px] sm:text-xs">Menu</span>
+      </button>
+
+      <span class="w-[1px] h-4 bg-white/10 hidden sm:inline-block"></span>
+
+      <!-- Brand / Logo -->
+      <div class="flex items-center gap-1.5 sm:gap-2 cursor-pointer" onclick="switchTab('studio')">
+        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-tr from-cyan-400 via-blue-500 to-indigo-600 flex items-center justify-center shadow-md shadow-cyan-500/25 text-white">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+        </div>
         <span class="text-xs sm:text-sm font-bold tracking-tight text-white whitespace-nowrap">Mind Cave</span>
-        <span class="hidden xl:inline-flex text-[10px] text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2 py-0.5 rounded-full font-mono whitespace-nowrap items-center gap-1.5">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Private Vault
-        </span>
       </div>
     </div>
 
     <!-- Master Navigation Tabs (Desktop / Tablet Bar) -->
-    <nav class="hidden md:flex items-center gap-0.5 sm:gap-1 bg-black/50 p-1 rounded-full border border-white/5 shrink-0">
-      <!-- Master Hierarchical Menu Button -->
-      <button onclick="openMasterMenuModal()" id="btn-master-menu" class="px-2.5 py-1.5 rounded-full text-xs font-semibold text-cyan-300 hover:text-white hover:bg-white/10 flex items-center gap-1.5 transition-colors" title="Open All Sections & Directory">
-        <i data-lucide="menu" class="w-3.5 h-3.5 text-cyan-400"></i>
-        <span>Menu</span>
-      </button>
-
-      <span class="w-[1px] h-3.5 bg-white/10 mx-0.5"></span>
-
+    <nav class="hidden md:flex items-center gap-1 bg-black/50 p-1 rounded-full border border-white/5 shrink-0">
       <button onclick="switchTab('studio')" id="tab-btn-studio" class="tab-btn active flex items-center gap-1.5 whitespace-nowrap">
         <i data-lucide="message-square" class="w-3.5 h-3.5"></i> <span>Studio</span>
       </button>
@@ -123,55 +134,36 @@
         <i data-lucide="book-open" class="w-3.5 h-3.5"></i> <span>Journal</span>
       </button>
       <button onclick="switchTab('analytics')" id="tab-btn-analytics" class="tab-btn flex items-center gap-1.5 whitespace-nowrap">
-        <i data-lucide="brain-circuit" class="w-3.5 h-3.5"></i> <span>MindPulse</span>
+        <i data-lucide="brain-circuit" class="w-3.5 h-3.5"></i> <span>Dashboard</span>
       </button>
       <button onclick="switchTab('security')" id="tab-btn-security" class="tab-btn flex items-center gap-1.5 whitespace-nowrap">
         <i data-lucide="shield" class="w-3.5 h-3.5"></i> <span>Vault</span>
       </button>
     </nav>
 
-    <!-- User Identity & Auth Action -->
-    <div class="flex items-center gap-1 sm:gap-1.5 shrink-0">
-      <!-- Mobile Menu Button (Direct Access to Master Modal on Small Screens) -->
-      <button onclick="openMasterMenuModal()" class="md:hidden flex items-center gap-1 bg-cyan-950/60 hover:bg-cyan-900/80 px-2 py-1 rounded-full border border-cyan-500/40 text-xs text-cyan-300 font-semibold transition-colors" title="Directory Menu">
-        <i data-lucide="menu" class="w-3 h-3 text-cyan-400"></i>
-        <span class="text-[10px] font-bold">Menu</span>
+    <!-- Right Area: Theme Toggle Shortcut + Consolidated User Profile Trigger -->
+    <div class="flex items-center gap-1.5 shrink-0">
+      <!-- 1-Tap Theme Mode Switcher in Global Bar -->
+      <button onclick="toggleTheme()" id="btn-global-theme" class="w-8 h-8 rounded-full bg-slate-900/90 dark:bg-white/5 hover:bg-slate-800 dark:hover:bg-white/10 border border-slate-700/50 dark:border-white/10 flex items-center justify-center text-amber-400 hover:text-amber-300 transition-all cursor-pointer shadow-sm active:scale-95" title="Toggle Light / Dark Mode">
+        <i data-lucide="sun" id="global-theme-icon" class="w-4 h-4 text-amber-400"></i>
       </button>
 
-      <!-- Gemini API Status -->
-      <button onclick="openGeminiKeyModal()" id="gemini-key-pill" class="flex items-center gap-1 bg-emerald-950/30 hover:bg-emerald-900/40 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-full border border-emerald-500/30 text-xs transition-all whitespace-nowrap" title="Gemini Status">
-        <span id="gemini-key-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
-        <span id="gemini-key-label" class="font-mono text-[10px] text-emerald-300 font-medium whitespace-nowrap hidden sm:inline">Gemini 3.5</span>
-      </button>
-
-      <!-- Consolidated User Profile & Auth Trigger -->
-      <button onclick="openAuthModal()" id="user-pill" class="flex items-center gap-1 bg-slate-900/90 hover:bg-slate-800 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-full border border-slate-800 text-xs whitespace-nowrap cursor-pointer transition-colors" title="Account & Profile Settings">
+      <!-- Consolidated User Profile & Settings Trigger -->
+      <button onclick="openAuthModal()" id="user-pill" class="flex items-center gap-1.5 bg-slate-900/90 hover:bg-slate-800 px-2.5 py-1.5 rounded-full border border-slate-800 text-xs whitespace-nowrap cursor-pointer transition-colors shadow-sm" title="Account & Biological Profile Settings">
         <div id="user-avatar-indicator" class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></div>
-        <span id="user-display-name" class="font-medium text-slate-200 truncate max-w-[55px] sm:max-w-[120px] whitespace-nowrap text-[10px] sm:text-xs">Guest</span>
-        <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400 shrink-0 hidden sm:inline"></i>
-      </button>
-      
-      <!-- Notifications Trigger Button -->
-      <button onclick="openNotificationsModal()" id="notifications-btn" class="flex items-center justify-center w-7 h-7 sm:px-2.5 sm:py-1.5 rounded-full text-xs font-semibold border transition-all duration-200 whitespace-nowrap bg-slate-900/90 hover:bg-slate-800 border-slate-800 text-slate-200 shrink-0" title="Reminders & Notifications">
-        <i data-lucide="bell" class="w-3.5 h-3.5 text-amber-400"></i>
-        <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse hidden sm:inline-block"></span>
-      </button>
-
-      <!-- Theme Switcher (Light / Dark) -->
-      <button onclick="toggleTheme()" id="theme-toggle-btn" class="flex items-center justify-center w-7 h-7 sm:px-2.5 sm:py-1.5 rounded-full text-xs font-semibold border transition-all duration-200 whitespace-nowrap theme-toggle-pill shrink-0" title="Toggle Light / Dark Theme">
-        <i id="theme-toggle-icon" data-lucide="sun" class="w-3.5 h-3.5"></i>
-        <span id="theme-toggle-label" class="hidden sm:inline">Light</span>
+        <span id="user-display-name" class="font-medium text-slate-200 truncate max-w-[80px] sm:max-w-[120px] whitespace-nowrap text-xs">Guest</span>
+        <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400 shrink-0"></i>
       </button>
     </div>
   </header>
 
   <!-- Main Content Container -->
-  <main class="studio-container flex-1 flex flex-col">
+  <main class="studio-container flex-1 flex flex-col max-w-6xl mx-auto w-full">
 
     <!-- ===================================================================== -->
     <!-- TAB 1: STUDIO (MULTI-TURN AI INTERACTION & JOURNALING) -->
     <!-- ===================================================================== -->
-    <section id="view-studio" class="flex-1 flex flex-col justify-between w-full min-h-[calc(100vh-120px)] relative">
+    <section id="view-studio" class="flex-1 flex flex-col justify-between w-full relative pb-16 md:pb-4">
       
       <!-- Streamlined Studio Top Control Ribbon -->
       <div class="studio-top-ribbon flex flex-col sm:flex-row items-center justify-between gap-2.5 pb-2.5 border-b border-white/5 shrink-0">
@@ -264,16 +256,32 @@
               onkeydown="handleTextareaKeydown(event)"
             ></textarea>
 
-            <div class="flex items-center justify-between pt-1 border-t border-white/5">
-              <div class="flex items-center gap-2 text-[11px] text-slate-500">
-                <span class="flex items-center gap-1 text-slate-400 font-mono">
-                  <i data-lucide="lock" class="w-3 h-3 text-emerald-400"></i> Zero-Knowledge Vault
-                </span>
-                <span id="voice-indicator-studio" class="hidden items-center gap-1 text-cyan-400 font-mono animate-pulse">
+            <div class="flex items-center justify-between pt-1.5 border-t border-white/5 flex-wrap gap-2">
+              <!-- Left: Antigravity-Style Model & Vault Selectors -->
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <!-- Gemini Model Selector Pill (Interactive like Antigravity / AI Studio) -->
+                <button type="button" onclick="openGeminiKeyModal()" id="composer-model-pill" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900/90 hover:bg-slate-800 border border-cyan-500/30 hover:border-cyan-400/60 text-[11px] font-mono text-cyan-300 transition-all cursor-pointer shadow-sm group" title="Google Gemini 3.5 Flash Active (Click to inspect model & API key settings)">
+                  <span id="gemini-key-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+                  <span class="font-bold text-slate-200 group-hover:text-white flex items-center gap-1">
+                    <i data-lucide="sparkles" class="w-3 h-3 text-cyan-400"></i>
+                    <span id="gemini-key-label">Gemini 3.5 Flash</span>
+                  </span>
+                  <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400 group-hover:text-cyan-300"></i>
+                </button>
+
+                <!-- Private Vault Security Badge (Interactive) -->
+                <button type="button" onclick="switchTab('security')" class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-950/40 hover:bg-emerald-900/50 border border-emerald-500/30 hover:border-emerald-400/60 text-[11px] font-mono text-emerald-300 transition-all cursor-pointer shadow-sm group" title="Zero-Knowledge AES-256 Client Encryption & Strict Firestore UID Boundary Active. Click to view Vault.">
+                  <i data-lucide="shield-check" class="w-3 h-3 text-emerald-400"></i>
+                  <span class="font-medium text-emerald-300 group-hover:text-emerald-200">Private Vault</span>
+                </button>
+
+                <!-- Listening Audio Feedback Indicator -->
+                <span id="voice-indicator-studio" class="hidden items-center gap-1 text-cyan-400 font-mono text-[11px] animate-pulse">
                   <span class="w-2 h-2 rounded-full bg-cyan-400"></span> Listening...
                 </span>
               </div>
 
+              <!-- Right: Voice & Submit Controls -->
               <div class="flex items-center gap-1.5">
                 <!-- Voice Input (Speech-to-Text) Button -->
                 <button type="button" onclick="toggleVoiceInput('chat-input', 'voice-indicator-studio')" id="btn-voice-chat-input" class="w-8 h-8 rounded-full bg-white/5 hover:bg-cyan-500/20 text-slate-400 hover:text-cyan-300 border border-white/10 flex items-center justify-center transition-all" title="Add via Voice (Speech-to-Text)">
@@ -296,13 +304,13 @@
     <section id="view-journals" class="hidden flex-1 flex flex-col gap-3">
 
       <!-- ─── Master Journal Page Header & Actions ─── -->
-      <div class="journal-page-header flex flex-row items-center justify-between gap-2 mb-1">
+      <div class="journal-page-header flex flex-row flex-wrap items-center justify-between gap-2 mb-1">
         <div class="journal-header-title min-w-0">
           <span class="eyebrow-badge !text-[9px] !py-0.5 !px-2">Life Intelligence System</span>
           <h2 class="text-base sm:text-lg font-bold tracking-tight mt-0.5 truncate" style="color: var(--text-primary)">Mind Cave Journal</h2>
         </div>
 
-        <div class="journal-header-actions flex items-center gap-1 sm:gap-2 shrink-0">
+        <div class="journal-header-actions flex flex-wrap items-center justify-end gap-1 sm:gap-2 shrink-0">
           <!-- Aesthetic Scrapbook Social Card Exporter -->
           <button onclick="openScrapbookModal()" class="btn-secondary text-xs !py-1 sm:!py-1.5 !px-2 sm:!px-2.5 flex items-center gap-1 hover:border-pink-400 text-pink-400" title="Export Aesthetic Social Journal / Scrapbook Page">
             <i data-lucide="palette" class="w-3.5 h-3.5 text-pink-400"></i>
@@ -322,7 +330,7 @@
           </button>
           
           <button onclick="openNewJournalModal()" class="btn-island !py-1 sm:!py-1.5 !px-2.5 sm:!px-3 text-xs font-semibold" title="Record New Journal Moment">
-            <span>Moment</span>
+            <span class="hidden sm:inline">Moment</span>
             <div class="btn-island-icon !w-4 !h-4">
               <i data-lucide="plus" class="w-3 h-3 text-white"></i>
             </div>
@@ -331,293 +339,306 @@
       </div>
 
       <!-- ─── Master 5-Page Journal Sub-Navigation Architecture ─── -->
-      <div id="journal-tracks-nav" class="journal-track-nav overflow-x-auto no-scrollbar flex-nowrap py-1 gap-1.5 -mx-1 px-1">
-        <button onclick="switchJournalTrack('chrono')" id="track-btn-chrono" class="track-tab-btn active-chrono shrink-0 !text-xs !py-1.5 !px-3">
+      <div id="journal-tracks-nav" class="journal-track-nav flex overflow-x-auto no-scrollbar flex-nowrap py-1 gap-1.5 w-full px-2 pr-6">
+        <button onclick="switchJournalTrack('chrono')" id="track-btn-chrono" class="track-tab-btn active-chrono shrink-0 !text-[11px] sm:!text-xs !py-1 sm:!py-1.5 !px-2.5 sm:!px-3">
           <i data-lucide="calendar" class="w-3.5 h-3.5"></i><span>Living Timeline</span>
         </button>
-        <button onclick="switchJournalTrack('harmony')" id="track-btn-harmony" class="track-tab-btn shrink-0 !text-xs !py-1.5 !px-3">
+        <button onclick="switchJournalTrack('harmony')" id="track-btn-harmony" class="track-tab-btn shrink-0 !text-[11px] sm:!text-xs !py-1 sm:!py-1.5 !px-2.5 sm:!px-3">
           <i data-lucide="sparkles" class="w-3.5 h-3.5 text-emerald-500"></i><span>Daily Harmony</span>
         </button>
-        <button onclick="switchJournalTrack('memory_lane')" id="track-btn-memory_lane" class="track-tab-btn shrink-0 !text-xs !py-1.5 !px-3">
+        <button onclick="switchJournalTrack('memory_lane')" id="track-btn-memory_lane" class="track-tab-btn shrink-0 !text-[11px] sm:!text-xs !py-1 sm:!py-1.5 !px-2.5 sm:!px-3">
           <i data-lucide="history" class="w-3.5 h-3.5 text-amber-500"></i><span>Memory Lane</span>
         </button>
-        <button onclick="switchJournalTrack('memory')" id="track-btn-memory" class="track-tab-btn shrink-0 !text-xs !py-1.5 !px-3">
+        <button onclick="switchJournalTrack('memory')" id="track-btn-memory" class="track-tab-btn shrink-0 !text-[11px] sm:!text-xs !py-1 sm:!py-1.5 !px-2.5 sm:!px-3">
           <i data-lucide="image" class="w-3.5 h-3.5 text-purple-500"></i><span>Photo Stream</span>
         </button>
-        <button onclick="switchJournalTrack('sanctuary')" id="track-btn-sanctuary" class="track-tab-btn shrink-0 !text-xs !py-1.5 !px-3">
+        <button onclick="switchJournalTrack('sanctuary')" id="track-btn-sanctuary" class="track-tab-btn shrink-0 !text-[11px] sm:!text-xs !py-1 sm:!py-1.5 !px-2.5 sm:!px-3">
           <i data-lucide="heart-pulse" class="w-3.5 h-3.5 text-indigo-500"></i><span>Bio Sanctuary</span>
         </button>
       </div>
 
       <!-- =================================================================== -->
-      <!-- PAGE 1: TIMELINE & CHRONICLE STREAM -->
+      <!-- PAGE 1: TIMELINE & CHRONICLE STREAM (DYNAMIC MOBILE & WEB LAYOUT) -->
       <!-- =================================================================== -->
-      <div id="journal-track-chrono" class="space-y-3">
+      <div id="journal-track-chrono" class="grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-4 items-start">
         
-        <!-- DYNAMIC FOCUS & HABITS HUB: COLLAPSIBLE 2-TILE DECK -->
-        <div class="today-goal-card p-3 sm:p-4 rounded-2xl bg-white dark:bg-slate-900/90 border border-amber-500/30 dark:border-amber-500/25 shadow-md flex flex-col gap-3" id="today-focus-habits-hub">
-          <!-- Hub Master Header Bar -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-100 dark:border-white/5">
-            <div class="flex items-center gap-2 min-w-0">
-              <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-amber-500/20 text-amber-500 dark:text-amber-400 flex items-center justify-center font-bold shrink-0">
-                <i data-lucide="target" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500 dark:text-amber-400"></i>
-              </div>
-              <div class="min-w-0 flex-1">
-                <div class="flex items-center gap-1.5 flex-wrap">
-                  <h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">Focus & Habits Hub</h4>
-                  <span id="goals-completed-badge" class="text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-300 font-mono font-bold flex items-center gap-1">
-                    <i data-lucide="check-circle" class="w-3 h-3 text-emerald-500"></i>
-                    <span>2/3 Done</span>
-                  </span>
-                  <span id="goals-duration-badge" class="text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-500/30 text-amber-700 dark:text-amber-300 font-mono font-bold flex items-center gap-1">
-                    <i data-lucide="clock" class="w-3 h-3 text-amber-500"></i>
-                    <span>3h 15m</span>
-                  </span>
-                  <span id="habit-streak-badge" class="text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-bold border border-amber-200 dark:border-amber-500/30 flex items-center gap-1">
-                    <i data-lucide="flame" class="w-3 h-3 text-amber-500"></i>
-                    <span>12d streak</span>
-                  </span>
+        <!-- MAIN COLUMN (Desktop Left, 7/12 Cols): Chronicle Command Ribbon & Timeline Stream -->
+        <div class="lg:col-span-7 xl:col-span-8 space-y-3 order-2 lg:order-1 min-w-0">
+          <!-- Unified Master Command Ribbon with Search & Date Quick Jumpers -->
+          <div class="double-bezel">
+            <div class="double-bezel-inner p-2.5 sm:p-3.5 flex flex-col gap-2.5">
+              <!-- Command Top Bar -->
+              <div class="flex flex-col gap-2.5">
+                <!-- Row 1: Date Navigator & Search -->
+                <div class="flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
+                  <div class="flex items-center gap-1.5 shrink-0">
+                    <button onclick="stepDiaryDay(-1)" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-black/40 hover:bg-slate-200 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-colors shrink-0" title="Previous Day">
+                      <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+                    </button>
+                    
+                    <div class="flex items-center justify-center gap-1 bg-slate-100 dark:bg-black/40 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-white/10 shadow-sm">
+                      <h3 id="diary-current-date-title" class="hidden sm:flex text-[10px] sm:text-xs font-bold text-slate-800 dark:text-white tracking-tight items-center gap-1 whitespace-nowrap">
+                        <i data-lucide="book-marked" class="w-3 h-3 text-cyan-600 dark:text-cyan-400"></i>
+                      </h3>
+                      <input type="date" id="chrono-date-picker" onchange="onDiaryDatePickerChange(this.value)" class="bg-transparent text-slate-800 dark:text-cyan-300 text-xs font-bold font-mono focus:outline-none cursor-pointer p-0 m-0 border-0 h-5">
+                    </div>
+
+                    <button onclick="stepDiaryDay(1)" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-black/40 hover:bg-slate-200 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-colors shrink-0" title="Next Day">
+                      <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                    </button>
+                  </div>
+
+                  <div class="relative flex-1 min-w-[120px] max-w-full sm:max-w-[220px]">
+                    <input type="text" id="memory-search-input" oninput="filterDiaryTimeline(this.value)" placeholder="Search moments..." class="w-full bg-slate-100 dark:bg-black/50 text-slate-900 dark:text-slate-200 placeholder-slate-500 text-xs py-1.5 px-3 pl-7 rounded-lg border border-slate-200 dark:border-white/10 focus:outline-none focus:border-cyan-500">
+                    <i data-lucide="search" class="w-3 h-3 text-slate-400 absolute left-2.5 top-2"></i>
+                  </div>
+                </div>
+
+                <!-- Row 2: Scrollable Quick Actions (Jumpers + Media Toggles with safe right padding) -->
+                <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar flex-nowrap pb-1 pr-6 w-full">
+                  <button onclick="jumpToToday()" class="btn-secondary !py-1 !px-2 text-[10px] flex items-center gap-1 font-mono shrink-0">
+                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-500 dark:bg-cyan-400 animate-ping"></span>
+                    <span>Today</span>
+                  </button>
+                  <button onclick="jumpToYesterday()" class="btn-secondary !py-1 !px-2 text-[10px] font-mono text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white shrink-0">
+                    Yesterday
+                  </button>
+                  <button onclick="setDiaryRangeMode('week')" class="btn-secondary !py-1 !px-2 text-[10px] font-mono text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white shrink-0">
+                    Week
+                  </button>
+                  <button onclick="setDiaryRangeMode('all')" class="btn-secondary !py-1 !px-2 text-[10px] font-mono text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white shrink-0">
+                    Month
+                  </button>
+                  
+                  <div class="w-px h-3.5 bg-slate-200 dark:bg-white/10 mx-0.5 shrink-0"></div>
+
+                  <button type="button" id="media-mode-toggle-btn" onclick="toggleMediaMode()" class="btn-secondary !py-1 !px-2 text-[10px] flex items-center gap-1.5 shrink-0 bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 hover:border-amber-500/40 text-slate-700 dark:text-slate-300 transition-colors">
+                    <i data-lucide="image" id="media-mode-icon" class="w-3 h-3 text-amber-500 dark:text-amber-400"></i>
+                    <span id="media-mode-label" class="font-semibold">Photos</span>
+                  </button>
+                  <button type="button" onclick="triggerQuickPhotoMoment()" class="btn-secondary !py-1 !px-2 text-[10px] flex items-center gap-1 shrink-0 bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/30 text-purple-700 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-500/20 transition-colors">
+                    <i data-lucide="camera" class="w-3 h-3 text-purple-600 dark:text-purple-400"></i>
+                    <span class="font-semibold">+ Photo</span>
+                  </button>
                 </div>
               </div>
-            </div>
 
-            <!-- Action Buttons & Collapse Controls -->
-            <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-auto">
-              <button type="button" onclick="openNewGoalModal()" class="btn-secondary !py-1 !px-2 text-[11px] flex items-center gap-1 text-amber-600 dark:text-amber-300 hover:border-amber-400 font-semibold" title="Add New Achievable Goal">
-                <i data-lucide="plus" class="w-3 h-3 text-amber-500"></i> <span>Goal</span>
-              </button>
-              <button type="button" onclick="openNewHabitModal()" class="btn-secondary !py-1 !px-2 text-[11px] flex items-center gap-1 text-cyan-600 dark:text-cyan-300 hover:border-cyan-400 font-semibold" title="Add New Habit">
-                <i data-lucide="plus" class="w-3 h-3 text-cyan-400"></i> <span>Habit</span>
-              </button>
-              <button type="button" onclick="openGoalsHabitsModal()" class="w-7 h-7 rounded-lg bg-gradient-to-r from-amber-500/20 to-cyan-500/20 hover:from-amber-500/30 hover:to-cyan-500/30 text-amber-600 dark:text-amber-300 border border-amber-500/30 flex items-center justify-center transition-all shadow-sm" title="Expand Focus Deck Modal">
-                <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
-              </button>
-              <button type="button" id="toggle-goals-tiles-btn" onclick="toggleGoalsTilesCollapse()" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-colors" title="Collapse / Expand Deck">
-                <i data-lucide="chevron-up" id="goals-tiles-chevron" class="w-4 h-4 transition-transform duration-300"></i>
-              </button>
+              <!-- 7-Day Weekly Ribbon -->
+              <div class="diary-week-ribbon pt-1 border-t border-white/5" id="diary-week-ribbon-container">
+                <!-- Dynamically populated via JS -->
+              </div>
             </div>
           </div>
 
-          <!-- 2 Side-by-Side Tiles (Collapsible) -->
-          <div id="goals-habits-deck-body" class="grid grid-cols-1 lg:grid-cols-12 gap-3 transition-all duration-300">
-            
-            <!-- Today's Achievable Goals (Left Column, 7 Cols) -->
-            <div class="lg:col-span-7 flex flex-col justify-between p-3 rounded-2xl bg-slate-50/80 dark:bg-black/30 border border-slate-200/80 dark:border-white/5 space-y-3">
-              <div class="space-y-2.5">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-                    <h5 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider font-mono">Today's Achievable Goals</h5>
-                  </div>
-                  <button type="button" onclick="openScrapbookModal()" class="text-[11px] text-pink-600 dark:text-pink-400 hover:underline flex items-center gap-1 font-semibold">
-                    <i data-lucide="share-2" class="w-3 h-3"></i> <span>Share</span>
-                  </button>
-                </div>
+          <!-- VIEW MODE 1: Vertical Timeline Stream (REFLECTIONS + TASKS + GCAL + PHOTOS INLINE) -->
+          <div class="timeline-container" id="chrono-timeline-list">
+            <div class="timeline-spine"></div>
+            <!-- Only actual logged entries & tasks rendered via JS -->
+          </div>
 
-                <!-- Bulleted Goals List -->
-                <div id="today-goals-list" class="space-y-2">
-                  <!-- Rendered dynamically -->
+          <!-- VIEW MODE 2: Story Flow Carousel (SWIPE & DRAG REVISIT) -->
+          <div id="chrono-story-view" class="hidden space-y-3">
+            <div class="flex items-center justify-between text-xs px-2 text-slate-400">
+              <span class="font-semibold text-slate-300 flex items-center gap-1.5">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-cyan-400"></i>
+                <span>Revisit Moments (Swipe, Drag or use Arrow Keys)</span>
+              </span>
+              <span id="story-progress-indicator" class="font-mono text-cyan-300">Moment 1 of 3</span>
+            </div>
+
+            <div class="story-carousel-container">
+              <div class="story-carousel-viewport" id="story-carousel-viewport">
+                <div class="story-carousel-track" id="story-carousel-track">
+                  <!-- Dynamic Story Slides rendered via JS -->
                 </div>
               </div>
 
-              <!-- Directional Summary Footer -->
-              <div class="p-2.5 rounded-xl bg-white dark:bg-black/40 border border-slate-200/80 dark:border-white/5 space-y-1.5 mt-2" id="goals-summary-footer">
-                <div class="flex items-center justify-between text-[11px] gap-2">
-                  <span class="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1 truncate">
-                    <i data-lucide="pie-chart" class="w-3 h-3 text-cyan-500 shrink-0"></i>
-                    <span class="truncate">Directional Focus Velocity:</span>
-                  </span>
-                  <span class="font-mono text-cyan-600 dark:text-cyan-400 font-bold shrink-0" id="goals-velocity-text">75% Daily Goal Velocity</span>
+              <!-- Floating Controls -->
+              <div class="flex items-center justify-between mt-3 px-2">
+                <button onclick="prevStorySlide()" class="story-nav-btn" title="Previous Moment (←)">
+                  <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                </button>
+                
+                <div id="story-dots-container" class="flex items-center gap-1.5">
+                  <!-- Dots populated via JS -->
                 </div>
-                <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden flex">
-                  <div id="goals-progress-bar" class="h-full bg-gradient-to-r from-amber-500 to-emerald-500 rounded-full transition-all duration-500" style="width: 67%;"></div>
+
+                <button onclick="nextStorySlide()" class="story-nav-btn" title="Next Moment (→)">
+                  <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SIDEBAR COLUMN (Desktop Right, 5/12 Cols): Focus Hub & Life Quests -->
+        <div class="lg:col-span-5 xl:col-span-4 space-y-3 order-1 lg:order-2 min-w-0">
+          <!-- DYNAMIC FOCUS & HABITS HUB -->
+          <div class="today-goal-card p-3 sm:p-4 rounded-2xl bg-white dark:bg-slate-900/90 border border-amber-500/30 dark:border-amber-500/25 shadow-md flex flex-col gap-3" id="today-focus-habits-hub">
+            <!-- Hub Master Header Bar -->
+            <div class="flex items-center justify-between gap-2 pb-2 border-b border-slate-100 dark:border-white/5">
+              <div class="flex items-center gap-2 min-w-0">
+                <div class="w-7 h-7 rounded-xl bg-amber-500/20 text-amber-500 dark:text-amber-400 flex items-center justify-center font-bold shrink-0">
+                  <i data-lucide="target" class="w-3.5 h-3.5 text-amber-500 dark:text-amber-400"></i>
                 </div>
-                <div class="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 pt-0.5 flex-wrap gap-1" id="goals-breakdown-pills"></div>
+                <div class="min-w-0">
+                  <h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">Focus & Habits Hub</h4>
+                </div>
+              </div>
+
+              <!-- Action Buttons & Collapse Controls -->
+              <div class="flex items-center gap-1 shrink-0">
+                <button type="button" onclick="openNewGoalModal()" class="btn-secondary !py-1 !px-2 text-[10px] flex items-center gap-1 text-amber-600 dark:text-amber-300 hover:border-amber-400 font-semibold" title="Add New Achievable Goal">
+                  <i data-lucide="plus" class="w-3 h-3 text-amber-500"></i> <span>Goal</span>
+                </button>
+                <button type="button" onclick="openNewHabitModal()" class="btn-secondary !py-1 !px-2 text-[10px] flex items-center gap-1 text-cyan-600 dark:text-cyan-300 hover:border-cyan-400 font-semibold" title="Add New Habit">
+                  <i data-lucide="plus" class="w-3 h-3 text-cyan-400"></i> <span>Habit</span>
+                </button>
+                <button type="button" onclick="openGoalsHabitsModal()" class="w-7 h-7 rounded-lg bg-gradient-to-r from-amber-500/20 to-cyan-500/20 hover:from-amber-500/30 hover:to-cyan-500/30 text-amber-600 dark:text-amber-300 border border-amber-500/30 flex items-center justify-center transition-all shadow-sm" title="Expand Focus Deck Modal">
+                  <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
+                </button>
+                <button type="button" id="toggle-goals-tiles-btn" onclick="toggleGoalsTilesCollapse()" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-colors" title="Collapse / Expand Deck">
+                  <i data-lucide="chevron-up" id="goals-tiles-chevron" class="w-4 h-4 transition-transform duration-300"></i>
+                </button>
               </div>
             </div>
 
-            <!-- Daily Habits & Streaks (Right Column, 5 Cols) -->
-            <div class="lg:col-span-5 flex flex-col justify-between p-3 rounded-2xl bg-slate-50/80 dark:bg-black/30 border border-slate-200/80 dark:border-white/5 space-y-3">
-              <div class="space-y-2.5">
+            <!-- Focus Hub Summary Metrics Row -->
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span id="goals-completed-badge" class="text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-300 font-mono font-bold flex items-center gap-1">
+                <i data-lucide="check-circle" class="w-3 h-3 text-emerald-500"></i>
+                <span>2/3 Done</span>
+              </span>
+              <span id="goals-duration-badge" class="text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-500/30 text-amber-700 dark:text-amber-300 font-mono font-bold flex items-center gap-1">
+                <i data-lucide="clock" class="w-3 h-3 text-amber-500"></i>
+                <span>3h 15m</span>
+              </span>
+              <span id="habit-streak-badge" class="text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-bold border border-amber-200 dark:border-amber-500/30 flex items-center gap-1">
+                <i data-lucide="flame" class="w-3 h-3 text-amber-500"></i>
+                <span>12d streak</span>
+              </span>
+            </div>
+
+            <!-- Collapsible Goals & Habits Body -->
+            <div id="goals-habits-deck-body" class="space-y-3 transition-all duration-300">
+              <!-- Today's Goals Section -->
+              <div class="p-3 rounded-2xl bg-slate-50/80 dark:bg-black/30 border border-slate-200/80 dark:border-white/5 space-y-2.5">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                    <h5 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider font-mono">Today's Goals</h5>
+                  </div>
+                  <button type="button" onclick="openScrapbookModal()" class="text-[10px] text-pink-600 dark:text-pink-400 hover:underline flex items-center gap-1 font-semibold">
+                    <i data-lucide="share-2" class="w-3 h-3"></i> <span>Share</span>
+                  </button>
+                </div>
+                <div id="today-goals-list" class="space-y-2"></div>
+                
+                <!-- Goals Velocity Bar -->
+                <div class="p-2 rounded-xl bg-white dark:bg-black/40 border border-slate-200/80 dark:border-white/5 space-y-1 mt-2">
+                  <div class="flex items-center justify-between text-[10px]">
+                    <span class="font-semibold text-slate-700 dark:text-slate-300 truncate">Velocity:</span>
+                    <span class="font-mono text-cyan-600 dark:text-cyan-400 font-bold" id="goals-velocity-text">75%</span>
+                  </div>
+                  <div class="w-full h-1 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden flex">
+                    <div id="goals-progress-bar" class="h-full bg-gradient-to-r from-amber-500 to-emerald-500 rounded-full" style="width: 67%;"></div>
+                  </div>
+                  <div class="flex items-center justify-between text-[9px] text-slate-500 dark:text-slate-400 pt-0.5 flex-wrap gap-1" id="goals-breakdown-pills"></div>
+                </div>
+              </div>
+
+              <!-- Habits Section -->
+              <div class="p-3 rounded-2xl bg-slate-50/80 dark:bg-black/30 border border-slate-200/80 dark:border-white/5 space-y-2.5">
                 <div class="flex items-center justify-between gap-1 flex-wrap">
                   <div class="flex items-center gap-1.5">
                     <span class="w-2 h-2 rounded-full bg-cyan-500"></span>
                     <h5 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider font-mono">Habits & Streaks</h5>
                   </div>
                   <div class="flex items-center gap-1.5 shrink-0 flex-wrap">
-                    <button type="button" onclick="refreshHabitsTracker(this)" class="text-[10px] text-slate-500 hover:text-cyan-500 dark:text-slate-400 dark:hover:text-cyan-300 font-mono flex items-center gap-1 transition-colors group" title="Refresh & Recalculate Habit Streaks">
-                      <i data-lucide="refresh-cw" class="w-3 h-3 text-cyan-500 group-hover:rotate-180 transition-transform duration-500"></i>
-                      <span class="hidden xs:inline">Refresh</span>
+                    <button type="button" onclick="refreshHabitsTracker(this)" class="text-[10px] text-slate-500 hover:text-cyan-500 dark:text-slate-400 dark:hover:text-cyan-300 font-mono flex items-center gap-1 transition-colors" title="Refresh Streaks">
+                      <i data-lucide="refresh-cw" class="w-3 h-3 text-cyan-500"></i>
                     </button>
-                    <button type="button" onclick="openArchivedHabitsModal()" class="text-[10px] text-slate-500 hover:text-amber-400 dark:text-slate-400 dark:hover:text-amber-300 font-mono flex items-center gap-1 transition-colors" title="View & Recover Archived Habits">
-                      <i data-lucide="archive" class="w-3 h-3 text-amber-500"></i>
+                    <button type="button" onclick="openArchivedHabitsModal()" class="text-[10px] text-slate-500 hover:text-amber-400 dark:text-slate-400 dark:hover:text-amber-300 font-mono" title="View Archive">
                       <span id="archived-habits-badge-inline">Archive</span>
                     </button>
-                    <button type="button" onclick="toggleHabitWeeklyView()" class="text-[10px] text-slate-500 hover:text-cyan-500 dark:text-slate-400 dark:hover:text-cyan-300 font-mono flex items-center gap-1 transition-colors" title="Toggle between Today Focus and 7-Day History View">
-                      <i data-lucide="calendar" class="w-3 h-3 text-cyan-500"></i>
+                    <button type="button" onclick="toggleHabitWeeklyView()" class="text-[10px] text-slate-500 hover:text-cyan-500 dark:text-slate-400 dark:hover:text-cyan-300 font-mono">
                       <span>7D</span>
                     </button>
-                    <span class="text-[10px] text-cyan-600 dark:text-cyan-400 font-mono font-semibold shrink-0" id="habit-progress-pill">
-                      5/6 Done
-                    </span>
+                    <span class="text-[10px] text-cyan-600 dark:text-cyan-400 font-mono font-semibold" id="habit-progress-pill">5/6 Done</span>
                   </div>
                 </div>
-
-                <!-- Habit Undo Banner -->
                 <div id="habit-undo-banner" class="hidden"></div>
+                <div id="habit-tracker-list" class="space-y-2"></div>
 
-                <!-- Habits List with Bullet Dots & Checkmarks -->
-                <div id="habit-tracker-list" class="space-y-2">
-                  <!-- Rendered dynamically -->
-                </div>
-              </div>
-
-              <!-- 1-Tap Timeline Shortcuts Row -->
-              <div class="pt-2 border-t border-slate-200/80 dark:border-white/5 space-y-1.5 mt-2">
-                <div class="flex items-center justify-between">
-                  <span class="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider">1-Tap Timeline Shortcuts</span>
-                  <button type="button" onclick="openTimelineShortcutsModal()" class="text-[10px] text-amber-600 dark:text-amber-400 hover:underline font-semibold">Customize</button>
-                </div>
-                <div id="timeline-custom-shortcuts-container" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar flex-nowrap py-0.5 max-w-full">
-                  <!-- Rendered dynamically -->
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- DASHBOARD MILESTONE & DREAMS RADAR -->
-        <div id="dashboard-milestone-radar" class="p-3 rounded-2xl bg-gradient-to-r from-pink-500/10 via-purple-500/5 to-cyan-500/10 border border-pink-500/20 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
-          <div class="flex items-center gap-3 min-w-0 flex-1">
-            <div class="w-8 h-8 rounded-xl bg-pink-500/20 border border-pink-500/30 flex items-center justify-center text-pink-400 shrink-0">
-              <i data-lucide="sparkles" class="w-4 h-4 text-pink-400"></i>
-            </div>
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center gap-2 flex-wrap">
-                <span class="text-xs font-bold text-slate-900 dark:text-white">Active Life Milestone Quests</span>
-                <span id="dashboard-radar-count-badge" class="text-[10px] font-mono px-2 py-0.2 rounded-full bg-pink-500/20 text-pink-700 dark:text-pink-300 font-bold border border-pink-500/30">2 In Action</span>
-                <span id="dashboard-radar-fulfillment-badge" class="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-semibold">1/6 Fulfilled (17%)</span>
-              </div>
-              <div class="text-[11px] text-slate-600 dark:text-slate-300 truncate mt-0.5" id="dashboard-radar-active-step">
-                <!-- Populated dynamically via JS with closest upcoming dream & action step -->
-              </div>
-            </div>
-          </div>
-          <div class="flex items-center gap-2 shrink-0 self-end md:self-auto">
-            <button type="button" onclick="switchJournalTrack('sanctuary')" class="px-2.5 py-1 rounded-xl bg-pink-500/15 hover:bg-pink-500/25 border border-pink-500/30 text-pink-600 dark:text-pink-300 text-xs font-bold flex items-center gap-1 transition-all">
-              <span>View Dream Vault</span>
-              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-            </button>
-          </div>
-        </div>
-        
-        <!-- Unified Master Command Ribbon with Search & Date Quick Jumpers -->
-        <div class="double-bezel">
-          <div class="double-bezel-inner p-2.5 sm:p-3.5 flex flex-col gap-2.5">
-            <!-- Command Top Bar -->
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
-              <!-- Left: Date Navigator & Stepper (Locked as an inline row) -->
-              <div class="flex flex-col sm:flex-row sm:items-center gap-2 flex-wrap">
-                <div class="flex items-center justify-between sm:justify-start gap-1.5 w-full sm:w-auto shrink-0">
-                  <button onclick="stepDiaryDay(-1)" class="w-7 h-7 rounded-lg bg-black/40 hover:bg-white/10 border border-white/10 text-slate-300 flex items-center justify-center transition-colors shrink-0" title="Previous Day">
-                    <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
-                  </button>
-                  
-                  <div class="flex items-center justify-center gap-1.5 bg-black/40 px-2.5 py-1 rounded-lg border border-white/10 flex-1 sm:flex-initial">
-                    <h3 id="diary-current-date-title" class="text-xs font-bold text-white tracking-tight flex items-center gap-1.5 whitespace-nowrap">
-                      <i data-lucide="book-marked" class="w-3.5 h-3.5 text-cyan-400"></i>
-                      <span>Chronicle</span>
-                    </h3>
-                    <input type="date" id="chrono-date-picker" onchange="onDiaryDatePickerChange(this.value)" class="bg-transparent text-cyan-300 text-xs font-mono focus:outline-none cursor-pointer">
+                <!-- 1-Tap Shortcuts -->
+                <div class="pt-2 border-t border-slate-200/80 dark:border-white/5 space-y-1 mt-1">
+                  <div class="flex items-center justify-between">
+                    <span class="text-[9px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider">1-Tap Shortcuts</span>
+                    <button type="button" onclick="openTimelineShortcutsModal()" class="text-[9px] text-amber-600 dark:text-amber-400 hover:underline font-semibold">Customize</button>
                   </div>
-
-                  <button onclick="stepDiaryDay(1)" class="w-7 h-7 rounded-lg bg-black/40 hover:bg-white/10 border border-white/10 text-slate-300 flex items-center justify-center transition-colors shrink-0" title="Next Day">
-                    <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-                  </button>
-                </div>
-
-                <!-- Quick Date Jumpers -->
-                <div class="flex items-center gap-1 overflow-x-auto no-scrollbar flex-nowrap py-0.5 max-w-full">
-                  <button onclick="jumpToToday()" class="btn-secondary !py-1 !px-2 text-xs flex items-center gap-1 font-mono shrink-0">
-                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
-                    <span>Today</span>
-                  </button>
-                  <button onclick="jumpToYesterday()" class="btn-secondary !py-1 !px-2 text-xs font-mono text-slate-400 hover:text-white shrink-0">
-                    Yesterday
-                  </button>
-                  <button onclick="setDiaryRangeMode('week')" class="btn-secondary !py-1 !px-2 text-xs font-mono text-slate-400 hover:text-white shrink-0">
-                    This Week
-                  </button>
-                  <button onclick="setDiaryRangeMode('all')" class="btn-secondary !py-1 !px-2 text-xs font-mono text-slate-400 hover:text-white shrink-0">
-                    This Month
-                  </button>
+                  <div id="timeline-custom-shortcuts-container" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar flex-nowrap py-0.5 max-w-full"></div>
                 </div>
               </div>
-
-              <!-- Right: Media Mode (Photos On/Off) Toggle, Quick Photo Upload, and Search Bar -->
-              <div class="flex items-center gap-1.5 w-full md:w-auto flex-wrap sm:flex-nowrap">
-                <!-- Image On/Off Toggle Button -->
-                <button type="button" id="media-mode-toggle-btn" onclick="toggleMediaMode()" class="btn-secondary !py-1.5 !px-2.5 text-xs flex items-center gap-1.5 shrink-0 bg-black/40 border border-white/10 hover:border-amber-500/40 text-slate-300 transition-colors" title="Toggle Photos & Visual Memories on Timeline">
-                  <i data-lucide="image" id="media-mode-icon" class="w-3.5 h-3.5 text-amber-400"></i>
-                  <span id="media-mode-label" class="font-semibold text-[11px]">Photos: On</span>
-                </button>
-
-                <!-- Quick Add Photo Moment Button -->
-                <button type="button" onclick="triggerQuickPhotoMoment()" class="btn-secondary !py-1.5 !px-2.5 text-xs flex items-center gap-1.5 shrink-0 bg-purple-500/10 border border-purple-500/30 text-purple-400 hover:bg-purple-500/20 transition-colors" title="Attach Photo to Living Timeline">
-                  <i data-lucide="camera" class="w-3.5 h-3.5 text-purple-400"></i>
-                  <span class="font-semibold text-[11px]">+ Photo</span>
-                </button>
-
-                <div class="relative w-full sm:w-auto sm:min-w-[170px]">
-                  <input type="text" id="memory-search-input" oninput="filterDiaryTimeline(this.value)" placeholder="Search memory..." class="w-full bg-black/50 text-slate-200 placeholder-slate-500 text-xs py-1.5 px-3 pl-7 rounded-xl border border-white/10 focus:outline-none focus:border-cyan-500">
-                  <i data-lucide="search" class="w-3 h-3 text-slate-400 absolute left-2.5 top-2.5"></i>
-                </div>
-              </div>
-            </div>
-
-            <!-- 7-Day Weekly Ribbon -->
-            <div class="diary-week-ribbon pt-1 border-t border-white/5" id="diary-week-ribbon-container">
-              <!-- Dynamically populated via JS -->
             </div>
           </div>
-        </div>
 
-        <!-- VIEW MODE 1: Vertical Timeline Stream (REFLECTIONS + TASKS + GCAL + PHOTOS INLINE) -->
-        <div class="timeline-container" id="chrono-timeline-list">
-          <div class="timeline-spine"></div>
-          <!-- Only actual logged entries & tasks rendered via JS -->
-        </div>
-
-        <!-- VIEW MODE 2: Story Flow Carousel (SWIPE & DRAG REVISIT) -->
-        <div id="chrono-story-view" class="hidden space-y-3">
-          <div class="flex items-center justify-between text-xs px-2 text-slate-400">
-            <span class="font-semibold text-slate-300 flex items-center gap-1.5">
-              <i data-lucide="sparkles" class="w-3.5 h-3.5 text-cyan-400"></i>
-              <span>Revisit Moments (Swipe, Drag or use Arrow Keys)</span>
-            </span>
-            <span id="story-progress-indicator" class="font-mono text-cyan-300">Moment 1 of 3</span>
-          </div>
-
-          <div class="story-carousel-container">
-            <div class="story-carousel-viewport" id="story-carousel-viewport">
-              <div class="story-carousel-track" id="story-carousel-track">
-                <!-- Dynamic Story Slides rendered via JS -->
+          <!-- DASHBOARD MILESTONE & DREAMS RADAR -->
+          <div id="dashboard-milestone-radar" class="p-3 rounded-2xl bg-gradient-to-r from-pink-500/10 via-purple-500/5 to-cyan-500/10 border border-pink-500/20 shadow-sm flex flex-col gap-2.5">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2 min-w-0">
+                <div class="w-7 h-7 rounded-xl bg-pink-500/20 border border-pink-500/30 flex items-center justify-center text-pink-400 shrink-0">
+                  <i data-lucide="sparkles" class="w-3.5 h-3.5 text-pink-400"></i>
+                </div>
+                <div class="min-w-0">
+                  <span class="text-xs font-bold text-slate-900 dark:text-white truncate block">Milestone Quests</span>
+                </div>
               </div>
-            </div>
-
-            <!-- Floating Controls -->
-            <div class="flex items-center justify-between mt-3 px-2">
-              <button onclick="prevStorySlide()" class="story-nav-btn" title="Previous Moment (←)">
-                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+              <button type="button" onclick="switchJournalTrack('sanctuary')" class="px-2 py-0.5 rounded-lg bg-pink-500/15 hover:bg-pink-500/25 border border-pink-500/30 text-pink-600 dark:text-pink-300 text-[10px] font-bold flex items-center gap-1 transition-all shrink-0">
+                <span>Vault →</span>
               </button>
-              
-              <div id="story-dots-container" class="flex items-center gap-1.5">
-                <!-- Dots populated via JS -->
-              </div>
+            </div>
+            
+            <div class="flex items-center gap-2 flex-wrap text-[10px] font-mono">
+              <span id="dashboard-radar-count-badge" class="px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-700 dark:text-pink-300 font-bold border border-pink-500/30">2 In Action</span>
+              <span id="dashboard-radar-fulfillment-badge" class="text-emerald-600 dark:text-emerald-400 font-semibold">1/6 Fulfilled</span>
+            </div>
+            <div class="text-[11px] text-slate-600 dark:text-slate-300 leading-snug" id="dashboard-radar-active-step"></div>
+          </div>
 
-              <button onclick="nextStorySlide()" class="story-nav-btn" title="Next Moment (→)">
-                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          <!-- COGNITIVE & DIURNAL VITALITY DASHBOARD CARD -->
+          <div class="p-3.5 rounded-2xl bg-gradient-to-br from-indigo-950/40 via-purple-950/30 to-blue-950/40 border border-indigo-500/20 shadow-sm flex flex-col gap-2.5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2 min-w-0">
+                <div class="w-7 h-7 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0">
+                  <i data-lucide="activity" class="w-3.5 h-3.5 text-indigo-400"></i>
+                </div>
+                <h5 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider font-mono">Cognitive & Energy Equilibrium</h5>
+              </div>
+              <span class="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-500/30 px-2 py-0.5 rounded-full">96% Optimal</span>
+            </div>
+
+            <!-- Mini 3-Metric Matrix Grid -->
+            <div class="grid grid-cols-3 gap-1.5 pt-1 text-center font-mono">
+              <div class="p-2 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200/80 dark:border-white/5">
+                <div class="text-[9px] text-slate-500 dark:text-slate-400">CBT Clearance</div>
+                <div class="text-xs font-bold text-cyan-600 dark:text-cyan-400 mt-0.5">8/8 Clean</div>
+              </div>
+              <div class="p-2 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200/80 dark:border-white/5">
+                <div class="text-[9px] text-slate-500 dark:text-slate-400">Resilience</div>
+                <div class="text-xs font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">92% High</div>
+              </div>
+              <div class="p-2 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200/80 dark:border-white/5">
+                <div class="text-[9px] text-slate-500 dark:text-slate-400">Focus Hours</div>
+                <div class="text-xs font-bold text-amber-600 dark:text-amber-400 mt-0.5">3.25 hrs</div>
+              </div>
+            </div>
+
+            <!-- Quick Reflect Action -->
+            <div class="pt-1 flex items-center justify-between text-[10px]">
+              <span class="text-slate-500 dark:text-slate-400">Diurnal Peak: <strong class="text-slate-800 dark:text-slate-200">10:00 AM – 2:00 PM</strong></span>
+              <button type="button" onclick="switchTab('analytics')" class="text-cyan-600 dark:text-cyan-400 hover:underline font-semibold flex items-center gap-0.5">
+                <span>View Radar</span>
+                <i data-lucide="chevron-right" class="w-3 h-3"></i>
               </button>
             </div>
           </div>
@@ -1186,101 +1207,287 @@
     </section>
 
     <!-- ===================================================================== -->
-    <!-- TAB 3: MINDPULSE COGNITIVE ANALYTICS (ORIGINAL FEATURE) -->
+    <!-- TAB 3: DEDICATED LIFE & MIND INTELLIGENCE MASTER DASHBOARD -->
     <!-- ===================================================================== -->
     <section id="view-analytics" class="hidden flex-1 flex flex-col gap-5">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+      <!-- Master Dashboard Header & Horizon Switcher -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-2 border-b border-slate-200/80 dark:border-white/5">
         <div>
           <div class="flex items-center gap-2">
-            <h2 class="text-xl font-bold text-white tracking-tight">MindPulse Cognitive Intelligence</h2>
-            <span class="eyebrow-badge">Core Engine</span>
+            <h2 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Life Intelligence Master Dashboard</h2>
+            <span class="eyebrow-badge bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border border-cyan-500/25 font-mono text-[10px] font-bold">Comprehensive OS</span>
           </div>
-          <p class="text-xs text-slate-400">Dynamic AI extraction of emotional vectors, CBT cognitive distortions, and growth trajectories.</p>
-        </div>
-        <button onclick="loadAnalytics()" class="btn-secondary text-xs">
-          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Refresh Analytics
-        </button>
-      </div>
-
-      <!-- KPI Metrics Strip -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div class="p-3.5 rounded-2xl bg-black/40 border border-cyan-500/20">
-          <span class="text-[10px] text-cyan-400 font-mono font-semibold uppercase block">Cognitive Velocity</span>
-          <div class="flex items-baseline gap-1.5 mt-1">
-            <span class="text-lg font-bold text-white font-mono">88%</span>
-            <span class="text-[10px] text-emerald-400 font-semibold">+14% vs avg</span>
-          </div>
-          <span class="text-[10px] text-slate-400 block mt-0.5">Reframing conversion speed</span>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Holistic tracking across Goals, Habit Streaks, Life Milestone Quests, Cognitive Health, and Biological Vitality.</p>
         </div>
 
-        <div class="p-3.5 rounded-2xl bg-black/40 border border-emerald-500/20">
-          <span class="text-[10px] text-emerald-400 font-mono font-semibold uppercase block">Emotional Valence</span>
-          <div class="flex items-baseline gap-1.5 mt-1">
-            <span class="text-lg font-bold text-white font-mono">+0.74</span>
-            <span class="text-[10px] text-emerald-400 font-semibold">Positive</span>
-          </div>
-          <span class="text-[10px] text-slate-400 block mt-0.5">Optimism & Clarity Dominant</span>
-        </div>
-
-        <div class="p-3.5 rounded-2xl bg-black/40 border border-amber-500/20">
-          <span class="text-[10px] text-amber-400 font-mono font-semibold uppercase block">Diurnal Stamina</span>
-          <div class="flex items-baseline gap-1.5 mt-1">
-            <span class="text-lg font-bold text-white font-mono">6.2 hrs</span>
-            <span class="text-[10px] text-amber-300 font-semibold">Peak Flow</span>
-          </div>
-          <span class="text-[10px] text-slate-400 block mt-0.5">Aligned with circadian curve</span>
-        </div>
-
-        <div class="p-3.5 rounded-2xl bg-black/40 border border-purple-500/20">
-          <span class="text-[10px] text-purple-400 font-mono font-semibold uppercase block">CBT Breakthroughs</span>
-          <div class="flex items-baseline gap-1.5 mt-1">
-            <span class="text-lg font-bold text-white font-mono">14 Biases</span>
-            <span class="text-[10px] text-purple-300 font-semibold">Deconstructed</span>
-          </div>
-          <span class="text-[10px] text-slate-400 block mt-0.5">Zero persistent catastrophizing</span>
+        <!-- Master Timeframe Horizon Switcher (Daily / Weekly / Monthly / Yearly) -->
+        <div class="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100 dark:bg-black/50 border border-slate-200 dark:border-white/10 text-xs shrink-0 self-start md:self-auto" id="master-dashboard-horizon-selector">
+          <button type="button" onclick="setMasterDashboardHorizon('daily')" id="dash-btn-daily" class="px-3 py-1.5 rounded-xl font-semibold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center gap-1.5">
+            <i data-lucide="sun" class="w-3.5 h-3.5 text-amber-500"></i> <span>Daily</span>
+          </button>
+          <button type="button" onclick="setMasterDashboardHorizon('weekly')" id="dash-btn-weekly" class="px-3 py-1.5 rounded-xl font-semibold transition-all bg-cyan-500/20 text-cyan-600 dark:text-cyan-300 border border-cyan-500/30 flex items-center gap-1.5">
+            <i data-lucide="calendar-days" class="w-3.5 h-3.5 text-cyan-400"></i> <span>Weekly</span>
+          </button>
+          <button type="button" onclick="setMasterDashboardHorizon('monthly')" id="dash-btn-monthly" class="px-3 py-1.5 rounded-xl font-semibold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center gap-1.5">
+            <i data-lucide="calendar-range" class="w-3.5 h-3.5 text-indigo-400"></i> <span>Monthly</span>
+          </button>
+          <button type="button" onclick="setMasterDashboardHorizon('yearly')" id="dash-btn-yearly" class="px-3 py-1.5 rounded-xl font-semibold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center gap-1.5">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-purple-400"></i> <span>Yearly</span>
+          </button>
+          <button type="button" onclick="loadAnalytics()" class="w-7 h-7 rounded-xl bg-slate-200/80 dark:bg-white/5 hover:bg-slate-300 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-colors shrink-0 ml-1" title="Refresh Dashboard Data">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+          </button>
         </div>
       </div>
 
-      <!-- Bento Grid for Analytics -->
+      <!-- ─── 6-PILLAR EXECUTIVE METRICS STRIP ─── -->
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2.5" id="dashboard-pillars-strip">
+        <!-- Pillar 1: Goals Throughput -->
+        <div class="p-3 rounded-2xl bg-white dark:bg-black/40 border border-amber-500/30 dark:border-amber-500/20 shadow-sm flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-[9px] sm:text-[10px] text-amber-600 dark:text-amber-400 font-mono font-bold uppercase tracking-wider">Goal Velocity</span>
+            <i data-lucide="target" class="w-3.5 h-3.5 text-amber-500"></i>
+          </div>
+          <div class="my-1.5">
+            <span class="text-base sm:text-lg font-bold text-slate-900 dark:text-white font-mono" id="pillar-goals-stat">85% Done</span>
+            <div class="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold" id="pillar-goals-sub">+12% vs prior</div>
+          </div>
+          <span class="text-[9px] text-slate-500 dark:text-slate-400 truncate" id="pillar-goals-desc">3.5h Deep Work</span>
+        </div>
+
+        <!-- Pillar 2: Habits Consistency -->
+        <div class="p-3 rounded-2xl bg-white dark:bg-black/40 border border-cyan-500/30 dark:border-cyan-500/20 shadow-sm flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-[9px] sm:text-[10px] text-cyan-600 dark:text-cyan-400 font-mono font-bold uppercase tracking-wider">Habits Discipline</span>
+            <i data-lucide="flame" class="w-3.5 h-3.5 text-cyan-500"></i>
+          </div>
+          <div class="my-1.5">
+            <span class="text-base sm:text-lg font-bold text-slate-900 dark:text-white font-mono" id="pillar-habits-stat">14d Streak</span>
+            <div class="text-[10px] text-cyan-600 dark:text-cyan-400 font-semibold" id="pillar-habits-sub">92% Consistent</div>
+          </div>
+          <span class="text-[9px] text-slate-500 dark:text-slate-400 truncate" id="pillar-habits-desc">6/6 Logged Today</span>
+        </div>
+
+        <!-- Pillar 3: Milestone Quests -->
+        <div class="p-3 rounded-2xl bg-white dark:bg-black/40 border border-pink-500/30 dark:border-pink-500/20 shadow-sm flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-[9px] sm:text-[10px] text-pink-600 dark:text-pink-400 font-mono font-bold uppercase tracking-wider">Dream Quests</span>
+            <i data-lucide="award" class="w-3.5 h-3.5 text-pink-500"></i>
+          </div>
+          <div class="my-1.5">
+            <span class="text-base sm:text-lg font-bold text-slate-900 dark:text-white font-mono" id="pillar-milestones-stat">2/6 Fulfilled</span>
+            <div class="text-[10px] text-pink-600 dark:text-pink-400 font-semibold" id="pillar-milestones-sub">2 In Action</div>
+          </div>
+          <span class="text-[9px] text-slate-500 dark:text-slate-400 truncate" id="pillar-milestones-desc">Target: Dec 2027</span>
+        </div>
+
+        <!-- Pillar 4: Cognitive Equilibrium -->
+        <div class="p-3 rounded-2xl bg-white dark:bg-black/40 border border-indigo-500/30 dark:border-indigo-500/20 shadow-sm flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-[9px] sm:text-[10px] text-indigo-600 dark:text-indigo-400 font-mono font-bold uppercase tracking-wider">CBT Equilibrium</span>
+            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-indigo-500"></i>
+          </div>
+          <div class="my-1.5">
+            <span class="text-base sm:text-lg font-bold text-slate-900 dark:text-white font-mono" id="pillar-cbt-stat">96% Clean</span>
+            <div class="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold" id="pillar-cbt-sub">14 Biases Reframed</div>
+          </div>
+          <span class="text-[9px] text-slate-500 dark:text-slate-400 truncate" id="pillar-cbt-desc">Zero Catastrophizing</span>
+        </div>
+
+        <!-- Pillar 5: Circadian Vitality -->
+        <div class="p-3 rounded-2xl bg-white dark:bg-black/40 border border-emerald-500/30 dark:border-emerald-500/20 shadow-sm flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-[9px] sm:text-[10px] text-emerald-600 dark:text-emerald-400 font-mono font-bold uppercase tracking-wider">Diurnal Stamina</span>
+            <i data-lucide="activity" class="w-3.5 h-3.5 text-emerald-500"></i>
+          </div>
+          <div class="my-1.5">
+            <span class="text-base sm:text-lg font-bold text-slate-900 dark:text-white font-mono" id="pillar-vitality-stat">6.5 hrs</span>
+            <div class="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold" id="pillar-vitality-sub">Peak Flow Aligned</div>
+          </div>
+          <span class="text-[9px] text-slate-500 dark:text-slate-400 truncate" id="pillar-vitality-desc">Peak: 10am – 2pm</span>
+        </div>
+
+        <!-- Pillar 6: Mind Cave Memory Volume -->
+        <div class="p-3 rounded-2xl bg-white dark:bg-black/40 border border-purple-500/30 dark:border-purple-500/20 shadow-sm flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-[9px] sm:text-[10px] text-purple-600 dark:text-purple-400 font-mono font-bold uppercase tracking-wider">Memory Vault</span>
+            <i data-lucide="book-marked" class="w-3.5 h-3.5 text-purple-500"></i>
+          </div>
+          <div class="my-1.5">
+            <span class="text-base sm:text-lg font-bold text-slate-900 dark:text-white font-mono" id="pillar-volume-stat">128 Moments</span>
+            <div class="text-[10px] text-purple-600 dark:text-purple-400 font-semibold" id="pillar-volume-sub">14,250 Words</div>
+          </div>
+          <span class="text-[9px] text-slate-500 dark:text-slate-400 truncate" id="pillar-volume-desc">24 Photos • 8 Voice</span>
+        </div>
+      </div>
+
+      <!-- ─── MASTER BENTO GRID (DOMAINS & INTERACTIVE ANALYTICS) ─── -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
         
-        <!-- Radar Chart Card -->
+        <!-- BENTO 1 (6 Cols): Goal Velocity & Category Focus Allocation -->
         <div class="double-bezel lg:col-span-6">
-          <div class="double-bezel-inner p-5 flex flex-col h-full">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
-                <i data-lucide="hexagon" class="w-4 h-4 text-blue-400"></i> Emotional State Dimensions
-              </h3>
-              <span class="text-[11px] text-slate-400 font-mono">6-Vector Matrix</span>
+          <div class="double-bezel-inner p-4 sm:p-5 flex flex-col justify-between h-full space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-xl bg-amber-500/20 text-amber-500 dark:text-amber-400 flex items-center justify-center font-bold shrink-0">
+                  <i data-lucide="target" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900 dark:text-white">Goal Execution & Focus Velocity</h3>
+                  <p class="text-[10px] text-slate-500 dark:text-slate-400">Time and energy invested across cognitive domains</p>
+                </div>
+              </div>
+              <span class="text-[11px] font-mono font-bold text-amber-600 dark:text-amber-400" id="dash-goal-horizon-lbl">Weekly Scope</span>
             </div>
-            <div class="flex-1 flex items-center justify-center min-h-[280px]">
+
+            <!-- Category Focus Allocation Progress Bars -->
+            <div class="space-y-2.5 py-1">
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-cyan-500"></span> Deep Work & Architecture
+                  </span>
+                  <span class="font-mono text-slate-500 dark:text-slate-400" id="dash-cat-deepwork">18.5 hrs (45%)</span>
+                </div>
+                <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                  <div class="h-full bg-cyan-500 rounded-full" style="width: 45%;"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Physical Vitality & Somatics
+                  </span>
+                  <span class="font-mono text-slate-500 dark:text-slate-400" id="dash-cat-health">10.2 hrs (25%)</span>
+                </div>
+                <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                  <div class="h-full bg-emerald-500 rounded-full" style="width: 25%;"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-purple-500"></span> Strategic Career & Quests
+                  </span>
+                  <span class="font-mono text-slate-500 dark:text-slate-400" id="dash-cat-career">8.2 hrs (20%)</span>
+                </div>
+                <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                  <div class="h-full bg-purple-500 rounded-full" style="width: 20%;"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-pink-500"></span> Mindfulness & Reflection
+                  </span>
+                  <span class="font-mono text-slate-500 dark:text-slate-400" id="dash-cat-mindset">4.1 hrs (10%)</span>
+                </div>
+                <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                  <div class="h-full bg-pink-500 rounded-full" style="width: 10%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Active Goals Snapshot for Horizon -->
+            <div class="pt-2 border-t border-slate-200/80 dark:border-white/5 flex items-center justify-between text-xs">
+              <span class="text-slate-600 dark:text-slate-400" id="dash-goals-summary-text">14 of 16 targets achieved in this horizon.</span>
+              <button type="button" onclick="openGoalsHabitsModal()" class="text-amber-600 dark:text-amber-400 hover:underline font-semibold flex items-center gap-0.5">
+                <span>Manage Goals →</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- BENTO 2 (6 Cols): Habit Discipline Matrix & Consistency Heatmap -->
+        <div class="double-bezel lg:col-span-6">
+          <div class="double-bezel-inner p-4 sm:p-5 flex flex-col justify-between h-full space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-xl bg-cyan-500/20 text-cyan-500 dark:text-cyan-400 flex items-center justify-center font-bold shrink-0">
+                  <i data-lucide="calendar-check-2" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900 dark:text-white">Habit Consistency Heatmap</h3>
+                  <p class="text-[10px] text-slate-500 dark:text-slate-400">Longitudinal consistency across daily micro-disciplines</p>
+                </div>
+              </div>
+              <span class="text-xs font-mono font-bold text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/60 border border-cyan-200 dark:border-cyan-500/30 px-2 py-0.5 rounded-full" id="dash-habit-rate-badge">92% Rate</span>
+            </div>
+
+            <!-- Dynamic Multi-Week / Multi-Day Consistency Heatmap Grid -->
+            <div class="p-3 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200/80 dark:border-white/5 space-y-2">
+              <div class="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 font-mono">
+                <span id="dash-heatmap-range-lbl">Last 28 Days Continuity</span>
+                <span class="flex items-center gap-1">
+                  <span>Less</span>
+                  <span class="w-2 h-2 rounded bg-slate-200 dark:bg-slate-800"></span>
+                  <span class="w-2 h-2 rounded bg-cyan-500/30"></span>
+                  <span class="w-2 h-2 rounded bg-cyan-500/70"></span>
+                  <span class="w-2 h-2 rounded bg-cyan-500"></span>
+                  <span>More</span>
+                </span>
+              </div>
+              <div id="dash-heatmap-grid" class="grid grid-cols-7 sm:grid-cols-14 gap-1 pt-1">
+                <!-- Injected dynamically via JS -->
+              </div>
+            </div>
+
+            <!-- Habit Streaks Snapshot -->
+            <div class="flex items-center justify-between text-xs pt-1">
+              <div class="flex items-center gap-2">
+                <span class="text-slate-700 dark:text-slate-300 font-semibold">Top Streak:</span>
+                <span class="font-mono text-amber-600 dark:text-amber-400 font-bold" id="dash-top-streak">Morning Architecture Flow (14d)</span>
+              </div>
+              <button type="button" onclick="switchTab('journals')" class="text-cyan-600 dark:text-cyan-400 hover:underline font-semibold">
+                <span>View Habits →</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- BENTO 3 (6 Cols): 6-Vector Emotional State Radar -->
+        <div class="double-bezel lg:col-span-6">
+          <div class="double-bezel-inner p-4 sm:p-5 flex flex-col h-full space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-xl bg-blue-500/20 text-blue-500 dark:text-blue-400 flex items-center justify-center font-bold shrink-0">
+                  <i data-lucide="hexagon" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900 dark:text-white">Emotional Dimensions Radar</h3>
+                  <p class="text-[10px] text-slate-500 dark:text-slate-400">6-Vector psychological state equilibrium</p>
+                </div>
+              </div>
+              <span class="text-[11px] font-mono text-slate-500 dark:text-slate-400">Joy • Clarity • Resilience • Focus • Calm • Optimism</span>
+            </div>
+            <div class="flex-1 flex items-center justify-center min-h-[260px]">
               <canvas id="radarMoodChart"></canvas>
             </div>
           </div>
         </div>
 
-        <!-- Clarity & Resilience Trajectory Card (Week / Month / Year) -->
+        <!-- BENTO 4 (6 Cols): Longitudinal Resilience & Clarity Trajectory -->
         <div class="double-bezel lg:col-span-6">
-          <div class="double-bezel-inner p-5 flex flex-col h-full">
-            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-              <div>
-                <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                  <i data-lucide="trending-up" class="w-4 h-4 text-emerald-500 dark:text-emerald-400"></i> Resilience & Clarity Trajectory
-                </h3>
-                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Neural equilibrium & cognitive distortion reduction over time</p>
+          <div class="double-bezel-inner p-4 sm:p-5 flex flex-col h-full space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-xl bg-emerald-500/20 text-emerald-500 dark:text-emerald-400 flex items-center justify-center font-bold shrink-0">
+                  <i data-lucide="trending-up" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900 dark:text-white">Resilience & Clarity Trajectory</h3>
+                  <p class="text-[10px] text-slate-500 dark:text-slate-400">Longitudinal equilibrium progression</p>
+                </div>
               </div>
-
-              <!-- Timeframe Switcher: Week / Month / Year -->
-              <div class="flex items-center gap-1 p-1 rounded-xl bg-slate-100 dark:bg-black/50 border border-slate-200 dark:border-white/10 text-xs" id="trajectory-timeframe-selector">
-                <button type="button" onclick="setTrajectoryTimeframe('week')" id="traj-btn-week" class="px-2.5 py-1 rounded-lg font-semibold transition-all bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30">Week</button>
-                <button type="button" onclick="setTrajectoryTimeframe('month')" id="traj-btn-month" class="px-2.5 py-1 rounded-lg font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">Month</button>
-                <button type="button" onclick="setTrajectoryTimeframe('year')" id="traj-btn-year" class="px-2.5 py-1 rounded-lg font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">Year</button>
-              </div>
+              <span class="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400" id="dash-traj-rate-badge">+14% Growth</span>
             </div>
 
-            <!-- Key Metric Highlights for Selected Horizon -->
-            <div class="grid grid-cols-3 gap-2 mb-3" id="trajectory-summary-metrics">
-              <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5">
+            <!-- Key Metric Highlights for Horizon -->
+            <div class="grid grid-cols-3 gap-2" id="trajectory-summary-metrics">
+              <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200/80 dark:border-white/5">
                 <div class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1">
                   <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Resilience
                 </div>
@@ -1288,7 +1495,7 @@
                 <div class="text-[10px] text-slate-500 dark:text-slate-400" id="traj-resilience-sub">+14% vs baseline</div>
               </div>
 
-              <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5">
+              <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200/80 dark:border-white/5">
                 <div class="text-[10px] text-cyan-600 dark:text-cyan-400 font-bold uppercase tracking-wider flex items-center gap-1">
                   <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span> Clarity Index
                 </div>
@@ -1296,120 +1503,70 @@
                 <div class="text-[10px] text-slate-500 dark:text-slate-400" id="traj-clarity-sub">+18% vs baseline</div>
               </div>
 
-              <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5">
+              <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200/80 dark:border-white/5">
                 <div class="text-[10px] text-amber-600 dark:text-amber-400 font-bold uppercase tracking-wider flex items-center gap-1">
                   <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Velocity
                 </div>
-                <div class="text-xs font-bold text-slate-900 dark:text-white mt-1" id="traj-velocity-stat">Ascending Flow</div>
+                <div class="text-xs font-bold text-slate-900 dark:text-white mt-1 font-mono" id="traj-velocity-stat">Ascending Flow</div>
                 <div class="text-[10px] text-slate-500 dark:text-slate-400" id="traj-velocity-sub">Compounding</div>
               </div>
             </div>
 
             <!-- Chart Canvas -->
-            <div class="flex-1 flex items-center justify-center min-h-[260px] w-full">
+            <div class="flex-1 flex items-center justify-center min-h-[220px] w-full">
               <canvas id="lineTimelineChart"></canvas>
             </div>
 
-            <!-- Trajectory Narrative Insight Banner -->
-            <div class="mt-3 p-2.5 rounded-xl bg-emerald-950/20 dark:bg-emerald-950/30 border border-emerald-500/25 flex items-start gap-2">
-              <div class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
-                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-              </div>
+            <!-- Narrative Insight Banner -->
+            <div class="p-2.5 rounded-xl bg-emerald-950/20 dark:bg-emerald-950/30 border border-emerald-500/25 flex items-start gap-2">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5"></i>
               <div class="text-xs leading-relaxed text-slate-700 dark:text-slate-300" id="trajectory-insight-banner">
-                <strong>Weekly Synthesis:</strong> Cognitive resilience climbed +14% as mindful micro-habits and evening reframing decoupled somatic stress from task execution.
+                <strong>Horizon Synthesis:</strong> Cognitive resilience climbed +14% as mindful micro-habits and evening reframing decoupled somatic stress from task execution.
               </div>
             </div>
           </div>
         </div>
 
-        <!-- CBT Distortions Frequency Bento -->
+        <!-- BENTO 5 (6 Cols): CBT Cognitive Distortions Tracker -->
         <div class="double-bezel lg:col-span-6">
-          <div class="double-bezel-inner p-5">
-            <h3 class="text-sm font-semibold text-slate-200 mb-3 flex items-center gap-2">
-              <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-400"></i> CBT Cognitive Distortions Tracker
-            </h3>
-            <div id="distortions-container" class="space-y-2">
-              <!-- Rendered via JS -->
-            </div>
-          </div>
-        </div>
-
-        <!-- Action Items & Micro-Commitments Bento -->
-        <div class="double-bezel lg:col-span-6">
-          <div class="double-bezel-inner p-5">
-            <h3 class="text-sm font-semibold text-slate-200 mb-3 flex items-center gap-2">
-              <i data-lucide="check-circle-2" class="w-4 h-4 text-cyan-400"></i> AI-Synthesized Action Items & Behavioral Tasks
-            </h3>
-            <div id="action-items-container" class="space-y-2 text-sm text-slate-300">
-              <!-- Rendered via JS -->
-            </div>
-          </div>
-        </div>
-
-        <!-- Cognitive Coaching & Goal Achievement Guide -->
-        <div class="double-bezel lg:col-span-12">
-          <div class="double-bezel-inner p-5 space-y-4">
-            <div class="flex items-center justify-between border-b border-black/5 dark:border-white/5 pb-3">
-              <div class="flex items-center gap-2.5">
-                <div class="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center">
-                  <i data-lucide="compass" class="w-4 h-4"></i>
+          <div class="double-bezel-inner p-4 sm:p-5 flex flex-col h-full space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-xl bg-amber-500/20 text-amber-500 dark:text-amber-400 flex items-center justify-center font-bold shrink-0">
+                  <i data-lucide="alert-triangle" class="w-4 h-4"></i>
                 </div>
                 <div>
-                  <h3 class="text-base font-bold text-slate-900 dark:text-white">Cognitive Coaching & Goal Achievement Guide</h3>
-                  <p class="text-xs text-slate-500 dark:text-slate-400">Step-by-step evidence-based psychological reframing to help you achieve your goals</p>
+                  <h3 class="text-sm font-bold text-slate-900 dark:text-white">CBT Cognitive Distortions Neutralizer</h3>
+                  <p class="text-[10px] text-slate-500 dark:text-slate-400">Psychological bias extraction and reframing rate</p>
                 </div>
               </div>
-              <span class="text-xs font-mono px-2.5 py-1 rounded-full bg-cyan-50 text-cyan-700 dark:bg-cyan-950/60 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-500/30">CBT + Stoic Framework</span>
+              <span class="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400">100% Cleared</span>
             </div>
+            <div id="distortions-container" class="space-y-2 flex-1">
+              <!-- Rendered dynamically via JS -->
+            </div>
+          </div>
+        </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-              <!-- Guide 1 -->
-              <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 space-y-2">
-                <div class="flex items-center gap-2">
-                  <div class="w-6 h-6 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0">
-                    <i data-lucide="target" class="w-3.5 h-3.5"></i>
-                  </div>
-                  <h4 class="text-xs font-bold text-slate-900 dark:text-white">Decatastrophizing Triple Matrix</h4>
+        <!-- BENTO 6 (6 Cols): AI Action Items & Micro-Commitments -->
+        <div class="double-bezel lg:col-span-6">
+          <div class="double-bezel-inner p-4 sm:p-5 flex flex-col h-full space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-xl bg-cyan-500/20 text-cyan-500 dark:text-cyan-400 flex items-center justify-center font-bold shrink-0">
+                  <i data-lucide="check-circle-2" class="w-4 h-4"></i>
                 </div>
-                <p class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
-                  When facing anxiety over a high-stakes deliverable, write down the worst, best, and most likely outcome to ground your nervous system.
-                </p>
-                <button onclick="launchGuidedCBT('decatastrophize')" class="text-xs text-cyan-600 dark:text-cyan-400 font-semibold hover:underline flex items-center gap-1">
-                  <span>Practice in Studio →</span>
-                </button>
-              </div>
-
-              <!-- Guide 2 -->
-              <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 space-y-2">
-                <div class="flex items-center gap-2">
-                  <div class="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
-                    <i data-lucide="scale" class="w-3.5 h-3.5"></i>
-                  </div>
-                  <h4 class="text-xs font-bold text-slate-900 dark:text-white">Dialectical Spectrum Thinking</h4>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900 dark:text-white">AI Behavioral Action Blueprint</h3>
+                  <p class="text-[10px] text-slate-500 dark:text-slate-400">Deterministic steps extracted from reflection journals</p>
                 </div>
-                <p class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
-                  Replace all-or-nothing judgments with percentage progress. Acknowledging a 65% completion rate prevents burnout and builds momentum.
-                </p>
-                <button onclick="launchGuidedCBT('continuum')" class="text-xs text-cyan-600 dark:text-cyan-400 font-semibold hover:underline flex items-center gap-1">
-                  <span>Practice in Studio →</span>
-                </button>
               </div>
-
-              <!-- Guide 3 -->
-              <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 space-y-2">
-                <div class="flex items-center gap-2">
-                  <div class="w-6 h-6 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0">
-                    <i data-lucide="zap" class="w-3.5 h-3.5"></i>
-                  </div>
-                  <h4 class="text-xs font-bold text-slate-900 dark:text-white">Micro-Action Sprints</h4>
-                </div>
-                <p class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
-                  When paralyzed by a daunting task, reduce the entry barrier to an atomic 5-minute action that requires zero willpower to initiate.
-                </p>
-                <button onclick="launchGuidedCBT('microsprint')" class="text-xs text-cyan-600 dark:text-cyan-400 font-semibold hover:underline flex items-center gap-1">
-                  <span>Practice in Studio →</span>
-                </button>
-              </div>
+              <button type="button" onclick="switchTab('studio')" class="text-xs text-cyan-600 dark:text-cyan-400 font-semibold hover:underline flex items-center gap-1">
+                <span>Reflect in Studio →</span>
+              </button>
+            </div>
+            <div id="action-items-container" class="space-y-2 text-sm text-slate-700 dark:text-slate-300 flex-1">
+              <!-- Rendered dynamically via JS -->
             </div>
           </div>
         </div>
@@ -1532,7 +1689,7 @@
         </div>
 
         <!-- Active User Status Card -->
-        <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 flex items-center justify-between gap-3">
+        <div id="active-user-status-card" class="p-3.5 rounded-2xl bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 flex items-center justify-between gap-3 hidden">
           <div class="flex items-center gap-3 min-w-0">
             <div class="w-9 h-9 rounded-full bg-blue-600/15 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-sm shrink-0">
               <i data-lucide="user" class="w-4 h-4 text-blue-500"></i>
@@ -1540,11 +1697,11 @@
             <div class="min-w-0">
               <div class="flex items-center gap-1.5">
                 <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0 animate-pulse"></span>
-                <span class="text-xs font-bold text-slate-900 dark:text-white truncate" id="modal-current-user-lbl">vickykalam34@gmail.com</span>
+                <span class="text-xs font-bold text-slate-900 dark:text-white truncate" id="modal-current-user-lbl"></span>
               </div>
               <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono flex items-center gap-1 mt-0.5">
                 <i data-lucide="lock" class="w-2.5 h-2.5 text-emerald-500"></i>
-                <span>Client AES-256 Vault Active</span>
+                <span id="modal-role-lbl">Client AES-256 Vault Active</span>
               </div>
             </div>
           </div>
@@ -1554,21 +1711,22 @@
           </button>
         </div>
 
-        <!-- Main Modal Tabs (Auth vs Profile) -->
-        <div class="flex gap-1 bg-slate-100 dark:bg-black/50 p-1 rounded-xl border border-slate-200 dark:border-white/10 text-xs">
-          <button type="button" onclick="switchAuthTab('firebase')" id="auth-tab-btn-firebase" class="flex-1 py-1.5 rounded-lg font-semibold transition-all bg-white dark:bg-blue-600/30 text-blue-600 dark:text-blue-300 shadow-sm dark:shadow-none border border-slate-200/80 dark:border-blue-500/40 flex items-center justify-center gap-1.5">
-            <i data-lucide="flame" class="w-3.5 h-3.5 text-amber-500"></i>
-            <span>Firebase Auth</span>
-          </button>
-          <button type="button" onclick="switchAuthTab('sandbox')" id="auth-tab-btn-sandbox" class="flex-1 py-1.5 rounded-lg font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all flex items-center justify-center gap-1.5">
-            <i data-lucide="users" class="w-3.5 h-3.5 text-blue-500"></i>
-            <span>Demo Sandbox</span>
-          </button>
-        </div>
+        <div id="auth-forms-container" class="space-y-4">
+          <!-- Main Modal Tabs (Auth vs Profile) -->
+          <div class="flex gap-1 bg-slate-100 dark:bg-black/50 p-1 rounded-xl border border-slate-200 dark:border-white/10 text-xs">
+            <button type="button" onclick="switchAuthTab('firebase')" id="auth-tab-btn-firebase" class="flex-1 py-1.5 rounded-lg font-semibold transition-all bg-white dark:bg-blue-600/30 text-blue-600 dark:text-blue-300 shadow-sm dark:shadow-none border border-slate-200/80 dark:border-blue-500/40 flex items-center justify-center gap-1.5">
+              <i data-lucide="flame" class="w-3.5 h-3.5 text-amber-500"></i>
+              <span>Firebase Auth</span>
+            </button>
+            <button type="button" onclick="switchAuthTab('sandbox')" id="auth-tab-btn-sandbox" class="admin-only hidden flex-1 py-1.5 rounded-lg font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all flex items-center justify-center gap-1.5">
+              <i data-lucide="users" class="w-3.5 h-3.5 text-blue-500"></i>
+              <span>Demo Sandbox</span>
+            </button>
+          </div>
 
-        <!-- Section A: Live Firebase Auth -->
-        <div id="auth-panel-firebase" class="space-y-3">
-          <!-- Google Sign In Button -->
+          <!-- Section A: Live Firebase Auth -->
+          <div id="auth-panel-firebase" class="space-y-3">
+            <!-- Google Sign In Button -->
           <button type="button" onclick="signInWithFirebaseGoogle()" class="w-full flex items-center justify-center gap-2.5 bg-white text-slate-800 hover:bg-slate-50 font-semibold py-2.5 px-4 rounded-xl text-xs border border-slate-300 dark:border-white/20 shadow-sm transition-all">
             <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
             <span>Sign In with Google (Firebase)</span>
@@ -1601,7 +1759,7 @@
           </div>
 
           <!-- Firebase Status & Config Box -->
-          <div id="firebase-status-banner" class="mt-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400 flex items-center justify-between">
+          <div id="firebase-status-banner" class="admin-only mt-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400 flex items-center justify-between">
             <span class="flex items-center gap-1.5">
               <span id="fb-status-dot" class="w-2 h-2 rounded-full bg-emerald-500"></span>
               <span id="fb-status-text" class="font-medium">Firebase Client Ready</span>
@@ -1650,6 +1808,7 @@
             </button>
           </div>
         </div>
+        </div> <!-- End of auth-forms-container -->
 
         <!-- Section C: Profile & Physiological Personalization -->
         <div class="pt-3 border-t border-slate-200 dark:border-white/10 space-y-3">
@@ -1658,6 +1817,16 @@
               <i data-lucide="user-check" class="w-3.5 h-3.5 text-cyan-500 dark:text-cyan-400"></i> Biological Profile & Timezone
             </span>
             <span class="text-[10px] text-slate-500 dark:text-slate-400 font-mono">Client Encrypted</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
+            <div>
+              <label class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 block mb-1">First Name (or Moniker)</label>
+              <input type="text" id="profile-first-name" oninput="saveProfileDetails()" placeholder="e.g. Alex" class="w-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 text-xs p-2.5 rounded-xl border border-slate-300 dark:border-slate-800 focus:outline-none focus:border-cyan-500 placeholder-slate-400 dark:placeholder-slate-600">
+            </div>
+            <div>
+              <label class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 block mb-1">Date of Birth</label>
+              <input type="date" id="profile-dob" oninput="saveProfileDetails()" class="w-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 text-xs p-2.5 rounded-xl border border-slate-300 dark:border-slate-800 focus:outline-none focus:border-cyan-500 text-slate-500">
+            </div>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -2252,28 +2421,52 @@
   <!-- ===================================================================== -->
   <div id="gemini-key-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
     <div class="double-bezel max-w-md w-full">
-      <div class="double-bezel-inner p-6">
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-xl bg-blue-600/20 text-blue-400 flex items-center justify-center">
-              <i data-lucide="key" class="w-4 h-4"></i>
+      <div class="double-bezel-inner p-5 sm:p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between pb-3 border-b border-white/10">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-400 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-cyan-500/25">
+              <i data-lucide="sparkles" class="w-5 h-5 text-white"></i>
             </div>
-            <h3 class="text-base font-bold text-white">Google Gemini API Key</h3>
+            <div>
+              <h3 class="text-base font-bold text-white">AI Model & Architecture</h3>
+              <p class="text-[11px] text-cyan-300 font-mono">Google Gemini 3.5 Flash • Cognitive Engine</p>
+            </div>
           </div>
-          <button onclick="closeGeminiKeyModal()" class="text-slate-400 hover:text-white">
-            <i data-lucide="x" class="w-5 h-5"></i>
+          <button onclick="closeGeminiKeyModal()" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
+            <i data-lucide="x" class="w-4 h-4"></i>
           </button>
         </div>
 
-        <p class="text-xs text-slate-400 mb-4">
-          Enter your Gemini API key from <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-blue-400 underline">Google AI Studio</a> to enable real live multi-turn AI interactions (Gemini 2.5 Flash).
+        <!-- Model Architecture & Info Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div class="p-3 rounded-2xl bg-cyan-950/40 border border-cyan-500/30 space-y-1">
+            <div class="flex items-center justify-between text-xs font-bold text-cyan-300">
+              <span class="flex items-center gap-1.5"><i data-lucide="cpu" class="w-3.5 h-3.5 text-cyan-400"></i> Model Engine</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Active</span>
+            </div>
+            <div class="text-xs font-semibold text-white">Gemini 3.5 Flash</div>
+            <p class="text-[10px] text-slate-400 leading-relaxed">High-velocity multi-turn reflection, CBT cognitive distortion tagging, and structured emotion analytics.</p>
+          </div>
+
+          <div class="p-3 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 space-y-1">
+            <div class="flex items-center justify-between text-xs font-bold text-emerald-300">
+              <span class="flex items-center gap-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i> Security Vault</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">AES-256</span>
+            </div>
+            <div class="text-xs font-semibold text-white">Zero-Knowledge Isolation</div>
+            <p class="text-[10px] text-slate-400 leading-relaxed">Client-encrypted entries with strict Firestore UID boundary partitions. Zero cross-user memory leakage.</p>
+          </div>
+        </div>
+
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Provide your custom API key from <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-cyan-400 underline font-semibold">Google AI Studio</a> to connect live production quota, or utilize built-in server credentials.
         </p>
 
-        <form onsubmit="submitGeminiApiKey(event)" class="space-y-3">
+        <form onsubmit="submitGeminiApiKey(event)" class="space-y-3 pt-1">
           <div>
-            <label class="text-xs text-slate-300 block mb-1">Gemini API Key</label>
-            <input type="password" id="gemini-api-key-input" placeholder="AIzaSy..." required class="w-full bg-black/60 text-slate-200 text-xs p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-blue-500 font-mono">
-            <p class="text-[10px] text-slate-500 mt-1">Stored securely in server runtime / Secret Manager. Never leaked to clients.</p>
+            <label class="text-xs font-semibold text-slate-300 block mb-1">Google AI Studio API Key</label>
+            <input type="password" id="gemini-api-key-input" placeholder="AIzaSy..." required class="w-full bg-black/60 text-slate-200 text-xs p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-cyan-500 font-mono">
+            <p class="text-[10px] text-slate-500 mt-1">Stored securely in server runtime / Secret Manager. Never exposed to browser clients.</p>
           </div>
 
           <div class="pt-2 flex justify-end gap-2">
@@ -3013,166 +3206,234 @@
   <!-- ===================================================================== -->
   <!-- MASTER NAVIGATION & HIERARCHICAL SECTION DIRECTORY MODAL -->
   <!-- ===================================================================== -->
-  <div id="master-menu-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/70 backdrop-blur-md hidden">
-    <div class="glass-modal max-w-2xl w-full p-5 sm:p-6 rounded-3xl border shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
-      <!-- Modal Header -->
-      <div class="flex items-center justify-between pb-3 border-b border-white/10 dark:border-white/10 shrink-0">
-        <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-400 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-cyan-500/25">
-            <i data-lucide="compass" class="w-4 h-4 text-white"></i>
-          </div>
-          <div>
-            <h3 class="text-sm font-bold text-slate-900 dark:text-white menu-header-title">Mind Cave Navigation Directory</h3>
-            <p class="text-[11px] text-slate-500 dark:text-slate-400">All application sections, cognitive tracks & child features</p>
-          </div>
-        </div>
-        <button onclick="closeMasterMenuModal()" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition-colors">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
-      </div>
-
-      <!-- Hierarchical Tree Grid -->
-      <div class="overflow-y-auto py-4 space-y-4 pr-1">
-        
-        <!-- Section 1: Studio (AI Sanctuary) -->
-        <div class="menu-section-box p-3.5 rounded-2xl border transition-colors">
-          <div class="flex items-center justify-between mb-2">
-            <div class="flex items-center gap-2 cursor-pointer group" onclick="navigateToSection('studio')">
-              <div class="w-7 h-7 rounded-lg bg-cyan-500/10 text-cyan-500 flex items-center justify-center shrink-0">
-                <i data-lucide="message-square" class="w-4 h-4"></i>
-              </div>
-              <h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white group-hover:text-cyan-400 transition-colors menu-title">1. Studio — AI Cognitive Sanctuary</h4>
+  <div id="master-menu-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-xl hidden overflow-y-auto">
+    <div class="double-bezel max-w-3xl w-full my-auto shadow-2xl">
+      <div class="double-bezel-inner p-4 sm:p-6 max-h-[88vh] overflow-y-auto flex flex-col gap-3.5 bg-slate-950/95 border-white/10">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between pb-3 border-b border-white/10 shrink-0">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-2xl bg-gradient-to-tr from-cyan-400 via-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/25 shrink-0">
+              <i data-lucide="compass" class="w-5 h-5 text-white"></i>
             </div>
-            <button onclick="navigateToSection('studio')" class="text-[11px] px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-600 dark:text-cyan-300 border border-cyan-500/30 font-semibold hover:bg-cyan-500/30 transition-colors">Open Studio →</button>
+            <div>
+              <h3 class="text-base font-bold text-white tracking-tight flex items-center gap-2">
+                <span>Mind Cave Navigation Directory</span>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">Master Index</span>
+              </h3>
+              <p class="text-[11px] text-slate-400">All cognitive features, journaling tracks & system configurations</p>
+            </div>
           </div>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs pt-1">
-            <button onclick="navigateToStudioPersona('cbt_reflector')" class="menu-subitem-btn p-2 rounded-xl border text-left transition-colors">
-              <div class="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i><span>Reflect</span></div>
-              <div class="text-[10px] text-slate-500 dark:text-slate-400">CBT Reframing</div>
-            </button>
-            <button onclick="navigateToStudioPersona('socratic_brainstormer')" class="menu-subitem-btn p-2 rounded-xl border text-left transition-colors">
-              <div class="font-bold text-amber-600 dark:text-amber-300 flex items-center gap-1.5"><i data-lucide="lightbulb" class="w-3.5 h-3.5"></i><span>Brainstorm</span></div>
-              <div class="text-[10px] text-slate-500 dark:text-slate-400">Socratic Ideation</div>
-            </button>
-            <button onclick="navigateToStudioPersona('executive_strategist')" class="menu-subitem-btn p-2 rounded-xl border text-left transition-colors">
-              <div class="font-bold text-cyan-600 dark:text-cyan-300 flex items-center gap-1.5"><i data-lucide="target" class="w-3.5 h-3.5"></i><span>Strategize</span></div>
-              <div class="text-[10px] text-slate-500 dark:text-slate-400">Execution Velocity</div>
-            </button>
-            <button onclick="navigateToStudioPersona('shadow_work_analyst')" class="menu-subitem-btn p-2 rounded-xl border text-left transition-colors">
-              <div class="font-bold text-purple-600 dark:text-purple-300 flex items-center gap-1.5"><i data-lucide="moon" class="w-3.5 h-3.5"></i><span>Shadow Work</span></div>
-              <div class="text-[10px] text-slate-500 dark:text-slate-400">Blindspot Analysis</div>
-            </button>
-          </div>
+          <button onclick="closeMasterMenuModal()" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
         </div>
 
-        <!-- Section 2: Journal & Life Intelligence -->
-        <div class="menu-section-box p-3.5 rounded-2xl border transition-colors">
-          <div class="flex items-center justify-between mb-2">
-            <div class="flex items-center gap-2 cursor-pointer group" onclick="navigateToSection('journals', 'chrono')">
-              <div class="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0">
-                <i data-lucide="book-open" class="w-4 h-4"></i>
-              </div>
-              <h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white group-hover:text-cyan-400 transition-colors menu-title">2. Journal — Life Intelligence System</h4>
-            </div>
-            <button onclick="navigateToSection('journals', 'chrono')" class="text-[11px] px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-600 dark:text-cyan-300 border border-cyan-500/30 font-semibold hover:bg-cyan-500/30 transition-colors">Open Journal →</button>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-xs pt-1">
-            <button onclick="navigateToSection('journals', 'chrono')" class="menu-subitem-btn p-2.5 rounded-xl border text-left transition-colors flex items-center justify-between">
-              <div>
-                <div class="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5"><i data-lucide="calendar" class="w-3.5 h-3.5 text-blue-500"></i><span>Living Timeline</span></div>
-                <div class="text-[10px] text-slate-500 dark:text-slate-400">Chronicle & 1-Tap Habits</div>
-              </div>
-              <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
-            </button>
-            <button onclick="navigateToSection('journals', 'harmony')" class="menu-subitem-btn p-2.5 rounded-xl border text-left transition-colors flex items-center justify-between">
-              <div>
-                <div class="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5 text-emerald-500"></i><span>Daily Harmony</span></div>
-                <div class="text-[10px] text-slate-500 dark:text-slate-400">96% Equilibrium & Audio</div>
-              </div>
-              <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
-            </button>
-            <button onclick="navigateToSection('journals', 'memory_lane')" class="menu-subitem-btn p-2.5 rounded-xl border text-left transition-colors flex items-center justify-between">
-              <div>
-                <div class="font-bold text-amber-600 dark:text-amber-300 flex items-center gap-1.5"><i data-lucide="history" class="w-3.5 h-3.5 text-amber-500"></i><span>Memory Lane</span></div>
-                <div class="text-[10px] text-slate-500 dark:text-slate-400">30-Day Decision Recall</div>
-              </div>
-              <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
-            </button>
-            <button onclick="navigateToSection('journals', 'memory')" class="menu-subitem-btn p-2.5 rounded-xl border text-left transition-colors flex items-center justify-between">
-              <div>
-                <div class="font-bold text-purple-600 dark:text-purple-300 flex items-center gap-1.5"><i data-lucide="image" class="w-3.5 h-3.5 text-purple-500"></i><span>Photo Stream</span></div>
-                <div class="text-[10px] text-slate-500 dark:text-slate-400">Google Photos & Scrapbook</div>
-              </div>
-              <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
-            </button>
-            <button onclick="navigateToSection('journals', 'sanctuary')" class="menu-subitem-btn p-2.5 rounded-xl border text-left transition-colors flex items-center justify-between">
-              <div>
-                <div class="font-bold text-indigo-600 dark:text-indigo-300 flex items-center gap-1.5"><i data-lucide="heart-pulse" class="w-3.5 h-3.5 text-indigo-500"></i><span>Bio Sanctuary</span></div>
-                <div class="text-[10px] text-slate-500 dark:text-slate-400">CBT Heatmaps & Diurnal Bio</div>
-              </div>
-              <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
-            </button>
-          </div>
-        </div>
+        <!-- Hierarchical Tree Grid -->
+        <div class="space-y-3.5 pt-1">
 
-        <!-- Section 3: MindPulse Cognitive Intelligence -->
-        <div class="menu-section-box p-3.5 rounded-2xl border transition-colors">
-          <div class="flex items-center justify-between mb-2">
-            <div class="flex items-center gap-2 cursor-pointer group" onclick="navigateToSection('analytics')">
-              <div class="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0">
-                <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
+          <!-- Section 0: System Settings, Theme & Notifications -->
+          <div class="p-3.5 rounded-2xl bg-gradient-to-r from-slate-900 via-blue-950/50 to-slate-900 border border-cyan-500/30 shadow-md space-y-2.5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center">
+                  <i data-lucide="sliders" class="w-3.5 h-3.5"></i>
+                </div>
+                <span class="text-xs font-bold text-slate-100 uppercase tracking-wider font-mono">System Preferences & Settings</span>
               </div>
-              <h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white group-hover:text-cyan-400 transition-colors menu-title">3. MindPulse — Cognitive Intelligence</h4>
+              <span class="text-[10px] text-cyan-400 font-mono px-2 py-0.5 rounded-full bg-cyan-950/60 border border-cyan-500/30">Live Sync</span>
             </div>
-            <button onclick="navigateToSection('analytics')" class="text-[11px] px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-600 dark:text-cyan-300 border border-cyan-500/30 font-semibold hover:bg-cyan-500/30 transition-colors">Open MindPulse →</button>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs pt-1">
-            <div class="menu-subitem-btn p-2.5 rounded-xl border">
-              <div class="font-bold text-cyan-600 dark:text-cyan-400 flex items-center gap-1.5"><i data-lucide="brain" class="w-3.5 h-3.5"></i><span>8 CBT Distortion Patterns</span></div>
-              <div class="text-[10px] text-slate-500 dark:text-slate-400">Real-time cognitive bias analysis</div>
-            </div>
-            <div class="menu-subitem-btn p-2.5 rounded-xl border">
-              <div class="font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1.5"><i data-lucide="radar" class="w-3.5 h-3.5"></i><span>6-Factor Emotion Radar</span></div>
-              <div class="text-[10px] text-slate-500 dark:text-slate-400">Joy, Clarity, Resilience, Focus</div>
-            </div>
-            <div class="menu-subitem-btn p-2.5 rounded-xl border">
-              <div class="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5"><i data-lucide="activity" class="w-3.5 h-3.5"></i><span>1-Click Guided CBT</span></div>
-              <div class="text-[10px] text-slate-500 dark:text-slate-400">Decatastrophizing & Continuum</div>
-            </div>
-          </div>
-        </div>
 
-        <!-- Section 4: Vault & Security -->
-        <div class="menu-section-box p-3.5 rounded-2xl border transition-colors">
-          <div class="flex items-center justify-between mb-2">
-            <div class="flex items-center gap-2 cursor-pointer group" onclick="navigateToSection('security')">
-              <div class="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0">
-                <i data-lucide="shield-check" class="w-4 h-4"></i>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+              <!-- Theme Toggle Button -->
+              <button onclick="toggleTheme()" class="p-2.5 rounded-xl bg-black/50 hover:bg-slate-900 border border-white/10 hover:border-amber-500/50 text-left transition-all flex flex-col justify-between gap-1.5 group cursor-pointer shadow-sm">
+                <div class="flex items-center justify-between">
+                  <i id="menu-theme-icon" data-lucide="sun" class="w-4 h-4 text-amber-400"></i>
+                  <span class="text-[10px] font-mono text-slate-400 group-hover:text-amber-300">Toggle</span>
+                </div>
+                <div>
+                  <div class="font-bold text-slate-200 group-hover:text-white" id="menu-theme-label">Theme Mode</div>
+                  <div class="text-[10px] text-slate-400" id="menu-theme-sublabel">Light / Dark</div>
+                </div>
+              </button>
+
+              <!-- Notifications Button -->
+              <button onclick="closeMasterMenuModal(); openNotificationsModal();" class="p-2.5 rounded-xl bg-black/50 hover:bg-slate-900 border border-white/10 hover:border-amber-500/50 text-left transition-all flex flex-col justify-between gap-1.5 group cursor-pointer shadow-sm">
+                <div class="flex items-center justify-between">
+                  <i data-lucide="bell" class="w-4 h-4 text-amber-400"></i>
+                  <span class="text-[10px] font-mono text-emerald-400">Active</span>
+                </div>
+                <div>
+                  <div class="font-bold text-slate-200 group-hover:text-white">Notifications</div>
+                  <div class="text-[10px] text-slate-400">Alarms & Check-ins</div>
+                </div>
+              </button>
+
+              <!-- Account & Biological Profile -->
+              <button onclick="closeMasterMenuModal(); openAuthModal();" class="p-2.5 rounded-xl bg-black/50 hover:bg-slate-900 border border-white/10 hover:border-blue-500/50 text-left transition-all flex flex-col justify-between gap-1.5 group cursor-pointer shadow-sm">
+                <div class="flex items-center justify-between">
+                  <i data-lucide="user-check" class="w-4 h-4 text-blue-400"></i>
+                  <span class="text-[10px] font-mono text-cyan-400">Bio Profile</span>
+                </div>
+                <div>
+                  <div class="font-bold text-slate-200 group-hover:text-white">Profile & Bio</div>
+                  <div class="text-[10px] text-slate-400">Gender & Vitality</div>
+                </div>
+              </button>
+
+              <!-- Gemini API Key Setup -->
+              <button onclick="closeMasterMenuModal(); openGeminiKeyModal();" class="p-2.5 rounded-xl bg-black/50 hover:bg-slate-900 border border-white/10 hover:border-emerald-500/50 text-left transition-all flex flex-col justify-between gap-1.5 group cursor-pointer shadow-sm">
+                <div class="flex items-center justify-between">
+                  <i data-lucide="sparkles" class="w-4 h-4 text-emerald-400"></i>
+                  <span class="text-[10px] font-mono text-emerald-400">Gemini 3.5</span>
+                </div>
+                <div>
+                  <div class="font-bold text-slate-200 group-hover:text-white">AI Studio Key</div>
+                  <div class="text-[10px] text-slate-400">Config & Privacy</div>
+                </div>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Section 1: Studio (AI Sanctuary) -->
+          <div class="menu-section-box p-3.5 rounded-2xl bg-black/40 border border-cyan-500/20 transition-all hover:border-cyan-500/40">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2 cursor-pointer group" onclick="navigateToSection('studio')">
+                <div class="w-7 h-7 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0">
+                  <i data-lucide="message-square" class="w-4 h-4"></i>
+                </div>
+                <h4 class="text-xs sm:text-sm font-bold text-white group-hover:text-cyan-300 transition-colors">1. Studio — AI Cognitive Sanctuary</h4>
               </div>
-              <h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white group-hover:text-cyan-400 transition-colors menu-title">4. Vault — Privacy & Security Hardening</h4>
+              <button onclick="navigateToSection('studio')" class="text-[11px] px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold hover:bg-cyan-500/30 transition-colors">Open Studio →</button>
             </div>
-            <button onclick="navigateToSection('security')" class="text-[11px] px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-600 dark:text-cyan-300 border border-cyan-500/30 font-semibold hover:bg-cyan-500/30 transition-colors">Open Vault →</button>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs pt-1">
+              <button onclick="navigateToStudioPersona('cbt_reflector')" class="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-emerald-500/30 text-left transition-colors">
+                <div class="font-bold text-emerald-400 flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i><span>Reflect</span></div>
+                <div class="text-[10px] text-slate-400">CBT Reframing</div>
+              </button>
+              <button onclick="navigateToStudioPersona('socratic_brainstormer')" class="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-amber-500/30 text-left transition-colors">
+                <div class="font-bold text-amber-300 flex items-center gap-1.5"><i data-lucide="lightbulb" class="w-3.5 h-3.5"></i><span>Brainstorm</span></div>
+                <div class="text-[10px] text-slate-400">Socratic Ideation</div>
+              </button>
+              <button onclick="navigateToStudioPersona('executive_strategist')" class="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-cyan-500/30 text-left transition-colors">
+                <div class="font-bold text-cyan-300 flex items-center gap-1.5"><i data-lucide="target" class="w-3.5 h-3.5"></i><span>Strategize</span></div>
+                <div class="text-[10px] text-slate-400">Execution Velocity</div>
+              </button>
+              <button onclick="navigateToStudioPersona('shadow_work_analyst')" class="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-purple-500/30 text-left transition-colors">
+                <div class="font-bold text-purple-300 flex items-center gap-1.5"><i data-lucide="moon" class="w-3.5 h-3.5"></i><span>Shadow Work</span></div>
+                <div class="text-[10px] text-slate-400">Blindspot Analysis</div>
+              </button>
+            </div>
           </div>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs pt-1">
-            <div class="menu-subitem-btn p-2.5 rounded-xl border">
-              <div class="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5"><i data-lucide="lock" class="w-3.5 h-3.5"></i><span>Client AES-256 Vault</span></div>
-              <div class="text-[10px] text-slate-500 dark:text-slate-400">Zero-knowledge local encryption</div>
-            </div>
-            <div class="menu-subitem-btn p-2.5 rounded-xl border">
-              <div class="font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5"><i data-lucide="shield" class="w-3.5 h-3.5"></i><span>Multi-Tenant Isolation</span></div>
-              <div class="text-[10px] text-slate-500 dark:text-slate-400">Strict Firestore UID boundaries</div>
-            </div>
-            <div class="menu-subitem-btn p-2.5 rounded-xl border">
-              <div class="font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1.5"><i data-lucide="search" class="w-3.5 h-3.5"></i><span>Live Security Audit</span></div>
-              <div class="text-[10px] text-slate-500 dark:text-slate-400">Automated credential checks</div>
-            </div>
-          </div>
-          <div class="pt-2 mt-2 border-t border-slate-200 dark:border-white/5 flex items-center justify-between">
-            <span class="text-[10px] text-rose-500 dark:text-rose-400 font-semibold flex items-center gap-1"><i data-lucide="alert-triangle" class="w-3 h-3"></i><span>Danger Zone: Permanent Factory Reset</span></span>
-            <button onclick="closeMasterMenuModal(); openFactoryResetModal();" class="text-[10px] px-2 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 dark:text-rose-400 border border-rose-500/30 font-bold transition-colors">Wipe & Reset Everything →</button>
-          </div>
-        </div>
 
+          <!-- Section 2: Journal & Life Intelligence -->
+          <div class="menu-section-box p-3.5 rounded-2xl bg-black/40 border border-emerald-500/20 transition-all hover:border-emerald-500/40">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2 cursor-pointer group" onclick="navigateToSection('journals', 'chrono')">
+                <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                  <i data-lucide="book-open" class="w-4 h-4"></i>
+                </div>
+                <h4 class="text-xs sm:text-sm font-bold text-white group-hover:text-emerald-300 transition-colors">2. Journal — Life Intelligence System</h4>
+              </div>
+              <button onclick="navigateToSection('journals', 'chrono')" class="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-semibold hover:bg-emerald-500/30 transition-colors">Open Journal →</button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-xs pt-1">
+              <button onclick="navigateToSection('journals', 'chrono')" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-blue-500/30 text-left transition-colors flex items-center justify-between">
+                <div>
+                  <div class="font-bold text-slate-100 flex items-center gap-1.5"><i data-lucide="calendar" class="w-3.5 h-3.5 text-blue-400"></i><span>Living Timeline</span></div>
+                  <div class="text-[10px] text-slate-400">Chronicle & 1-Tap Habits</div>
+                </div>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
+              </button>
+              <button onclick="navigateToSection('journals', 'harmony')" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-emerald-500/30 text-left transition-colors flex items-center justify-between">
+                <div>
+                  <div class="font-bold text-emerald-400 flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5 text-emerald-400"></i><span>Daily Harmony</span></div>
+                  <div class="text-[10px] text-slate-400">96% Equilibrium & Audio</div>
+                </div>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
+              </button>
+              <button onclick="navigateToSection('journals', 'memory_lane')" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-amber-500/30 text-left transition-colors flex items-center justify-between">
+                <div>
+                  <div class="font-bold text-amber-300 flex items-center gap-1.5"><i data-lucide="history" class="w-3.5 h-3.5 text-amber-400"></i><span>Memory Lane</span></div>
+                  <div class="text-[10px] text-slate-400">30-Day Decision Recall</div>
+                </div>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
+              </button>
+              <button onclick="navigateToSection('journals', 'memory')" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-purple-500/30 text-left transition-colors flex items-center justify-between">
+                <div>
+                  <div class="font-bold text-purple-300 flex items-center gap-1.5"><i data-lucide="image" class="w-3.5 h-3.5 text-purple-400"></i><span>Photo Stream</span></div>
+                  <div class="text-[10px] text-slate-400">Photos & Scrapbook</div>
+                </div>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
+              </button>
+              <button onclick="navigateToSection('journals', 'sanctuary')" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-indigo-500/30 text-left transition-colors flex items-center justify-between">
+                <div>
+                  <div class="font-bold text-indigo-300 flex items-center gap-1.5"><i data-lucide="heart-pulse" class="w-3.5 h-3.5 text-indigo-400"></i><span>Bio Sanctuary</span></div>
+                  <div class="text-[10px] text-slate-400">Milestone Dreams & Radar</div>
+                </div>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Section 3: MindPulse Cognitive Intelligence -->
+          <div class="menu-section-box p-3.5 rounded-2xl bg-black/40 border border-blue-500/20 transition-all hover:border-blue-500/40">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2 cursor-pointer group" onclick="navigateToSection('analytics')">
+                <div class="w-7 h-7 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
+                  <i data-lucide="brain-circuit" class="w-4 h-4"></i>
+                </div>
+                <h4 class="text-xs sm:text-sm font-bold text-white group-hover:text-blue-300 transition-colors">3. MindPulse — Cognitive Intelligence</h4>
+              </div>
+              <button onclick="navigateToSection('analytics')" class="text-[11px] px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/40 font-semibold hover:bg-blue-500/30 transition-colors">Open MindPulse →</button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs pt-1">
+              <div class="p-2.5 rounded-xl bg-white/5 border border-white/5">
+                <div class="font-bold text-cyan-400 flex items-center gap-1.5"><i data-lucide="brain" class="w-3.5 h-3.5"></i><span>8 CBT Distortion Patterns</span></div>
+                <div class="text-[10px] text-slate-400">Real-time cognitive bias analysis</div>
+              </div>
+              <div class="p-2.5 rounded-xl bg-white/5 border border-white/5">
+                <div class="font-bold text-blue-400 flex items-center gap-1.5"><i data-lucide="radar" class="w-3.5 h-3.5"></i><span>6-Factor Emotion Radar</span></div>
+                <div class="text-[10px] text-slate-400">Joy, Clarity, Resilience, Focus</div>
+              </div>
+              <div class="p-2.5 rounded-xl bg-white/5 border border-white/5">
+                <div class="font-bold text-emerald-400 flex items-center gap-1.5"><i data-lucide="activity" class="w-3.5 h-3.5"></i><span>1-Click Guided CBT</span></div>
+                <div class="text-[10px] text-slate-400">Decatastrophizing & Continuum</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 4: Vault & Security -->
+          <div class="menu-section-box p-3.5 rounded-2xl bg-black/40 border border-emerald-500/20 transition-all hover:border-emerald-500/40">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2 cursor-pointer group" onclick="navigateToSection('security')">
+                <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                  <i data-lucide="shield-check" class="w-4 h-4"></i>
+                </div>
+                <h4 class="text-xs sm:text-sm font-bold text-white group-hover:text-emerald-300 transition-colors">4. Vault — Privacy & Security Hardening</h4>
+              </div>
+              <button onclick="navigateToSection('security')" class="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-semibold hover:bg-emerald-500/30 transition-colors">Open Vault →</button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs pt-1">
+              <div class="p-2.5 rounded-xl bg-white/5 border border-white/5">
+                <div class="font-bold text-emerald-400 flex items-center gap-1.5"><i data-lucide="lock" class="w-3.5 h-3.5"></i><span>Client AES-256 Vault</span></div>
+                <div class="text-[10px] text-slate-400">Zero-knowledge local encryption</div>
+              </div>
+              <div class="p-2.5 rounded-xl bg-white/5 border border-white/5">
+                <div class="font-bold text-indigo-400 flex items-center gap-1.5"><i data-lucide="shield" class="w-3.5 h-3.5"></i><span>Multi-Tenant Isolation</span></div>
+                <div class="text-[10px] text-slate-400">Strict Firestore UID boundaries</div>
+              </div>
+              <div class="p-2.5 rounded-xl bg-white/5 border border-white/5">
+                <div class="font-bold text-amber-400 flex items-center gap-1.5"><i data-lucide="search" class="w-3.5 h-3.5"></i><span>Live Security Audit</span></div>
+                <div class="text-[10px] text-slate-400">Automated credential checks</div>
+              </div>
+            </div>
+            <div class="pt-2 mt-2 border-t border-white/5 flex items-center justify-between">
+              <span class="text-[10px] text-rose-400 font-semibold flex items-center gap-1"><i data-lucide="alert-triangle" class="w-3 h-3 text-rose-400"></i><span>Danger Zone: Permanent Factory Reset</span></span>
+              <button onclick="closeMasterMenuModal(); openFactoryResetModal();" class="text-[10px] px-2 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold transition-colors">Wipe & Reset Everything →</button>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
   </div>
@@ -3372,32 +3633,28 @@
     </div>
   </div>
 
-  <div class="mobile-bottom-nav md:hidden fixed bottom-3 left-3 right-3 z-40 bg-slate-950/90 backdrop-blur-xl border border-white/10 rounded-2xl p-1.5 flex items-center justify-around shadow-2xl">
-    <button onclick="switchTab('studio')" id="mobile-tab-studio" class="mobile-nav-btn active flex flex-col items-center gap-0.5 text-[10px] text-cyan-400 font-medium py-1 px-2 rounded-xl transition-colors">
+  <div class="mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 w-full z-40 bg-slate-950/95 backdrop-blur-2xl border-t border-slate-800/60 px-2 pt-2 flex items-center justify-around shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+    <button onclick="switchTab('studio')" id="mobile-tab-studio" class="mobile-nav-btn active flex flex-col items-center gap-0.5 text-[10px] text-cyan-400 font-medium py-1 px-3 rounded-xl transition-colors">
       <i data-lucide="message-square" class="w-4 h-4"></i>
       <span>Studio</span>
     </button>
-    <button onclick="switchTab('chrono')" id="mobile-tab-chrono" class="mobile-nav-btn flex flex-col items-center gap-0.5 text-[10px] text-slate-400 font-medium py-1 px-2 rounded-xl transition-colors">
-      <i data-lucide="calendar" class="w-4 h-4"></i>
-      <span>Timeline</span>
+    <button onclick="switchTab('journals')" id="mobile-tab-journals" class="mobile-nav-btn flex flex-col items-center gap-0.5 text-[10px] text-slate-400 font-medium py-1 px-3 rounded-xl transition-colors">
+      <i data-lucide="book-open" class="w-4 h-4"></i>
+      <span>Journal</span>
     </button>
     
     <!-- Quick Log Floating Button in Center -->
-    <button onclick="openNewJournalModal()" class="w-10 h-10 -mt-5 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-600 text-white flex items-center justify-center shadow-lg shadow-cyan-500/30 active:scale-95 transition-transform" title="Quick Log Moment">
+    <button onclick="openNewJournalModal()" class="w-10 h-10 -mt-5 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-600 text-white flex items-center justify-center shadow-lg shadow-cyan-500/30 active:scale-95 transition-transform shrink-0" title="Quick Log Moment">
       <i data-lucide="plus" class="w-5 h-5"></i>
     </button>
 
-    <button onclick="switchTab('harmony')" id="mobile-tab-harmony" class="mobile-nav-btn flex flex-col items-center gap-0.5 text-[10px] text-slate-400 font-medium py-1 px-2 rounded-xl transition-colors">
-      <i data-lucide="sparkles" class="w-4 h-4 text-emerald-400"></i>
-      <span>Harmony</span>
-    </button>
-    <button onclick="switchTab('memory_lane')" id="mobile-tab-memory_lane" class="mobile-nav-btn flex flex-col items-center gap-0.5 text-[10px] text-slate-400 font-medium py-1 px-2 rounded-xl transition-colors">
-      <i data-lucide="history" class="w-4 h-4 text-purple-400"></i>
-      <span>Memory</span>
-    </button>
-    <button onclick="switchTab('analytics')" id="mobile-tab-analytics" class="mobile-nav-btn flex flex-col items-center gap-0.5 text-[10px] text-slate-400 font-medium py-1 px-2 rounded-xl transition-colors">
+    <button onclick="switchTab('analytics')" id="mobile-tab-analytics" class="mobile-nav-btn flex flex-col items-center gap-0.5 text-[10px] text-slate-400 font-medium py-1 px-3 rounded-xl transition-colors">
       <i data-lucide="brain-circuit" class="w-4 h-4"></i>
-      <span>MindPulse</span>
+      <span>Dashboard</span>
+    </button>
+    <button onclick="switchTab('security')" id="mobile-tab-security" class="mobile-nav-btn flex flex-col items-center gap-0.5 text-[10px] text-slate-400 font-medium py-1 px-3 rounded-xl transition-colors">
+      <i data-lucide="shield" class="w-4 h-4"></i>
+      <span>Vault</span>
     </button>
   </div>
 

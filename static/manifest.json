@@ -1,0 +1,23 @@
+{
+  "name": "Mind Cave Journal",
+  "short_name": "Mind Cave",
+  "description": "Personal AI-powered Life Intelligence System",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "shortcuts": [
+    {
+      "name": "Quick Moment",
+      "short_name": "Moment",
+      "description": "Record a quick journal moment",
+      "url": "/?action=new_moment"
+    },
+    {
+      "name": "Log Habit",
+      "short_name": "Habits",
+      "description": "Jump to habits and tracking",
+      "url": "/?action=habits"
+    }
+  ]
+}

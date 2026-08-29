@@ -56,6 +56,7 @@ class ChatRequest(BaseModel):
     session_id: Optional[str] = None
     persona: str = Field("cbt_reflector", description="cbt_reflector | socratic_brainstormer | executive_strategist | shadow_work_analyst")
     analyze_cognition: bool = True
+    profile_context: Optional[dict] = None
 
 
 class JournalCreateRequest(BaseModel):
@@ -256,7 +257,8 @@ async def chat_interaction(
     # 4. Generate AI response via Gemini with security boundaries
     ai_response = gemini_service.generate_chat_response(
         messages=formatted_history,
-        persona=req.persona
+        persona=req.persona,
+        profile_context=req.profile_context
     )
 
     # 5. Extract MindPulse cognitive analytics if enabled
@@ -419,6 +421,27 @@ async def get_cognitive_analytics(current_user: UserContext = Depends(get_curren
     """Retrieve MindPulse cognitive trends strictly for the authenticated user."""
     analytics = firestore_manager.get_analytics(user_id=current_user.uid)
     return {"analytics": analytics}
+
+@app.get("/api/health/telemetry")
+async def get_health_telemetry(current_user: UserContext = Depends(get_current_user)):
+    """
+    Placeholder for Google Fit REST API integration.
+    Requires OAuth2 scopes:
+    - https://www.googleapis.com/auth/fitness.activity.read
+    - https://www.googleapis.com/auth/fitness.sleep.read
+    """
+    # Mock data to refine the UI presentation as requested by user.
+    # In a full implementation, use google-api-python-client here.
+    return {
+        "steps": {
+            "current": 8420,
+            "goal": 10000
+        },
+        "sleep": {
+            "hours": 7.8,
+            "score": 88
+        }
+    }
 
 
 # =============================================================================
