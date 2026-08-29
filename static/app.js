@@ -459,18 +459,31 @@ function startNewSession() {
   state.currentSessionId = `session_${Date.now()}`;
   const chatMessages = document.getElementById('chat-messages');
   chatMessages.innerHTML = `
-    <div class="chat-msg-ai p-4 max-w-3xl">
-      <div class="flex items-center gap-2 mb-2">
-        <span class="w-5 h-5 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-[10px] font-bold">AI</span>
-        <span class="text-xs font-semibold text-slate-300">Gemini Reflective Partner</span>
-        <span class="text-[10px] text-slate-500 font-mono">Session Refreshed</span>
+    <div class="chat-msg-ai-card">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-7 h-7 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-md shadow-cyan-500/20 text-white">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-bold text-white">Gemini Cognitive Studio</span>
+              <span class="text-[10px] bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded-full font-mono font-semibold">Gemini 2.5 Flash</span>
+            </div>
+            <span class="text-[11px] text-slate-400">Security-Guarded & Isolated Cloud Firestore</span>
+          </div>
+        </div>
+        <span class="text-[10px] text-emerald-400 bg-emerald-950/40 border border-emerald-500/30 px-2 py-0.5 rounded-full font-mono flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Zero Leakage
+        </span>
       </div>
+
       <div class="markdown-body text-sm text-slate-200">
-        <p>New session initialized for <strong>${escapeHtml(state.currentUser.name)}</strong>. What thoughts or ideas would you like to explore?</p>
+        <p>New thread initialized for <strong>${escapeHtml(state.currentUser.name)}</strong>. What is on your mind today? Feel free to brainstorm an architecture, unpack cognitive distortions, or reflect on your day.</p>
       </div>
     </div>
   `;
-  document.getElementById('live-cognitive-bar').classList.add('hidden');
+  lucide.createIcons();
 }
 
 function insertPrompt(promptText) {
@@ -539,60 +552,156 @@ async function sendChatMessage(event) {
 function appendChatMessage(role, content, authorName, modelTag, cognitiveData = null, originalPrompt = "") {
   const container = document.getElementById('chat-messages');
   const isUser = role === 'user';
+  const turnId = `turn_${Date.now()}_${Math.floor(Math.random()*1000)}`;
 
   const msgDiv = document.createElement('div');
-  msgDiv.className = isUser 
-    ? 'chat-msg-user p-4 max-w-2xl ml-auto text-sm text-slate-100'
-    : 'chat-msg-ai p-4 max-w-3xl text-sm text-slate-200';
+  msgDiv.className = isUser ? 'chat-msg-user-wrap' : 'w-full';
 
-  const headerHtml = isUser
-    ? `<div class="flex items-center justify-end gap-2 mb-1.5 text-xs text-blue-300 font-semibold"><span>${escapeHtml(authorName)}</span></div>`
-    : `<div class="flex items-center justify-between mb-2">
-        <div class="flex items-center gap-2">
-          <span class="w-5 h-5 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-[10px] font-bold">AI</span>
-          <span class="text-xs font-semibold text-slate-300">${escapeHtml(authorName)}</span>
-          ${modelTag ? `<span class="text-[10px] bg-white/5 px-2 py-0.5 rounded text-slate-400 font-mono">${modelTag}</span>` : ''}
+  if (isUser) {
+    msgDiv.innerHTML = `
+      <div class="chat-msg-user-card">
+        <div class="flex items-center justify-between gap-3 mb-1.5 text-xs text-blue-300 font-semibold">
+          <span>${escapeHtml(authorName)}</span>
+          <span class="text-[10px] text-slate-400 font-mono">You</span>
         </div>
-        ${cognitiveData && cognitiveData.primary_emotion ? `
-          <span class="text-[10px] bg-purple-950/40 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded-full font-medium">
-            💙 ${escapeHtml(cognitiveData.primary_emotion)}
-          </span>
+        <div class="text-sm text-slate-100 whitespace-pre-wrap leading-relaxed">${escapeHtml(content)}</div>
+      </div>
+    `;
+  } else {
+    const distortions = cognitiveData?.detected_distortions || [];
+    const tags = cognitiveData?.semantic_tags || ['#SelfReflection'];
+
+    msgDiv.innerHTML = `
+      <div class="chat-msg-ai-card">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-3.5 pb-2.5 border-b border-white/5">
+          <div class="flex items-center gap-2.5">
+            <div class="w-7 h-7 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-md shadow-cyan-500/25 text-white">
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-bold text-white">${escapeHtml(authorName)}</span>
+                <span class="text-[10px] bg-blue-500/10 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded-full font-mono font-semibold">
+                  ${modelTag || 'gemini-2.5-flash'}
+                </span>
+              </div>
+              <span class="text-[11px] text-slate-400 capitalize">${(state.currentPersona || '').replace('_', ' ')} Guide</span>
+            </div>
+          </div>
+
+          ${cognitiveData && cognitiveData.primary_emotion ? `
+            <span class="text-xs bg-purple-950/40 text-purple-300 border border-purple-500/30 px-2.5 py-1 rounded-full font-medium flex items-center gap-1.5 shadow-sm">
+              <span>💙</span> ${escapeHtml(cognitiveData.primary_emotion)}
+            </span>
+          ` : ''}
+        </div>
+
+        <!-- Expandable MindPulse Matrix Reasoning Pill (Perplexity Style) -->
+        ${cognitiveData ? `
+          <div class="mb-3.5">
+            <button type="button" onclick="toggleReasoningAccordion('${turnId}')" class="reasoning-pill-btn">
+              <div class="flex items-center gap-2 text-xs text-slate-300 font-medium">
+                <i data-lucide="brain" class="w-3.5 h-3.5 text-cyan-400"></i>
+                <span>MindPulse Cognitive Matrix</span>
+                ${distortions.length > 0 ? `
+                  <span class="bg-amber-950/70 text-amber-300 border border-amber-500/40 px-2 py-0.2 rounded-full text-[10px] font-bold">
+                    ⚠️ ${distortions.length} Distortion Pattern(s)
+                  </span>
+                ` : `
+                  <span class="text-emerald-400 text-[10px] font-mono">✨ Balanced Emotional Vector</span>
+                `}
+              </div>
+              <i data-lucide="chevron-down" id="reasoning-icon-${turnId}" class="w-3.5 h-3.5 text-slate-400 transition-transform"></i>
+            </button>
+
+            <div id="reasoning-body-${turnId}" class="hidden p-3 rounded-xl bg-black/40 border border-white/5 space-y-2.5 mb-3">
+              <div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5 text-center">
+                ${Object.entries(cognitiveData.mood_scores || {}).map(([k, v]) => `
+                  <div class="bg-slate-900/80 p-1.5 rounded-lg border border-white/5">
+                    <div class="text-[9px] text-slate-400 uppercase font-mono">${k}</div>
+                    <div class="text-xs font-bold text-blue-400 font-mono">${v}%</div>
+                  </div>
+                `).join('')}
+              </div>
+              ${cognitiveData.cognitive_reframing ? `
+                <div class="text-xs text-slate-300 bg-blue-950/30 p-2.5 rounded-lg border border-blue-500/20 leading-relaxed">
+                  <strong class="text-blue-400">🔄 Clinical Reframing:</strong> ${escapeHtml(cognitiveData.cognitive_reframing)}
+                </div>
+              ` : ''}
+            </div>
+          </div>
         ` : ''}
-       </div>`;
 
-  const parsedContent = isUser ? `<p class="whitespace-pre-wrap">${escapeHtml(content)}</p>` : `<div class="markdown-body">${marked.parse(content)}</div>`;
-
-  // Tagging & Metadata Footer for AI responses
-  let footerHtml = '';
-  if (!isUser && cognitiveData) {
-    const distortions = cognitiveData.detected_distortions || [];
-    const tags = cognitiveData.semantic_tags || ['#SelfReflection'];
-    
-    footerHtml = `
-      <div class="mt-3 pt-3 border-t border-white/5 flex flex-wrap items-center justify-between gap-2 text-xs">
-        <div class="flex flex-wrap items-center gap-1.5">
-          ${distortions.map(d => `
-            <span class="bg-amber-950/60 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-full text-[10px] font-semibold flex items-center gap-1">
-              ⚠️ ${escapeHtml(d)}
-            </span>
-          `).join('')}
-          ${tags.map(t => `
-            <span class="bg-blue-950/60 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded-full text-[10px] font-mono">
-              ${escapeHtml(t)}
-            </span>
-          `).join('')}
+        <!-- Markdown Body -->
+        <div class="markdown-body text-sm text-slate-200 leading-relaxed">
+          ${marked.parse(content)}
         </div>
-        <button onclick="saveQuickJournal('${escapeHtml(originalPrompt || 'Reflection')}', '${escapeHtml(content).replace(/'/g, "\\'")}', '${cognitiveData.primary_emotion || 'Reflective'}')" class="text-[10px] text-slate-400 hover:text-white flex items-center gap-1 bg-white/5 hover:bg-white/10 px-2 py-1 rounded-lg transition-all">
-          <i data-lucide="bookmark" class="w-3 h-3 text-cyan-400"></i> Save to Vault
-        </button>
+
+        <!-- Footer Action Toolbar -->
+        <div class="mt-4 pt-3 border-t border-white/5 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div class="flex flex-wrap items-center gap-1.5">
+            ${distortions.map(d => `
+              <span class="bg-amber-950/60 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-full text-[10px] font-semibold flex items-center gap-1">
+                ⚠️ ${escapeHtml(d)}
+              </span>
+            `).join('')}
+            ${tags.map(t => `
+              <span class="bg-blue-950/60 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded-full text-[10px] font-mono">
+                ${escapeHtml(t)}
+              </span>
+            `).join('')}
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="copyToClipboard('${escapeHtml(content).replace(/'/g, "\\'")}', this)" class="text-xs text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-lg transition-all flex items-center gap-1">
+              <i data-lucide="copy" class="w-3 h-3 text-slate-400"></i>
+              <span>Copy</span>
+            </button>
+            <button onclick="saveQuickJournal('${escapeHtml(originalPrompt || 'Reflection')}', '${escapeHtml(content).replace(/'/g, "\\'")}', '${cognitiveData?.primary_emotion || 'Reflective'}')" class="text-xs text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-lg transition-all flex items-center gap-1">
+              <i data-lucide="bookmark" class="w-3 h-3 text-cyan-400"></i>
+              <span>Save Vault</span>
+            </button>
+          </div>
+        </div>
       </div>
     `;
   }
 
-  msgDiv.innerHTML = `${headerHtml}${parsedContent}${footerHtml}`;
   container.appendChild(msgDiv);
   container.scrollTop = container.scrollHeight;
   lucide.createIcons();
+}
+
+function toggleReasoningAccordion(turnId) {
+  const body = document.getElementById(`reasoning-body-${turnId}`);
+  const icon = document.getElementById(`reasoning-icon-${turnId}`);
+  if (body) {
+    const isHidden = body.classList.contains('hidden');
+    if (isHidden) {
+      body.classList.remove('hidden');
+      if (icon) icon.style.transform = 'rotate(180deg)';
+    } else {
+      body.classList.add('hidden');
+      if (icon) icon.style.transform = 'rotate(0deg)';
+    }
+  }
+}
+
+function copyToClipboard(text, btnElement) {
+  navigator.clipboard.writeText(text).then(() => {
+    if (btnElement) {
+      const span = btnElement.querySelector('span');
+      if (span) {
+        const orig = span.textContent;
+        span.textContent = 'Copied!';
+        setTimeout(() => span.textContent = orig, 1500);
+      }
+    }
+    showToast('Response copied to clipboard!');
+  }).catch(() => {
+    showToast('Copied to clipboard');
+  });
 }
 
 function updateLiveCognitiveBar(cogData) {
