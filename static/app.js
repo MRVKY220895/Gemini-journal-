@@ -1290,94 +1290,12 @@ const state = {
   isRecordingVoice: false,
   speechRecognition: null,
   speechUtterance: null,
-  agendaItems: safeJSONParse(localStorage.getItem('mind_cave_agenda_items'), null) || (localStorage.getItem('mind_cave_is_reset') ? [] : [
-    {
-      id: 'task_1',
-      type: 'todo',
-      title: 'Review System Architecture with Core Engineering',
-      date: (new Date()).toISOString().split('T')[0],
-      time: '14:30',
-      priority: 'high',
-      completed: false,
-      gcalSynced: true
-    },
-    {
-      id: 'task_2',
-      type: 'reminder',
-      title: 'Take 15-min Circadian Stroll & Deep Breathing',
-      date: (new Date()).toISOString().split('T')[0],
-      time: '16:00',
-      priority: 'normal',
-      completed: true,
-      gcalSynced: true
-    },
-    {
-      id: 'task_3',
-      type: 'milestone',
-      title: 'Quarterly Mind & Goal Alignment Milestone',
-      date: (new Date()).toISOString().split('T')[0],
-      time: '19:00',
-      priority: 'high',
-      completed: false,
-      gcalSynced: true
-    }
-  ]),
-  todayGoals: safeJSONParse(localStorage.getItem('mind_cave_today_goals'), null) || (localStorage.getItem('mind_cave_is_reset') ? [] : [
-    {
-      id: 'g1',
-      title: 'Ship Core System Architecture & Validate Test Boundaries',
-      completed: true,
-      startTime: '09:30',
-      endTime: '12:00',
-      duration: '2h 30m',
-      category: 'north_star',
-      categoryLabel: 'North Star',
-      notes: 'Clean zero-warning build & 7/7 pytest verification'
-    },
-    {
-      id: 'g2',
-      title: '30m Mindful Nature Walk & Somatic Breathing',
-      completed: true,
-      startTime: '13:30',
-      endTime: '14:15',
-      duration: '45m',
-      category: 'wellness',
-      categoryLabel: 'Wellness',
-      notes: 'Zone 2 cardio completed'
-    },
-    {
-      id: 'g3',
-      title: 'Refactor Longitudinal Trajectory & Daily Harmony Engine',
-      completed: false,
-      startTime: '16:00',
-      endTime: '18:00',
-      duration: '2h',
-      category: 'deep_work',
-      categoryLabel: 'Deep Work',
-      notes: 'In progress'
-    }
-  ]),
-  todayGoal: safeJSONParse(localStorage.getItem('mind_cave_today_goal'), null) || (localStorage.getItem('mind_cave_is_reset') ? { text: '', completed: false } : {
-    text: "Ship Core System Architecture & complete evening 30m mindful walk",
-    completed: false
-  }),
-  habitsList: safeJSONParse(localStorage.getItem('mind_cave_habits_list'), null) || (localStorage.getItem('mind_cave_is_reset') ? [] : [
-    { id: 'h1', title: 'Hydrate (Drink Water)', emoji: '💧', type: 'counter', targetCount: 8, currentCount: 5, unit: 'glasses', streak: 12, target: '8 glasses', isTimelineShortcut: true, history: [true, true, true, true, true, true, false] },
-    { id: 'h2', title: '15m Mindfulness & CBT', emoji: '🧘', type: 'boolean', streak: 7, target: '15 mins', isTimelineShortcut: true, history: [true, true, true, false, true, true, true] },
-    { id: 'h3', title: '30m Zone-2 Cardio / Walk', emoji: '🚶', type: 'counter', targetCount: 30, currentCount: 30, unit: 'mins', streak: 5, target: '30 mins', isTimelineShortcut: true, history: [true, true, true, true, false, true, true] },
-    { id: 'h4', title: '20m Focused Reading', emoji: '📖', type: 'counter', targetCount: 20, currentCount: 15, unit: 'pages', streak: 9, target: '20 pages', isTimelineShortcut: true, history: [true, true, true, true, true, true, false] },
-    { id: 'h5', title: '8h Circadian Sleep Protocol', emoji: '🌙', type: 'boolean', streak: 6, target: '8 hours', isTimelineShortcut: false, history: [true, true, true, true, true, true, true] },
-    { id: 'h6', title: '90m Deep Work Block', emoji: '💻', type: 'counter', targetCount: 2, currentCount: 2, unit: 'blocks', streak: 14, target: '2 blocks', isTimelineShortcut: false, history: [true, true, true, true, true, true, true] }
-  ]),
-  archivedHabits: safeJSONParse(localStorage.getItem('mind_cave_archived_habits'), []),
-  bucketList: safeJSONParse(localStorage.getItem('mind_cave_bucket_list'), null) || (localStorage.getItem('mind_cave_is_reset') ? [] : [
-    { id: 'b1', title: 'Scuba dive the Great Barrier Reef', category: 'travel', year: '2027', achieved: false },
-    { id: 'b2', title: 'Publish Open-Source AI Architecture Benchmark', category: 'career', year: '2026', achieved: true },
-    { id: 'b3', title: 'Trek the Annapurna Circuit in Himalayas', category: 'adventure', year: '2027', achieved: false },
-    { id: 'b4', title: 'Run a sub-4-hour Marathon', category: 'wellness', year: '2026', achieved: false },
-    { id: 'b5', title: 'Solo Roadtrip across New Zealand South Island', category: 'travel', year: '2028', achieved: false },
-    { id: 'b6', title: 'Build a private off-grid mountain cabin sanctuary', category: 'wellness', year: '2029', achieved: false }
-  ]),
+  agendaItems: [],
+  todayGoals: [],
+  todayGoal: { text: '', completed: false },
+  habitsList: [],
+  archivedHabits: [],
+  bucketList: [],
   bucketCategories: safeJSONParse(localStorage.getItem('mind_cave_bucket_categories'), null) || [
     { id: 'travel', name: 'Travel & World Exploration', color: 'cyan' },
     { id: 'career', name: 'Career & Mastery', color: 'indigo' },
@@ -7780,11 +7698,7 @@ function updateAllDashboardStats() {
     `;
   }
 
-  const isReset = Boolean(localStorage.getItem('mind_cave_is_reset'));
-  const journals = state.journalsCache || state.journals || [];
-  const habits = state.habitsList || [];
-  const bucket = state.bucketList || [];
-  const goals = state.todayGoals || [];
+  // Variables reused from function top scope (isReset, journals, habits, bucket, goals)
 
   // 1. Journal Rhythm stats
   const totalEntriesEl = document.getElementById('journal-stat-total');
@@ -7858,16 +7772,9 @@ function updateAllDashboardStats() {
     renderDashboardHeatmap(28, [0]);
   }
 
-  // 7. Equilibrium Card
-  const eqCbt = document.getElementById('equilibrium-cbt-clearance');
-  const eqRes = document.getElementById('equilibrium-resilience');
-  const eqFoc = document.getElementById('equilibrium-focus');
+  // 7. Equilibrium Card (Consolidated)
   const eqOpt = document.getElementById('equilibrium-optimal-badge');
-
-  if (eqCbt) eqCbt.textContent = isReset || journals.length === 0 ? 'Clean' : '8/8 Clean';
-  if (eqRes) eqRes.textContent = isReset || journals.length === 0 ? '--' : '92% High';
-  if (eqFoc) eqFoc.textContent = isReset || goals.length === 0 ? '0.00 hrs' : '3.25 hrs';
-  if (eqOpt) eqOpt.textContent = isReset || journals.length === 0 ? 'Clean State' : '96% Optimal';
+  if (eqOpt) eqOpt.textContent = isClean ? 'Clean State' : '96% Optimal';
 
   // 8. Google Fit & Plan vs Action
   const fitSteps = document.getElementById('fit-steps-val');
@@ -9361,83 +9268,10 @@ function autoCalcGoalDuration() {
 
 
 function initTodayGoal() {
-
   if (!state.todayGoals || !Array.isArray(state.todayGoals)) {
-
-    state.todayGoals = [
-
-      {
-
-        id: 'g1',
-
-        title: 'Ship Core System Architecture & Validate Test Boundaries',
-
-        completed: true,
-
-        startTime: '09:30',
-
-        endTime: '12:00',
-
-        duration: '2h 30m',
-
-        category: 'north_star',
-
-        categoryLabel: 'North Star',
-
-        notes: 'Clean zero-warning build & 7/7 pytest verification'
-
-      },
-
-      {
-
-        id: 'g2',
-
-        title: '30m Mindful Nature Walk & Somatic Breathing',
-
-        completed: true,
-
-        startTime: '13:30',
-
-        endTime: '14:15',
-
-        duration: '45m',
-
-        category: 'wellness',
-
-        categoryLabel: 'Wellness',
-
-        notes: 'Zone 2 cardio completed'
-
-      },
-
-      {
-
-        id: 'g3',
-
-        title: 'Refactor Longitudinal Trajectory & Daily Harmony Engine',
-
-        completed: false,
-
-        startTime: '16:00',
-
-        endTime: '18:00',
-
-        duration: '2h',
-
-        category: 'deep_work',
-
-        categoryLabel: 'Deep Work',
-
-        notes: 'In progress'
-
-      }
-
-    ];
-
+    state.todayGoals = profileStorage.getItem('today_goals', []);
   }
-
   renderTodayGoal();
-
 }
 
 
@@ -10279,27 +10113,8 @@ function updateArchivedHabitsBadges() {
 
 
 function renderHabitTracker() {
-  // Ensure default habits if empty
-  if (!state.habitsList || state.habitsList.length === 0) {
-    try {
-      const saved = localStorage.getItem('mind_cave_habits_list');
-      if (saved) state.habitsList = JSON.parse(saved);
-    } catch (e) {}
-
-    if (!state.habitsList || state.habitsList.length === 0) {
-      const todayDayIdx = (new Date().getDay() + 6) % 7;
-      state.habitsList = [
-        { id: 'h1', title: 'Daily Optimal Hydration', emoji: '💧', icon: '💧', type: 'counter', targetCount: 8, unit: 'glasses', currentCount: 6, streak: 14, isTimelineShortcut: true, history: [true, true, true, true, true, true, true] },
-        { id: 'h2', title: '30m Deep Socratic Work', emoji: '💻', icon: '💻', type: 'boolean', target: '30 mins', streak: 12, isTimelineShortcut: true, history: [true, true, true, true, true, true, false] },
-        { id: 'h3', title: 'Mindful Nature Walk', emoji: '👟', icon: '👟', type: 'boolean', target: '20 mins', streak: 8, isTimelineShortcut: true, history: [true, true, true, false, true, true, true] },
-        { id: 'h4', title: 'Stoic Cognitive Reframing', emoji: '🧠', icon: '🧠', type: 'boolean', target: '1 reflection', streak: 19, isTimelineShortcut: true, history: [true, true, true, true, true, true, true] },
-        { id: 'h5', title: '10 Pages Philosophical Reading', emoji: '📖', icon: '📖', type: 'counter', targetCount: 10, unit: 'pages', currentCount: 10, streak: 7, isTimelineShortcut: true, history: [true, true, true, true, true, true, true] },
-        { id: 'h6', title: 'Circadian Sleep Wind-Down', emoji: '🌙', icon: '🌙', type: 'boolean', target: '11:00 PM', streak: 21, isTimelineShortcut: true, history: [true, true, true, true, true, true, true] }
-      ];
-      try {
-        profileStorage.setItem('habits_list', state.habitsList);
-      } catch (e) {}
-    }
+  if (!state.habitsList) {
+    state.habitsList = profileStorage.getItem('habits_list', []);
   }
 
   const containerSet = new Set([
