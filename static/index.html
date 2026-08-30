@@ -111,13 +111,13 @@
   <header class="floating-nav flex items-center justify-between gap-1 sm:gap-2 mb-2 sm:mb-4 px-2 sm:px-4 py-1.5 sm:py-2 sticky top-2 left-0 right-0 w-full max-w-6xl mx-auto z-50 rounded-full shadow-sm">
     <!-- Left Area: Master Menu Button + Brand / Logo -->
     <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-      <!-- Master Hierarchical Menu Button (Far Left Corner) -->
-      <button onclick="openMasterMenuModal()" id="btn-master-menu" class="btn-menu shrink-0" title="Open Master Directory & Settings">
+      <!-- Master Hierarchical Menu Button (Desktop Only) -->
+      <button onclick="openMasterMenuModal()" id="btn-master-menu" class="btn-menu shrink-0 hidden lg:inline-flex" title="Open Master Directory & Settings">
         <i data-lucide="menu" class="w-3.5 h-3.5 text-[#9BB7A5]"></i>
         <span class="inline">Menu</span>
       </button>
 
-      <span class="w-[1px] h-4 bg-[var(--mc-border-subtle)] hidden sm:inline-block"></span>
+      <span class="w-[1px] h-4 bg-[var(--mc-border-subtle)] hidden lg:inline-block"></span>
 
       <!-- Brand / Logo -->
       <div class="flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0" onclick="switchTab('overview')">
@@ -129,7 +129,7 @@
     </div>
 
     <!-- Master Navigation Tabs (5 Core Destinations - Always Available on All Screens) -->
-    <nav class="flex items-center gap-1 nav-pill-track shrink-0 overflow-x-auto no-scrollbar max-w-[55vw] sm:max-w-none">
+    <nav class="flex items-center gap-0.5 sm:gap-1 nav-pill-track shrink-0">
       <button onclick="switchTab('overview')" id="tab-btn-overview" class="tab-btn active flex items-center gap-1 sm:gap-1.5 whitespace-nowrap !py-1 !px-2 sm:!px-3 text-xs" title="Home Sanctuary">
         <i data-lucide="home" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Home</span>
       </button>
