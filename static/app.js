@@ -1496,6 +1496,8 @@ async function sendChatMessage(event) {
 
         analyze_cognition: true,
 
+        offline_mode: window._offlineModeOverride || state.offlineMode || false,
+
         profile_context: typeof getProfileContext === 'function' ? getProfileContext() : {}
 
       })
@@ -1504,10 +1506,15 @@ async function sendChatMessage(event) {
 
 
 
+    if (response.status === 503) {
+      const errData = await response.json().catch(() => ({}));
+      const errCode = errData.code || 'api_unavailable';
+      appendGeminiUnavailableCard(errCode, message);
+      return;
+    }
+
     if (!response.ok) {
-
       throw new Error(`Chat API responded with status ${response.status}: ${response.statusText}`);
-
     }
 
 
@@ -1545,6 +1552,74 @@ async function sendChatMessage(event) {
   }
 
 }
+
+// Show a clear, actionable Gemini API unavailable card (instead of fake offline content)
+function appendGeminiUnavailableCard(errorCode, retryMessage) {
+  const chatBox = document.getElementById('chat-messages');
+  if (!chatBox) return;
+
+  const isQuota = errorCode === 'quota_exhausted' || errorCode?.includes('RESOURCE_EXHAUSTED');
+  const isNoAuth = errorCode === 'api_unavailable' || errorCode?.includes('NOT_FOUND') || errorCode?.includes('Unauthorized');
+
+  const titleText = isQuota ? '⚡ API Quota Exhausted' : '🔌 Gemini API Unavailable';
+  const bodyText = isQuota
+    ? 'Your current API credentials have exhausted their quota. To continue, please set up Application Default Credentials (ADC) or paste a fresh API key in AI Settings.'
+    : 'The Gemini AI engine could not be reached. To connect, set up ADC credentials or paste your Google AI Studio API key in AI Settings.';
+
+  const card = document.createElement('div');
+  card.className = 'my-3 mx-1';
+  card.innerHTML = `
+    <div class="rounded-2xl border border-amber-500/30 bg-amber-950/20 p-4 space-y-3">
+      <div class="flex items-center gap-2">
+        <div class="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center">
+          <i data-lucide="wifi-off" class="w-4 h-4 text-amber-400"></i>
+        </div>
+        <div>
+          <p class="text-sm font-bold text-amber-300">${titleText}</p>
+          <p class="text-[10px] text-slate-400 font-mono">Gemini live response required • Offline mode is OFF</p>
+        </div>
+      </div>
+      <p class="text-xs text-slate-300 leading-relaxed">${bodyText}</p>
+      <div class="flex flex-wrap gap-2 pt-1">
+        <button onclick="openGeminiKeyModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-xs text-cyan-300 hover:bg-cyan-500/25 transition-colors font-medium">
+          <i data-lucide="key" class="w-3 h-3"></i> AI Settings & Key Setup
+        </button>
+        <button onclick="retryChatMessage(${JSON.stringify(retryMessage)})" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-xs text-slate-300 hover:bg-slate-700 transition-colors font-medium">
+          <i data-lucide="refresh-cw" class="w-3 h-3"></i> Retry
+        </button>
+        <button onclick="sendChatMessageOffline(${JSON.stringify(retryMessage)})" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800/50 border border-slate-700/50 text-xs text-slate-400 hover:bg-slate-700/50 transition-colors">
+          <i data-lucide="cpu" class="w-3 h-3"></i> Use Offline Mode (this message only)
+        </button>
+      </div>
+    </div>`;
+  chatBox.appendChild(card);
+  chatBox.scrollTop = chatBox.scrollHeight;
+  if (window.lucide) lucide.createIcons();
+}
+
+// Retry with same message after user has updated credentials
+async function retryChatMessage(message) {
+  const input = document.getElementById('chat-input');
+  if (input && message) {
+    input.value = message;
+    await sendChatMessage();
+  }
+}
+
+// Use offline mode for just this one message
+async function sendChatMessageOffline(message) {
+  const input = document.getElementById('chat-input');
+  if (input && message) {
+    input.value = message;
+    // Temporarily patch the body to include offline_mode=true
+    const origSend = window._offlineModeOverride;
+    window._offlineModeOverride = true;
+    await sendChatMessage();
+    window._offlineModeOverride = origSend || false;
+  }
+}
+
+
 
 
 

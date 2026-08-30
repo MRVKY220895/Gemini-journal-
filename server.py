@@ -24,7 +24,7 @@ from pydantic import BaseModel, Field
 from security.secret_manager import secret_manager
 from auth.firebase_verifier import get_current_user, UserContext
 from storage.firestore_manager import firestore_manager
-from ai.gemini_service import gemini_service
+from ai.gemini_service import gemini_service, GeminiAPIError
 from ai.cognitive_engine import cognitive_engine
 
 logger = logging.getLogger("server")
@@ -57,6 +57,7 @@ class ChatRequest(BaseModel):
     persona: str = Field("cbt_reflector", description="cbt_reflector | socratic_brainstormer | executive_strategist | shadow_work_analyst")
     analyze_cognition: bool = True
     profile_context: Optional[dict] = None
+    offline_mode: bool = False  # Only true if user explicitly opts into offline mode
 
 
 class JournalCreateRequest(BaseModel):
@@ -295,99 +296,109 @@ async def chat_interaction(
     """
     Multi-turn AI chat interaction with Gemini.
     Strictly isolated to current_user.uid.
+    Returns HTTP 503 if Gemini API is unavailable and offline_mode is not enabled.
     """
     session_id = req.session_id or f"session_{int(time.time())}"
 
+    # 1. Save user message to isolated database
     try:
-        # 1. Save user message to isolated database
-        try:
-            firestore_manager.save_chat_message(
-                user_id=current_user.uid,
-                session_id=session_id,
-                role="user",
-                content=req.message
-            )
-        except Exception as db_err:
-            logger.warning(f"Notice saving user message: {db_err}")
+        firestore_manager.save_chat_message(
+            user_id=current_user.uid,
+            session_id=session_id,
+            role="user",
+            content=req.message
+        )
+    except Exception as db_err:
+        logger.warning(f"Notice saving user message: {db_err}")
 
-        # 2. Retrieve conversation history strictly for this user & session
-        try:
-            history = firestore_manager.get_chat_history(
-                user_id=current_user.uid,
-                session_id=session_id
-            )
-        except Exception:
-            history = []
+    # 2. Retrieve conversation history strictly for this user & session
+    try:
+        history = firestore_manager.get_chat_history(
+            user_id=current_user.uid,
+            session_id=session_id
+        )
+    except Exception:
+        history = []
 
-        # Format history for Gemini service
-        formatted_history = [{"role": msg["role"], "content": msg["content"]} for msg in history]
-        if not formatted_history or formatted_history[-1].get("content") != req.message:
-            formatted_history.append({"role": "user", "content": req.message})
+    # Format history for Gemini service
+    formatted_history = [{"role": msg["role"], "content": msg["content"]} for msg in history]
+    if not formatted_history or formatted_history[-1].get("content") != req.message:
+        formatted_history.append({"role": "user", "content": req.message})
 
-        # 3. Generate AI response via Gemini with security boundaries
+    # 3. Generate AI response via Gemini (raises GeminiAPIError if all protocols fail)
+    try:
         ai_response = gemini_service.generate_chat_response(
             messages=formatted_history,
             persona=req.persona,
-            profile_context=req.profile_context
+            profile_context=req.profile_context,
+            offline_mode=req.offline_mode
+        )
+    except GeminiAPIError as api_err:
+        # Return a proper 503 — never silently return fake offline content
+        logger.error(f"Gemini API unavailable for user {current_user.uid}: {api_err.message}")
+        return JSONResponse(
+            status_code=503,
+            content={
+                "error": "gemini_unavailable",
+                "code": api_err.code,
+                "message": "The Gemini AI engine is temporarily unavailable. Please run 'gcloud auth application-default login' locally, or set a valid GEMINI_API_KEY. You can also enable Offline Mode in AI Settings to use the built-in offline processor.",
+                "session_id": session_id
+            }
+        )
+    except Exception as e:
+        logger.error(f"Unexpected error in chat_interaction: {e}", exc_info=True)
+        return JSONResponse(
+            status_code=503,
+            content={
+                "error": "server_error",
+                "code": "unexpected_error",
+                "message": f"An unexpected server error occurred: {str(e)[:200]}",
+                "session_id": session_id
+            }
         )
 
-        # 4. Extract MindPulse cognitive analytics if enabled
-        cognitive_data = None
-        if req.analyze_cognition:
-            try:
-                cognitive_data = cognitive_engine.analyze_reflection(req.message, req.persona)
-                firestore_manager.record_analytics(
-                    user_id=current_user.uid,
-                    session_id=session_id,
-                    mood_scores=cognitive_data["mood_scores"],
-                    distortions=cognitive_data["detected_distortions"],
-                    action_items=cognitive_data["action_items"]
-                )
-            except Exception as cog_err:
-                logger.warning(f"Notice extracting cognition: {cog_err}")
-
-        # 5. Save AI reply to isolated database
-        saved_reply = None
+    # 4. Extract MindPulse cognitive analytics if enabled
+    cognitive_data = None
+    if req.analyze_cognition:
         try:
-            saved_reply = firestore_manager.save_chat_message(
+            cognitive_data = cognitive_engine.analyze_reflection(req.message, req.persona)
+            firestore_manager.record_analytics(
                 user_id=current_user.uid,
                 session_id=session_id,
-                role="model",
-                content=ai_response.get("content", ""),
-                cognitive_data=cognitive_data
+                mood_scores=cognitive_data["mood_scores"],
+                distortions=cognitive_data["detected_distortions"],
+                action_items=cognitive_data["action_items"]
             )
-        except Exception as reply_err:
-            logger.warning(f"Notice saving reply: {reply_err}")
-            saved_reply = {
-                "id": f"msg_{int(time.time())}",
-                "role": "model",
-                "content": ai_response.get("content", ""),
-                "created_at": time.time(),
-                "cognitive_data": cognitive_data
-            }
+        except Exception as cog_err:
+            logger.warning(f"Notice extracting cognition: {cog_err}")
 
-        return {
-            "session_id": session_id,
-            "message": saved_reply,
-            "cognitive_data": cognitive_data,
-            "model_used": ai_response.get("model_used", "gemini-3.5-flash"),
-            "is_live_gemini": ai_response.get("is_live_gemini", False)
+    # 5. Save AI reply to isolated database
+    saved_reply = None
+    try:
+        saved_reply = firestore_manager.save_chat_message(
+            user_id=current_user.uid,
+            session_id=session_id,
+            role="model",
+            content=ai_response.get("content", ""),
+            cognitive_data=cognitive_data
+        )
+    except Exception as reply_err:
+        logger.warning(f"Notice saving reply: {reply_err}")
+        saved_reply = {
+            "id": f"msg_{int(time.time())}",
+            "role": "model",
+            "content": ai_response.get("content", ""),
+            "created_at": time.time(),
+            "cognitive_data": cognitive_data
         }
-    except Exception as e:
-        logger.error(f"Error in chat_interaction: {e}", exc_info=True)
-        fallback_resp = gemini_service._generate_simulated_reflective_response(req.message, req.persona)
-        return {
-            "session_id": session_id,
-            "message": {
-                "id": f"msg_{int(time.time())}",
-                "role": "model",
-                "content": fallback_resp["content"],
-                "created_at": time.time()
-            },
-            "cognitive_data": None,
-            "model_used": "smart-processor-resilience",
-            "is_live_gemini": False
-        }
+
+    return {
+        "session_id": session_id,
+        "message": saved_reply,
+        "cognitive_data": cognitive_data,
+        "model_used": ai_response.get("model_used", "gemini-2.5-flash"),
+        "is_live_gemini": ai_response.get("is_live_gemini", True)
+    }
 
 
 @app.post("/api/gemini/generate-plan")
