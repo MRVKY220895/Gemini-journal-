@@ -517,19 +517,7 @@
         </div>
       </div>
 
-            <!-- Quick Jump to Latest Message Floating Action Pill -->
-      <button 
-        type="button" 
-        id="btn-scroll-bottom" 
-        onclick="scrollChatToBottom(true)" 
-        class="hidden fixed right-6 bottom-24 sm:bottom-28 z-50 items-center gap-1.5 px-3.5 py-2 rounded-full bg-[var(--mc-bg-secondary)] hover:bg-[var(--mc-bg-elevation)] text-[var(--mc-text-primary)] border border-[var(--mc-border-default)] shadow-2xl text-xs font-semibold backdrop-blur-2xl transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95 group"
-        title="Move to the end of conversation (↓)"
-      >
-        <div class="w-5 h-5 rounded-full bg-[#9BB7A5]/20 flex items-center justify-center shrink-0">
-          <i data-lucide="arrow-down" class="w-3.5 h-3.5 text-[#9BB7A5] group-hover:translate-y-0.5 transition-transform"></i>
-        </div>
-        <span>Move to end</span>
-      </button>
+            
 
       <!-- Floating Bottom Composer Area (Double-Bezel Hardware) -->
       <div class="composer-wrap">
@@ -4199,5 +4187,20 @@
     </div>
   </div>
 
+  <!-- Global Floating Quick Jump to Latest Message Button -->
+  <button 
+    type="button" 
+    id="btn-scroll-bottom" 
+    onclick="scrollChatToBottom(true)" 
+    class="group"
+    title="Move to the end of conversation (↓)"
+    aria-label="Move to end of conversation"
+  >
+    <div class="w-5 h-5 rounded-full bg-[#9BB7A5]/25 flex items-center justify-center shrink-0 text-[#9BB7A5] group-hover:scale-110 transition-transform">
+      <i data-lucide="arrow-down" class="w-3.5 h-3.5 text-[#9BB7A5]"></i>
+    </div>
+    <span class="tracking-wide">Move to end</span>
+    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping shrink-0 ml-0.5"></span>
+  </button>
 </body>
 </html>

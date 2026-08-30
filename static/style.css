@@ -3034,3 +3034,38 @@ body.light .chat-msg-ai-card {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+
+/* Global Floating Jump to Bottom Capsule */
+#btn-scroll-bottom {
+  position: fixed !important;
+  bottom: 6.5rem !important;
+  right: 2rem !important;
+  z-index: 99999 !important;
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: 9999px;
+  background: var(--mc-bg-secondary);
+  border: 1px solid var(--mc-border-strong);
+  box-shadow: 0 12px 36px -4px rgba(0, 0, 0, 0.45), 0 0 0 1px var(--mc-accent-25);
+  color: var(--mc-text-primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;
+  transform: translateY(0);
+}
+
+#btn-scroll-bottom.is-visible {
+  display: inline-flex !important;
+}
+
+#btn-scroll-bottom:hover {
+  transform: translateY(-2px) scale(1.04);
+  background: var(--mc-bg-elevation);
+  border-color: var(--mc-accent);
+}

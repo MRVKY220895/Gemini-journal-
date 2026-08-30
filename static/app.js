@@ -7,7 +7,7 @@ function scrollChatToBottom(smooth = true) {
   const container = document.getElementById('chat-messages');
   if (container) {
     container.scrollTo({
-      top: container.scrollHeight + 5000,
+      top: container.scrollHeight + 10000,
       behavior: smooth ? 'smooth' : 'auto'
     });
   }
@@ -18,8 +18,7 @@ function scrollChatToBottom(smooth = true) {
 
   const btn = document.getElementById('btn-scroll-bottom');
   if (btn) {
-    btn.classList.add('hidden');
-    btn.classList.remove('flex');
+    btn.classList.remove('is-visible');
   }
 }
 
@@ -27,40 +26,34 @@ function checkScrollDistance() {
   const studioView = document.getElementById('view-studio');
   const btn = document.getElementById('btn-scroll-bottom');
   if (!studioView || studioView.classList.contains('hidden') || !btn) {
-    if (btn) {
-      btn.classList.add('hidden');
-      btn.classList.remove('flex');
-    }
+    if (btn) btn.classList.remove('is-visible');
     return;
   }
 
   const container = document.getElementById('chat-messages');
-  let distanceFromBottom = 0;
+  let isScrolledUp = false;
 
   if (container && container.scrollHeight > container.clientHeight) {
-    distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+    const dist = container.scrollHeight - container.scrollTop - container.clientHeight;
+    if (dist > 60) isScrolledUp = true;
   } else {
-    distanceFromBottom = (document.documentElement.scrollHeight || document.body.scrollHeight) - window.scrollY - window.innerHeight;
+    const docDist = (document.documentElement.scrollHeight || document.body.scrollHeight) - window.scrollY - window.innerHeight;
+    if (docDist > 60) isScrolledUp = true;
   }
 
-  if (distanceFromBottom > 70) {
-    btn.classList.remove('hidden');
-    btn.classList.add('flex');
+  if (isScrolledUp) {
+    btn.classList.add('is-visible');
     if (window.lucide) refreshIcons();
   } else {
-    btn.classList.add('hidden');
-    btn.classList.remove('flex');
+    btn.classList.remove('is-visible');
   }
 }
 
 function initChatScrollWatcher() {
-  const container = document.getElementById('chat-messages');
-  if (container) {
-    container.removeEventListener('scroll', checkScrollDistance);
-    container.addEventListener('scroll', checkScrollDistance, { passive: true });
-  }
-  window.removeEventListener('scroll', checkScrollDistance);
+  document.addEventListener('scroll', checkScrollDistance, { capture: true, passive: true });
   window.addEventListener('scroll', checkScrollDistance, { passive: true });
+  document.addEventListener('wheel', () => requestAnimationFrame(checkScrollDistance), { capture: true, passive: true });
+  document.addEventListener('touchmove', () => requestAnimationFrame(checkScrollDistance), { capture: true, passive: true });
 }
 
 
