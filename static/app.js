@@ -14203,6 +14203,39 @@ function openMoodPickerModal() {
 // ADVANCED NOTES, INTERACTIVE CHECKLISTS & DEADLINE TASKS CONTROLLER
 // =============================================================================
 
+
+// ─── LIVE SANCTUARY PULSE CLOCK ───
+let liveSanctuaryClockInterval = null;
+function startLiveSanctuaryClock() {
+  function updateClock() {
+    const now = new Date();
+    const clockEl = document.getElementById('pulse-live-clock');
+    const windowEl = document.getElementById('pulse-circadian-window');
+    
+    if (clockEl) {
+      clockEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+
+    if (windowEl) {
+      const hour = now.getHours();
+      if (hour >= 6 && hour < 11) {
+        windowEl.textContent = 'Morning Flow & High-Agency Clarity';
+      } else if (hour >= 11 && hour < 15) {
+        windowEl.textContent = 'Peak Analytical Sprint & Focus Window';
+      } else if (hour >= 15 && hour < 19) {
+        windowEl.textContent = 'Creative Synthesis & Strategic Execution';
+      } else {
+        windowEl.textContent = 'Neural Wind-down & Restorative Harmony';
+      }
+    }
+  }
+
+  updateClock();
+  if (liveSanctuaryClockInterval) clearInterval(liveSanctuaryClockInterval);
+  liveSanctuaryClockInterval = setInterval(updateClock, 1000);
+}
+window.startLiveSanctuaryClock = startLiveSanctuaryClock;
+
 state.capturesList = [];
 state.capturesFilter = 'all';
 
@@ -14273,7 +14306,40 @@ function initNotesAndAlerts() {
       localStorage.setItem('mind_cave_captures_list', JSON.stringify(state.capturesList));
     }
   } catch (e) {
-    state.capturesList = [];
+    
+// ─── LIVE SANCTUARY PULSE CLOCK ───
+let liveSanctuaryClockInterval = null;
+function startLiveSanctuaryClock() {
+  function updateClock() {
+    const now = new Date();
+    const clockEl = document.getElementById('pulse-live-clock');
+    const windowEl = document.getElementById('pulse-circadian-window');
+    
+    if (clockEl) {
+      clockEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+
+    if (windowEl) {
+      const hour = now.getHours();
+      if (hour >= 6 && hour < 11) {
+        windowEl.textContent = 'Morning Flow & High-Agency Clarity';
+      } else if (hour >= 11 && hour < 15) {
+        windowEl.textContent = 'Peak Analytical Sprint & Focus Window';
+      } else if (hour >= 15 && hour < 19) {
+        windowEl.textContent = 'Creative Synthesis & Strategic Execution';
+      } else {
+        windowEl.textContent = 'Neural Wind-down & Restorative Harmony';
+      }
+    }
+  }
+
+  updateClock();
+  if (liveSanctuaryClockInterval) clearInterval(liveSanctuaryClockInterval);
+  liveSanctuaryClockInterval = setInterval(updateClock, 1000);
+}
+window.startLiveSanctuaryClock = startLiveSanctuaryClock;
+
+state.capturesList = [];
   }
 
   renderNotesCards();
