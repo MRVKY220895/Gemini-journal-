@@ -546,6 +546,51 @@ async def create_journal_entry(
     return {"entry": entry}
 
 
+class JournalUpdateRequest(BaseModel):
+    title: Optional[str] = None
+    content: Optional[str] = None
+    persona: Optional[str] = None
+    tags: Optional[List[str]] = None
+    mood: Optional[str] = None
+    is_encrypted: Optional[bool] = None
+
+
+@app.put("/api/journals/{journal_id}")
+async def update_journal_entry_endpoint(
+    journal_id: str,
+    req: JournalUpdateRequest,
+    current_user: UserContext = Depends(get_current_user)
+):
+    """Update an existing journal reflection in-place."""
+    existing = firestore_manager.get_journal(user_id=current_user.uid, journal_id=journal_id)
+    if not existing:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Journal entry not found or access denied."
+        )
+
+    updated_data = {}
+    if req.title is not None:
+        updated_data["title"] = req.title
+    if req.content is not None:
+        updated_data["content"] = req.content
+    if req.persona is not None:
+        updated_data["persona"] = req.persona
+    if req.tags is not None:
+        updated_data["tags"] = req.tags
+    if req.mood is not None:
+        updated_data["mood"] = req.mood
+    if req.is_encrypted is not None:
+        updated_data["is_encrypted"] = req.is_encrypted
+
+    entry = firestore_manager.update_journal(
+        user_id=current_user.uid,
+        journal_id=journal_id,
+        **updated_data
+    )
+    return {"entry": entry}
+
+
 @app.get("/api/journals")
 async def list_journal_entries(current_user: UserContext = Depends(get_current_user)):
     """List all journals strictly isolated to the authenticated user."""

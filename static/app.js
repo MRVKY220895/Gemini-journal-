@@ -4697,8 +4697,8 @@ async function renderChronoTimeline(forceFetch = false) {
 
                 ` : `
 
-                  <button onclick="openNewJournalModal('${ev.time}')" class="text-[11px] font-semibold text-[var(--mc-accent)] hover:opacity-80 flex items-center gap-1 transition-colors px-2 py-0.5 rounded-lg bg-[var(--mc-accent-10)] border border-[var(--mc-accent-25)]" title="Add note to this hour">
-                    <i data-lucide="edit-3" class="w-3 h-3 text-[var(--mc-accent)]"></i> <span>Add Note</span>
+                  <button onclick="openNewJournalModal('${ev.time}', '${ev.journalId || ev.id || ''}')" class="text-[11px] font-semibold text-[var(--mc-accent)] hover:opacity-80 flex items-center gap-1 transition-colors px-2 py-0.5 rounded-lg bg-[var(--mc-accent-10)] border border-[var(--mc-accent-25)]" title="${(ev.journalId || ev.id) ? 'Edit this reflection' : 'Add note to this hour'}">
+                    <i data-lucide="${(ev.journalId || ev.id) ? 'edit-2' : 'edit-3'}" class="w-3 h-3 text-[var(--mc-accent)]"></i> <span>${(ev.journalId || ev.id) ? 'Edit Note' : 'Add Note'}</span>
                   </button>
                   ${(ev.journalId || ev.id) ? `
                     <button onclick="deleteJournalEntry('${ev.journalId || ev.id}', event)" class="text-xs text-rose-500 hover:text-rose-400 p-1 rounded-lg hover:bg-rose-500/10 transition-colors cursor-pointer" title="Delete reflection">
@@ -6029,8 +6029,14 @@ async function submitNewJournal(event) {
   if (typeof attachedSketchBase64 !== 'undefined' && attachedSketchBase64) finalContent += `\nIncludes Canvas Sketch`;
 
   try {
-    const response = await fetch('/api/journals', {
-      method: 'POST',
+    const editId = document.getElementById('journal-edit-id')?.value;
+    const isEditMode = Boolean(editId && editId.trim());
+
+    const endpoint = isEditMode ? `/api/journals/${editId}` : '/api/journals';
+    const reqMethod = isEditMode ? 'PUT' : 'POST';
+
+    const response = await fetch(endpoint, {
+      method: reqMethod,
       headers: getAuthHeaders(),
       body: JSON.stringify({
         title: `[${hour}] ${title}`,

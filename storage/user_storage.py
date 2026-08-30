@@ -279,6 +279,42 @@ class IsolatedUserStorage:
             del d["insights_json"]
             return d
 
+    def update_journal(
+        self,
+        user_id: str,
+        journal_id: str,
+        title: Optional[str] = None,
+        content: Optional[str] = None,
+        persona: Optional[str] = None,
+        tags: Optional[List[str]] = None,
+        mood: Optional[str] = None,
+        is_encrypted: Optional[bool] = None
+    ) -> Optional[Dict[str, Any]]:
+        """Update an existing journal entry in-place strictly matching user_id."""
+        existing = self.get_journal(user_id, journal_id)
+        if not existing:
+            return None
+
+        now = time.time()
+        new_title = title if title is not None else existing["title"]
+        new_content = content if content is not None else existing["content"]
+        new_persona = persona if persona is not None else existing.get("persona", "cbt_reflector")
+        new_tags = tags if tags is not None else existing.get("tags", [])
+        new_mood = mood if mood is not None else existing.get("mood", "Calm")
+        new_encrypted = is_encrypted if is_encrypted is not None else existing.get("is_encrypted", False)
+
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                """UPDATE journals 
+                   SET title = ?, content = ?, persona = ?, tags = ?, mood = ?, is_encrypted = ?, updated_at = ?
+                   WHERE id = ? AND user_id = ?""",
+                (new_title, new_content, new_persona, json.dumps(new_tags), new_mood, 1 if new_encrypted else 0, now, journal_id, user_id)
+            )
+            conn.commit()
+
+        return self.get_journal(user_id, journal_id)
+
     def delete_journal(self, user_id: str, journal_id: str) -> bool:
         """Delete a journal entry strictly matching user_id."""
         with self._get_connection() as conn:

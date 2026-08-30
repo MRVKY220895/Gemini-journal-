@@ -56,6 +56,16 @@ class FirestoreManager:
                 logger.warning(f"Failed to sync journal to Firestore: {e}")
         return result
 
+    def update_journal(self, user_id: str, journal_id: str, **kwargs) -> Optional[Dict[str, Any]]:
+        result = isolated_storage.update_journal(user_id, journal_id, **kwargs)
+        if result and self.is_live:
+            try:
+                user_ref = self.get_user_doc_ref(user_id)
+                user_ref.collection("journals").document(journal_id).set(result, merge=True)
+            except Exception as e:
+                logger.warning(f"Failed to sync updated journal to Firestore: {e}")
+        return result
+
     def get_journals(self, user_id: str, limit: int = 50) -> List[Dict[str, Any]]:
         return isolated_storage.list_journals(user_id, limit)
 

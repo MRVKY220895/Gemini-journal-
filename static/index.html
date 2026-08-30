@@ -2496,8 +2496,8 @@
             <i data-lucide="edit-3" class="w-4 h-4"></i>
           </div>
           <div>
-            <h3 class="text-base font-semibold text-[var(--mc-text-primary)]">Log Reflection</h3>
-            <p class="text-[11px] text-[var(--mc-text-secondary)]">Capture your thoughts, mood, and state with clarity</p>
+            <h3 class="text-base font-semibold text-[var(--mc-text-primary)]" id="journal-modal-title">Log Reflection</h3>
+            <p class="text-[11px] text-[var(--mc-text-secondary)]" id="journal-modal-subtitle">Capture your thoughts, mood, and state with clarity</p>
           </div>
         </div>
         <button onclick="closeNewJournalModal()" class="text-[var(--mc-text-muted)] hover:text-[var(--mc-text-primary)] transition-colors p-1 cursor-pointer">
@@ -2506,6 +2506,7 @@
       </div>
 
       <form onsubmit="submitNewJournal(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="journal-edit-id" value="">
         <!-- Title & Time Row -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
           <div class="sm:col-span-2">
