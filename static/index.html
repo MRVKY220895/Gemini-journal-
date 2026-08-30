@@ -517,6 +517,18 @@
         </div>
       </div>
 
+            <!-- Quick Jump to Latest Message Floating Action Pill -->
+      <button 
+        type="button" 
+        id="btn-scroll-bottom" 
+        onclick="scrollChatToBottom(true)" 
+        class="hidden absolute right-4 bottom-24 z-30 items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--mc-bg-secondary)] hover:bg-[var(--mc-bg-elevation)] text-[var(--mc-text-primary)] border border-[var(--mc-border-default)] shadow-2xl text-xs font-semibold backdrop-blur-xl transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95 group"
+        title="Move to the end of conversation (↓)"
+      >
+        <i data-lucide="arrow-down" class="w-3.5 h-3.5 text-[#9BB7A5] group-hover:translate-y-0.5 transition-transform"></i>
+        <span>Move to end</span>
+      </button>
+
       <!-- Floating Bottom Composer Area (Double-Bezel Hardware) -->
       <div class="composer-wrap">
         <!-- Dynamic Contextual Suggestions (Appears once chat begins) -->

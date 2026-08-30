@@ -1,4 +1,41 @@
 
+// =============================================================================
+// QUICK MOVE / SCROLL TO END OF CONVERSATION CONTROLLER
+// =============================================================================
+
+function scrollChatToBottom(smooth = true) {
+  const container = document.getElementById('chat-messages');
+  if (!container) return;
+  container.scrollTo({
+    top: container.scrollHeight,
+    behavior: smooth ? 'smooth' : 'auto'
+  });
+  const btn = document.getElementById('btn-scroll-bottom');
+  if (btn) {
+    btn.classList.add('hidden');
+    btn.classList.remove('flex');
+  }
+}
+
+function initChatScrollWatcher() {
+  const container = document.getElementById('chat-messages');
+  const btn = document.getElementById('btn-scroll-bottom');
+  if (!container || !btn) return;
+
+  container.addEventListener('scroll', () => {
+    const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+    if (distanceFromBottom > 140) {
+      btn.classList.remove('hidden');
+      btn.classList.add('flex');
+      if (window.lucide) refreshIcons();
+    } else {
+      btn.classList.add('hidden');
+      btn.classList.remove('flex');
+    }
+  }, { passive: true });
+}
+
+
 function updateComposerModelStatus(isLive, modelName = 'gemini-3.5-flash-lite') {
   const dot = document.getElementById('gemini-key-dot');
   const label = document.getElementById('gemini-key-label');
@@ -215,7 +252,7 @@ function appendLoadingIndicator() {
     </div>
   `;
   container.appendChild(loaderDiv);
-  container.scrollTop = container.scrollHeight;
+  scrollChatToBottom(true);
   refreshIcons(loaderDiv);
 }
 
@@ -2086,7 +2123,7 @@ function appendErrorCard(errorMessage, retryPrompt) {
   `;
 
   container.appendChild(errorDiv);
-  container.scrollTop = container.scrollHeight;
+  scrollChatToBottom(true);
   refreshIcons();
 }
 
@@ -2275,7 +2312,7 @@ function appendChatMessage(role, content, authorName, modelTag, cognitiveData = 
 
 
   container.appendChild(msgDiv);
-  container.scrollTop = container.scrollHeight;
+  scrollChatToBottom(true);
   refreshIcons();
 }
 
@@ -2298,7 +2335,7 @@ function restoreChatHistory() {
         });
         const lastUser = history.filter(h => h.role === 'user').slice(-1)[0];
         if (lastUser) updateSessionTitle(lastUser.content);
-        container.scrollTop = container.scrollHeight;
+        scrollChatToBottom(true);
       }
     }
   } catch (e) {
