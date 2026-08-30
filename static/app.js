@@ -1,3 +1,84 @@
+
+// =============================================================================
+// LUCIDE & CUSTOM SVG ICON ENGINE FOR HABITS & TRACKS
+// =============================================================================
+
+let currentSelectedHabitIcon = 'droplet';
+
+function selectHabitIcon(iconName) {
+  currentSelectedHabitIcon = iconName;
+  const badge = document.getElementById('habit-selected-emoji-badge');
+  if (badge) {
+    badge.innerHTML = `<i data-lucide="${iconName}" class="w-4 h-4 text-[var(--mc-accent)]"></i>`;
+    if (window.lucide) lucide.createIcons();
+  }
+  document.querySelectorAll('.habit-icon-btn').forEach(btn => {
+    if (btn.getAttribute('data-icon') === iconName) {
+      btn.classList.add('bg-[var(--mc-accent-12)]', 'border', 'border-[var(--mc-accent-25)]');
+    } else {
+      btn.classList.remove('bg-[var(--mc-accent-12)]', 'border', 'border-[var(--mc-accent-25)]');
+    }
+  });
+}
+
+function selectHabitEmoji(emojiOrIcon) {
+  // Backwards compatibility with emoji calls
+  if (emojiOrIcon && emojiOrIcon.startsWith('icon:')) {
+    selectHabitIcon(emojiOrIcon.replace('icon:', ''));
+    return;
+  }
+  const emojiToIconMap = {
+    '💧': 'droplet', '🧘': 'heart', '🚶': 'footprints', '📖': 'book-open',
+    '🌙': 'moon', '💻': 'laptop', '🍵': 'coffee', '🏃': 'activity',
+    '🍎': 'apple', '🎨': 'palette', '⚡': 'zap', '✍️': 'edit-3'
+  };
+  const icon = emojiToIconMap[emojiOrIcon] || 'droplet';
+  selectHabitIcon(icon);
+}
+
+function handleCustomSvgUpload(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const svgContent = e.target.result;
+    if (svgContent && (svgContent.includes('<svg') || svgContent.startsWith('data:image/svg'))) {
+      currentSelectedHabitIcon = 'custom_svg:' + svgContent;
+      const badge = document.getElementById('habit-selected-emoji-badge');
+      if (badge) {
+        badge.innerHTML = `<div class="w-4 h-4 flex items-center justify-center overflow-hidden [&>svg]:w-4 [&>svg]:h-4 [&>svg]:fill-current text-[var(--mc-accent)]">${svgContent}</div>`;
+      }
+      showToast('Custom SVG icon imported successfully!');
+    } else {
+      showToast('Please select a valid .svg file.');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function renderHabitIcon(iconValue) {
+  if (!iconValue) return `<i data-lucide="droplet" class="w-4 h-4 text-[var(--mc-accent)]"></i>`;
+  if (iconValue.startsWith('custom_svg:')) {
+    const svgCode = iconValue.replace('custom_svg:', '');
+    return `<div class="w-4 h-4 flex items-center justify-center overflow-hidden [&>svg]:w-4 [&>svg]:h-4 [&>svg]:fill-current text-[var(--mc-accent)] shrink-0">${svgCode}</div>`;
+  }
+  if (iconValue.startsWith('icon:')) {
+    const iconName = iconValue.replace('icon:', '');
+    return `<i data-lucide="${escapeHtml(iconName)}" class="w-4 h-4 text-[var(--mc-accent)] shrink-0"></i>`;
+  }
+  const emojiToIconMap = {
+    '💧': 'droplet', '🧘': 'heart', '🚶': 'footprints', '📖': 'book-open',
+    '🌙': 'moon', '💻': 'laptop', '🍵': 'coffee', '🏃': 'activity',
+    '🍎': 'apple', '🎨': 'palette', '⚡': 'zap', '✍️': 'edit-3'
+  };
+  if (emojiToIconMap[iconValue]) {
+    return `<i data-lucide="${emojiToIconMap[iconValue]}" class="w-4 h-4 text-[var(--mc-accent)] shrink-0"></i>`;
+  }
+  // If standard lucide icon name
+  return `<i data-lucide="${escapeHtml(iconValue)}" class="w-4 h-4 text-[var(--mc-accent)] shrink-0"></i>`;
+}
+
+
 /**
 
  * Mind Cave — Cognitive Sanctuary & Reflective Studio - Client Controller
@@ -9050,7 +9131,7 @@ function renderHabitTracker() {
 
           <div class="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
 
-            <span class="text-base sm:text-lg shrink-0">${h.emoji || '💧'}</span>
+            <div class="w-7 h-7 rounded-lg bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] flex items-center justify-center text-[var(--mc-accent)] shrink-0">${renderHabitIcon(h.icon || h.emoji)}</div>
 
             <div class="min-w-0 flex-1">
 
@@ -10161,12 +10242,10 @@ function submitNewHabit(event) {
 
 
     const newHabit = {
-
-      id: `h_${Date.now()}`,
-
+      id: editId || `habit_${Date.now()}`,
       title: title,
-
-      emoji: selectedHabitEmojiVal,
+      emoji: currentSelectedHabitIcon,
+      icon: currentSelectedHabitIcon,
 
       type: isCounter ? 'counter' : 'boolean',
 
