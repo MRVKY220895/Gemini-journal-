@@ -14106,28 +14106,15 @@ state.capturesList = [];
 state.capturesFilter = 'all';
 
 function initNotesAndAlerts() {
+  const activeUid = profileStorage.getUid();
+  const isAlice = activeUid === 'user_alice' || activeUid === 'demo_user_alice';
+  const isReset = Boolean(profileStorage.getItem('is_reset', false, activeUid)) || localStorage.getItem('mind_cave_is_reset') === 'true';
+
   try {
-    const saved = localStorage.getItem('mind_cave_captures_list') || localStorage.getItem('mind_cave_notes_list');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      // Migrate old formats if necessary
-      state.capturesList = parsed.map(item => ({
-        id: item.id || `cap_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
-        type: item.type || (item.items ? 'checklist' : item.dueDate ? 'task' : 'note'),
-        title: item.title || 'Untitled Capture',
-        content: item.content || '',
-        items: item.items || (item.content && item.content.includes('\n') ? item.content.split('\n').map(t => ({ id: `chk_${Math.random()}`, text: t.replace(/^[-*•\d.]+\s*/, ''), completed: false })) : []),
-        dueDate: item.dueDate || '',
-        dueTime: item.time || '',
-        priority: item.priority || 'medium',
-        tag: item.tag || 'Work',
-        completed: Boolean(item.completed),
-        completedAt: item.completedAt || null,
-        syncToJournal: item.syncToJournal !== undefined ? item.syncToJournal : Boolean(item.syncToGoal),
-        updatedAt: item.updatedAt || Date.now()
-      }));
-    } else {
-      // Default demo rich captures
+    const saved = profileStorage.getItem('captures_list', null, activeUid);
+    if (saved && Array.isArray(saved)) {
+      state.capturesList = saved;
+    } else if (isAlice && !isReset) {
       state.capturesList = [
         {
           id: 'cap_1',
@@ -14169,12 +14156,14 @@ function initNotesAndAlerts() {
           updatedAt: Date.now() - 10800000
         }
       ];
-      profileStorage.setItem('captures_list', state.capturesList);
+    } else {
+      state.capturesList = [];
     }
   } catch (e) {
     state.capturesList = [];
   }
 
+  state.notesList = state.capturesList;
   renderNotesCards();
   startLiveSanctuaryClock();
 }
