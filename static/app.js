@@ -12644,7 +12644,7 @@ function closeScrapbookModal() {
 
 function setScrapbookTheme(theme) {
 
-  state.scrapbookTheme = theme;
+  state.scrapbookTheme = theme || 'sanctuary';
 
   document.querySelectorAll('#scrapbook-theme-selector .scrapbook-theme-btn').forEach(btn => {
 
@@ -12764,42 +12764,43 @@ function renderScrapbookCard() {
 
   const themes = {
 
+    sanctuary: {
+      bg: '#141816',
+      pageInner: '#1b221e',
+      ink: '#e8edea',
+      inkLight: '#9bb7a5',
+      accent1: '#5e856f',
+      accent2: '#c5aa78',
+      accent3: '#8fa9b8',
+      washi1: '#2a3830',
+      washi2: '#35433b',
+      washi3: '#3a3324',
+      tapeBorder: '#c5aa78',
+      paperLines: '#242f29',
+      cardBg1: '#202b25',
+      cardBg2: '#1e2823',
+      cardBg3: '#26241a',
+      polaroidBg: '#18201c',
+      flameColor: '#c5aa78'
+    },
     pastel: {
-
-      bg: '#fdf6ee',
-
-      pageInner: '#fffdfa',
-
-      ink: '#2b2333',
-
-      inkLight: '#574c63',
-
-      accent1: '#e11d48',
-
-      accent2: '#0284c7',
-
-      accent3: '#10b981',
-
-      washi1: '#ffe4e6',
-
-      washi2: '#e0f2fe',
-
-      washi3: '#fef3c7',
-
-      tapeBorder: '#fb7185',
-
-      paperLines: '#f5ebe0',
-
-      cardBg1: '#fff5f7',
-
-      cardBg2: '#f0f9ff',
-
-      cardBg3: '#fefce8',
-
+      bg: '#f7f9f8',
+      pageInner: '#ffffff',
+      ink: '#1c2420',
+      inkLight: '#4d5e54',
+      accent1: '#5e856f',
+      accent2: '#c5aa78',
+      accent3: '#8fa9b8',
+      washi1: '#e2ece6',
+      washi2: '#f0ece3',
+      washi3: '#e5edf2',
+      tapeBorder: '#5e856f',
+      paperLines: '#eef3f0',
+      cardBg1: '#f2f7f4',
+      cardBg2: '#faf6ee',
+      cardBg3: '#f0f5f8',
       polaroidBg: '#ffffff',
-
-      flameColor: '#f97316'
-
+      flameColor: '#c5aa78'
     },
 
     vintage: {

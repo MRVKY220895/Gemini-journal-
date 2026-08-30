@@ -809,6 +809,9 @@
         <button onclick="switchJournalTrack('chrono')" id="track-btn-chrono" class="track-tab-btn active-chrono shrink-0 !text-[11px] sm:!text-xs !py-1 sm:!py-1.5 !px-2.5 sm:!px-3">
           <i data-lucide="calendar" class="w-3.5 h-3.5"></i><span>Living Timeline</span>
         </button>
+        <button onclick="switchJournalTrack('sanctuary')" id="track-btn-sanctuary" class="track-tab-btn shrink-0 !text-[11px] sm:!text-xs !py-1 sm:!py-1.5 !px-2.5 sm:!px-3">
+          <i data-lucide="heart-pulse" class="w-3.5 h-3.5 text-rose-400"></i><span>Bio Sanctuary</span>
+        </button>
         <button onclick="switchJournalTrack('harmony')" id="track-btn-harmony" class="track-tab-btn shrink-0 !text-[11px] sm:!text-xs !py-1 sm:!py-1.5 !px-2.5 sm:!px-3">
           <i data-lucide="sparkles" class="w-3.5 h-3.5"></i><span>Daily Harmony</span>
         </button>
@@ -817,9 +820,6 @@
         </button>
         <button onclick="switchJournalTrack('memory')" id="track-btn-memory" class="track-tab-btn shrink-0 !text-[11px] sm:!text-xs !py-1 sm:!py-1.5 !px-2.5 sm:!px-3">
           <i data-lucide="image" class="w-3.5 h-3.5"></i><span>Photo Stream</span>
-        </button>
-        <button onclick="switchJournalTrack('sanctuary')" id="track-btn-sanctuary" class="track-tab-btn shrink-0 !text-[11px] sm:!text-xs !py-1 sm:!py-1.5 !px-2.5 sm:!px-3">
-          <i data-lucide="heart-pulse" class="w-3.5 h-3.5"></i><span>Bio Sanctuary</span>
         </button>
       </div>
 
@@ -3095,115 +3095,114 @@
   <!-- ===================================================================== -->
   <!-- MODAL: AESTHETIC HANDWRITTEN SCRAPBOOK SOCIAL CARD EXPORTER -->
   <!-- ===================================================================== -->
+    <!-- ===================================================================== -->
+  <!-- MODAL: AESTHETIC HANDWRITTEN SCRAPBOOK SOCIAL CARD EXPORTER -->
+  <!-- ===================================================================== -->
   <div id="scrapbook-modal" class="fixed inset-0 bg-black/85 backdrop-blur-xl z-50 flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
-    <div class="double-bezel max-w-4xl w-full my-auto max-h-[92vh] flex flex-col">
-      <div class="double-bezel-inner p-4 sm:p-6 flex flex-col flex-1 overflow-hidden">
+    <div class="double-bezel max-w-4xl w-full my-auto max-h-[92vh] flex flex-col shadow-2xl">
+      <div class="double-bezel-inner p-4 sm:p-6 flex flex-col flex-1 overflow-hidden bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-default)]">
         <!-- Modal Header -->
-        <div class="flex items-center justify-between pb-3 border-b border-white/10 shrink-0">
-          <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-xl bg-pink-500/20 text-pink-300 flex items-center justify-center">
-              <i data-lucide="palette" class="w-4 h-4 text-pink-400"></i>
+        <div class="flex items-center justify-between pb-3 border-b border-[var(--mc-border-subtle)] shrink-0">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-[var(--mc-accent-12)] border border-[var(--mc-accent-25)] text-[var(--mc-accent)] flex items-center justify-center">
+              <i data-lucide="palette" class="w-4 h-4 text-[#9BB7A5]"></i>
             </div>
             <div>
-              <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <h3 class="text-base font-bold text-[var(--mc-text-primary)] flex items-center gap-2">
                 <span>Handwritten Scrapbook Social Card</span>
-                <span class="text-[10px] bg-pink-950/60 border border-pink-500/30 text-pink-300 px-2 py-0.2 rounded-full font-mono">Pinterest & IG Ready</span>
+                <span class="text-[10px] bg-[var(--mc-accent-12)] border border-[var(--mc-accent-30)] text-[var(--mc-accent)] px-2 py-0.5 rounded-full font-mono">Mind Cave Sanctuary</span>
               </h3>
-              <p class="text-[11px] text-slate-400">Export your day as an aesthetic physical bullet-journal page with stickers & handwritten cursive.</p>
+              <p class="text-[11px] text-[var(--mc-text-secondary)]">Export your daily reflections as an aesthetic journal card styled with washi tape, stamps & cursive.</p>
             </div>
           </div>
-          <button onclick="closeScrapbookModal()" class="text-slate-400 hover:text-white p-1">
-            <i data-lucide="x" class="w-5 h-5"></i>
+          <button onclick="closeScrapbookModal()" class="w-8 h-8 rounded-xl bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-bg-elevation)] text-[var(--mc-text-muted)] hover:text-[var(--mc-text-primary)] flex items-center justify-center transition-colors cursor-pointer">
+            <i data-lucide="x" class="w-4 h-4"></i>
           </button>
         </div>
 
         <!-- Body: Controls & Canvas Preview -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 pt-4 flex-1 overflow-y-auto">
           <!-- Left: Customization Controls -->
-          <div class="lg:col-span-4 space-y-3 text-xs">
+          <div class="lg:col-span-5 space-y-3 text-xs">
             <!-- Theme Selection -->
             <div>
-              <label class="text-slate-300 font-semibold block mb-1">Aesthetic Theme</label>
-              <div class="grid grid-cols-2 gap-1.5" id="scrapbook-theme-selector">
-                <button type="button" onclick="setScrapbookTheme('pastel')" class="scrapbook-theme-btn active p-2 rounded-xl border text-left text-xs bg-pink-950/30 border-pink-500/50 text-pink-200">
-                  <span class="font-bold flex items-center gap-1.5"><i data-lucide="flower" class="w-3.5 h-3.5 text-pink-400"></i><span>Pastel Bloom</span></span>
-                  <span class="text-[10px] text-pink-300/70 block mt-0.5">Washi tape & cute doodles</span>
+              <label class="text-[var(--mc-text-secondary)] font-semibold block mb-1.5">Sanctuary Aesthetic Theme</label>
+              <div class="grid grid-cols-2 gap-2" id="scrapbook-theme-selector">
+                <button type="button" onclick="setScrapbookTheme('sanctuary')" class="scrapbook-theme-btn active p-2.5 rounded-xl border text-left text-xs bg-[var(--mc-accent-10)] border-[var(--mc-accent-40)] text-[var(--mc-accent)] cursor-pointer transition-all">
+                  <span class="font-bold flex items-center gap-1.5"><i data-lucide="feather" class="w-3.5 h-3.5 text-[#9BB7A5]"></i><span>Sanctuary Sage</span></span>
+                  <span class="text-[10px] opacity-75 block mt-0.5">Warm olive & gold washi</span>
                 </button>
-                <button type="button" onclick="setScrapbookTheme('vintage')" class="scrapbook-theme-btn p-2 rounded-xl border text-left text-xs bg-black/40 border-slate-700 hover:border-amber-500 text-amber-200">
-                  <span class="font-bold flex items-center gap-1.5"><i data-lucide="scroll" class="w-3.5 h-3.5 text-amber-400"></i><span>Vintage Kraft</span></span>
-                  <span class="text-[10px] text-amber-300/70 block mt-0.5">Sepia paper & stamps</span>
+                <button type="button" onclick="setScrapbookTheme('vintage')" class="scrapbook-theme-btn p-2.5 rounded-xl border text-left text-xs bg-[var(--mc-bg-tertiary)] border-[var(--mc-border-subtle)] hover:border-[#C5AA78] text-[#C5AA78] cursor-pointer transition-all">
+                  <span class="font-bold flex items-center gap-1.5"><i data-lucide="scroll" class="w-3.5 h-3.5 text-[#C5AA78]"></i><span>Vintage Kraft</span></span>
+                  <span class="text-[10px] opacity-75 block mt-0.5">Sepia paper & stamps</span>
                 </button>
-                <button type="button" onclick="setScrapbookTheme('notebook')" class="scrapbook-theme-btn p-2 rounded-xl border text-left text-xs bg-black/40 border-slate-700 hover:border-cyan-500 text-cyan-200">
-                  <span class="font-bold flex items-center gap-1.5"><i data-lucide="book-open" class="w-3.5 h-3.5 text-cyan-400"></i><span>Spiral Grid</span></span>
-                  <span class="text-[10px] text-cyan-300/70 block mt-0.5">Clean bullet journal wire</span>
+                <button type="button" onclick="setScrapbookTheme('notebook')" class="scrapbook-theme-btn p-2.5 rounded-xl border text-left text-xs bg-[var(--mc-bg-tertiary)] border-[var(--mc-border-subtle)] hover:border-[#8FA9B8] text-[#8FA9B8] cursor-pointer transition-all">
+                  <span class="font-bold flex items-center gap-1.5"><i data-lucide="book-open" class="w-3.5 h-3.5 text-[#8FA9B8]"></i><span>Minimalist Grid</span></span>
+                  <span class="text-[10px] opacity-75 block mt-0.5">Clean architectural grid</span>
                 </button>
-                <button type="button" onclick="setScrapbookTheme('cyber')" class="scrapbook-theme-btn p-2 rounded-xl border text-left text-xs bg-black/40 border-slate-700 hover:border-purple-500 text-purple-200">
-                  <span class="font-bold flex items-center gap-1.5"><i data-lucide="moon" class="w-3.5 h-3.5 text-purple-400"></i><span>Midnight Neon</span></span>
-                  <span class="text-[10px] text-purple-300/70 block mt-0.5">Dark mode handwriting</span>
+                <button type="button" onclick="setScrapbookTheme('cyber')" class="scrapbook-theme-btn p-2.5 rounded-xl border text-left text-xs bg-[var(--mc-bg-tertiary)] border-[var(--mc-border-subtle)] hover:border-emerald-400 text-emerald-400 cursor-pointer transition-all">
+                  <span class="font-bold flex items-center gap-1.5"><i data-lucide="moon" class="w-3.5 h-3.5 text-emerald-400"></i><span>Obsidian Dark</span></span>
+                  <span class="text-[10px] opacity-75 block mt-0.5">Matte dark mode</span>
                 </button>
               </div>
             </div>
 
             <!-- Font Family Selection -->
             <div>
-              <label class="text-slate-300 font-semibold block mb-1">Handwritten Script Font</label>
-              <select id="scrapbook-font-select" onchange="renderScrapbookCard()" class="w-full bg-slate-900 text-slate-200 text-xs p-2 rounded-xl border border-slate-800 focus:outline-none focus:border-pink-500">
+              <label class="text-[var(--mc-text-secondary)] font-semibold block mb-1">Handwritten Script Font</label>
+              <select id="scrapbook-font-select" onchange="renderScrapbookCard()" class="mc-input w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] text-xs p-2.5 rounded-xl border border-[var(--mc-border-default)] focus:outline-none">
                 <option value="'Caveat', cursive" selected>Caveat (Casual Pen)</option>
-                <option value="'Patrick Hand', cursive">Patrick Hand (Clean Doodles)</option>
                 <option value="'Kalam', cursive">Kalam (Warm Journal Handwriting)</option>
+                <option value="'Patrick Hand', cursive">Patrick Hand (Clean Doodles)</option>
                 <option value="'Architects Daughter', cursive">Architects Daughter (Artistic)</option>
               </select>
             </div>
 
             <!-- Content Toggles -->
-            <div class="space-y-1.5 pt-1 border-t border-white/5">
-              <label class="text-slate-300 font-semibold block">Included Elements</label>
-              <label class="flex items-center gap-2 cursor-pointer text-[11px] text-slate-300">
-                <input type="checkbox" id="scrap-toggle-goal" checked onchange="renderScrapbookCard()" class="rounded bg-slate-900 text-pink-500">
+            <div class="space-y-1.5 pt-1 border-t border-[var(--mc-border-subtle)]">
+              <label class="text-[var(--mc-text-secondary)] font-semibold block mb-1">Included Elements</label>
+              <label class="flex items-center gap-2 cursor-pointer text-[11px] text-[var(--mc-text-primary)]">
+                <input type="checkbox" id="scrap-toggle-goal" checked onchange="renderScrapbookCard()" class="accent-[#5E856F]">
                 <span>Today's North Star Goal & Intent</span>
               </label>
-              <label class="flex items-center gap-2 cursor-pointer text-[11px] text-slate-300">
-                <input type="checkbox" id="scrap-toggle-habits" checked onchange="renderScrapbookCard()" class="rounded bg-slate-900 text-pink-500">
+              <label class="flex items-center gap-2 cursor-pointer text-[11px] text-[var(--mc-text-primary)]">
+                <input type="checkbox" id="scrap-toggle-habits" checked onchange="renderScrapbookCard()" class="accent-[#5E856F]">
                 <span>Daily Habit Checkmarks & Streaks</span>
               </label>
-              <label class="flex items-center gap-2 cursor-pointer text-[11px] text-slate-300">
-                <input type="checkbox" id="scrap-toggle-metrics" checked onchange="renderScrapbookCard()" class="rounded bg-slate-900 text-pink-500">
-                <span>Plan vs. Action Execution Score</span>
+              <label class="flex items-center gap-2 cursor-pointer text-[11px] text-[var(--mc-text-primary)]">
+                <input type="checkbox" id="scrap-toggle-metrics" checked onchange="renderScrapbookCard()" class="accent-[#5E856F]">
+                <span>Emotional Equilibrium & Clarity Score</span>
               </label>
-              <label class="flex items-center gap-2 cursor-pointer text-[11px] text-slate-300">
-                <input type="checkbox" id="scrap-toggle-polaroid" checked onchange="renderScrapbookCard()" class="rounded bg-slate-900 text-pink-500">
+              <label class="flex items-center gap-2 cursor-pointer text-[11px] text-[var(--mc-text-primary)]">
+                <input type="checkbox" id="scrap-toggle-polaroid" checked onchange="renderScrapbookCard()" class="accent-[#5E856F]">
                 <span>Memory Polaroid with Washi Tape</span>
               </label>
-              <label class="flex items-center gap-2 cursor-pointer text-[11px] text-slate-300">
-                <input type="checkbox" id="scrap-toggle-reflection" checked onchange="renderScrapbookCard()" class="rounded bg-slate-900 text-pink-500">
+              <label class="flex items-center gap-2 cursor-pointer text-[11px] text-[var(--mc-text-primary)]">
+                <input type="checkbox" id="scrap-toggle-reflection" checked onchange="renderScrapbookCard()" class="accent-[#5E856F]">
                 <span>Top Journal Reflection Quote</span>
               </label>
             </div>
 
             <!-- Actions -->
             <div class="pt-2 space-y-2">
-              <button onclick="generateNanoBananaScrapbookArt()" class="w-full btn-secondary !py-2 justify-center font-bold text-amber-300 hover:border-amber-400 flex items-center gap-1.5" title="Generate Custom AI Doodles & Art for Today's Journal Card">
-                <i data-lucide="sparkles" class="w-4 h-4 text-amber-400"></i>
-                <span>Nano Banana AI Art Enhance</span>
-              </button>
-              <button onclick="downloadScrapbookPNG()" class="w-full btn-island !py-2 justify-center font-bold !bg-gradient-to-r !from-pink-500 !to-purple-600">
+              <button onclick="downloadScrapbookPNG()" class="w-full btn-primary !py-2.5 justify-center font-bold flex items-center gap-1.5 cursor-pointer shadow-md">
                 <i data-lucide="download" class="w-4 h-4 text-white"></i>
-                <span>Download High-Res PNG</span>
+                <span>Download High-Res PNG (880x1150)</span>
               </button>
-              <button onclick="shareScrapbookImage()" class="w-full btn-secondary !py-2 justify-center font-semibold text-pink-300 hover:border-pink-400">
-                <i data-lucide="share-2" class="w-4 h-4 text-pink-400"></i>
-                <span>Share to Socials (IG / Pinterest / X)</span>
+              <button onclick="shareScrapbookImage()" class="w-full btn-secondary !py-2 justify-center font-semibold text-[var(--mc-text-primary)] flex items-center gap-1.5 cursor-pointer">
+                <i data-lucide="share-2" class="w-4 h-4 text-[var(--mc-accent)]"></i>
+                <span>Share to Socials</span>
               </button>
             </div>
           </div>
 
           <!-- Right: Live Canvas / Card Preview -->
-          <div class="lg:col-span-8 flex flex-col items-center justify-center bg-black/40 rounded-2xl p-3 border border-white/5 min-h-[440px]">
+          <div class="lg:col-span-7 flex flex-col items-center justify-center bg-[var(--mc-bg-tertiary)] rounded-2xl p-3 border border-[var(--mc-border-subtle)] min-h-[440px]">
             <div class="scrapbook-canvas-wrapper shadow-2xl rounded-2xl overflow-hidden max-w-full">
-              <canvas id="scrapbook-render-canvas" width="800" height="1000" class="w-full max-w-[420px] sm:max-w-[480px] h-auto rounded-xl border border-white/10 shadow-2xl"></canvas>
+              <canvas id="scrapbook-render-canvas" width="880" height="1150" class="w-full max-w-[380px] sm:max-w-[420px] h-auto rounded-xl border border-[var(--mc-border-default)] shadow-2xl"></canvas>
             </div>
-            <p class="text-[10px] text-slate-500 font-mono mt-2 flex items-center gap-1">
-              <i data-lucide="info" class="w-3 h-3"></i> Real-time generated 4:5 social canvas resolution (800x1000px)
+            <p class="text-[10px] text-[var(--mc-text-muted)] font-mono mt-2 flex items-center gap-1">
+              <i data-lucide="shield-check" class="w-3 h-3 text-[#9BB7A5]"></i> Mind Cave Life Intelligence Card (880x1150px)
             </p>
           </div>
         </div>
