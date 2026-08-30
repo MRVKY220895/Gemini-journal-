@@ -5,11 +5,17 @@
 
 function scrollChatToBottom(smooth = true) {
   const container = document.getElementById('chat-messages');
-  if (!container) return;
-  container.scrollTo({
-    top: container.scrollHeight,
+  if (container) {
+    container.scrollTo({
+      top: container.scrollHeight + 5000,
+      behavior: smooth ? 'smooth' : 'auto'
+    });
+  }
+  window.scrollTo({
+    top: document.documentElement.scrollHeight || document.body.scrollHeight,
     behavior: smooth ? 'smooth' : 'auto'
   });
+
   const btn = document.getElementById('btn-scroll-bottom');
   if (btn) {
     btn.classList.add('hidden');
@@ -17,18 +23,45 @@ function scrollChatToBottom(smooth = true) {
   }
 }
 
+function checkScrollDistance() {
+  const studioView = document.getElementById('view-studio');
+  const btn = document.getElementById('btn-scroll-bottom');
+  if (!studioView || studioView.classList.contains('hidden') || !btn) {
+    if (btn) {
+      btn.classList.add('hidden');
+      btn.classList.remove('flex');
+    }
+    return;
+  }
+
+  const container = document.getElementById('chat-messages');
+  let distanceFromBottom = 0;
+
+  if (container && container.scrollHeight > container.clientHeight) {
+    distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+  } else {
+    distanceFromBottom = (document.documentElement.scrollHeight || document.body.scrollHeight) - window.scrollY - window.innerHeight;
+  }
+
+  if (distanceFromBottom > 70) {
+    btn.classList.remove('hidden');
+    btn.classList.add('flex');
+    if (window.lucide) refreshIcons();
+  } else {
+    btn.classList.add('hidden');
+    btn.classList.remove('flex');
+  }
+}
+
 function initChatScrollWatcher() {
   const container = document.getElementById('chat-messages');
-  const btn = document.getElementById('btn-scroll-bottom');
-  if (!container || !btn) return;
-
-  container.addEventListener('scroll', () => {
-    const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
-    if (distanceFromBottom > 140) {
-      btn.classList.remove('hidden');
-      btn.classList.add('flex');
-      if (window.lucide) refreshIcons();
-    } else {
+  if (container) {
+    container.removeEventListener('scroll', checkScrollDistance);
+    container.addEventListener('scroll', checkScrollDistance, { passive: true });
+  }
+  window.removeEventListener('scroll', checkScrollDistance);
+  window.addEventListener('scroll', checkScrollDistance, { passive: true });
+} else {
       btn.classList.add('hidden');
       btn.classList.remove('flex');
     }

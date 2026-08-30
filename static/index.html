@@ -522,10 +522,12 @@
         type="button" 
         id="btn-scroll-bottom" 
         onclick="scrollChatToBottom(true)" 
-        class="hidden absolute right-4 bottom-24 z-30 items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--mc-bg-secondary)] hover:bg-[var(--mc-bg-elevation)] text-[var(--mc-text-primary)] border border-[var(--mc-border-default)] shadow-2xl text-xs font-semibold backdrop-blur-xl transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95 group"
+        class="hidden fixed right-6 bottom-24 sm:bottom-28 z-50 items-center gap-1.5 px-3.5 py-2 rounded-full bg-[var(--mc-bg-secondary)] hover:bg-[var(--mc-bg-elevation)] text-[var(--mc-text-primary)] border border-[var(--mc-border-default)] shadow-2xl text-xs font-semibold backdrop-blur-2xl transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95 group"
         title="Move to the end of conversation (↓)"
       >
-        <i data-lucide="arrow-down" class="w-3.5 h-3.5 text-[#9BB7A5] group-hover:translate-y-0.5 transition-transform"></i>
+        <div class="w-5 h-5 rounded-full bg-[#9BB7A5]/20 flex items-center justify-center shrink-0">
+          <i data-lucide="arrow-down" class="w-3.5 h-3.5 text-[#9BB7A5] group-hover:translate-y-0.5 transition-transform"></i>
+        </div>
         <span>Move to end</span>
       </button>
 
