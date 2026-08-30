@@ -6338,6 +6338,10 @@ const masterDashboardDataStore = {
 
 let currentDashboardHorizon = 'weekly';
 
+function setDashboardHorizon(horizon, btnEl) {
+  setMasterDashboardHorizon(horizon);
+}
+
 function setMasterDashboardHorizon(horizon) {
   if (!masterDashboardDataStore[horizon]) horizon = 'weekly';
   currentDashboardHorizon = horizon;
@@ -6347,9 +6351,9 @@ function setMasterDashboardHorizon(horizon) {
     const btn = document.getElementById(`dash-btn-${h}`);
     if (btn) {
       if (h === horizon) {
-        btn.className = 'px-3 py-1.5 rounded-xl font-semibold transition-all bg-cyan-500/20 text-cyan-600 dark:text-cyan-300 border border-cyan-500/30 flex items-center gap-1.5 shadow-sm';
+        btn.className = 'dash-horizon-btn active px-2.5 py-1 rounded-lg text-xs font-semibold bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] flex items-center gap-1 cursor-pointer';
       } else {
-        btn.className = 'px-3 py-1.5 rounded-xl font-semibold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center gap-1.5';
+        btn.className = 'dash-horizon-btn px-2.5 py-1 rounded-lg text-xs font-semibold text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] flex items-center gap-1 cursor-pointer';
       }
     }
   });
@@ -6491,18 +6495,18 @@ function renderDashboardHeatmap(totalDays, intensities) {
   if (!container) return;
 
   const bgClasses = [
-    'bg-slate-200 dark:bg-slate-800',
-    'bg-cyan-500/30 border border-cyan-500/40',
-    'bg-cyan-500/50 border border-cyan-500/60',
-    'bg-cyan-500/80 border border-cyan-400',
-    'bg-cyan-400 border border-cyan-300 shadow-[0_0_8px_rgba(6,182,212,0.4)]'
+    'bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)]',
+    'bg-[#5E856F]/25 border border-[#5E856F]/35',
+    'bg-[#5E856F]/50 border border-[#5E856F]/60',
+    'bg-[#5E856F]/75 border border-[#5E856F]/85',
+    'bg-[#5E856F] border border-[#9BB7A5] shadow-sm'
   ];
 
   let html = '';
   for (let i = 0; i < totalDays; i++) {
     const intensity = intensities[i % intensities.length] || 0;
     const cls = bgClasses[intensity] || bgClasses[0];
-    html += `<div class="h-5 sm:h-6 rounded-md ${cls} transition-all hover:scale-110 cursor-pointer" title="Period ${i+1}: Intensity ${intensity}/4"></div>`;
+    html += `<div class="h-5 sm:h-6 rounded-md ${cls} transition-all hover:scale-105 cursor-pointer" title="Period ${i+1}: Intensity ${intensity}/4"></div>`;
   }
   container.innerHTML = html;
 }

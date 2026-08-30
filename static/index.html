@@ -1477,19 +1477,19 @@
 
         <!-- Time Horizon Picker Pills & Refresh Action -->
         <div class="flex items-center gap-1 bg-[var(--mc-bg-tertiary)] p-1 rounded-xl border border-[var(--mc-border-default)] shrink-0 self-start sm:self-auto">
-          <button type="button" onclick="setDashboardHorizon('daily', this)" class="dash-horizon-btn px-2.5 py-1 rounded-lg text-xs font-semibold text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] flex items-center gap-1">
+          <button type="button" id="dash-btn-daily" onclick="setDashboardHorizon('daily', this)" class="dash-horizon-btn px-2.5 py-1 rounded-lg text-xs font-semibold text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] flex items-center gap-1 cursor-pointer">
             <i data-lucide="sun" class="w-3.5 h-3.5 text-[#C5AA78]"></i> <span>Daily</span>
           </button>
-          <button type="button" onclick="setDashboardHorizon('weekly', this)" class="dash-horizon-btn active px-2.5 py-1 rounded-lg text-xs font-semibold bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] flex items-center gap-1">
+          <button type="button" id="dash-btn-weekly" onclick="setDashboardHorizon('weekly', this)" class="dash-horizon-btn active px-2.5 py-1 rounded-lg text-xs font-semibold bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] flex items-center gap-1 cursor-pointer">
             <i data-lucide="calendar" class="w-3.5 h-3.5 text-[#5E856F]"></i> <span>Weekly</span>
           </button>
-          <button type="button" onclick="setDashboardHorizon('monthly', this)" class="dash-horizon-btn px-2.5 py-1 rounded-lg text-xs font-semibold text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] flex items-center gap-1">
+          <button type="button" id="dash-btn-monthly" onclick="setDashboardHorizon('monthly', this)" class="dash-horizon-btn px-2.5 py-1 rounded-lg text-xs font-semibold text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] flex items-center gap-1 cursor-pointer">
             <i data-lucide="layers" class="w-3.5 h-3.5 text-[#8FA9B8]"></i> <span>Monthly</span>
           </button>
-          <button type="button" onclick="setDashboardHorizon('yearly', this)" class="dash-horizon-btn px-2.5 py-1 rounded-lg text-xs font-semibold text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] flex items-center gap-1">
+          <button type="button" id="dash-btn-yearly" onclick="setDashboardHorizon('yearly', this)" class="dash-horizon-btn px-2.5 py-1 rounded-lg text-xs font-semibold text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] flex items-center gap-1 cursor-pointer">
             <i data-lucide="sparkles" class="w-3.5 h-3.5 text-[#9BB7A5]"></i> <span>Yearly</span>
           </button>
-          <button type="button" onclick="loadAnalytics()" class="btn-secondary !w-7 !h-7 !p-0 flex items-center justify-center shrink-0 ml-1" title="Refresh Dashboard Data">
+          <button type="button" onclick="loadAnalytics()" class="btn-secondary !w-7 !h-7 !p-0 flex items-center justify-center shrink-0 ml-1 cursor-pointer" title="Refresh Dashboard Data">
             <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
           </button>
         </div>
@@ -1829,11 +1829,11 @@
           <p class="text-xs text-slate-500 dark:text-slate-400">Military-grade AES-256-GCM client encryption, biometric authentication, and strict per-user cloud isolation.</p>
         </div>
         <div class="flex items-center gap-2">
-          <button type="button" onclick="lockVaultImmediately()" class="px-3 py-1.5 rounded-xl bg-slate-900 text-slate-200 border border-slate-700 hover:border-slate-500 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer">
-            <i data-lucide="lock" class="w-3.5 h-3.5 text-rose-400"></i>
+          <button type="button" onclick="lockVaultImmediately()" class="btn-secondary text-xs flex items-center gap-1.5 cursor-pointer">
+            <i data-lucide="lock" class="w-3.5 h-3.5 text-[#C5AA78]"></i>
             <span>Lock Vault</span>
           </button>
-          <button type="button" onclick="promptVaultUnlock()" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-md shadow-emerald-600/20 transition-all cursor-pointer">
+          <button type="button" onclick="promptVaultUnlock()" class="btn-primary text-xs flex items-center gap-1.5 cursor-pointer">
             <i data-lucide="unlock" class="w-3.5 h-3.5 text-white"></i>
             <span>Unlock Vault</span>
           </button>
@@ -1841,56 +1841,54 @@
       </div>
 
       <!-- 📜 BENTO 1: Security Compliance Scorecard -->
-      <div class="double-bezel">
-        <div class="double-bezel-inner p-5 sm:p-6 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950/40 border border-slate-800">
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/10">
-            <div class="flex items-center gap-3">
-              <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-cyan-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/25">
-                <i data-lucide="shield-check" class="w-6 h-6"></i>
-              </div>
-              <div>
-                <div class="flex items-center gap-2">
-                  <h3 class="text-base sm:text-lg font-bold text-white">Bank-Grade Compliance Rating</h3>
-                  <span class="text-xs font-mono font-bold text-emerald-400 bg-emerald-950/80 border border-emerald-500/40 px-2.5 py-0.5 rounded-full" id="vault-compliance-grade">98% A+ Certified</span>
-                </div>
-                <p class="text-xs text-slate-400 mt-0.5">Continuous cryptographic verification active for your session</p>
-              </div>
+      <div class="mc-card p-5 sm:p-6 space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[var(--mc-border-subtle)]">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-2xl bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] flex items-center justify-center">
+              <i data-lucide="shield-check" class="w-5 h-5"></i>
             </div>
-            <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span class="text-xs font-mono text-emerald-300 font-semibold">Zero Telemetry Leakage</span>
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="text-base sm:text-lg font-semibold text-[var(--mc-text-primary)]">Bank-Grade Compliance Rating</h3>
+                <span class="text-xs font-mono font-semibold text-[var(--mc-accent)] bg-[var(--mc-accent-12)] border border-[var(--mc-accent-25)] px-2.5 py-0.5 rounded-full" id="vault-compliance-grade">98% A+ Certified</span>
+              </div>
+              <p class="text-xs text-[var(--mc-text-secondary)] mt-0.5">Continuous cryptographic verification active for your session</p>
             </div>
           </div>
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-[var(--mc-accent)] animate-pulse"></span>
+            <span class="text-xs font-mono text-[var(--mc-accent)] font-semibold">Zero Telemetry Leakage</span>
+          </div>
+        </div>
 
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 text-xs">
-            <div class="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1">
-              <div class="flex items-center gap-1.5 text-emerald-400 font-semibold">
-                <i data-lucide="key" class="w-3.5 h-3.5"></i>
-                <span>AES-256-GCM</span>
-              </div>
-              <p class="text-[11px] text-slate-400">Client-Side Cipher Active</p>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1 text-xs">
+          <div class="p-3 rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] space-y-1">
+            <div class="flex items-center gap-1.5 text-[var(--mc-accent)] font-semibold">
+              <i data-lucide="key" class="w-3.5 h-3.5"></i>
+              <span>AES-256-GCM</span>
             </div>
-            <div class="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1">
-              <div class="flex items-center gap-1.5 text-cyan-400 font-semibold">
-                <i data-lucide="fingerprint" class="w-3.5 h-3.5"></i>
-                <span id="scorecard-biometric-lbl">WebAuthn Ready</span>
-              </div>
-              <p class="text-[11px] text-slate-400">FaceID / TouchID Hook</p>
+            <p class="text-[11px] text-[var(--mc-text-secondary)]">Client-Side Cipher Active</p>
+          </div>
+          <div class="p-3 rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] space-y-1">
+            <div class="flex items-center gap-1.5 text-[#8FA9B8] font-semibold">
+              <i data-lucide="fingerprint" class="w-3.5 h-3.5"></i>
+              <span id="scorecard-biometric-lbl">WebAuthn Ready</span>
             </div>
-            <div class="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1">
-              <div class="flex items-center gap-1.5 text-purple-400 font-semibold">
-                <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
-                <span>Strict UID Guard</span>
-              </div>
-              <p class="text-[11px] text-slate-400">Isolated Firestore Path</p>
+            <p class="text-[11px] text-[var(--mc-text-secondary)]">FaceID / TouchID Hook</p>
+          </div>
+          <div class="p-3 rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] space-y-1">
+            <div class="flex items-center gap-1.5 text-[#C5AA78] font-semibold">
+              <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
+              <span>Strict UID Guard</span>
             </div>
-            <div class="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1">
-              <div class="flex items-center gap-1.5 text-amber-400 font-semibold">
-                <i data-lucide="eye-off" class="w-3.5 h-3.5"></i>
-                <span>Zero Trackers</span>
-              </div>
-              <p class="text-[11px] text-slate-400">100% Private Sandbox</p>
+            <p class="text-[11px] text-[var(--mc-text-secondary)]">Isolated Firestore Path</p>
+          </div>
+          <div class="p-3 rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] space-y-1">
+            <div class="flex items-center gap-1.5 text-[var(--mc-text-muted)] font-semibold">
+              <i data-lucide="eye-off" class="w-3.5 h-3.5"></i>
+              <span>Zero Trackers</span>
             </div>
+            <p class="text-[11px] text-[var(--mc-text-secondary)]">100% Private Sandbox</p>
           </div>
         </div>
       </div>
@@ -1899,89 +1897,83 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         
         <!-- Feature 1: Biometric Unlock (WebAuthn) -->
-        <div class="double-bezel">
-          <div class="double-bezel-inner p-5 flex flex-col justify-between h-full space-y-4">
-            <div class="space-y-2">
-              <div class="flex items-center justify-between">
-                <div class="w-8 h-8 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold">
-                  <i data-lucide="fingerprint" class="w-4 h-4"></i>
-                </div>
-                <span id="biometric-status-badge" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">Not Linked</span>
-              </div>
-              <h3 class="text-sm font-bold text-slate-900 dark:text-white">Biometric Unlock (FaceID / TouchID)</h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                Unlock your encrypted journal entries with a single touch or glance using your device's biometric sensor.
-              </p>
-            </div>
-
-            <div class="space-y-2 pt-2 border-t border-white/5">
-              <button type="button" onclick="registerBiometricCredential()" id="btn-register-biometric" class="w-full py-2 px-3 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-md shadow-cyan-600/20">
+        <div class="mc-card p-5 flex flex-col justify-between h-full space-y-4">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <div class="w-8 h-8 rounded-xl bg-[var(--mc-accent-12)] text-[var(--mc-accent)] flex items-center justify-center font-bold">
                 <i data-lucide="fingerprint" class="w-4 h-4"></i>
-                <span id="btn-biometric-text">Link Device Biometrics</span>
-              </button>
-              <button type="button" onclick="testBiometricAuthentication()" class="w-full py-1.5 px-3 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors">
-                <i data-lucide="unlock" class="w-3.5 h-3.5 text-cyan-400"></i>
-                <span>Test Biometric Unlock</span>
-              </button>
+              </div>
+              <span id="biometric-status-badge" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-muted)] border border-[var(--mc-border-default)]">Not Linked</span>
             </div>
+            <h3 class="text-sm font-semibold text-[var(--mc-text-primary)]">Biometric Unlock (FaceID / TouchID)</h3>
+            <p class="text-xs text-[var(--mc-text-secondary)] leading-relaxed">
+              Unlock your encrypted journal entries with a single touch or glance using your device's biometric sensor.
+            </p>
+          </div>
+
+          <div class="space-y-2 pt-2 border-t border-[var(--mc-border-subtle)]">
+            <button type="button" onclick="registerBiometricCredential()" id="btn-register-biometric" class="btn-primary w-full text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer">
+              <i data-lucide="fingerprint" class="w-4 h-4"></i>
+              <span id="btn-biometric-text">Link Device Biometrics</span>
+            </button>
+            <button type="button" onclick="testBiometricAuthentication()" class="btn-secondary w-full text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer">
+              <i data-lucide="unlock" class="w-3.5 h-3.5 text-[var(--mc-accent)]"></i>
+              <span>Test Biometric Unlock</span>
+            </button>
           </div>
         </div>
 
         <!-- Feature 2: Duress / Decoy PIN Protection -->
-        <div class="double-bezel">
-          <div class="double-bezel-inner p-5 flex flex-col justify-between h-full space-y-4">
-            <div class="space-y-2">
-              <div class="flex items-center justify-between">
-                <div class="w-8 h-8 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold">
-                  <i data-lucide="shield-alert" class="w-4 h-4"></i>
-                </div>
-                <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/30">Duress Mode</span>
+        <div class="mc-card p-5 flex flex-col justify-between h-full space-y-4">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <div class="w-8 h-8 rounded-xl bg-[#C5AA78]/15 text-[#C5AA78] flex items-center justify-center font-bold">
+                <i data-lucide="shield-alert" class="w-4 h-4"></i>
               </div>
-              <h3 class="text-sm font-bold text-slate-900 dark:text-white">Decoy Passphrase / Duress PIN</h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                If compelled to unlock your vault under duress, entering this decoy passphrase opens a benign, generic placeholder journal without revealing sensitive reflections.
-              </p>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#C5AA78]/10 text-[#C5AA78] border border-[#C5AA78]/30">Duress Mode</span>
             </div>
+            <h3 class="text-sm font-semibold text-[var(--mc-text-primary)]">Decoy Passphrase / Duress PIN</h3>
+            <p class="text-xs text-[var(--mc-text-secondary)] leading-relaxed">
+              If compelled to unlock your vault under duress, entering this decoy passphrase opens a benign, generic placeholder journal without revealing sensitive reflections.
+            </p>
+          </div>
 
-            <div class="space-y-2 pt-2 border-t border-white/5">
-              <div class="flex items-center gap-2">
-                <input type="password" id="decoy-passphrase-input" placeholder="Configure Decoy PIN / Phrase..." class="flex-1 bg-black/50 text-slate-200 text-xs p-2 rounded-xl border border-slate-800 focus:outline-none focus:border-rose-500 font-mono">
-                <button type="button" onclick="saveDecoyPassphrase()" class="px-3 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition-all shrink-0">
-                  Save
-                </button>
-              </div>
-              <p class="text-[10px] text-slate-500 dark:text-slate-400">Default emergency decoy: <code class="text-rose-300 font-mono">decoy</code></p>
+          <div class="space-y-2 pt-2 border-t border-[var(--mc-border-subtle)]">
+            <div class="flex items-center gap-2">
+              <input type="password" id="decoy-passphrase-input" placeholder="Configure Decoy PIN / Phrase..." class="flex-1 bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] text-xs p-2 rounded-xl border border-[var(--mc-border-default)] focus:outline-none font-mono">
+              <button type="button" onclick="saveDecoyPassphrase()" class="btn-primary text-xs px-3 py-2 font-semibold shrink-0 cursor-pointer">
+                Save
+              </button>
             </div>
+            <p class="text-[10px] text-[var(--mc-text-muted)]">Default emergency decoy: <code class="text-[var(--mc-accent)] font-mono">decoy</code></p>
           </div>
         </div>
 
         <!-- Feature 3: Automated Encrypted Cloud Backups (.mcave) -->
-        <div class="double-bezel md:col-span-2 lg:col-span-1">
-          <div class="double-bezel-inner p-5 flex flex-col justify-between h-full space-y-4">
-            <div class="space-y-2">
-              <div class="flex items-center justify-between">
-                <div class="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold">
-                  <i data-lucide="package" class="w-4 h-4"></i>
-                </div>
-                <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/30">.mcave Format</span>
+        <div class="mc-card p-5 flex flex-col justify-between h-full space-y-4 md:col-span-2 lg:col-span-1">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <div class="w-8 h-8 rounded-xl bg-[var(--mc-accent-12)] text-[var(--mc-accent)] flex items-center justify-center font-bold">
+                <i data-lucide="package" class="w-4 h-4"></i>
               </div>
-              <h3 class="text-sm font-bold text-slate-900 dark:text-white">Encrypted Archive & Backups</h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                Export an encrypted, tamper-proof <code>.mcave</code> backup archive of all journal reflections, photos, and cognitive blueprints.
-              </p>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)]">.mcave Format</span>
             </div>
+            <h3 class="text-sm font-semibold text-[var(--mc-text-primary)]">Encrypted Archive & Backups</h3>
+            <p class="text-xs text-[var(--mc-text-secondary)] leading-relaxed">
+              Export an encrypted, tamper-proof <code>.mcave</code> backup archive of all journal reflections, photos, and cognitive blueprints.
+            </p>
+          </div>
 
-            <div class="space-y-2 pt-2 border-t border-white/5">
-              <button type="button" onclick="exportEncryptedBackup()" class="w-full py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-md shadow-purple-600/20">
-                <i data-lucide="download" class="w-4 h-4"></i>
-                <span>Download Encrypted .mcave</span>
-              </button>
-              <label class="w-full py-1.5 px-3 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer block text-center">
-                <i data-lucide="upload" class="w-3.5 h-3.5 text-purple-400 inline"></i>
-                <span>Restore from .mcave Backup</span>
-                <input type="file" id="import-backup-file-input" accept=".mcave,.json" class="hidden" onchange="importEncryptedBackup(this)">
-              </label>
-            </div>
+          <div class="space-y-2 pt-2 border-t border-[var(--mc-border-subtle)]">
+            <button type="button" onclick="exportEncryptedBackup()" class="btn-primary w-full text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer">
+              <i data-lucide="download" class="w-4 h-4"></i>
+              <span>Download Encrypted .mcave</span>
+            </button>
+            <label class="btn-secondary w-full text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer block text-center">
+              <i data-lucide="upload" class="w-3.5 h-3.5 text-[var(--mc-accent)] inline"></i>
+              <span>Restore from .mcave Backup</span>
+              <input type="file" id="import-backup-file-input" accept=".mcave,.json" class="hidden" onchange="importEncryptedBackup(this)">
+            </label>
           </div>
         </div>
 
