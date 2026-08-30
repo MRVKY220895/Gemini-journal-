@@ -1,5 +1,23 @@
 
 // =============================================================================
+// GUEST ONBOARDING & AUTHENTICATION CONTROLLER
+// =============================================================================
+
+function continueAsGuest() {
+  state.currentUser = {
+    uid: 'guest_' + Math.random().toString(36).substring(2, 9),
+    email: null,
+    displayName: 'Mindful Guest',
+    isAnonymous: true
+  };
+  localStorage.setItem('mind_cave_user', JSON.stringify(state.currentUser));
+  updateUserProfileDisplay();
+  closeAuthModal();
+  showToast('Welcome to Mind Cave! Continuing in Private Local Vault mode.');
+}
+
+
+// =============================================================================
 // QUICK MOVE / SCROLL TO END OF CONVERSATION CONTROLLER
 // =============================================================================
 

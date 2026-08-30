@@ -55,6 +55,7 @@ class ChatRequest(BaseModel):
     message: str = Field(..., min_length=1, max_length=10000)
     session_id: Optional[str] = None
     persona: str = Field("cbt_reflector", description="cbt_reflector | socratic_brainstormer | executive_strategist | shadow_work_analyst")
+    language: Optional[str] = "auto"
     analyze_cognition: bool = True
     profile_context: Optional[dict] = None
     offline_mode: bool = False  # Only true if user explicitly opts into offline mode
@@ -341,6 +342,8 @@ async def chat_interaction(
     profile_ctx = req.profile_context or {}
     if "user_id" not in profile_ctx:
         profile_ctx["user_id"] = current_user.uid
+    if req.language and req.language != "auto":
+        profile_ctx["preferred_language"] = req.language
 
     try:
         ai_response = gemini_service.generate_chat_response(
