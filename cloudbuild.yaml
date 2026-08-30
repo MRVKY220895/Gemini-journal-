@@ -1,7 +1,7 @@
 steps:
   # 1. Build Docker image using root Dockerfile
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/gemini-journal:$COMMIT_SHA', '-t', 'gcr.io/$PROJECT_ID/gemini-journal:latest', '.']
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/gemini-journal:latest', '.']
 
   # 2. Push Docker image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
