@@ -108,28 +108,28 @@
   <div class="fixed bottom-12 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse-slow"></div>
 
   <!-- Top Floating Glass Navigation Header -->
-  <header class="floating-nav flex items-center justify-between gap-1 sm:gap-2 mb-2 sm:mb-4 px-2 sm:px-4 py-1.5 sm:py-2.5 md:relative fixed top-0 left-0 right-0 w-full md:max-w-6xl md:mx-auto z-50 md:rounded-full md:mt-2 bg-slate-950/90 backdrop-blur-2xl border-b border-white/10 md:border md:border-white/10 shadow-lg pt-[max(0.4rem,env(safe-area-inset-top,0.4rem))] md:pt-2.5">
+  <header class="floating-nav flex items-center justify-between gap-1 sm:gap-2 mb-2 sm:mb-4 px-2 sm:px-4 py-1.5 sm:py-2 md:relative fixed top-0 left-0 right-0 w-full md:max-w-6xl md:mx-auto z-50 md:rounded-full md:mt-2 shadow-sm pt-[max(0.4rem,env(safe-area-inset-top,0.4rem))] md:pt-2">
     <!-- Left Area: Master Menu Button + Brand / Logo -->
     <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
       <!-- Master Hierarchical Menu Button (Far Left Corner) -->
-      <button onclick="openMasterMenuModal()" id="btn-master-menu" class="flex items-center gap-1 sm:gap-1.5 bg-gradient-to-r from-cyan-950/80 to-blue-950/80 hover:from-cyan-900 hover:to-blue-900 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-full border border-cyan-500/40 text-[11px] sm:text-xs font-bold text-cyan-300 hover:text-white transition-all shadow-md shadow-cyan-950/30 active:scale-95 cursor-pointer shrink-0" title="Open Master Directory & Settings">
-        <i data-lucide="menu" class="w-3.5 h-3.5 text-cyan-400"></i>
+      <button onclick="openMasterMenuModal()" id="btn-master-menu" class="btn-menu shrink-0" title="Open Master Directory & Settings">
+        <i data-lucide="menu" class="w-3.5 h-3.5 text-[#9BB7A5]"></i>
         <span class="inline">Menu</span>
       </button>
 
-      <span class="w-[1px] h-4 bg-white/10 hidden sm:inline-block"></span>
+      <span class="w-[1px] h-4 bg-[var(--mc-border-subtle)] hidden sm:inline-block"></span>
 
       <!-- Brand / Logo -->
       <div class="flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0" onclick="switchTab('overview')">
         <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-[#9BB7A5]/15 border border-[#9BB7A5]/30 flex items-center justify-center text-[#9BB7A5]">
           <i data-lucide="compass" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#9BB7A5]"></i>
         </div>
-        <span class="text-xs sm:text-sm font-semibold tracking-tight text-[#F2F4F5] whitespace-nowrap hidden sm:inline">Mind Cave</span>
+        <span class="text-xs sm:text-sm font-semibold tracking-tight text-[var(--mc-text-primary)] whitespace-nowrap hidden sm:inline">Mind Cave</span>
       </div>
     </div>
 
     <!-- Master Navigation Tabs (5 Core Destinations) -->
-    <nav class="hidden md:flex items-center gap-1 bg-[#111417] p-1 rounded-full border border-[#252B31] shrink-0">
+    <nav class="hidden md:flex items-center gap-1 nav-pill-track shrink-0">
       <button onclick="switchTab('overview')" id="tab-btn-overview" class="tab-btn active flex items-center gap-1.5 whitespace-nowrap">
         <i data-lucide="home" class="w-3.5 h-3.5"></i> <span>Home</span>
       </button>
@@ -151,121 +151,121 @@
     <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
       <!-- Custom Multi-Language Selector Trigger -->
       <div class="relative inline-block" id="language-picker-container">
-        <button type="button" onclick="toggleLanguageDropdown(event)" id="btn-language-picker" class="flex items-center gap-1 bg-slate-900/90 dark:bg-white/5 hover:bg-slate-800 dark:hover:bg-white/10 border border-slate-700/50 dark:border-white/10 text-slate-200 text-xs rounded-full px-2 sm:px-2.5 py-1 sm:py-1.5 cursor-pointer outline-none transition-all shadow-sm font-semibold shrink-0" title="Change Language / Auto-Detect">
+        <button type="button" onclick="toggleLanguageDropdown(event)" id="btn-language-picker" class="nav-action-btn font-semibold shrink-0" title="Change Language / Auto-Detect">
           <span id="current-lang-flag" class="text-xs">🌐</span>
-          <span id="current-lang-code" class="text-[11px] sm:text-xs text-slate-200">Auto</span>
-          <i data-lucide="chevron-down" class="w-2.5 h-2.5 sm:w-3 sm:h-3 text-slate-400"></i>
+          <span id="current-lang-code" class="text-[11px] sm:text-xs">Auto</span>
+          <i data-lucide="chevron-down" class="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[var(--mc-text-muted)]"></i>
         </button>
 
         <!-- Custom Dropdown Menu (Glass Popover with Dark High-Contrast Background) -->
-        <div id="language-dropdown-menu" class="hidden absolute right-0 mt-2 w-52 sm:w-56 rounded-2xl bg-slate-950 border border-slate-700 shadow-2xl backdrop-blur-2xl p-1.5 z-50 text-xs divide-y divide-white/5 max-h-80 overflow-y-auto">
+        <div id="language-dropdown-menu" class="hidden absolute right-0 mt-2 w-52 sm:w-56 rounded-2xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-default)] shadow-2xl backdrop-blur-2xl p-1.5 z-50 text-xs divide-y divide-[var(--mc-border-subtle)] max-h-80 overflow-y-auto">
           <div class="py-1">
-            <button onclick="selectLanguageOption('auto')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-white/10 text-slate-100 transition-colors font-medium cursor-pointer">
+            <button onclick="selectLanguageOption('auto')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] transition-colors font-medium cursor-pointer">
               <div class="flex items-center gap-2">
                 <span class="text-sm">🌐</span>
-                <span class="text-slate-100 font-semibold">Auto-Detect</span>
+                <span class="font-semibold">Auto-Detect</span>
               </div>
-              <i data-lucide="check" class="w-3.5 h-3.5 text-cyan-400 hidden lang-check" data-check="auto"></i>
+              <i data-lucide="check" class="w-3.5 h-3.5 text-[#9BB7A5] hidden lang-check" data-check="auto"></i>
             </button>
           </div>
           <div class="py-1 space-y-0.5">
-            <button onclick="selectLanguageOption('en')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-white/10 text-slate-100 transition-colors font-medium cursor-pointer">
+            <button onclick="selectLanguageOption('en')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] transition-colors font-medium cursor-pointer">
               <div class="flex items-center gap-2">
                 <span class="text-sm">🇬🇧</span>
-                <span class="text-slate-100">English</span>
+                <span>English</span>
               </div>
-              <i data-lucide="check" class="w-3.5 h-3.5 text-cyan-400 hidden lang-check" data-check="en"></i>
+              <i data-lucide="check" class="w-3.5 h-3.5 text-[#9BB7A5] hidden lang-check" data-check="en"></i>
             </button>
-            <button onclick="selectLanguageOption('ta')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-white/10 text-slate-100 transition-colors font-medium cursor-pointer">
+            <button onclick="selectLanguageOption('ta')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] transition-colors font-medium cursor-pointer">
               <div class="flex items-center gap-2">
                 <span class="text-sm">🇮🇳</span>
-                <span class="text-slate-100">தமிழ் (Tamil)</span>
+                <span>தமிழ் (Tamil)</span>
               </div>
-              <i data-lucide="check" class="w-3.5 h-3.5 text-cyan-400 hidden lang-check" data-check="ta"></i>
+              <i data-lucide="check" class="w-3.5 h-3.5 text-[#9BB7A5] hidden lang-check" data-check="ta"></i>
             </button>
-            <button onclick="selectLanguageOption('hi')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-white/10 text-slate-100 transition-colors font-medium cursor-pointer">
+            <button onclick="selectLanguageOption('hi')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] transition-colors font-medium cursor-pointer">
               <div class="flex items-center gap-2">
                 <span class="text-sm">🇮🇳</span>
-                <span class="text-slate-100">हिंदी (Hindi)</span>
+                <span>हिंदी (Hindi)</span>
               </div>
-              <i data-lucide="check" class="w-3.5 h-3.5 text-cyan-400 hidden lang-check" data-check="hi"></i>
+              <i data-lucide="check" class="w-3.5 h-3.5 text-[#9BB7A5] hidden lang-check" data-check="hi"></i>
             </button>
-            <button onclick="selectLanguageOption('te')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-white/10 text-slate-100 transition-colors font-medium cursor-pointer">
+            <button onclick="selectLanguageOption('te')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] transition-colors font-medium cursor-pointer">
               <div class="flex items-center gap-2">
                 <span class="text-sm">🇮🇳</span>
-                <span class="text-slate-100">తెలుగు (Telugu)</span>
+                <span>తెలుగు (Telugu)</span>
               </div>
-              <i data-lucide="check" class="w-3.5 h-3.5 text-cyan-400 hidden lang-check" data-check="te"></i>
+              <i data-lucide="check" class="w-3.5 h-3.5 text-[#9BB7A5] hidden lang-check" data-check="te"></i>
             </button>
-            <button onclick="selectLanguageOption('es')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-white/10 text-slate-100 transition-colors font-medium cursor-pointer">
+            <button onclick="selectLanguageOption('es')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] transition-colors font-medium cursor-pointer">
               <div class="flex items-center gap-2">
                 <span class="text-sm">🇪🇸</span>
-                <span class="text-slate-100">Español (Spanish)</span>
+                <span>Español (Spanish)</span>
               </div>
-              <i data-lucide="check" class="w-3.5 h-3.5 text-cyan-400 hidden lang-check" data-check="es"></i>
+              <i data-lucide="check" class="w-3.5 h-3.5 text-[#9BB7A5] hidden lang-check" data-check="es"></i>
             </button>
-            <button onclick="selectLanguageOption('fr')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-white/10 text-slate-100 transition-colors font-medium cursor-pointer">
+            <button onclick="selectLanguageOption('fr')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] transition-colors font-medium cursor-pointer">
               <div class="flex items-center gap-2">
                 <span class="text-sm">🇫🇷</span>
-                <span class="text-slate-100">Français (French)</span>
+                <span>Français (French)</span>
               </div>
-              <i data-lucide="check" class="w-3.5 h-3.5 text-cyan-400 hidden lang-check" data-check="fr"></i>
+              <i data-lucide="check" class="w-3.5 h-3.5 text-[#9BB7A5] hidden lang-check" data-check="fr"></i>
             </button>
-            <button onclick="selectLanguageOption('de')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-white/10 text-slate-100 transition-colors font-medium cursor-pointer">
+            <button onclick="selectLanguageOption('de')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] transition-colors font-medium cursor-pointer">
               <div class="flex items-center gap-2">
                 <span class="text-sm">🇩🇪</span>
-                <span class="text-slate-100">Deutsch (German)</span>
+                <span>Deutsch (German)</span>
               </div>
-              <i data-lucide="check" class="w-3.5 h-3.5 text-cyan-400 hidden lang-check" data-check="de"></i>
+              <i data-lucide="check" class="w-3.5 h-3.5 text-[#9BB7A5] hidden lang-check" data-check="de"></i>
             </button>
-            <button onclick="selectLanguageOption('ja')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-white/10 text-slate-100 transition-colors font-medium cursor-pointer">
+            <button onclick="selectLanguageOption('ja')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] transition-colors font-medium cursor-pointer">
               <div class="flex items-center gap-2">
                 <span class="text-sm">🇯🇵</span>
-                <span class="text-slate-100">日本語 (Japanese)</span>
+                <span>日本語 (Japanese)</span>
               </div>
-              <i data-lucide="check" class="w-3.5 h-3.5 text-cyan-400 hidden lang-check" data-check="ja"></i>
+              <i data-lucide="check" class="w-3.5 h-3.5 text-[#9BB7A5] hidden lang-check" data-check="ja"></i>
             </button>
-            <button onclick="selectLanguageOption('zh')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-white/10 text-slate-100 transition-colors font-medium cursor-pointer">
+            <button onclick="selectLanguageOption('zh')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] transition-colors font-medium cursor-pointer">
               <div class="flex items-center gap-2">
                 <span class="text-sm">🇨🇳</span>
-                <span class="text-slate-100">中文 (Chinese)</span>
+                <span>中文 (Chinese)</span>
               </div>
-              <i data-lucide="check" class="w-3.5 h-3.5 text-cyan-400 hidden lang-check" data-check="zh"></i>
+              <i data-lucide="check" class="w-3.5 h-3.5 text-[#9BB7A5] hidden lang-check" data-check="zh"></i>
             </button>
-            <button onclick="selectLanguageOption('ar')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-white/10 text-slate-100 transition-colors font-medium cursor-pointer">
+            <button onclick="selectLanguageOption('ar')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] transition-colors font-medium cursor-pointer">
               <div class="flex items-center gap-2">
                 <span class="text-sm">🇸🇦</span>
-                <span class="text-slate-100">العربية (Arabic)</span>
+                <span>العربية (Arabic)</span>
               </div>
-              <i data-lucide="check" class="w-3.5 h-3.5 text-cyan-400 hidden lang-check" data-check="ar"></i>
+              <i data-lucide="check" class="w-3.5 h-3.5 text-[#9BB7A5] hidden lang-check" data-check="ar"></i>
             </button>
-            <button onclick="selectLanguageOption('pt')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-white/10 text-slate-100 transition-colors font-medium cursor-pointer">
+            <button onclick="selectLanguageOption('pt')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] transition-colors font-medium cursor-pointer">
               <div class="flex items-center gap-2">
                 <span class="text-sm">🇧🇷</span>
-                <span class="text-slate-100">Português</span>
+                <span>Português</span>
               </div>
-              <i data-lucide="check" class="w-3.5 h-3.5 text-cyan-400 hidden lang-check" data-check="pt"></i>
+              <i data-lucide="check" class="w-3.5 h-3.5 text-[#9BB7A5] hidden lang-check" data-check="pt"></i>
             </button>
           </div>
         </div>
       </div>
 
       <!-- 1-Tap PWA / PWD Standalone App Installation Trigger -->
-      <button onclick="triggerPWAInstall()" id="btn-pwa-install" class="hidden items-center gap-1 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-full text-[11px] font-semibold transition-all cursor-pointer shadow-sm active:scale-95 shrink-0" title="Install Mind Cave Native App to Home Screen">
-        <i data-lucide="download" class="w-3 h-3 text-cyan-400"></i>
+      <button onclick="triggerPWAInstall()" id="btn-pwa-install" class="hidden items-center gap-1 nav-action-btn text-[#9BB7A5] font-semibold transition-all cursor-pointer shadow-sm active:scale-95 shrink-0" title="Install Mind Cave Native App to Home Screen">
+        <i data-lucide="download" class="w-3 h-3 text-[#9BB7A5]"></i>
         <span class="hidden sm:inline">Install App</span>
       </button>
 
       <!-- 1-Tap Theme Mode Switcher in Global Bar -->
-      <button onclick="toggleTheme()" id="btn-global-theme" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-900/90 dark:bg-white/5 hover:bg-slate-800 dark:hover:bg-white/10 border border-slate-700/50 dark:border-white/10 flex items-center justify-center text-amber-400 hover:text-amber-300 transition-all cursor-pointer shadow-sm active:scale-95 shrink-0" title="Toggle Light / Dark Mode">
+      <button onclick="toggleTheme()" id="btn-global-theme" class="nav-action-btn !w-8 !h-8 !p-0 justify-center rounded-full shrink-0" title="Toggle Light / Dark Mode">
         <i data-lucide="sun" id="global-theme-icon" class="w-3.5 h-3.5 text-amber-400"></i>
       </button>
 
       <!-- Consolidated User Profile & Settings Trigger -->
-      <button onclick="openAuthModal()" id="user-pill" class="flex items-center gap-1 sm:gap-1.5 bg-slate-900/90 hover:bg-slate-800 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-full border border-slate-800 text-[11px] sm:text-xs whitespace-nowrap cursor-pointer transition-colors shadow-sm shrink-0" title="Account & Biological Profile Settings">
+      <button onclick="openAuthModal()" id="user-pill" class="nav-action-btn whitespace-nowrap shrink-0" title="Account & Biological Profile Settings">
         <div id="user-avatar-indicator" class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></div>
-        <span id="user-display-name" class="font-medium text-slate-200 truncate max-w-[65px] sm:max-w-[120px] whitespace-nowrap text-[11px] sm:text-xs">Guest</span>
-        <i data-lucide="chevron-down" class="w-2.5 h-2.5 sm:w-3 sm:h-3 text-slate-400 shrink-0"></i>
+        <span id="user-display-name" class="font-medium truncate max-w-[65px] sm:max-w-[120px] whitespace-nowrap text-[11px] sm:text-xs">Guest</span>
+        <i data-lucide="chevron-down" class="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[var(--mc-text-muted)] shrink-0"></i>
       </button>
     </div>
   </header>
@@ -285,22 +285,22 @@
         <div class="col-span-12 lg:col-span-8 mc-card flex flex-col justify-between space-y-4">
           <div>
             <div class="flex items-center justify-between gap-2 mb-2">
-              <span class="text-[11px] font-mono tracking-widest text-[#6F7881] uppercase">Today's Space</span>
-              <span class="text-xs text-[#6F7881]" id="home-today-date">Today</span>
+              <span class="text-[11px] font-mono tracking-widest text-[var(--mc-text-muted)] uppercase">Today's Space</span>
+              <span class="text-xs text-[var(--mc-text-muted)]" id="home-today-date">Today</span>
             </div>
-            <h2 class="text-xl sm:text-2xl font-semibold tracking-tight text-[#F2F4F5]">What is present for you today?</h2>
-            <p class="text-sm text-[#A5ADB5] mt-1 leading-relaxed">Give your thoughts a quiet place to settle. Start a quick reflection or explore what matters most.</p>
+            <h2 class="text-xl sm:text-2xl font-semibold tracking-tight text-[var(--mc-text-primary)]">What is present for you today?</h2>
+            <p class="text-sm text-[var(--mc-text-secondary)] mt-1 leading-relaxed">Give your thoughts a quiet place to settle. Start a quick reflection or explore what matters most.</p>
           </div>
 
           <div class="space-y-3 pt-2">
             <div class="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar text-xs">
-              <button onclick="insertPromptAndOpenStudio('What is bringing me a sense of clarity today?')" class="px-3 py-1.5 rounded-full bg-[#161A1E] hover:bg-[#1C2126] border border-[#252B31] text-[#A5ADB5] hover:text-[#F2F4F5] whitespace-nowrap transition-colors">
+              <button onclick="insertPromptAndOpenStudio('What is bringing me a sense of clarity today?')" class="mc-chip">
                 ✨ Moments of Clarity
               </button>
-              <button onclick="insertPromptAndOpenStudio('Where am I feeling friction or resistance right now?')" class="px-3 py-1.5 rounded-full bg-[#161A1E] hover:bg-[#1C2126] border border-[#252B31] text-[#A5ADB5] hover:text-[#F2F4F5] whitespace-nowrap transition-colors">
+              <button onclick="insertPromptAndOpenStudio('Where am I feeling friction or resistance right now?')" class="mc-chip">
                 🌿 Unpacking Friction
               </button>
-              <button onclick="insertPromptAndOpenStudio('What is the single most important action for today?')" class="px-3 py-1.5 rounded-full bg-[#161A1E] hover:bg-[#1C2126] border border-[#252B31] text-[#A5ADB5] hover:text-[#F2F4F5] whitespace-nowrap transition-colors">
+              <button onclick="insertPromptAndOpenStudio('What is the single most important action for today?')" class="mc-chip">
                 🎯 Core Priority
               </button>
             </div>
@@ -322,35 +322,35 @@
         <div class="col-span-12 lg:col-span-4 mc-card flex flex-col justify-between space-y-4">
           <div>
             <div class="flex items-center justify-between gap-2 mb-2">
-              <span class="text-[11px] font-mono tracking-widest text-[#6F7881] uppercase">Emotional State</span>
+              <span class="text-[11px] font-mono tracking-widest text-[var(--mc-text-muted)] uppercase">Emotional State</span>
               <span class="w-2 h-2 rounded-full bg-[#91B59D]"></span>
             </div>
-            <div class="text-2xl font-semibold text-[#F2F4F5]" id="home-mood-title">Calm</div>
-            <div class="text-xs text-[#A5ADB5] mt-0.5">Equilibrium & Balance</div>
+            <div class="text-2xl font-semibold text-[var(--mc-text-primary)]" id="home-mood-title">Calm</div>
+            <div class="text-xs text-[var(--mc-text-secondary)] mt-0.5">Equilibrium & Balance</div>
           </div>
 
           <div class="space-y-2.5 py-1">
             <div class="space-y-1">
-              <div class="flex justify-between text-[11px] text-[#6F7881]">
+              <div class="flex justify-between text-[11px] text-[var(--mc-text-muted)]">
                 <span>Calm</span>
                 <span class="text-[#9BB7A5]">85%</span>
               </div>
-              <div class="w-full h-1 bg-[#252B31] rounded-full overflow-hidden">
+              <div class="w-full h-1.5 bg-[var(--mc-border-subtle)] rounded-full overflow-hidden">
                 <div class="h-full bg-[#9BB7A5] rounded-full" style="width: 85%;"></div>
               </div>
             </div>
             <div class="space-y-1">
-              <div class="flex justify-between text-[11px] text-[#6F7881]">
+              <div class="flex justify-between text-[11px] text-[var(--mc-text-muted)]">
                 <span>Clarity</span>
                 <span class="text-[#8FA9B8]">78%</span>
               </div>
-              <div class="w-full h-1 bg-[#252B31] rounded-full overflow-hidden">
+              <div class="w-full h-1.5 bg-[var(--mc-border-subtle)] rounded-full overflow-hidden">
                 <div class="h-full bg-[#8FA9B8] rounded-full" style="width: 78%;"></div>
               </div>
             </div>
           </div>
 
-          <button onclick="openMoodPickerModal()" class="w-full btn-ghost text-xs flex items-center justify-center gap-1 border border-[#252B31] hover:border-[#30373E]">
+          <button onclick="openMoodPickerModal()" class="w-full btn-ghost text-xs flex items-center justify-center gap-1 border border-[var(--mc-border-default)] hover:border-[var(--mc-border-strong)]">
             <span>Log Check-in</span>
             <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
           </button>
@@ -359,14 +359,14 @@
         <!-- 3. Recent Journal (4 Columns) -->
         <div class="col-span-12 md:col-span-4 mc-card flex flex-col justify-between space-y-3 cursor-pointer group" onclick="switchTab('journals')">
           <div class="flex items-center justify-between gap-2">
-            <span class="text-[11px] font-mono tracking-widest text-[#6F7881] uppercase">Journal</span>
-            <i data-lucide="book-open" class="w-3.5 h-3.5 text-[#6F7881] group-hover:text-[#9BB7A5] transition-colors"></i>
+            <span class="text-[11px] font-mono tracking-widest text-[var(--mc-text-muted)] uppercase">Journal</span>
+            <i data-lucide="book-open" class="w-3.5 h-3.5 text-[var(--mc-text-muted)] group-hover:text-[#9BB7A5] transition-colors"></i>
           </div>
           <div>
-            <h3 class="text-sm font-semibold text-[#F2F4F5] group-hover:text-[#9BB7A5] transition-colors">Reflections & Moments</h3>
-            <p class="text-xs text-[#A5ADB5] mt-1 leading-relaxed line-clamp-2" id="home-last-journal-snippet">Every entry gives a thought a permanent home.</p>
+            <h3 class="text-sm font-semibold text-[var(--mc-text-primary)] group-hover:text-[#9BB7A5] transition-colors">Reflections & Moments</h3>
+            <p class="text-xs text-[var(--mc-text-secondary)] mt-1 leading-relaxed line-clamp-2" id="home-last-journal-snippet">Every entry gives a thought a permanent home.</p>
           </div>
-          <div class="text-[11px] text-[#6F7881] flex items-center gap-1 pt-1">
+          <div class="text-[11px] text-[var(--mc-text-muted)] flex items-center gap-1 pt-1">
             <span>View Timeline</span>
             <i data-lucide="arrow-right" class="w-3 h-3 group-hover:translate-x-0.5 transition-transform"></i>
           </div>
@@ -375,12 +375,12 @@
         <!-- 4. Focus & Habits (4 Columns) -->
         <div class="col-span-12 md:col-span-4 mc-card flex flex-col justify-between space-y-3 cursor-pointer group" onclick="openMasterGoalsModal()">
           <div class="flex items-center justify-between gap-2">
-            <span class="text-[11px] font-mono tracking-widest text-[#6F7881] uppercase">Focus & Habits</span>
-            <i data-lucide="target" class="w-3.5 h-3.5 text-[#6F7881] group-hover:text-[#9BB7A5] transition-colors"></i>
+            <span class="text-[11px] font-mono tracking-widest text-[var(--mc-text-muted)] uppercase">Focus & Habits</span>
+            <i data-lucide="target" class="w-3.5 h-3.5 text-[var(--mc-text-muted)] group-hover:text-[#9BB7A5] transition-colors"></i>
           </div>
           <div>
-            <h3 class="text-sm font-semibold text-[#F2F4F5] group-hover:text-[#9BB7A5] transition-colors">Habits & Direction</h3>
-            <p class="text-xs text-[#A5ADB5] mt-1 leading-relaxed">Daily micro-habits building lasting consistency.</p>
+            <h3 class="text-sm font-semibold text-[var(--mc-text-primary)] group-hover:text-[#9BB7A5] transition-colors">Habits & Direction</h3>
+            <p class="text-xs text-[var(--mc-text-secondary)] mt-1 leading-relaxed">Daily micro-habits building lasting consistency.</p>
           </div>
           <div class="text-[11px] text-[#9BB7A5] font-mono flex items-center gap-1 pt-1">
             <span>● 5 Active Habits</span>
@@ -390,12 +390,12 @@
         <!-- 5. MindPulse Insight (4 Columns) -->
         <div class="col-span-12 md:col-span-4 mc-card flex flex-col justify-between space-y-3 cursor-pointer group" onclick="switchTab('analytics')">
           <div class="flex items-center justify-between gap-2">
-            <span class="text-[11px] font-mono tracking-widest text-[#6F7881] uppercase">MindPulse</span>
-            <i data-lucide="activity" class="w-3.5 h-3.5 text-[#6F7881] group-hover:text-[#8FA9B8] transition-colors"></i>
+            <span class="text-[11px] font-mono tracking-widest text-[var(--mc-text-muted)] uppercase">MindPulse</span>
+            <i data-lucide="activity" class="w-3.5 h-3.5 text-[var(--mc-text-muted)] group-hover:text-[#8FA9B8] transition-colors"></i>
           </div>
           <div>
-            <h3 class="text-sm font-semibold text-[#F2F4F5] group-hover:text-[#8FA9B8] transition-colors">Cognitive Patterns</h3>
-            <p class="text-xs text-[#A5ADB5] mt-1 leading-relaxed">Longitudinal insights into emotions and habits.</p>
+            <h3 class="text-sm font-semibold text-[var(--mc-text-primary)] group-hover:text-[#8FA9B8] transition-colors">Cognitive Patterns</h3>
+            <p class="text-xs text-[var(--mc-text-secondary)] mt-1 leading-relaxed">Longitudinal insights into emotions and habits.</p>
           </div>
           <div class="text-[11px] text-[#8FA9B8] font-mono flex items-center gap-1 pt-1">
             <span>Explore Analytics →</span>
@@ -405,14 +405,14 @@
         <!-- 6. Memory Lane (8 Columns) -->
         <div class="col-span-12 lg:col-span-8 mc-card flex flex-col justify-between space-y-3 cursor-pointer group" onclick="switchTab('journals')">
           <div class="flex items-center justify-between gap-2">
-            <span class="text-[11px] font-mono tracking-widest text-[#6F7881] uppercase">Memory Lane</span>
-            <i data-lucide="clock" class="w-3.5 h-3.5 text-[#6F7881] group-hover:text-[#9BB7A5] transition-colors"></i>
+            <span class="text-[11px] font-mono tracking-widest text-[var(--mc-text-muted)] uppercase">Memory Lane</span>
+            <i data-lucide="clock" class="w-3.5 h-3.5 text-[var(--mc-text-muted)] group-hover:text-[#9BB7A5] transition-colors"></i>
           </div>
           <div>
-            <h3 class="text-sm font-semibold text-[#F2F4F5] group-hover:text-[#9BB7A5] transition-colors">Past Reflections</h3>
-            <p class="text-xs text-[#A5ADB5] mt-1 leading-relaxed">Revisit the thoughts, milestones, and perspectives you documented in past moments.</p>
+            <h3 class="text-sm font-semibold text-[var(--mc-text-primary)] group-hover:text-[#9BB7A5] transition-colors">Past Reflections</h3>
+            <p class="text-xs text-[var(--mc-text-secondary)] mt-1 leading-relaxed">Revisit the thoughts, milestones, and perspectives you documented in past moments.</p>
           </div>
-          <div class="text-[11px] text-[#6F7881] flex items-center gap-1">
+          <div class="text-[11px] text-[var(--mc-text-muted)] flex items-center gap-1">
             <span>Open Memories →</span>
           </div>
         </div>
@@ -420,12 +420,12 @@
         <!-- 7. Vault Sanctuary (4 Columns) -->
         <div class="col-span-12 lg:col-span-4 mc-card flex flex-col justify-between space-y-3 cursor-pointer group" onclick="switchTab('security')">
           <div class="flex items-center justify-between gap-2">
-            <span class="text-[11px] font-mono tracking-widest text-[#6F7881] uppercase">Private Vault</span>
+            <span class="text-[11px] font-mono tracking-widest text-[var(--mc-text-muted)] uppercase">Private Vault</span>
             <i data-lucide="shield-check" class="w-3.5 h-3.5 text-[#91B59D]"></i>
           </div>
           <div>
-            <h3 class="text-sm font-semibold text-[#F2F4F5]">Protected Sanctuary</h3>
-            <p class="text-xs text-[#A5ADB5] mt-1 leading-relaxed">Your journal is private, isolated, and encrypted.</p>
+            <h3 class="text-sm font-semibold text-[var(--mc-text-primary)]">Protected Sanctuary</h3>
+            <p class="text-xs text-[var(--mc-text-secondary)] mt-1 leading-relaxed">Your journal is private, isolated, and encrypted.</p>
           </div>
           <div class="text-[11px] text-[#91B59D] font-mono flex items-center gap-1">
             <span>● AES-256 Vault Active</span>
@@ -441,36 +441,36 @@
     <section id="view-studio" class="hidden flex-1 flex flex-col justify-between w-full relative pb-16 md:pb-4">
       
       <!-- Streamlined Studio Top Control Ribbon -->
-      <div class="studio-top-ribbon flex flex-col sm:flex-row items-center justify-between gap-2.5 pb-2.5 border-b border-white/5 shrink-0">
+      <div class="studio-top-ribbon flex flex-col sm:flex-row items-center justify-between gap-2.5 pb-2.5 border-b border-[var(--mc-border-subtle)] shrink-0">
         <!-- Left: Persona Modes Pill Group -->
         <div class="flex items-center gap-1.5 flex-wrap justify-center sm:justify-start" id="persona-selector">
-          <div class="modes-track flex items-center gap-1 bg-[#111417] p-1 rounded-full border border-[#252B31]">
-            <button onclick="selectPersona('cbt_reflector')" data-persona="cbt_reflector" class="persona-btn active flex items-center gap-1.5 text-xs font-medium text-[#F2F4F5]" title="Cognitive Reframing & Psychological Reflection">
+          <div class="modes-track flex items-center gap-1">
+            <button onclick="selectPersona('cbt_reflector')" data-persona="cbt_reflector" class="persona-btn active flex items-center gap-1.5 text-xs font-medium" title="Cognitive Reframing & Psychological Reflection">
               <i data-lucide="sparkles" class="w-3.5 h-3.5 text-[#9BB7A5]"></i> <span>Reflect</span>
             </button>
-            <button onclick="selectPersona('socratic_brainstormer')" data-persona="socratic_brainstormer" class="persona-btn flex items-center gap-1.5 text-xs font-medium text-[#A5ADB5]" title="Socratic Brainstorming & Assumption Challenging">
+            <button onclick="selectPersona('socratic_brainstormer')" data-persona="socratic_brainstormer" class="persona-btn flex items-center gap-1.5 text-xs font-medium" title="Socratic Brainstorming & Assumption Challenging">
               <i data-lucide="lightbulb" class="w-3.5 h-3.5 text-[#C5AA78]"></i> <span>Brainstorm</span>
             </button>
-            <button onclick="selectPersona('executive_strategist')" data-persona="executive_strategist" class="persona-btn flex items-center gap-1.5 text-xs font-medium text-[#A5ADB5]" title="Executive Strategy & Execution Velocity">
+            <button onclick="selectPersona('executive_strategist')" data-persona="executive_strategist" class="persona-btn flex items-center gap-1.5 text-xs font-medium" title="Executive Strategy & Execution Velocity">
               <i data-lucide="target" class="w-3.5 h-3.5 text-[#8FA9B8]"></i> <span>Strategize</span>
             </button>
-            <button onclick="selectPersona('shadow_work_analyst')" data-persona="shadow_work_analyst" class="persona-btn flex items-center gap-1.5 text-xs font-medium text-[#A5ADB5]" title="Shadow Work & Subconscious Exploration">
-              <i data-lucide="moon" class="w-3.5 h-3.5 text-[#A5ADB5]"></i> <span>Shadow Work</span>
+            <button onclick="selectPersona('shadow_work_analyst')" data-persona="shadow_work_analyst" class="persona-btn flex items-center gap-1.5 text-xs font-medium" title="Shadow Work & Subconscious Exploration">
+              <i data-lucide="moon" class="w-3.5 h-3.5 text-[#91B59D]"></i> <span>Shadow Work</span>
             </button>
           </div>
         </div>
 
         <!-- Right: Session Actions & Topic Badge -->
         <div class="flex items-center gap-2">
-          <span id="session-topic-heading" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300 truncate max-w-[150px] sm:max-w-[220px]">
+          <span id="session-topic-heading" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)] text-[var(--mc-text-secondary)] truncate max-w-[150px] sm:max-w-[220px]">
             Personal Reflective Space
           </span>
-          <button onclick="openChatHistoryModal()" class="btn-secondary text-xs !py-1 !px-2.5 flex items-center gap-1 hover:border-purple-400 text-purple-300" title="View Past Conversations & Saved Reflections">
-            <i data-lucide="history" class="w-3.5 h-3.5 text-purple-400"></i>
+          <button onclick="openChatHistoryModal()" class="btn-secondary text-xs !py-1 !px-2.5 flex items-center gap-1" title="View Past Conversations & Saved Reflections">
+            <i data-lucide="history" class="w-3.5 h-3.5 text-[var(--mc-text-muted)]"></i>
             <span class="hidden sm:inline">Chat History</span>
           </button>
-          <button onclick="startNewSession()" class="btn-secondary text-xs !py-1 !px-2.5 flex items-center gap-1 hover:border-cyan-400 text-cyan-300" title="Start Clean Chat Session">
-            <i data-lucide="plus" class="w-3.5 h-3.5 text-cyan-400"></i>
+          <button onclick="startNewSession()" class="btn-secondary text-xs !py-1 !px-2.5 flex items-center gap-1" title="Start Clean Chat Session">
+            <i data-lucide="plus" class="w-3.5 h-3.5 text-[#9BB7A5]"></i>
             <span class="hidden sm:inline">New Session</span>
           </button>
         </div>
@@ -483,35 +483,35 @@
           <div class="w-10 h-10 rounded-xl bg-[#9BB7A5]/15 border border-[#9BB7A5]/30 flex items-center justify-center text-[#9BB7A5] mb-3">
             <i data-lucide="compass" class="w-5 h-5"></i>
           </div>
-          <h1 class="text-xl sm:text-2xl font-semibold text-[#F2F4F5] tracking-tight mb-1.5">
+          <h1 class="text-xl sm:text-2xl font-semibold text-[var(--mc-text-primary)] tracking-tight mb-1.5">
             What do you want to explore?
           </h1>
-          <p class="text-xs text-[#A5ADB5] max-w-md mb-6 leading-relaxed">
+          <p class="text-xs text-[var(--mc-text-secondary)] max-w-md mb-6 leading-relaxed">
             Your personal reflection and cognitive space. Unpack thoughts, examine assumptions, or navigate decisions.
           </p>
 
           <!-- Quiet Bento Prompt Starters -->
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-3xl">
-            <button onclick="insertPrompt('Help me untangle what is making me feel overwhelmed with my work today.')" class="mc-card text-left hover:bg-[#161A1E] transition-colors p-4 group cursor-pointer">
+            <button onclick="insertPrompt('Help me untangle what is making me feel overwhelmed with my work today.')" class="mc-card text-left hover:bg-[var(--mc-bg-elevation)] transition-colors p-4 group cursor-pointer">
               <div class="w-7 h-7 rounded-lg bg-[#9BB7A5]/10 text-[#9BB7A5] flex items-center justify-center mb-2.5">
                 <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
               </div>
-              <div class="text-xs font-semibold text-[#F2F4F5] mb-1">Untangle Overwhelm</div>
-              <div class="text-[11px] text-[#A5ADB5] leading-relaxed">Deconstruct cognitive friction and pinpoint root causes.</div>
+              <div class="text-xs font-semibold text-[var(--mc-text-primary)] mb-1">Untangle Overwhelm</div>
+              <div class="text-[11px] text-[var(--mc-text-secondary)] leading-relaxed">Deconstruct cognitive friction and pinpoint root causes.</div>
             </button>
-            <button onclick="insertPrompt('I want to celebrate a win and anchor my sense of gratitude.')" class="mc-card text-left hover:bg-[#161A1E] transition-colors p-4 group cursor-pointer">
+            <button onclick="insertPrompt('I want to celebrate a win and anchor my sense of gratitude.')" class="mc-card text-left hover:bg-[var(--mc-bg-elevation)] transition-colors p-4 group cursor-pointer">
               <div class="w-7 h-7 rounded-lg bg-[#91B59D]/10 text-[#91B59D] flex items-center justify-center mb-2.5">
                 <i data-lucide="heart" class="w-3.5 h-3.5"></i>
               </div>
-              <div class="text-xs font-semibold text-[#F2F4F5] mb-1">Anchor Gratitude</div>
-              <div class="text-[11px] text-[#A5ADB5] leading-relaxed">Deepen moments of joy and strengthen resilience.</div>
+              <div class="text-xs font-semibold text-[var(--mc-text-primary)] mb-1">Anchor Gratitude</div>
+              <div class="text-[11px] text-[var(--mc-text-secondary)] leading-relaxed">Deepen moments of joy and strengthen resilience.</div>
             </button>
-            <button onclick="insertPrompt('Brainstorm an architecture strategy and challenge my assumptions.')" class="mc-card text-left hover:bg-[#161A1E] transition-colors p-4 group cursor-pointer">
+            <button onclick="insertPrompt('Brainstorm an architecture strategy and challenge my assumptions.')" class="mc-card text-left hover:bg-[var(--mc-bg-elevation)] transition-colors p-4 group cursor-pointer">
               <div class="w-7 h-7 rounded-lg bg-[#8FA9B8]/10 text-[#8FA9B8] flex items-center justify-center mb-2.5">
                 <i data-lucide="compass" class="w-3.5 h-3.5"></i>
               </div>
-              <div class="text-xs font-semibold text-[#F2F4F5] mb-1">Socratic Ideation</div>
-              <div class="text-[11px] text-[#A5ADB5] leading-relaxed">Examine hidden blind spots and structure execution.</div>
+              <div class="text-xs font-semibold text-[var(--mc-text-primary)] mb-1">Socratic Ideation</div>
+              <div class="text-[11px] text-[var(--mc-text-secondary)] leading-relaxed">Examine hidden blind spots and structure execution.</div>
             </button>
           </div>
         </div>
@@ -531,48 +531,48 @@
               id="chat-input" 
               rows="2" 
               placeholder="Ask anything, journal your thoughts, or reflect... (Enter to send, Shift+Enter for newline)"
-              class="w-full bg-transparent text-slate-100 placeholder-slate-500 text-sm focus:outline-none resize-none font-sans leading-relaxed"
+              class="w-full bg-transparent text-[var(--mc-text-primary)] placeholder-[var(--mc-text-muted)] text-sm focus:outline-none resize-none font-sans leading-relaxed"
               onkeydown="handleTextareaKeydown(event)"
             ></textarea>
 
-            <div class="flex items-center justify-between pt-1.5 border-t border-white/5 flex-wrap gap-2">
+            <div class="flex items-center justify-between pt-1.5 border-t border-[var(--mc-border-subtle)] flex-wrap gap-2">
               <!-- Left: Antigravity-Style Model & Vault Selectors -->
               <div class="flex items-center gap-1.5 flex-wrap">
                 <!-- Gemini Model Selector Pill (Interactive Always-Active Badge) -->
-                <button type="button" onclick="openGeminiKeyModal()" id="composer-model-pill" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900/90 hover:bg-slate-800 border border-slate-700/60 hover:border-slate-600 text-[11px] font-mono text-slate-200 transition-all cursor-pointer shadow-sm group" title="Google Gemini 2.5 Flash Active & Live (Click to inspect model & AI settings)">
+                <button type="button" onclick="openGeminiKeyModal()" id="composer-model-pill" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-bg-elevation)] border border-[var(--mc-border-default)] text-[11px] font-mono text-[var(--mc-text-primary)] transition-all cursor-pointer shadow-sm group" title="Google Gemini 2.5 Flash Active & Live (Click to inspect model & AI settings)">
                   <span id="gemini-key-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
-                  <span class="font-bold text-slate-200 group-hover:text-white flex items-center gap-1">
-                    <i data-lucide="sparkles" class="w-3 h-3 text-cyan-400"></i>
+                  <span class="font-semibold text-[var(--mc-text-primary)] flex items-center gap-1">
+                    <i data-lucide="sparkles" class="w-3 h-3 text-[#9BB7A5]"></i>
                     <span id="gemini-key-label">Gemini 2.5 Flash (Live)</span>
                   </span>
-                  <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400 group-hover:text-slate-200"></i>
+                  <i data-lucide="chevron-down" class="w-3 h-3 text-[var(--mc-text-muted)] group-hover:text-[var(--mc-text-primary)]"></i>
                 </button>
 
                 <!-- Private Vault Security Badge (Interactive) -->
-                <button type="button" onclick="switchTab('security')" class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-950/40 hover:bg-emerald-900/50 border border-emerald-500/30 hover:border-emerald-400/60 text-[11px] font-mono text-emerald-300 transition-all cursor-pointer shadow-sm group" title="Zero-Knowledge AES-256 Client Encryption & Strict Firestore UID Boundary Active. Click to view Vault.">
-                  <i data-lucide="shield-check" class="w-3 h-3 text-emerald-400"></i>
-                  <span class="font-medium text-emerald-300 group-hover:text-emerald-200">Private Vault</span>
+                <button type="button" onclick="switchTab('security')" class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#91B59D]/15 hover:bg-[#91B59D]/25 border border-[#91B59D]/30 text-[11px] font-mono text-[#91B59D] transition-all cursor-pointer shadow-sm group" title="Zero-Knowledge AES-256 Client Encryption & Strict Firestore UID Boundary Active. Click to view Vault.">
+                  <i data-lucide="shield-check" class="w-3 h-3 text-[#91B59D]"></i>
+                  <span class="font-medium text-[#91B59D]">Private Vault</span>
                 </button>
 
                 <!-- Listening Audio Feedback Indicator -->
-                <span id="voice-indicator-studio" class="hidden items-center gap-1 text-cyan-400 font-mono text-[11px] animate-pulse">
-                  <span class="w-2 h-2 rounded-full bg-cyan-400"></span> Listening...
+                <span id="voice-indicator-studio" class="hidden items-center gap-1 text-[#9BB7A5] font-mono text-[11px] animate-pulse">
+                  <span class="w-2 h-2 rounded-full bg-[#9BB7A5]"></span> Listening...
                 </span>
               </div>
 
               <!-- Right: New Session (+), Voice & Submit Controls -->
               <div class="flex items-center gap-1.5">
                 <!-- New Session (+) Button -->
-                <button type="button" onclick="startNewSession()" id="btn-composer-new-session" class="w-8 h-8 rounded-full bg-white/5 hover:bg-purple-500/20 text-purple-400 hover:text-purple-300 border border-white/10 hover:border-purple-500/30 flex items-center justify-center transition-all cursor-pointer" title="Start New Reflection Session (+)">
-                  <i data-lucide="plus" class="w-4 h-4 text-purple-400"></i>
+                <button type="button" onclick="startNewSession()" id="btn-composer-new-session" class="w-8 h-8 rounded-full bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-bg-elevation)] text-[var(--mc-text-muted)] hover:text-[var(--mc-text-primary)] border border-[var(--mc-border-default)] flex items-center justify-center transition-all cursor-pointer" title="Start New Reflection Session (+)">
+                  <i data-lucide="plus" class="w-4 h-4"></i>
                 </button>
 
                 <!-- Voice Input (Speech-to-Text) Button -->
-                <button type="button" onclick="toggleVoiceInput('chat-input', 'voice-indicator-studio')" id="btn-voice-chat-input" class="w-8 h-8 rounded-full bg-white/5 hover:bg-cyan-500/20 text-slate-400 hover:text-cyan-300 border border-white/10 flex items-center justify-center transition-all" title="Add via Voice (Speech-to-Text)">
+                <button type="button" onclick="toggleVoiceInput('chat-input', 'voice-indicator-studio')" id="btn-voice-chat-input" class="w-8 h-8 rounded-full bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-bg-elevation)] text-[var(--mc-text-muted)] hover:text-[#9BB7A5] border border-[var(--mc-border-default)] flex items-center justify-center transition-all" title="Add via Voice (Speech-to-Text)">
                   <i data-lucide="mic" class="w-4 h-4"></i>
                 </button>
 
-                <button type="submit" id="btn-send" class="w-8 h-8 rounded-full bg-gradient-to-tr from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white flex items-center justify-center transition-all shadow-md shadow-blue-500/30 hover:scale-105 active:scale-95">
+                <button type="submit" id="btn-send" class="w-8 h-8 rounded-full bg-[#5E856F] hover:opacity-90 text-white flex items-center justify-center transition-all shadow-md hover:scale-105 active:scale-95 cursor-pointer">
                   <i data-lucide="arrow-up" class="w-4 h-4"></i>
                 </button>
               </div>
@@ -3611,24 +3611,24 @@
   <!-- ===================================================================== -->
   <!-- MASTER NAVIGATION & HIERARCHICAL SECTION DIRECTORY MODAL -->
   <!-- ===================================================================== -->
-  <div id="master-menu-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-xl hidden overflow-y-auto">
+  <div id="master-menu-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-xl hidden overflow-y-auto">
     <div class="double-bezel max-w-3xl w-full my-auto shadow-2xl">
-      <div class="double-bezel-inner p-4 sm:p-6 max-h-[88vh] overflow-y-auto flex flex-col gap-3.5 bg-slate-950/95 border-white/10">
+      <div class="double-bezel-inner p-4 sm:p-6 max-h-[88vh] overflow-y-auto flex flex-col gap-3.5">
         <!-- Modal Header -->
-        <div class="flex items-center justify-between pb-3 border-b border-white/10 shrink-0">
+        <div class="flex items-center justify-between pb-3 border-b border-[var(--mc-border-subtle)] shrink-0">
           <div class="flex items-center gap-2.5">
-            <div class="w-9 h-9 rounded-2xl bg-gradient-to-tr from-cyan-400 via-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/25 shrink-0">
-              <i data-lucide="compass" class="w-5 h-5 text-white"></i>
+            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#9BB7A5]/15 border border-[#9BB7A5]/30 flex items-center justify-center text-[#9BB7A5] shrink-0">
+              <i data-lucide="compass" class="w-4 h-4 sm:w-5 sm:h-5 text-[#9BB7A5]"></i>
             </div>
             <div>
-              <h3 class="text-base font-bold text-white tracking-tight flex items-center gap-2">
+              <h3 class="text-base font-semibold text-[var(--mc-text-primary)] tracking-tight flex items-center gap-2">
                 <span>Mind Cave Navigation Directory</span>
-                <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">Master Index</span>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#9BB7A5]/15 text-[#9BB7A5] border border-[#9BB7A5]/30">Master Index</span>
               </h3>
-              <p class="text-[11px] text-slate-400">All cognitive features, journaling tracks & system configurations</p>
+              <p class="text-[11px] text-[var(--mc-text-secondary)]">All cognitive features, journaling tracks & system configurations</p>
             </div>
           </div>
-          <button onclick="closeMasterMenuModal()" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
+          <button onclick="closeMasterMenuModal()" class="w-8 h-8 rounded-xl bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-bg-elevation)] text-[var(--mc-text-muted)] hover:text-[var(--mc-text-primary)] flex items-center justify-center transition-colors">
             <i data-lucide="x" class="w-4 h-4"></i>
           </button>
         </div>
@@ -3637,204 +3637,204 @@
         <div class="space-y-3.5 pt-1">
 
           <!-- Section 0: System Settings, Theme & Notifications -->
-          <div class="p-3.5 rounded-2xl bg-gradient-to-r from-slate-900 via-blue-950/50 to-slate-900 border border-cyan-500/30 shadow-md space-y-2.5">
+          <div class="p-3.5 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)] shadow-sm space-y-2.5">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center">
+                <div class="w-6 h-6 rounded-lg bg-[#9BB7A5]/15 text-[#9BB7A5] flex items-center justify-center">
                   <i data-lucide="sliders" class="w-3.5 h-3.5"></i>
                 </div>
-                <span class="text-xs font-bold text-slate-100 uppercase tracking-wider font-mono">System Preferences & Settings</span>
+                <span class="text-xs font-semibold text-[var(--mc-text-primary)] uppercase tracking-wider font-mono">System Preferences & Settings</span>
               </div>
-              <span class="text-[10px] text-cyan-400 font-mono px-2 py-0.5 rounded-full bg-cyan-950/60 border border-cyan-500/30">Live Sync</span>
+              <span class="text-[10px] text-[#9BB7A5] font-mono px-2 py-0.5 rounded-full bg-[#9BB7A5]/10 border border-[#9BB7A5]/25">Live Sync</span>
             </div>
 
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
               <!-- Theme Toggle Button -->
-              <button onclick="toggleTheme()" class="p-2.5 rounded-xl bg-black/50 hover:bg-slate-900 border border-white/10 hover:border-amber-500/50 text-left transition-all flex flex-col justify-between gap-1.5 group cursor-pointer shadow-sm">
+              <button onclick="toggleTheme()" class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] hover:bg-[var(--mc-bg-elevation)] border border-[var(--mc-border-subtle)] hover:border-[#C5AA78]/50 text-left transition-all flex flex-col justify-between gap-1.5 group cursor-pointer shadow-sm">
                 <div class="flex items-center justify-between">
                   <i id="menu-theme-icon" data-lucide="sun" class="w-4 h-4 text-amber-400"></i>
-                  <span class="text-[10px] font-mono text-slate-400 group-hover:text-amber-300">Toggle</span>
+                  <span class="text-[10px] font-mono text-[var(--mc-text-muted)] group-hover:text-amber-400">Toggle</span>
                 </div>
                 <div>
-                  <div class="font-bold text-slate-200 group-hover:text-white" id="menu-theme-label">Theme Mode</div>
-                  <div class="text-[10px] text-slate-400" id="menu-theme-sublabel">Light / Dark</div>
+                  <div class="font-semibold text-[var(--mc-text-primary)]" id="menu-theme-label">Theme Mode</div>
+                  <div class="text-[10px] text-[var(--mc-text-muted)]" id="menu-theme-sublabel">Light / Dark</div>
                 </div>
               </button>
 
               <!-- Notifications Button -->
-              <button onclick="closeMasterMenuModal(); openNotificationsModal();" class="p-2.5 rounded-xl bg-black/50 hover:bg-slate-900 border border-white/10 hover:border-amber-500/50 text-left transition-all flex flex-col justify-between gap-1.5 group cursor-pointer shadow-sm">
+              <button onclick="closeMasterMenuModal(); openNotificationsModal();" class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] hover:bg-[var(--mc-bg-elevation)] border border-[var(--mc-border-subtle)] hover:border-[#9BB7A5]/50 text-left transition-all flex flex-col justify-between gap-1.5 group cursor-pointer shadow-sm">
                 <div class="flex items-center justify-between">
                   <i data-lucide="bell" class="w-4 h-4 text-amber-400"></i>
-                  <span class="text-[10px] font-mono text-emerald-400">Active</span>
+                  <span class="text-[10px] font-mono text-[#91B59D]">Active</span>
                 </div>
                 <div>
-                  <div class="font-bold text-slate-200 group-hover:text-white">Notifications</div>
-                  <div class="text-[10px] text-slate-400">Alarms & Check-ins</div>
+                  <div class="font-semibold text-[var(--mc-text-primary)]">Notifications</div>
+                  <div class="text-[10px] text-[var(--mc-text-muted)]">Alarms & Check-ins</div>
                 </div>
               </button>
 
               <!-- Account & Biological Profile -->
-              <button onclick="closeMasterMenuModal(); openAuthModal();" class="p-2.5 rounded-xl bg-black/50 hover:bg-slate-900 border border-white/10 hover:border-blue-500/50 text-left transition-all flex flex-col justify-between gap-1.5 group cursor-pointer shadow-sm">
+              <button onclick="closeMasterMenuModal(); openAuthModal();" class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] hover:bg-[var(--mc-bg-elevation)] border border-[var(--mc-border-subtle)] hover:border-[#8FA9B8]/50 text-left transition-all flex flex-col justify-between gap-1.5 group cursor-pointer shadow-sm">
                 <div class="flex items-center justify-between">
-                  <i data-lucide="user-check" class="w-4 h-4 text-blue-400"></i>
-                  <span class="text-[10px] font-mono text-cyan-400">Bio Profile</span>
+                  <i data-lucide="user-check" class="w-4 h-4 text-[#8FA9B8]"></i>
+                  <span class="text-[10px] font-mono text-[#8FA9B8]">Bio Profile</span>
                 </div>
                 <div>
-                  <div class="font-bold text-slate-200 group-hover:text-white">Profile & Bio</div>
-                  <div class="text-[10px] text-slate-400">Gender & Vitality</div>
+                  <div class="font-semibold text-[var(--mc-text-primary)]">Profile & Bio</div>
+                  <div class="text-[10px] text-[var(--mc-text-muted)]">Gender & Vitality</div>
                 </div>
               </button>
 
               <!-- Gemini API Key Setup -->
-              <button onclick="closeMasterMenuModal(); openGeminiKeyModal();" class="p-2.5 rounded-xl bg-black/50 hover:bg-slate-900 border border-white/10 hover:border-emerald-500/50 text-left transition-all flex flex-col justify-between gap-1.5 group cursor-pointer shadow-sm">
+              <button onclick="closeMasterMenuModal(); openGeminiKeyModal();" class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] hover:bg-[var(--mc-bg-elevation)] border border-[var(--mc-border-subtle)] hover:border-[#9BB7A5]/50 text-left transition-all flex flex-col justify-between gap-1.5 group cursor-pointer shadow-sm">
                 <div class="flex items-center justify-between">
-                  <i data-lucide="sparkles" class="w-4 h-4 text-emerald-400"></i>
-                  <span class="text-[10px] font-mono text-emerald-400">Gemini 3.5</span>
+                  <i data-lucide="sparkles" class="w-4 h-4 text-[#9BB7A5]"></i>
+                  <span class="text-[10px] font-mono text-[#9BB7A5]">Gemini 3.5</span>
                 </div>
                 <div>
-                  <div class="font-bold text-slate-200 group-hover:text-white">AI Studio Key</div>
-                  <div class="text-[10px] text-slate-400">Config & Privacy</div>
+                  <div class="font-semibold text-[var(--mc-text-primary)]">AI Studio Key</div>
+                  <div class="text-[10px] text-[var(--mc-text-muted)]">Config & Privacy</div>
                 </div>
               </button>
             </div>
           </div>
           
           <!-- Section 1: Studio (AI Sanctuary) -->
-          <div class="menu-section-box p-3.5 rounded-2xl bg-black/40 border border-cyan-500/20 transition-all hover:border-cyan-500/40">
+          <div class="menu-section-box p-3.5 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)] transition-all hover:border-[#9BB7A5]/40">
             <div class="flex items-center justify-between mb-2">
               <div class="flex items-center gap-2 cursor-pointer group" onclick="navigateToSection('studio')">
-                <div class="w-7 h-7 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0">
-                  <i data-lucide="message-square" class="w-4 h-4"></i>
+                <div class="w-7 h-7 rounded-lg bg-[#9BB7A5]/15 text-[#9BB7A5] flex items-center justify-center shrink-0">
+                  <i data-lucide="sparkles" class="w-4 h-4"></i>
                 </div>
-                <h4 class="text-xs sm:text-sm font-bold text-white group-hover:text-cyan-300 transition-colors">1. Studio — AI Cognitive Sanctuary</h4>
+                <h4 class="text-xs sm:text-sm font-semibold text-[var(--mc-text-primary)] group-hover:text-[#9BB7A5] transition-colors">1. Studio — AI Cognitive Sanctuary</h4>
               </div>
-              <button onclick="navigateToSection('studio')" class="text-[11px] px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold hover:bg-cyan-500/30 transition-colors">Open Studio →</button>
+              <button onclick="navigateToSection('studio')" class="text-[11px] px-2.5 py-0.5 rounded-full bg-[#9BB7A5]/15 text-[#9BB7A5] border border-[#9BB7A5]/30 font-semibold hover:bg-[#9BB7A5]/25 transition-colors">Open Studio →</button>
             </div>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs pt-1">
-              <button onclick="navigateToStudioPersona('cbt_reflector')" class="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-emerald-500/30 text-left transition-colors">
-                <div class="font-bold text-emerald-400 flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i><span>Reflect</span></div>
-                <div class="text-[10px] text-slate-400">CBT Reframing</div>
+              <button onclick="navigateToStudioPersona('cbt_reflector')" class="p-2 rounded-xl bg-[var(--mc-bg-secondary)] hover:bg-[var(--mc-bg-elevation)] border border-[var(--mc-border-subtle)] hover:border-[#9BB7A5]/40 text-left transition-colors">
+                <div class="font-semibold text-[#9BB7A5] flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i><span>Reflect</span></div>
+                <div class="text-[10px] text-[var(--mc-text-muted)]">CBT Reframing</div>
               </button>
-              <button onclick="navigateToStudioPersona('socratic_brainstormer')" class="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-amber-500/30 text-left transition-colors">
-                <div class="font-bold text-amber-300 flex items-center gap-1.5"><i data-lucide="lightbulb" class="w-3.5 h-3.5"></i><span>Brainstorm</span></div>
-                <div class="text-[10px] text-slate-400">Socratic Ideation</div>
+              <button onclick="navigateToStudioPersona('socratic_brainstormer')" class="p-2 rounded-xl bg-[var(--mc-bg-secondary)] hover:bg-[var(--mc-bg-elevation)] border border-[var(--mc-border-subtle)] hover:border-[#C5AA78]/40 text-left transition-colors">
+                <div class="font-semibold text-[#C5AA78] flex items-center gap-1.5"><i data-lucide="lightbulb" class="w-3.5 h-3.5"></i><span>Brainstorm</span></div>
+                <div class="text-[10px] text-[var(--mc-text-muted)]">Socratic Ideation</div>
               </button>
-              <button onclick="navigateToStudioPersona('executive_strategist')" class="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-cyan-500/30 text-left transition-colors">
-                <div class="font-bold text-cyan-300 flex items-center gap-1.5"><i data-lucide="target" class="w-3.5 h-3.5"></i><span>Strategize</span></div>
-                <div class="text-[10px] text-slate-400">Execution Velocity</div>
+              <button onclick="navigateToStudioPersona('executive_strategist')" class="p-2 rounded-xl bg-[var(--mc-bg-secondary)] hover:bg-[var(--mc-bg-elevation)] border border-[var(--mc-border-subtle)] hover:border-[#8FA9B8]/40 text-left transition-colors">
+                <div class="font-semibold text-[#8FA9B8] flex items-center gap-1.5"><i data-lucide="target" class="w-3.5 h-3.5"></i><span>Strategize</span></div>
+                <div class="text-[10px] text-[var(--mc-text-muted)]">Execution Velocity</div>
               </button>
-              <button onclick="navigateToStudioPersona('shadow_work_analyst')" class="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-purple-500/30 text-left transition-colors">
-                <div class="font-bold text-purple-300 flex items-center gap-1.5"><i data-lucide="moon" class="w-3.5 h-3.5"></i><span>Shadow Work</span></div>
-                <div class="text-[10px] text-slate-400">Blindspot Analysis</div>
+              <button onclick="navigateToStudioPersona('shadow_work_analyst')" class="p-2 rounded-xl bg-[var(--mc-bg-secondary)] hover:bg-[var(--mc-bg-elevation)] border border-[var(--mc-border-subtle)] hover:border-[#91B59D]/40 text-left transition-colors">
+                <div class="font-semibold text-[#91B59D] flex items-center gap-1.5"><i data-lucide="moon" class="w-3.5 h-3.5"></i><span>Shadow Work</span></div>
+                <div class="text-[10px] text-[var(--mc-text-muted)]">Blindspot Analysis</div>
               </button>
             </div>
           </div>
 
           <!-- Section 2: Journal & Life Intelligence -->
-          <div class="menu-section-box p-3.5 rounded-2xl bg-black/40 border border-emerald-500/20 transition-all hover:border-emerald-500/40">
+          <div class="menu-section-box p-3.5 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)] transition-all hover:border-[#9BB7A5]/40">
             <div class="flex items-center justify-between mb-2">
               <div class="flex items-center gap-2 cursor-pointer group" onclick="navigateToSection('journals', 'chrono')">
-                <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                <div class="w-7 h-7 rounded-lg bg-[#9BB7A5]/15 text-[#9BB7A5] flex items-center justify-center shrink-0">
                   <i data-lucide="book-open" class="w-4 h-4"></i>
                 </div>
-                <h4 class="text-xs sm:text-sm font-bold text-white group-hover:text-emerald-300 transition-colors">2. Journal — Life Intelligence System</h4>
+                <h4 class="text-xs sm:text-sm font-semibold text-[var(--mc-text-primary)] group-hover:text-[#9BB7A5] transition-colors">2. Journal — Life Intelligence System</h4>
               </div>
-              <button onclick="navigateToSection('journals', 'chrono')" class="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-semibold hover:bg-emerald-500/30 transition-colors">Open Journal →</button>
+              <button onclick="navigateToSection('journals', 'chrono')" class="text-[11px] px-2.5 py-0.5 rounded-full bg-[#9BB7A5]/15 text-[#9BB7A5] border border-[#9BB7A5]/30 font-semibold hover:bg-[#9BB7A5]/25 transition-colors">Open Journal →</button>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-xs pt-1">
-              <button onclick="navigateToSection('journals', 'chrono')" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-blue-500/30 text-left transition-colors flex items-center justify-between">
+              <button onclick="navigateToSection('journals', 'chrono')" class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] hover:bg-[var(--mc-bg-elevation)] border border-[var(--mc-border-subtle)] hover:border-[#9BB7A5]/40 text-left transition-colors flex items-center justify-between">
                 <div>
-                  <div class="font-bold text-slate-100 flex items-center gap-1.5"><i data-lucide="calendar" class="w-3.5 h-3.5 text-blue-400"></i><span>Living Timeline</span></div>
-                  <div class="text-[10px] text-slate-400">Chronicle & 1-Tap Habits</div>
+                  <div class="font-semibold text-[var(--mc-text-primary)] flex items-center gap-1.5"><i data-lucide="calendar" class="w-3.5 h-3.5 text-[#9BB7A5]"></i><span>Living Timeline</span></div>
+                  <div class="text-[10px] text-[var(--mc-text-muted)]">Chronicle & 1-Tap Habits</div>
                 </div>
-                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-[var(--mc-text-muted)]"></i>
               </button>
-              <button onclick="navigateToSection('journals', 'harmony')" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-emerald-500/30 text-left transition-colors flex items-center justify-between">
+              <button onclick="navigateToSection('journals', 'harmony')" class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] hover:bg-[var(--mc-bg-elevation)] border border-[var(--mc-border-subtle)] hover:border-[#91B59D]/40 text-left transition-colors flex items-center justify-between">
                 <div>
-                  <div class="font-bold text-emerald-400 flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5 text-emerald-400"></i><span>Daily Harmony</span></div>
-                  <div class="text-[10px] text-slate-400">96% Equilibrium & Audio</div>
+                  <div class="font-semibold text-[#91B59D] flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5 text-[#91B59D]"></i><span>Daily Harmony</span></div>
+                  <div class="text-[10px] text-[var(--mc-text-muted)]">96% Equilibrium & Audio</div>
                 </div>
-                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-[var(--mc-text-muted)]"></i>
               </button>
-              <button onclick="navigateToSection('journals', 'memory_lane')" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-amber-500/30 text-left transition-colors flex items-center justify-between">
+              <button onclick="navigateToSection('journals', 'memory_lane')" class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] hover:bg-[var(--mc-bg-elevation)] border border-[var(--mc-border-subtle)] hover:border-[#C5AA78]/40 text-left transition-colors flex items-center justify-between">
                 <div>
-                  <div class="font-bold text-amber-300 flex items-center gap-1.5"><i data-lucide="history" class="w-3.5 h-3.5 text-amber-400"></i><span>Memory Lane</span></div>
-                  <div class="text-[10px] text-slate-400">30-Day Decision Recall</div>
+                  <div class="font-semibold text-[#C5AA78] flex items-center gap-1.5"><i data-lucide="history" class="w-3.5 h-3.5 text-[#C5AA78]"></i><span>Memory Lane</span></div>
+                  <div class="text-[10px] text-[var(--mc-text-muted)]">30-Day Decision Recall</div>
                 </div>
-                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-[var(--mc-text-muted)]"></i>
               </button>
-              <button onclick="navigateToSection('journals', 'memory')" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-purple-500/30 text-left transition-colors flex items-center justify-between">
+              <button onclick="navigateToSection('journals', 'memory')" class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] hover:bg-[var(--mc-bg-elevation)] border border-[var(--mc-border-subtle)] hover:border-[#8FA9B8]/40 text-left transition-colors flex items-center justify-between">
                 <div>
-                  <div class="font-bold text-purple-300 flex items-center gap-1.5"><i data-lucide="image" class="w-3.5 h-3.5 text-purple-400"></i><span>Photo Stream</span></div>
-                  <div class="text-[10px] text-slate-400">Photos & Scrapbook</div>
+                  <div class="font-semibold text-[#8FA9B8] flex items-center gap-1.5"><i data-lucide="image" class="w-3.5 h-3.5 text-[#8FA9B8]"></i><span>Photo Stream</span></div>
+                  <div class="text-[10px] text-[var(--mc-text-muted)]">Photos & Scrapbook</div>
                 </div>
-                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-[var(--mc-text-muted)]"></i>
               </button>
-              <button onclick="navigateToSection('journals', 'sanctuary')" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-indigo-500/30 text-left transition-colors flex items-center justify-between">
+              <button onclick="navigateToSection('journals', 'sanctuary')" class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] hover:bg-[var(--mc-bg-elevation)] border border-[var(--mc-border-subtle)] hover:border-[#9BB7A5]/40 text-left transition-colors flex items-center justify-between">
                 <div>
-                  <div class="font-bold text-indigo-300 flex items-center gap-1.5"><i data-lucide="heart-pulse" class="w-3.5 h-3.5 text-indigo-400"></i><span>Bio Sanctuary</span></div>
-                  <div class="text-[10px] text-slate-400">Milestone Dreams & Radar</div>
+                  <div class="font-semibold text-[#9BB7A5] flex items-center gap-1.5"><i data-lucide="heart-pulse" class="w-3.5 h-3.5 text-[#9BB7A5]"></i><span>Bio Sanctuary</span></div>
+                  <div class="text-[10px] text-[var(--mc-text-muted)]">Milestone Dreams & Radar</div>
                 </div>
-                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-[var(--mc-text-muted)]"></i>
               </button>
             </div>
           </div>
 
           <!-- Section 3: MindPulse Cognitive Intelligence -->
-          <div class="menu-section-box p-3.5 rounded-2xl bg-black/40 border border-blue-500/20 transition-all hover:border-blue-500/40">
+          <div class="menu-section-box p-3.5 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)] transition-all hover:border-[#8FA9B8]/40">
             <div class="flex items-center justify-between mb-2">
               <div class="flex items-center gap-2 cursor-pointer group" onclick="navigateToSection('analytics')">
-                <div class="w-7 h-7 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
-                  <i data-lucide="brain-circuit" class="w-4 h-4"></i>
+                <div class="w-7 h-7 rounded-lg bg-[#8FA9B8]/15 text-[#8FA9B8] flex items-center justify-center shrink-0">
+                  <i data-lucide="activity" class="w-4 h-4"></i>
                 </div>
-                <h4 class="text-xs sm:text-sm font-bold text-white group-hover:text-blue-300 transition-colors">3. MindPulse — Cognitive Intelligence</h4>
+                <h4 class="text-xs sm:text-sm font-semibold text-[var(--mc-text-primary)] group-hover:text-[#8FA9B8] transition-colors">3. MindPulse — Cognitive Intelligence</h4>
               </div>
-              <button onclick="navigateToSection('analytics')" class="text-[11px] px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/40 font-semibold hover:bg-blue-500/30 transition-colors">Open MindPulse →</button>
+              <button onclick="navigateToSection('analytics')" class="text-[11px] px-2.5 py-0.5 rounded-full bg-[#8FA9B8]/15 text-[#8FA9B8] border border-[#8FA9B8]/30 font-semibold hover:bg-[#8FA9B8]/25 transition-colors">Open MindPulse →</button>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs pt-1">
-              <div class="p-2.5 rounded-xl bg-white/5 border border-white/5">
-                <div class="font-bold text-cyan-400 flex items-center gap-1.5"><i data-lucide="brain" class="w-3.5 h-3.5"></i><span>8 CBT Distortion Patterns</span></div>
-                <div class="text-[10px] text-slate-400">Real-time cognitive bias analysis</div>
+              <div class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)]">
+                <div class="font-semibold text-[#8FA9B8] flex items-center gap-1.5"><i data-lucide="brain" class="w-3.5 h-3.5"></i><span>8 Distortion Patterns</span></div>
+                <div class="text-[10px] text-[var(--mc-text-muted)]">Real-time cognitive bias analysis</div>
               </div>
-              <div class="p-2.5 rounded-xl bg-white/5 border border-white/5">
-                <div class="font-bold text-blue-400 flex items-center gap-1.5"><i data-lucide="radar" class="w-3.5 h-3.5"></i><span>6-Factor Emotion Radar</span></div>
-                <div class="text-[10px] text-slate-400">Joy, Clarity, Resilience, Focus</div>
+              <div class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)]">
+                <div class="font-semibold text-[#9BB7A5] flex items-center gap-1.5"><i data-lucide="radar" class="w-3.5 h-3.5"></i><span>6-Factor Emotion Radar</span></div>
+                <div class="text-[10px] text-[var(--mc-text-muted)]">Joy, Clarity, Resilience, Focus</div>
               </div>
-              <div class="p-2.5 rounded-xl bg-white/5 border border-white/5">
-                <div class="font-bold text-emerald-400 flex items-center gap-1.5"><i data-lucide="activity" class="w-3.5 h-3.5"></i><span>1-Click Guided CBT</span></div>
-                <div class="text-[10px] text-slate-400">Decatastrophizing & Continuum</div>
+              <div class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)]">
+                <div class="font-semibold text-[#91B59D] flex items-center gap-1.5"><i data-lucide="activity" class="w-3.5 h-3.5"></i><span>Guided Reflections</span></div>
+                <div class="text-[10px] text-[var(--mc-text-muted)]">Decatastrophizing & Continuum</div>
               </div>
             </div>
           </div>
 
           <!-- Section 4: Vault & Security -->
-          <div class="menu-section-box p-3.5 rounded-2xl bg-black/40 border border-emerald-500/20 transition-all hover:border-emerald-500/40">
+          <div class="menu-section-box p-3.5 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)] transition-all hover:border-[#91B59D]/40">
             <div class="flex items-center justify-between mb-2">
               <div class="flex items-center gap-2 cursor-pointer group" onclick="navigateToSection('security')">
-                <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                <div class="w-7 h-7 rounded-lg bg-[#91B59D]/15 text-[#91B59D] flex items-center justify-center shrink-0">
                   <i data-lucide="shield-check" class="w-4 h-4"></i>
                 </div>
-                <h4 class="text-xs sm:text-sm font-bold text-white group-hover:text-emerald-300 transition-colors">4. Vault — Privacy & Security Hardening</h4>
+                <h4 class="text-xs sm:text-sm font-semibold text-[var(--mc-text-primary)] group-hover:text-[#91B59D] transition-colors">4. Vault — Privacy & Security Hardening</h4>
               </div>
-              <button onclick="navigateToSection('security')" class="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-semibold hover:bg-emerald-500/30 transition-colors">Open Vault →</button>
+              <button onclick="navigateToSection('security')" class="text-[11px] px-2.5 py-0.5 rounded-full bg-[#91B59D]/15 text-[#91B59D] border border-[#91B59D]/30 font-semibold hover:bg-[#91B59D]/25 transition-colors">Open Vault →</button>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs pt-1">
-              <div class="p-2.5 rounded-xl bg-white/5 border border-white/5">
-                <div class="font-bold text-emerald-400 flex items-center gap-1.5"><i data-lucide="lock" class="w-3.5 h-3.5"></i><span>Client AES-256 Vault</span></div>
-                <div class="text-[10px] text-slate-400">Zero-knowledge local encryption</div>
+              <div class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)]">
+                <div class="font-semibold text-[#91B59D] flex items-center gap-1.5"><i data-lucide="lock" class="w-3.5 h-3.5"></i><span>Client AES-256 Vault</span></div>
+                <div class="text-[10px] text-[var(--mc-text-muted)]">Zero-knowledge local encryption</div>
               </div>
-              <div class="p-2.5 rounded-xl bg-white/5 border border-white/5">
-                <div class="font-bold text-indigo-400 flex items-center gap-1.5"><i data-lucide="shield" class="w-3.5 h-3.5"></i><span>Multi-Tenant Isolation</span></div>
-                <div class="text-[10px] text-slate-400">Strict Firestore UID boundaries</div>
+              <div class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)]">
+                <div class="font-semibold text-[#8FA9B8] flex items-center gap-1.5"><i data-lucide="shield" class="w-3.5 h-3.5"></i><span>Multi-Tenant Isolation</span></div>
+                <div class="text-[10px] text-[var(--mc-text-muted)]">Strict tenant boundaries</div>
               </div>
-              <div class="p-2.5 rounded-xl bg-white/5 border border-white/5">
-                <div class="font-bold text-amber-400 flex items-center gap-1.5"><i data-lucide="search" class="w-3.5 h-3.5"></i><span>Live Security Audit</span></div>
-                <div class="text-[10px] text-slate-400">Automated credential checks</div>
+              <div class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)]">
+                <div class="font-semibold text-[#C5AA78] flex items-center gap-1.5"><i data-lucide="search" class="w-3.5 h-3.5"></i><span>Live Security Audit</span></div>
+                <div class="text-[10px] text-[var(--mc-text-muted)]">Automated credential checks</div>
               </div>
             </div>
-            <div class="pt-2 mt-2 border-t border-white/5 flex items-center justify-between">
-              <span class="text-[10px] text-rose-400 font-semibold flex items-center gap-1"><i data-lucide="alert-triangle" class="w-3 h-3 text-rose-400"></i><span>Danger Zone: Permanent Factory Reset</span></span>
-              <button onclick="closeMasterMenuModal(); openFactoryResetModal();" class="text-[10px] px-2 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold transition-colors">Wipe & Reset Everything →</button>
+            <div class="pt-2 mt-2 border-t border-[var(--mc-border-subtle)] flex items-center justify-between">
+              <span class="text-[10px] text-[#B9858B] font-semibold flex items-center gap-1"><i data-lucide="alert-triangle" class="w-3 h-3"></i><span>Danger Zone: Permanent Factory Reset</span></span>
+              <button onclick="closeMasterMenuModal(); openFactoryResetModal();" class="text-[10px] px-2 py-1 rounded-lg bg-[#B9858B]/10 hover:bg-[#B9858B]/20 text-[#B9858B] border border-[#B9858B]/30 font-bold transition-colors">Wipe & Reset Everything →</button>
             </div>
           </div>
 
@@ -4038,24 +4038,24 @@
     </div>
   </div>
 
-  <div class="mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 w-full z-40 bg-[#111417]/95 backdrop-blur-2xl border-t border-[#252B31] px-2 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom,0.5rem))] flex items-center justify-around">
+  <div class="mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 w-full z-40 bg-[var(--mc-bg-secondary)] backdrop-blur-2xl border-t border-[var(--mc-border-default)] px-2 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom,0.5rem))] flex items-center justify-around">
     <button onclick="switchTab('overview')" id="mobile-tab-overview" class="mobile-nav-btn active flex flex-col items-center gap-0.5 text-[10px] text-[#9BB7A5] font-medium py-1 px-2 rounded-xl transition-colors">
       <i data-lucide="home" class="w-4 h-4"></i>
       <span>Home</span>
     </button>
-    <button onclick="switchTab('journals')" id="mobile-tab-journals" class="mobile-nav-btn flex flex-col items-center gap-0.5 text-[10px] text-[#6F7881] font-medium py-1 px-2 rounded-xl transition-colors">
+    <button onclick="switchTab('journals')" id="mobile-tab-journals" class="mobile-nav-btn flex flex-col items-center gap-0.5 text-[10px] text-[var(--mc-text-muted)] font-medium py-1 px-2 rounded-xl transition-colors">
       <i data-lucide="book-open" class="w-4 h-4"></i>
       <span>Journal</span>
     </button>
-    <button onclick="switchTab('studio')" id="mobile-tab-studio" class="mobile-nav-btn flex flex-col items-center gap-0.5 text-[10px] text-[#6F7881] font-medium py-1 px-2 rounded-xl transition-colors">
+    <button onclick="switchTab('studio')" id="mobile-tab-studio" class="mobile-nav-btn flex flex-col items-center gap-0.5 text-[10px] text-[var(--mc-text-muted)] font-medium py-1 px-2 rounded-xl transition-colors">
       <i data-lucide="sparkles" class="w-4 h-4"></i>
       <span>Studio</span>
     </button>
-    <button onclick="switchTab('analytics')" id="mobile-tab-analytics" class="mobile-nav-btn flex flex-col items-center gap-0.5 text-[10px] text-[#6F7881] font-medium py-1 px-2 rounded-xl transition-colors">
+    <button onclick="switchTab('analytics')" id="mobile-tab-analytics" class="mobile-nav-btn flex flex-col items-center gap-0.5 text-[10px] text-[var(--mc-text-muted)] font-medium py-1 px-2 rounded-xl transition-colors">
       <i data-lucide="activity" class="w-4 h-4"></i>
       <span>MindPulse</span>
     </button>
-    <button onclick="switchTab('security')" id="mobile-tab-security" class="mobile-nav-btn flex flex-col items-center gap-0.5 text-[10px] text-[#6F7881] font-medium py-1 px-2 rounded-xl transition-colors">
+    <button onclick="switchTab('security')" id="mobile-tab-security" class="mobile-nav-btn flex flex-col items-center gap-0.5 text-[10px] text-[var(--mc-text-muted)] font-medium py-1 px-2 rounded-xl transition-colors">
       <i data-lucide="shield-check" class="w-4 h-4"></i>
       <span>Vault</span>
     </button>
