@@ -868,6 +868,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initMediaMode();
   updateUserUI();
   checkFirstTimeOnboarding();
+  initNotesAndAlerts();
   initDiarySpace();
   initTodayGoal();
   initHabitTracker();
@@ -1883,7 +1884,7 @@ function switchTab(tabId) {
     return;
   }
 
-  const views = ['overview', 'journals', 'studio', 'analytics', 'security'];
+  const views = ['overview', 'journals', 'notes', 'studio', 'analytics', 'security'];
   views.forEach(v => {
     const viewEl = document.getElementById(`view-${v}`);
     const btnEl = document.getElementById(`tab-btn-${v}`);
@@ -4613,6 +4614,30 @@ function getChronologicalEvents(journals) {
 
     });
 
+  }
+
+  // 6. Add Synced Notes into Goals Timeline Stream
+  if (state.notesList && Array.isArray(state.notesList) && (state.diaryRangeMode === 'all' || isSelectedToday)) {
+    state.notesList.filter(n => n.syncToGoal).forEach(n => {
+      events.push({
+        id: `note_goal_${n.id}`,
+        type: 'goal',
+        time: '11:00',
+        rawHour: 11,
+        entryDate: selectedDate,
+        dateHeader: selectedDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
+        title: `[Note] ${n.title}`,
+        content: n.content,
+        isCompleted: false,
+        category: 'work',
+        categoryLabel: n.tag || 'Smart Note',
+        mood: 'Goal from Note',
+        cbtNote: null,
+        location: 'Notes & Alerts System',
+        energy: 'Actionable Note',
+        photoUrl: null
+      });
+    });
   }
 
 
@@ -14155,5 +14180,462 @@ function openMoodPickerModal() {
     openNewJournalModal();
   } else {
     switchTab('journals');
+  }
+}
+
+
+// =============================================================================
+// SMART NOTES & ALERTS SYSTEM CONTROLLER (WITH GOALS SYNC & AUDIO CHIMES)
+// =============================================================================
+
+state.notesList = [];
+state.alertsList = [];
+state.notesFilter = 'all';
+
+function initNotesAndAlerts() {
+  try {
+    const savedNotes = localStorage.getItem('mind_cave_notes_list');
+    if (savedNotes) {
+      state.notesList = JSON.parse(savedNotes);
+    } else {
+      // Default initial notes
+      state.notesList = [
+        {
+          id: 'note_1',
+          title: 'Mind Cave System Architecture & Next Milestones',
+          content: '1. Fast-path local token verification\n2. Multi-track journaling with Living Timeline\n3. Zero-knowledge client encryption vault active',
+          tag: 'Work',
+          syncToGoal: true,
+          updatedAt: Date.now() - 3600000
+        },
+        {
+          id: 'note_2',
+          title: 'Weekly Mindfulness & Focus Anchors',
+          content: 'Practice 30-min morning deep focus window without notifications. Celebrate small wins daily.',
+          tag: 'Personal',
+          syncToGoal: false,
+          updatedAt: Date.now() - 7200000
+        }
+      ];
+      localStorage.setItem('mind_cave_notes_list', JSON.stringify(state.notesList));
+    }
+
+    const savedAlerts = localStorage.getItem('mind_cave_alerts_list');
+    if (savedAlerts) {
+      state.alertsList = JSON.parse(savedAlerts);
+    } else {
+      // Default initial alerts
+      state.alertsList = [
+        {
+          id: 'alert_1',
+          title: 'Cloud Server Infrastructure Bill',
+          type: 'payment',
+          dueDate: new Date(Date.now() + 86400000 * 3).toISOString().split('T')[0],
+          time: '10:00',
+          frequency: 'monthly',
+          completed: false,
+          createdAt: Date.now()
+        },
+        {
+          id: 'alert_2',
+          title: 'Evening Reflection & Gratitude Log',
+          type: 'habit',
+          dueDate: new Date().toISOString().split('T')[0],
+          time: '20:30',
+          frequency: 'daily',
+          completed: false,
+          createdAt: Date.now()
+        }
+      ];
+      localStorage.setItem('mind_cave_alerts_list', JSON.stringify(state.alertsList));
+    }
+  } catch (e) {
+    state.notesList = [];
+    state.alertsList = [];
+  }
+
+  renderNotesCards();
+  renderAlertsCards();
+  startLiveSanctuaryClock();
+}
+
+// ─── LIVE SANCTUARY PULSE CLOCK ───
+function startLiveSanctuaryClock() {
+  function updateClock() {
+    const now = new Date();
+    const clockEl = document.getElementById('pulse-live-clock');
+    const windowEl = document.getElementById('pulse-circadian-window');
+    
+    if (clockEl) {
+      clockEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+
+    if (windowEl) {
+      const hour = now.getHours();
+      if (hour >= 6 && hour < 11) {
+        windowEl.textContent = 'Morning Flow & High-Agency Clarity';
+      } else if (hour >= 11 && hour < 15) {
+        windowEl.textContent = 'Peak Analytical Sprint & Focus Window';
+      } else if (hour >= 15 && hour < 19) {
+        windowEl.textContent = 'Creative Synthesis & Strategic Execution';
+      } else {
+        windowEl.textContent = 'Neural Wind-down & Restorative Harmony';
+      }
+    }
+  }
+
+  updateClock();
+  setInterval(updateClock, 1000);
+}
+
+// ─── RENDER NOTES CARDS ───
+function renderNotesCards() {
+  const container = document.getElementById('notes-cards-grid');
+  const countBadge = document.getElementById('notes-count-badge');
+  if (!container) return;
+
+  let list = state.notesList || [];
+  if (state.notesFilter === 'todos') {
+    list = list.filter(n => n.syncToGoal);
+  } else if (state.notesFilter === 'notes') {
+    list = list.filter(n => !n.syncToGoal);
+  }
+
+  if (countBadge) countBadge.textContent = `${list.length} Notes`;
+
+  if (list.length === 0) {
+    container.innerHTML = `
+      <div class="col-span-full p-6 text-center rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] space-y-2">
+        <p class="text-xs text-[var(--mc-text-muted)]">No notes matching filter. Click "+ New Note" to capture ideas.</p>
+        <button onclick="openNewNoteModal()" class="btn-primary !py-1 !px-3 text-xs">+ Create Note</button>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = list.map(note => {
+    const formattedDate = new Date(note.updatedAt || Date.now()).toLocaleDateString([], { month: 'short', day: 'numeric' });
+    return `
+      <div class="mc-card p-4 rounded-2xl border border-[var(--mc-border-default)] flex flex-col justify-between space-y-3 hover:border-[var(--mc-accent)]/50 transition-all shadow-sm">
+        <div>
+          <div class="flex items-start justify-between gap-2">
+            <h4 class="text-xs sm:text-sm font-bold text-[var(--mc-text-primary)] leading-snug">${escapeHtml(note.title)}</h4>
+            <span class="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full ${note.tag === 'Work' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/30' : note.tag === 'Idea' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'} shrink-0">${escapeHtml(note.tag || 'Note')}</span>
+          </div>
+          <p class="text-xs text-[var(--mc-text-secondary)] leading-relaxed mt-2 whitespace-pre-line line-clamp-4">${escapeHtml(note.content)}</p>
+        </div>
+
+        <div class="pt-2 border-t border-[var(--mc-border-subtle)] flex items-center justify-between gap-2">
+          <div class="flex items-center gap-1.5">
+            <button onclick="toggleNoteSyncToGoal('${note.id}')" class="text-[10px] font-mono px-2 py-0.5 rounded-lg border transition-all flex items-center gap-1 ${note.syncToGoal ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/40 font-bold' : 'bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-muted)] border-[var(--mc-border-default)]'}" title="Toggle automatic synchronization with Daily Goals deck">
+              <i data-lucide="${note.syncToGoal ? 'check-circle' : 'circle'}" class="w-3 h-3 text-emerald-400"></i>
+              <span>${note.syncToGoal ? '🎯 Synced to Goals' : 'Sync to Goals'}</span>
+            </button>
+            <span class="text-[9px] text-[var(--mc-text-muted)] font-mono">${formattedDate}</span>
+          </div>
+
+          <div class="flex items-center gap-1">
+            <button onclick="openNewNoteModal('${note.id}')" class="text-xs text-[var(--mc-text-muted)] hover:text-[var(--mc-text-primary)] p-1 transition-colors" title="Edit Note">
+              <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+            </button>
+            <button onclick="deleteNote('${note.id}')" class="text-xs text-[var(--mc-text-muted)] hover:text-rose-400 p-1 transition-colors" title="Delete Note">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  refreshIcons();
+}
+
+// ─── RENDER ALERTS CARDS ───
+function renderAlertsCards() {
+  const container = document.getElementById('alerts-cards-list');
+  const countBadge = document.getElementById('alerts-count-badge');
+  if (!container) return;
+
+  const list = state.alertsList || [];
+  if (countBadge) countBadge.textContent = `${list.length} Alerts`;
+
+  if (list.length === 0) {
+    container.innerHTML = `
+      <div class="p-6 text-center rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] space-y-2">
+        <p class="text-xs text-[var(--mc-text-muted)]">No active payment reminders or alerts. Click "+ Add Alert" to schedule one.</p>
+        <button onclick="openNewAlertModal()" class="btn-secondary !py-1 !px-3 text-xs text-amber-400">+ Add Alert</button>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = list.map(alert => {
+    const isPayment = alert.type === 'payment';
+    const isDeadline = alert.type === 'deadline';
+    const isHealth = alert.type === 'health';
+    
+    return `
+      <div class="p-3.5 rounded-2xl bg-[var(--mc-bg-tertiary)] border ${alert.completed ? 'border-[var(--mc-border-subtle)] opacity-60' : isPayment ? 'border-amber-500/30' : 'border-[var(--mc-border-default)]'} flex items-start justify-between gap-3 transition-all hover:border-[var(--mc-accent)]/50 shadow-sm">
+        <div class="flex items-start gap-2.5 min-w-0">
+          <button onclick="toggleAlertComplete('${alert.id}')" class="w-5 h-5 rounded-lg border flex items-center justify-center mt-0.5 shrink-0 transition-colors ${alert.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-[var(--mc-border-default)] hover:border-emerald-400'}">
+            <i data-lucide="check" class="w-3.5 h-3.5 ${alert.completed ? 'block' : 'hidden'} text-white"></i>
+          </button>
+          <div class="min-w-0">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <h4 class="text-xs font-bold text-[var(--mc-text-primary)] ${alert.completed ? 'line-through' : ''}">${escapeHtml(alert.title)}</h4>
+              <span class="text-[9px] font-mono px-1.5 py-0.2 rounded-full ${isPayment ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : isDeadline ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30' : 'bg-cyan-500/15 text-cyan-400 border border-cyan-500/30'} uppercase font-bold">${isPayment ? 'Payment' : isDeadline ? 'Deadline' : isHealth ? 'Health' : 'Habit'}</span>
+            </div>
+            <div class="flex items-center gap-2 text-[10px] text-[var(--mc-text-muted)] font-mono mt-1 flex-wrap">
+              <span>📅 ${alert.dueDate || 'Today'}</span>
+              ${alert.time ? `<span>⏰ ${alert.time}</span>` : ''}
+              <span class="capitalize">🔁 ${alert.frequency || 'Once'}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-1 shrink-0">
+          <button onclick="openNewAlertModal('${alert.id}')" class="text-xs text-[var(--mc-text-muted)] hover:text-[var(--mc-text-primary)] p-1 transition-colors" title="Edit Alert">
+            <i data-lucide="edit-2" class="w-3 h-3"></i>
+          </button>
+          <button onclick="deleteAlert('${alert.id}')" class="text-xs text-[var(--mc-text-muted)] hover:text-rose-400 p-1 transition-colors" title="Delete Alert">
+            <i data-lucide="trash-2" class="w-3 h-3"></i>
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  refreshIcons();
+}
+
+// ─── NOTE CRUD HANDLERS ───
+function openNewNoteModal(noteId = null) {
+  const modal = document.getElementById('note-modal');
+  const titleEl = document.getElementById('note-modal-title');
+  const editIdInput = document.getElementById('note-edit-id');
+  const titleInput = document.getElementById('note-title-input');
+  const contentInput = document.getElementById('note-content-input');
+  const tagSelect = document.getElementById('note-tag-select');
+  const syncCheckbox = document.getElementById('note-sync-to-goals');
+
+  if (noteId) {
+    const note = state.notesList.find(n => n.id === noteId);
+    if (note) {
+      if (titleEl) titleEl.textContent = 'Edit Note';
+      if (editIdInput) editIdInput.value = note.id;
+      if (titleInput) titleInput.value = note.title;
+      if (contentInput) contentInput.value = note.content;
+      if (tagSelect) tagSelect.value = note.tag || 'Work';
+      if (syncCheckbox) syncCheckbox.checked = Boolean(note.syncToGoal);
+    }
+  } else {
+    if (titleEl) titleEl.textContent = 'Create Smart Note';
+    if (editIdInput) editIdInput.value = '';
+    if (titleInput) titleInput.value = '';
+    if (contentInput) contentInput.value = '';
+    if (tagSelect) tagSelect.value = 'Work';
+    if (syncCheckbox) syncCheckbox.checked = false;
+  }
+
+  if (modal) modal.classList.remove('hidden');
+  refreshIcons();
+}
+
+function closeNoteModal() {
+  const modal = document.getElementById('note-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function submitNoteForm(event) {
+  event.preventDefault();
+  const editId = document.getElementById('note-edit-id')?.value;
+  const title = document.getElementById('note-title-input')?.value?.trim();
+  const content = document.getElementById('note-content-input')?.value?.trim();
+  const tag = document.getElementById('note-tag-select')?.value || 'Work';
+  const syncToGoal = document.getElementById('note-sync-to-goals')?.checked ?? false;
+
+  if (!title || !content) return;
+
+  if (editId) {
+    const idx = state.notesList.findIndex(n => n.id === editId);
+    if (idx !== -1) {
+      state.notesList[idx] = {
+        ...state.notesList[idx],
+        title,
+        content,
+        tag,
+        syncToGoal,
+        updatedAt: Date.now()
+      };
+    }
+  } else {
+    state.notesList.unshift({
+      id: `note_${Date.now()}`,
+      title,
+      content,
+      tag,
+      syncToGoal,
+      updatedAt: Date.now()
+    });
+  }
+
+  localStorage.setItem('mind_cave_notes_list', JSON.stringify(state.notesList));
+  closeNoteModal();
+  renderNotesCards();
+  showToast(editId ? 'Note updated successfully!' : 'Note saved! ' + (syncToGoal ? 'Synced to Daily Goals 🎯' : ''));
+}
+
+function deleteNote(noteId) {
+  if (!confirm('Delete this note?')) return;
+  state.notesList = state.notesList.filter(n => n.id !== noteId);
+  localStorage.setItem('mind_cave_notes_list', JSON.stringify(state.notesList));
+  renderNotesCards();
+  showToast('Note removed.');
+}
+
+function toggleNoteSyncToGoal(noteId) {
+  const note = state.notesList.find(n => n.id === noteId);
+  if (note) {
+    note.syncToGoal = !note.syncToGoal;
+    localStorage.setItem('mind_cave_notes_list', JSON.stringify(state.notesList));
+    renderNotesCards();
+    showToast(note.syncToGoal ? '🎯 Note synced to Daily Goals deck!' : 'Note unsynced from Goals.');
+  }
+}
+
+// ─── ALERT CRUD HANDLERS ───
+function openNewAlertModal(alertId = null) {
+  const modal = document.getElementById('alert-modal');
+  const titleEl = document.getElementById('alert-modal-title');
+  const editIdInput = document.getElementById('alert-edit-id');
+  const titleInput = document.getElementById('alert-title-input');
+  const typeSelect = document.getElementById('alert-type-select');
+  const dateInput = document.getElementById('alert-date-input');
+  const timeInput = document.getElementById('alert-time-input');
+  const freqSelect = document.getElementById('alert-frequency-select');
+
+  if (alertId) {
+    const alertItem = state.alertsList.find(a => a.id === alertId);
+    if (alertItem) {
+      if (titleEl) titleEl.textContent = 'Edit Smart Alert';
+      if (editIdInput) editIdInput.value = alertItem.id;
+      if (titleInput) titleInput.value = alertItem.title;
+      if (typeSelect) typeSelect.value = alertItem.type || 'payment';
+      if (dateInput) dateInput.value = alertItem.dueDate || '';
+      if (timeInput) timeInput.value = alertItem.time || '';
+      if (freqSelect) freqSelect.value = alertItem.frequency || 'once';
+    }
+  } else {
+    if (titleEl) titleEl.textContent = 'Create Smart Alert';
+    if (editIdInput) editIdInput.value = '';
+    if (titleInput) titleInput.value = '';
+    if (typeSelect) typeSelect.value = 'payment';
+    if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
+    if (timeInput) timeInput.value = '10:00';
+    if (freqSelect) freqSelect.value = 'once';
+  }
+
+  if (modal) modal.classList.remove('hidden');
+  refreshIcons();
+}
+
+function closeAlertModal() {
+  const modal = document.getElementById('alert-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function submitAlertForm(event) {
+  event.preventDefault();
+  const editId = document.getElementById('alert-edit-id')?.value;
+  const title = document.getElementById('alert-title-input')?.value?.trim();
+  const type = document.getElementById('alert-type-select')?.value || 'payment';
+  const dueDate = document.getElementById('alert-date-input')?.value;
+  const time = document.getElementById('alert-time-input')?.value || '';
+  const frequency = document.getElementById('alert-frequency-select')?.value || 'once';
+
+  if (!title || !dueDate) return;
+
+  if (editId) {
+    const idx = state.alertsList.findIndex(a => a.id === editId);
+    if (idx !== -1) {
+      state.alertsList[idx] = {
+        ...state.alertsList[idx],
+        title,
+        type,
+        dueDate,
+        time,
+        frequency
+      };
+    }
+  } else {
+    state.alertsList.unshift({
+      id: `alert_${Date.now()}`,
+      title,
+      type,
+      dueDate,
+      time,
+      frequency,
+      completed: false,
+      createdAt: Date.now()
+    });
+  }
+
+  localStorage.setItem('mind_cave_alerts_list', JSON.stringify(state.alertsList));
+  closeAlertModal();
+  renderAlertsCards();
+  showToast(editId ? 'Alert updated!' : '⏰ Alert & Payment Reminder scheduled!');
+}
+
+function deleteAlert(alertId) {
+  if (!confirm('Delete this alert?')) return;
+  state.alertsList = state.alertsList.filter(a => a.id !== alertId);
+  localStorage.setItem('mind_cave_alerts_list', JSON.stringify(state.alertsList));
+  renderAlertsCards();
+  showToast('Alert removed.');
+}
+
+function toggleAlertComplete(alertId) {
+  const alertItem = state.alertsList.find(a => a.id === alertId);
+  if (alertItem) {
+    alertItem.completed = !alertItem.completed;
+    localStorage.setItem('mind_cave_alerts_list', JSON.stringify(state.alertsList));
+    renderAlertsCards();
+    showToast(alertItem.completed ? '✅ Alert marked done!' : 'Alert re-activated.');
+  }
+}
+
+function setNotesFilter(filter, btn) {
+  state.notesFilter = filter;
+  document.querySelectorAll('.notes-filter-btn').forEach(b => {
+    b.className = 'notes-filter-btn text-xs px-3 py-1.5 rounded-xl bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-secondary)] border border-[var(--mc-border-default)] font-semibold cursor-pointer';
+  });
+  if (btn) {
+    btn.className = 'notes-filter-btn active text-xs px-3 py-1.5 rounded-xl bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] font-semibold cursor-pointer';
+  }
+  renderNotesCards();
+  renderAlertsCards();
+}
+
+function filterNotesAndAlerts(query) {
+  const q = (query || '').toLowerCase().trim();
+  if (!q) {
+    renderNotesCards();
+    renderAlertsCards();
+    return;
+  }
+  
+  const container = document.getElementById('notes-cards-grid');
+  if (container) {
+    const filteredNotes = (state.notesList || []).filter(n => 
+      (n.title && n.title.toLowerCase().includes(q)) || 
+      (n.content && n.content.toLowerCase().includes(q)) ||
+      (n.tag && n.tag.toLowerCase().includes(q))
+    );
+    container.innerHTML = filteredNotes.map(note => `
+      <div class="mc-card p-4 rounded-2xl border border-[var(--mc-accent-25)] space-y-2">
+        <h4 class="text-xs font-bold text-[var(--mc-text-primary)]">${escapeHtml(note.title)}</h4>
+        <p class="text-xs text-[var(--mc-text-secondary)] line-clamp-3">${escapeHtml(note.content)}</p>
+      </div>
+    `).join('');
   }
 }

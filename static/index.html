@@ -137,6 +137,9 @@
       <button onclick="switchTab('journals')" id="tab-btn-journals" class="tab-btn flex items-center gap-1.5 whitespace-nowrap !py-1 !px-3 text-xs" title="Journal & Memory Lane">
         <i data-lucide="book-open" class="w-3.5 h-3.5"></i> <span>Journal</span>
       </button>
+      <button onclick="switchTab('notes')" id="tab-btn-notes" class="tab-btn flex items-center gap-1.5 whitespace-nowrap !py-1 !px-3 text-xs" title="Notes & Smart Alerts System">
+        <i data-lucide="bell-ring" class="w-3.5 h-3.5 text-amber-400"></i> <span>Notes & Alerts</span>
+      </button>
       <button onclick="switchTab('studio')" id="tab-btn-studio" class="tab-btn flex items-center gap-1.5 whitespace-nowrap !py-1 !px-3 text-xs" title="AI Reflective Studio">
         <i data-lucide="sparkles" class="w-3.5 h-3.5 text-[#9BB7A5]"></i> <span>Studio</span>
       </button>
@@ -612,6 +615,93 @@
 
     </section>
 
+    
+    <!-- ===================================================================== -->
+    <!-- TAB: NOTES & SMART ALERTS SYSTEM (SYNC WITH GOALS & REMINDERS) -->
+    <!-- ===================================================================== -->
+    <section id="view-notes" class="hidden flex-1 flex flex-col gap-4 w-full pb-16 md:pb-8 max-w-6xl mx-auto">
+      
+      <!-- Top Notes & Alerts Command Header -->
+      <div class="mc-card p-5 sm:p-6 rounded-3xl border border-[var(--mc-border-default)] shadow-lg bg-gradient-to-br from-[var(--mc-bg-secondary)] via-[var(--mc-bg-tertiary)] to-[var(--mc-bg-secondary)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-3.5">
+          <div class="w-11 h-11 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-500 shrink-0">
+            <i data-lucide="bell-ring" class="w-5 h-5 text-amber-500"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <h2 class="text-base sm:text-lg font-bold text-[var(--mc-text-primary)]">Notes & Smart Alerts System</h2>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/30 font-semibold">2-Way Goals Sync</span>
+            </div>
+            <p class="text-xs text-[var(--mc-text-secondary)] mt-0.5">Capture quick ideas, meeting notes, payment reminders, and sync to Goals</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 flex-wrap">
+          <button onclick="openNewNoteModal()" class="btn-primary text-xs !py-2 !px-3.5 flex items-center gap-1.5 cursor-pointer shadow-md font-semibold">
+            <i data-lucide="edit" class="w-3.5 h-3.5 text-white"></i>
+            <span>+ New Note</span>
+          </button>
+          <button onclick="openNewAlertModal()" class="btn-secondary text-xs !py-2 !px-3.5 flex items-center gap-1.5 cursor-pointer text-amber-400 font-semibold">
+            <i data-lucide="alarm-clock" class="w-3.5 h-3.5 text-amber-500"></i>
+            <span>+ Add Alert</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter and Tab Controls -->
+      <div class="flex items-center justify-between gap-3 flex-wrap">
+        <!-- Search bar -->
+        <div class="relative flex-1 min-w-[220px]">
+          <i data-lucide="search" class="w-3.5 h-3.5 text-[var(--mc-text-muted)] absolute left-3 top-1/2 -translate-y-1/2"></i>
+          <input type="text" id="notes-search-input" oninput="filterNotesAndAlerts(this.value)" placeholder="Search notes, payment reminders & tasks..." class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] placeholder-[var(--mc-text-muted)] text-xs pl-8 pr-3 py-2 rounded-xl border border-[var(--mc-border-default)] focus:outline-none focus:border-[var(--mc-accent)]">
+        </div>
+
+        <!-- Filter Pills -->
+        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+          <button onclick="setNotesFilter('all', this)" class="notes-filter-btn active text-xs px-3 py-1.5 rounded-xl bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] font-semibold cursor-pointer">All Items</button>
+          <button onclick="setNotesFilter('notes', this)" class="notes-filter-btn text-xs px-3 py-1.5 rounded-xl bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-secondary)] border border-[var(--mc-border-default)] font-semibold cursor-pointer">📝 Notes</button>
+          <button onclick="setNotesFilter('alerts', this)" class="notes-filter-btn text-xs px-3 py-1.5 rounded-xl bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-secondary)] border border-[var(--mc-border-default)] font-semibold cursor-pointer">💳 Payment & Alerts</button>
+          <button onclick="setNotesFilter('todos', this)" class="notes-filter-btn text-xs px-3 py-1.5 rounded-xl bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-secondary)] border border-[var(--mc-border-default)] font-semibold cursor-pointer">🎯 Synced to Goals</button>
+        </div>
+      </div>
+
+      <!-- Main Two-Column Layout: Left (Notes), Right (Alerts & Reminders) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+        
+        <!-- Left: Smart Notes Cards (7 Cols) -->
+        <div class="lg:col-span-7 space-y-3">
+          <div class="flex items-center justify-between px-1">
+            <div class="flex items-center gap-2">
+              <h3 class="text-xs font-semibold text-[var(--mc-text-primary)] uppercase tracking-wider font-mono">Scratchpad & Notes</h3>
+              <span id="notes-count-badge" class="text-[10px] font-mono px-2 py-0.2 rounded-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-muted)] border border-[var(--mc-border-default)]">0 Notes</span>
+            </div>
+            <span class="text-[10px] text-[var(--mc-text-muted)] font-mono">Google Notes Hook Ready</span>
+          </div>
+
+          <div id="notes-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </div>
+
+        <!-- Right: Time-Sensitive Alerts & Reminders (5 Cols) -->
+        <div class="lg:col-span-5 space-y-3">
+          <div class="flex items-center justify-between px-1">
+            <div class="flex items-center gap-2">
+              <h3 class="text-xs font-semibold text-[var(--mc-text-primary)] uppercase tracking-wider font-mono">Active Alerts & Reminders</h3>
+              <span id="alerts-count-badge" class="text-[10px] font-mono px-2 py-0.2 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/30">0 Alerts</span>
+            </div>
+            <span class="text-[10px] text-amber-500 font-mono">Audio & Notification</span>
+          </div>
+
+          <div id="alerts-cards-list" class="space-y-2.5">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
     <!-- ===================================================================== -->
     <!-- TAB 2: STUDIO (CONVERSATIONAL REFLECTION & BRAINSTORMING) -->
     <!-- ===================================================================== -->
@@ -813,7 +903,7 @@
           <i data-lucide="heart-pulse" class="w-3.5 h-3.5 text-rose-400"></i><span>Bio Sanctuary</span>
         </button>
         <button onclick="switchJournalTrack('harmony')" id="track-btn-harmony" class="track-tab-btn shrink-0 !text-[11px] sm:!text-xs !py-1 sm:!py-1.5 !px-2.5 sm:!px-3">
-          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i><span>Daily Harmony</span>
+          <i data-lucide="activity" class="w-3.5 h-3.5 text-[#9BB7A5]"></i><span>Sanctuary Pulse</span>
         </button>
         <button onclick="switchJournalTrack('memory_lane')" id="track-btn-memory_lane" class="track-tab-btn shrink-0 !text-[11px] sm:!text-xs !py-1 sm:!py-1.5 !px-2.5 sm:!px-3">
           <i data-lucide="history" class="w-3.5 h-3.5"></i><span>Memory Lane</span>
@@ -826,450 +916,213 @@
       <!-- =================================================================== -->
       <!-- PAGE 1: TIMELINE & CHRONICLE STREAM (DYNAMIC MOBILE & WEB LAYOUT) -->
       <!-- =================================================================== -->
-      <div id="journal-track-chrono" class="grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-4 items-start">
+            <!-- =================================================================== -->
+      <!-- PAGE 1: TIMELINE & CHRONICLE STREAM (PURE CHRONOLOGICAL STREAM) -->
+      <!-- =================================================================== -->
+      <div id="journal-track-chrono" class="max-w-4xl mx-auto w-full space-y-3">
         
-        <!-- MAIN COLUMN (Desktop Left, 7/12 Cols): Chronicle Command Ribbon & Timeline Stream -->
-        <div class="lg:col-span-7 xl:col-span-8 space-y-3 order-2 lg:order-1 min-w-0">
-          <!-- Unified Master Command Ribbon with Search & Date Quick Jumpers (Compact Bento Design) -->
-          <div class="mc-card p-3 sm:p-4 flex flex-col gap-2">
-            <!-- Command Top Bar -->
-            <div class="flex flex-col gap-2">
-              <!-- Row 1: Unified Date Navigator & Search Moments Bar (Quiet Bento) -->
-              <div class="flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
-                <!-- Compact Date Jumper -->
-                <div class="flex items-center gap-1 shrink-0 bg-[var(--mc-bg-tertiary)] px-1 py-0.5 rounded-xl border border-[var(--mc-border-default)] shadow-sm h-8">
-                  <button onclick="stepDiaryDay(-1)" class="w-6 h-6 rounded-lg hover:bg-[var(--mc-bg-secondary)] text-[var(--mc-text-secondary)] flex items-center justify-center transition-colors shrink-0 cursor-pointer" title="Previous Day">
-                    <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
-                  </button>
-                  
-                  <div class="flex items-center gap-1.5 px-1">
-                    <i data-lucide="calendar" class="w-3.5 h-3.5 text-[var(--mc-text-muted)] shrink-0"></i>
-                    <input type="date" id="chrono-date-picker" onchange="onDiaryDatePickerChange(this.value)" class="bg-transparent text-[var(--mc-text-primary)] text-xs font-mono font-medium focus:outline-none cursor-pointer p-0 m-0 border-0 h-6">
-                  </div>
-
-                  <button onclick="stepDiaryDay(1)" class="w-6 h-6 rounded-lg hover:bg-[var(--mc-bg-secondary)] text-[var(--mc-text-secondary)] flex items-center justify-center transition-colors shrink-0 cursor-pointer" title="Next Day">
-                    <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-                  </button>
-                </div>
-
-                <!-- Compact Search Moments Input -->
-                <div class="relative flex-1 min-w-[140px] max-w-full sm:max-w-xs h-8">
-                  <input type="text" id="memory-search-input" oninput="filterDiaryTimeline(this.value)" placeholder="Search moments..." class="w-full h-8 bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] placeholder-[var(--mc-text-muted)] text-xs py-1 px-3 pl-8 rounded-xl border border-[var(--mc-border-default)] focus:outline-none focus:border-[var(--mc-accent)]">
-                  <i data-lucide="search" class="w-3.5 h-3.5 text-[var(--mc-text-muted)] absolute left-2.5 top-2.5"></i>
-                </div>
+        <!-- Chronicle Command Ribbon with Search & Date Quick Jumpers -->
+        <div class="mc-card p-3.5 sm:p-4 flex flex-col gap-2.5 shadow-sm">
+          <!-- Command Top Bar -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 flex-wrap">
+            <!-- Compact Date Jumper -->
+            <div class="flex items-center gap-1 shrink-0 bg-[var(--mc-bg-tertiary)] px-1.5 py-0.5 rounded-xl border border-[var(--mc-border-default)] shadow-sm h-8">
+              <button onclick="stepDiaryDay(-1)" class="w-6 h-6 rounded-lg hover:bg-[var(--mc-bg-secondary)] text-[var(--mc-text-secondary)] flex items-center justify-center transition-colors shrink-0 cursor-pointer" title="Previous Day">
+                <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+              </button>
+              
+              <div class="flex items-center gap-1.5 px-1">
+                <i data-lucide="calendar" class="w-3.5 h-3.5 text-[var(--mc-text-muted)] shrink-0"></i>
+                <input type="date" id="chrono-date-picker" onchange="onDiaryDatePickerChange(this.value)" class="bg-transparent text-[var(--mc-text-primary)] text-xs font-mono font-medium focus:outline-none cursor-pointer p-0 m-0 border-0 h-6">
               </div>
 
-              <!-- Row 2: Subtle Quick Range Selectors & Actions -->
-              <div class="flex items-center gap-1 overflow-x-auto no-scrollbar flex-nowrap pb-0.5 pr-4 w-full text-[10px]">
-                <button onclick="jumpToToday()" class="btn-secondary !py-0.5 !px-2 !text-[10px] flex items-center gap-1 font-mono shrink-0">
-                  <span class="w-1.5 h-1.5 rounded-full bg-[#5E856F] shrink-0"></span>
-                  <span>Today</span>
-                </button>
-                <button onclick="jumpToYesterday()" class="btn-secondary !py-0.5 !px-2 !text-[10px] font-mono text-[var(--mc-text-secondary)] shrink-0">
-                  Yesterday
-                </button>
-                <button onclick="setDiaryRangeMode('week')" class="btn-secondary !py-0.5 !px-2 !text-[10px] font-mono text-[var(--mc-text-secondary)] shrink-0">
-                  Week
-                </button>
-                <button onclick="setDiaryRangeMode('all')" class="btn-secondary !py-0.5 !px-2 !text-[10px] font-mono text-[var(--mc-text-secondary)] shrink-0">
-                  Month
-                </button>
-                
-                <div class="w-px h-3 bg-[var(--mc-border-subtle)] mx-0.5 shrink-0"></div>
+              <button onclick="stepDiaryDay(1)" class="w-6 h-6 rounded-lg hover:bg-[var(--mc-bg-secondary)] text-[var(--mc-text-secondary)] flex items-center justify-center transition-colors shrink-0 cursor-pointer" title="Next Day">
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+              </button>
 
-                <button type="button" id="media-mode-toggle-btn" onclick="toggleMediaMode()" class="btn-secondary !py-0.5 !px-2 !text-[10px] flex items-center gap-1 shrink-0 text-[var(--mc-text-secondary)]" title="Toggle View Mode (All / Text Only / Photos Only)">
-                  <i data-lucide="layers" id="media-mode-icon" class="w-3 h-3 text-[var(--mc-text-muted)]"></i>
-                  <span id="media-mode-label">All Content</span>
-                </button>
-                <button type="button" onclick="triggerQuickPhotoMoment()" class="btn-secondary !py-0.5 !px-2 !text-[10px] flex items-center gap-1 shrink-0 text-[var(--mc-text-secondary)]">
-                  <i data-lucide="camera" class="w-3 h-3 text-[var(--mc-text-muted)]"></i>
-                  <span>+ Photo</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- 7-Day Weekly Ribbon -->
-            <div class="diary-week-ribbon pt-1 border-t border-[var(--mc-border-subtle)]" id="diary-week-ribbon-container">
-              <!-- Dynamically populated via JS -->
-            </div>
-          </div>
-
-          <!-- VIEW MODE 1: Vertical Timeline Stream (REFLECTIONS + TASKS + GCAL + PHOTOS INLINE) -->
-          <div class="timeline-container" id="chrono-timeline-list">
-            <div class="timeline-spine"></div>
-            <!-- Only actual logged entries & tasks rendered via JS -->
-          </div>
-
-          <!-- VIEW MODE 2: Story Flow Carousel (SWIPE & DRAG REVISIT) -->
-          <div id="chrono-story-view" class="hidden space-y-3">
-            <div class="flex items-center justify-between text-xs px-2 text-[var(--mc-text-muted)]">
-              <span class="font-semibold text-[var(--mc-text-primary)] flex items-center gap-1.5">
-                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-[#9BB7A5]"></i>
-                <span>Revisit Moments (Swipe, Drag or use Arrow Keys)</span>
-              </span>
-              <span id="story-progress-indicator" class="font-mono text-[#9BB7A5]">Moment 1 of 3</span>
-            </div>
-
-            <div class="story-carousel-container">
-              <div class="story-carousel-viewport" id="story-carousel-viewport">
-                <div class="story-carousel-track" id="story-carousel-track">
-                  <!-- Dynamic Story Slides rendered via JS -->
-                </div>
-              </div>
-
-              <!-- Floating Controls -->
-              <div class="flex items-center justify-between mt-3 px-2">
-                <button onclick="prevStorySlide()" class="story-nav-btn" title="Previous Moment (←)">
-                  <i data-lucide="chevron-left" class="w-4 h-4"></i>
-                </button>
-                
-                <div id="story-dots-container" class="flex items-center gap-1.5">
-                  <!-- Dots populated via JS -->
-                </div>
-
-                <button onclick="nextStorySlide()" class="story-nav-btn" title="Next Moment (→)">
-                  <i data-lucide="chevron-right" class="w-4 h-4"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- SIDEBAR COLUMN (Desktop Right, 5/12 Cols): Focus Hub & Life Quests -->
-        <div class="lg:col-span-5 xl:col-span-4 space-y-3 order-1 lg:order-2 min-w-0">
-          <!-- DYNAMIC FOCUS & HABITS HUB -->
-          <div class="mc-card p-3 sm:p-4 flex flex-col gap-3" id="today-focus-habits-hub">
-            <!-- Hub Master Header Bar -->
-            <div class="flex items-center justify-between gap-2 pb-2 border-b border-[var(--mc-border-subtle)]">
-              <div class="flex items-center gap-2 shrink-0">
-                <div class="w-7 h-7 rounded-xl bg-[var(--mc-accent-12)] text-[var(--mc-accent)] flex items-center justify-center font-semibold shrink-0">
-                  <i data-lucide="target" class="w-3.5 h-3.5"></i>
-                </div>
-                <h4 class="text-xs sm:text-sm font-semibold text-[var(--mc-text-primary)] whitespace-nowrap">Focus & Habits</h4>
-              </div>
-
-              <!-- Action Buttons & Collapse Controls -->
-              <div class="flex items-center gap-1 shrink-0 ml-auto">
-                <button type="button" onclick="openNewGoalModal()" class="btn-secondary !py-1 !px-2 text-[10px] flex items-center gap-1 font-medium cursor-pointer" title="Add Goal">
-                  <i data-lucide="plus" class="w-3 h-3 text-[var(--mc-accent)]"></i> <span>Goal</span>
-                </button>
-                <button type="button" onclick="openNewHabitModal()" class="btn-secondary !py-1 !px-2 text-[10px] flex items-center gap-1 font-medium cursor-pointer" title="Add Habit">
-                  <i data-lucide="plus" class="w-3 h-3 text-[var(--mc-accent)]"></i> <span>Habit</span>
-                </button>
-                <button type="button" onclick="openGoalsHabitsModal()" class="btn-secondary !w-7 !h-7 !p-0 flex items-center justify-center cursor-pointer" title="Expand View">
-                  <i data-lucide="maximize-2" class="w-3.5 h-3.5 text-[var(--mc-text-muted)]"></i>
-                </button>
-                <button type="button" id="toggle-goals-tiles-btn" onclick="toggleGoalsTilesCollapse()" class="btn-secondary !w-7 !h-7 !p-0 flex items-center justify-center cursor-pointer" title="Collapse / Expand">
-                  <i data-lucide="chevron-up" id="goals-tiles-chevron" class="w-4 h-4 transition-transform duration-300"></i>
-                </button>
-              </div>
-            </div>
-
-            <!-- Focus Hub Summary Metrics Row -->
-            <div class="flex items-center gap-1.5 flex-wrap">
-              <span id="goals-completed-badge" class="text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)] text-[var(--mc-text-secondary)] font-mono font-semibold flex items-center gap-1">
-                <i data-lucide="check-circle" class="w-3 h-3 text-[#9BB7A5]"></i>
-                <span>2/3 Done</span>
-              </span>
-              <span id="goals-duration-badge" class="text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)] text-[var(--mc-text-secondary)] font-mono font-semibold flex items-center gap-1">
-                <i data-lucide="clock" class="w-3 h-3 text-[#C5AA78]"></i>
-                <span>3h 15m</span>
-              </span>
-              <span id="habit-streak-badge" class="text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-secondary)] font-semibold border border-[var(--mc-border-default)] flex items-center gap-1">
-                <i data-lucide="flame" class="w-3 h-3 text-[#C5AA78]"></i>
-                <span>12d streak</span>
-              </span>
-            </div>
-
-            <!-- Collapsible Goals & Habits Body -->
-            <div id="goals-habits-deck-body" class="space-y-3 transition-all duration-300">
-              <!-- Today's Goals Section -->
-              <div class="p-3 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)] space-y-2.5">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-[#C5AA78]"></span>
-                    <h5 class="text-xs font-semibold text-[var(--mc-text-primary)] uppercase tracking-wider font-mono">Today's Goals</h5>
-                  </div>
-                  <button type="button" onclick="openScrapbookModal()" class="text-[10px] text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] hover:underline flex items-center gap-1 font-semibold">
-                    <i data-lucide="share-2" class="w-3 h-3"></i> <span>Share</span>
-                  </button>
-                </div>
-                <div id="today-goals-list" class="space-y-2"></div>
-                
-                <!-- Goals Velocity Bar -->
-                <div class="p-2 rounded-xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] space-y-1 mt-2">
-                  <div class="flex items-center justify-between text-[10px]">
-                    <span class="font-semibold text-[var(--mc-text-secondary)] truncate">Velocity:</span>
-                    <span class="font-mono text-[#9BB7A5] font-bold" id="goals-velocity-text">75%</span>
-                  </div>
-                  <div class="w-full h-1.5 bg-[var(--mc-border-subtle)] rounded-full overflow-hidden flex">
-                    <div id="goals-progress-bar" class="h-full bg-[#9BB7A5] rounded-full" style="width: 67%;"></div>
-                  </div>
-                  <div class="flex items-center justify-between text-[9px] text-[var(--mc-text-muted)] pt-0.5 flex-wrap gap-1" id="goals-breakdown-pills"></div>
-                </div>
-              </div>
-
-              <!-- Habits Section -->
-              <div class="p-3 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)] space-y-2.5">
-                <div class="flex items-center justify-between gap-1 flex-wrap">
-                  <div class="flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-[#8FA9B8]"></span>
-                    <h5 class="text-xs font-semibold text-[var(--mc-text-primary)] uppercase tracking-wider font-mono">Habits & Streaks</h5>
-                  </div>
-                  <div class="flex items-center gap-1.5 shrink-0 flex-wrap">
-                    <button type="button" onclick="refreshHabitsTracker(this)" class="text-[10px] text-[var(--mc-text-muted)] hover:text-[var(--mc-text-primary)] font-mono flex items-center gap-1 transition-colors" title="Refresh Streaks">
-                      <i data-lucide="refresh-cw" class="w-3 h-3"></i>
-                    </button>
-                    <button type="button" onclick="openArchivedHabitsModal()" class="text-[10px] text-[var(--mc-text-muted)] hover:text-[var(--mc-text-primary)] font-mono" title="View Archive">
-                      <span id="archived-habits-badge-inline">Archive</span>
-                    </button>
-                    <button type="button" onclick="toggleHabitWeeklyView()" class="text-[10px] text-[var(--mc-text-muted)] hover:text-[var(--mc-text-primary)] font-mono">
-                      <span>7D</span>
-                    </button>
-                  </div>
-                </div>
-                <div id="today-habits-list" class="space-y-2"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- MILESTONE QUESTS RADAR -->
-          <div id="dashboard-milestone-radar" class="p-3 rounded-2xl mc-card flex flex-col gap-2.5">
-            <div class="flex items-center justify-between gap-2">
-              <div class="flex items-center gap-2 min-w-0">
-                <div class="w-7 h-7 rounded-xl bg-[#9BB7A5]/15 text-[#9BB7A5] flex items-center justify-center shrink-0">
-                  <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-                </div>
-                <div class="min-w-0">
-                  <span class="text-xs font-semibold text-[var(--mc-text-primary)] truncate block">Milestone Quests</span>
-                </div>
-              </div>
-              <button type="button" onclick="switchJournalTrack('sanctuary')" class="btn-secondary !py-0.5 !px-2 text-[10px] font-semibold flex items-center gap-1 transition-all shrink-0">
-                <span>Vault →</span>
+              <button onclick="jumpDiaryToToday()" class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-lg bg-[var(--mc-accent-12)] text-[var(--mc-accent)] hover:bg-[var(--mc-accent-25)] transition-colors shrink-0 ml-0.5 cursor-pointer">
+                Today
               </button>
             </div>
-            
-            <div class="flex items-center gap-2 flex-wrap text-[10px] font-mono">
-              <span id="dashboard-radar-count-badge" class="px-2 py-0.5 rounded-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-secondary)] font-semibold border border-[var(--mc-border-default)]">2 In Action</span>
-              <span id="dashboard-radar-fulfillment-badge" class="text-[#9BB7A5] font-semibold">1/6 Fulfilled</span>
-            </div>
-            <div class="text-[11px] text-[var(--mc-text-secondary)] leading-snug" id="dashboard-radar-active-step"></div>
-          </div>
 
-          <!-- COGNITIVE & DIURNAL VITALITY DASHBOARD CARD -->
-          <div class="p-3.5 rounded-2xl mc-card flex flex-col gap-2.5">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2 min-w-0">
-                <div class="w-7 h-7 rounded-xl bg-[#8FA9B8]/15 text-[#8FA9B8] flex items-center justify-center shrink-0">
-                  <i data-lucide="activity" class="w-3.5 h-3.5"></i>
-                </div>
-                <h5 class="text-xs font-semibold text-[var(--mc-text-primary)] uppercase tracking-wider font-mono">Cognitive Equilibrium</h5>
-              </div>
-              <span id="equilibrium-optimal-badge" class="text-[10px] font-mono font-semibold text-[#9BB7A5] bg-[#9BB7A5]/10 border border-[#9BB7A5]/25 px-2 py-0.5 rounded-full">Clean State</span>
+            <!-- Real-time Search Input -->
+            <div class="flex-1 min-w-[200px] relative">
+              <i data-lucide="search" class="w-3.5 h-3.5 text-[var(--mc-text-muted)] absolute left-3 top-1/2 -translate-y-1/2"></i>
+              <input type="text" id="chrono-search-input" oninput="onDiarySearchChange(this.value)" placeholder="Search today's reflections, thoughts & moments..." class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] placeholder-[var(--mc-text-muted)] text-xs pl-8 pr-3 py-1.5 rounded-xl border border-[var(--mc-border-default)] focus:outline-none focus:border-[var(--mc-accent)]">
             </div>
 
-            <!-- Mini 3-Metric Matrix Grid -->
-            <div class="grid grid-cols-3 gap-1.5 pt-1 text-center font-mono">
-              <div class="p-2 rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)]">
-                <div class="text-[9px] text-[var(--mc-text-muted)]">CBT Clearance</div>
-                <div id="equilibrium-cbt-clearance" class="text-xs font-semibold text-[#9BB7A5] mt-0.5">Clean</div>
-              </div>
-              <div class="p-2 rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)]">
-                <div class="text-[9px] text-[var(--mc-text-muted)]">Resilience</div>
-                <div id="equilibrium-resilience" class="text-xs font-semibold text-[#8FA9B8] mt-0.5">--</div>
-              </div>
-              <div class="p-2 rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)]">
-                <div class="text-[9px] text-[var(--mc-text-muted)]">Focus Hours</div>
-                <div id="equilibrium-focus" class="text-xs font-semibold text-[#C5AA78] mt-0.5">0.00 hrs</div>
-              </div>
-            </div>
-
-            <!-- Quick Reflect Action -->
-            <div class="pt-1 flex items-center justify-between text-[10px]">
-              <span class="text-[var(--mc-text-muted)]">Diurnal Peak: <strong class="text-[var(--mc-text-primary)]">10:00 AM – 2:00 PM</strong></span>
-              <button type="button" onclick="switchTab('analytics')" class="text-[#8FA9B8] hover:underline font-semibold flex items-center gap-0.5">
-                <span>View Radar</span>
-                <i data-lucide="chevron-right" class="w-3 h-3"></i>
+            <!-- View Modes (Vertical Stream vs Story Flow) -->
+            <div class="flex items-center gap-1 p-0.5 rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)] shrink-0">
+              <button onclick="setChronoViewMode('stream')" id="view-mode-stream-btn" class="px-2.5 py-1 rounded-lg font-semibold bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] text-xs flex items-center gap-1 cursor-pointer">
+                <i data-lucide="list" class="w-3 h-3"></i><span>Stream</span>
+              </button>
+              <button onclick="setChronoViewMode('story')" id="view-mode-story-btn" class="px-2.5 py-1 rounded-lg font-semibold text-[var(--mc-text-muted)] hover:text-[var(--mc-text-primary)] text-xs flex items-center gap-1 cursor-pointer">
+                <i data-lucide="film" class="w-3 h-3"></i><span>Story</span>
               </button>
             </div>
           </div>
         </div>
 
+        <!-- VIEW MODE 1: Vertical Timeline Stream (REFLECTIONS + TASKS + GCAL + PHOTOS INLINE) -->
+        <div class="timeline-container" id="chrono-timeline-list">
+          <div class="timeline-spine"></div>
+          <!-- Only actual logged entries & tasks rendered via JS -->
+        </div>
+
+        <!-- VIEW MODE 2: Story Flow Carousel -->
+        <div id="chrono-story-view" class="hidden space-y-3">
+          <div class="flex items-center justify-between text-xs px-2 text-[var(--mc-text-muted)]">
+            <span class="font-semibold text-[var(--mc-text-primary)] flex items-center gap-1.5">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5 text-[#9BB7A5]"></i>
+              <span>Revisit Moments (Swipe, Drag or use Arrow Keys)</span>
+            </span>
+            <span id="story-progress-indicator" class="font-mono text-[#9BB7A5]">Moment 1 of 3</span>
+          </div>
+
+          <div class="story-carousel-container">
+            <div class="story-carousel-track" id="chrono-story-track"></div>
+          </div>
+        </div>
       </div>
 
       <!-- =================================================================== -->
       <!-- PAGE 2: DAILY HARMONY & HOLISTIC SYNTHESIS -->
       <!-- =================================================================== -->
-      <div id="journal-track-harmony" class="hidden space-y-4">
-        <!-- Prominent Daily Harmony & Holistic Life Synthesis -->
-        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 shadow-sm flex flex-col gap-4">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-white/5">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-cyan-500/20">
-                <i data-lucide="sparkles" class="w-5 h-5"></i>
+            <!-- =================================================================== -->
+      <!-- PAGE 3: SANCTUARY PULSE (SMART DAILY SYNTHESIS, HABITS & EQUILIBRIUM) -->
+      <!-- =================================================================== -->
+      <div id="journal-track-harmony" class="hidden max-w-5xl mx-auto w-full space-y-4">
+        
+        <!-- Live Today Time & Circadian Vitality Banner -->
+        <div class="mc-card p-5 sm:p-6 rounded-3xl border border-[var(--mc-border-default)] shadow-lg bg-gradient-to-br from-[var(--mc-bg-secondary)] via-[var(--mc-bg-tertiary)] to-[var(--mc-bg-secondary)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-[var(--mc-accent-12)] border border-[var(--mc-accent-25)] flex items-center justify-center text-[var(--mc-accent)] shadow-md shrink-0">
+              <i data-lucide="clock" class="w-6 h-6 text-[#9BB7A5]"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <h3 class="text-base sm:text-lg font-extrabold text-[var(--mc-text-primary)]" id="pulse-live-clock">--:-- --</h3>
+                <span class="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span id="pulse-circadian-window">Peak Creative & Strategy Window</span>
+                </span>
               </div>
-              <div>
-                <div class="flex items-center gap-2 flex-wrap">
-                  <h3 class="text-base font-bold text-slate-900 dark:text-white">Daily Harmony & Holistic Synthesis</h3>
-                  <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30 flex items-center gap-1">
-                    <i data-lucide="sparkles" class="w-3.5 h-3.5 text-emerald-500"></i>
-                    <span>96% Equilibrium</span>
-                  </span>
+              <p class="text-xs text-[var(--mc-text-secondary)] mt-0.5">Sanctuary Pulse • Comprehensive equilibrium of habits, milestones, and mental clarity</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="toggleVoiceSummary()" id="btn-voice-summary" class="btn-secondary text-xs !py-2 !px-3.5 flex items-center gap-1.5 text-[#9BB7A5] cursor-pointer" title="Listen to AI Daily Synthesis">
+              <i data-lucide="volume-2" class="w-4 h-4 text-[#9BB7A5]" id="voice-summary-icon"></i>
+              <span id="voice-summary-label">Voice Summary</span>
+            </button>
+            <button onclick="regenerateDailySynthesis()" class="btn-primary text-xs !py-2 !px-3 flex items-center gap-1 cursor-pointer" title="Refresh AI Synthesis">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+              <span>Refresh</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3 Core Life Pulse Metrics (Habits, Milestone Quests, Cognitive Equilibrium) -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          
+          <!-- Card 1: Focus Habits & Consistency Streaks -->
+          <div class="mc-card p-4 sm:p-5 flex flex-col justify-between space-y-3">
+            <div>
+              <div class="flex items-center justify-between border-b border-[var(--mc-border-subtle)] pb-2 mb-2">
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-xl bg-amber-500/15 text-amber-500 flex items-center justify-center shrink-0">
+                    <i data-lucide="flame" class="w-4 h-4 text-amber-500"></i>
+                  </div>
+                  <h4 class="text-xs sm:text-sm font-semibold text-[var(--mc-text-primary)]">Focus Habits & Streaks</h4>
                 </div>
-                <p class="text-xs text-slate-500 dark:text-slate-400">Cross-track holistic synthesis of cognitive state, stamina, and agenda flow</p>
+                <button onclick="openNewHabitModal()" class="text-[10px] font-mono text-[var(--mc-accent)] hover:underline font-bold">+ Add</button>
+              </div>
+
+              <div id="sanctuary-habit-tracker-list" class="space-y-2 max-h-64 overflow-y-auto pr-0.5">
+                <!-- Dynamically populated via JS -->
               </div>
             </div>
 
-            <div class="flex items-center gap-2">
-              <button onclick="toggleVoiceSummary()" id="btn-voice-summary" class="btn-secondary text-xs !py-1.5 !px-3 flex items-center gap-1.5 text-cyan-600 dark:text-cyan-400 hover:opacity-80" title="Listen to AI Daily Synthesis">
-                <i data-lucide="volume-2" class="w-3.5 h-3.5 text-cyan-500" id="voice-summary-icon"></i>
-                <span id="voice-summary-label">Listen (Voice Summary)</span>
-              </button>
-              <button onclick="regenerateDailySynthesis()" class="btn-secondary text-xs !py-1.5 !px-2.5 flex items-center gap-1" title="Refresh AI Synthesis">
-                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-                <span class="hidden sm:inline">Refresh</span>
-              </button>
+            <div class="pt-2 border-t border-[var(--mc-border-subtle)] flex items-center justify-between text-[10px] text-[var(--mc-text-muted)] font-mono">
+              <span>Habit Consistency</span>
+              <span class="text-amber-500 font-bold" id="sanctuary-habit-progress-pill">5/6 Done Today</span>
             </div>
           </div>
 
-          <!-- 4 Vital Stat Chips -->
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-            <div class="p-3 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5 flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0">
-                <i data-lucide="calendar" class="w-4 h-4"></i>
+          <!-- Card 2: Milestone Quests Radar -->
+          <div class="mc-card p-4 sm:p-5 flex flex-col justify-between space-y-3">
+            <div>
+              <div class="flex items-center justify-between border-b border-[var(--mc-border-subtle)] pb-2 mb-2">
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-xl bg-[#9BB7A5]/15 text-[#9BB7A5] flex items-center justify-center shrink-0">
+                    <i data-lucide="target" class="w-4 h-4 text-[#9BB7A5]"></i>
+                  </div>
+                  <h4 class="text-xs sm:text-sm font-semibold text-[var(--mc-text-primary)]">Milestone Quests Radar</h4>
+                </div>
+                <button onclick="openBucketListModal()" class="text-[10px] font-mono text-[#9BB7A5] hover:underline font-bold">+ Quest</button>
               </div>
-              <div>
-                <span class="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-mono block">Schedule</span>
-                <span class="text-xs font-bold text-slate-800 dark:text-slate-200" id="synth-time-chip">3 Focus Blocks</span>
-              </div>
-            </div>
-            <div class="p-3 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5 flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center shrink-0">
-                <i data-lucide="brain" class="w-4 h-4"></i>
-              </div>
-              <div>
-                <span class="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-mono block">Cognition</span>
-                <span class="text-xs font-bold text-slate-800 dark:text-slate-200" id="synth-cbt-chip">1 Reframe Done</span>
-              </div>
-            </div>
-            <div class="p-3 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5 flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center shrink-0">
-                <i data-lucide="moon" class="w-4 h-4"></i>
-              </div>
-              <div>
-                <span class="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-mono block">Diurnal Bio</span>
-                <span class="text-xs font-bold text-slate-800 dark:text-slate-200" id="synth-bio-chip">Peak Stamina</span>
+
+              <div class="space-y-2 py-1">
+                <div class="flex items-center gap-2 text-[10px] font-mono">
+                  <span id="dashboard-radar-count-badge" class="px-2 py-0.5 rounded-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-secondary)] font-semibold border border-[var(--mc-border-default)]">2 In Action</span>
+                  <span id="dashboard-radar-fulfillment-badge" class="text-[#9BB7A5] font-semibold">1/6 Fulfilled</span>
+                </div>
+                <div class="text-[11px] text-[var(--mc-text-secondary)] leading-relaxed p-2.5 rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)]" id="dashboard-radar-active-step">
+                  Track target dates, milestones, and step-by-step dreams.
+                </div>
               </div>
             </div>
-            <div class="p-3 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5 flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0">
-                <i data-lucide="activity" class="w-4 h-4"></i>
-              </div>
-              <div>
-                <span class="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-mono block">Activity</span>
-                <span class="text-xs font-bold text-slate-800 dark:text-slate-200" id="synth-fit-chip">8.4k Steps</span>
-              </div>
+
+            <div class="pt-2 border-t border-[var(--mc-border-subtle)] flex items-center justify-between text-[10px]">
+              <span class="text-[var(--mc-text-muted)]">Long-term Vision</span>
+              <button type="button" onclick="switchJournalTrack('sanctuary')" class="text-[#9BB7A5] font-mono font-bold hover:underline">View Life Quests →</button>
             </div>
           </div>
 
-          <!-- Synthesis Narrative -->
-          <div class="p-4 rounded-xl bg-cyan-50/50 dark:bg-cyan-950/20 border border-cyan-200/60 dark:border-cyan-500/20">
-            <p id="cross-track-synthesis-text" class="text-xs leading-relaxed text-slate-700 dark:text-slate-300">
-              Your afternoon energy aligns with deep work execution. Morning deadlines showed minor catastrophizing, which was reframed through your reflective prompt. Physical stamina, Google Fit recovery, and calendar commitments remain in full equilibrium.
-            </p>
+          <!-- Card 3: Cognitive Equilibrium Matrix -->
+          <div class="mc-card p-4 sm:p-5 flex flex-col justify-between space-y-3">
+            <div>
+              <div class="flex items-center justify-between border-b border-[var(--mc-border-subtle)] pb-2 mb-2">
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-xl bg-[#8FA9B8]/15 text-[#8FA9B8] flex items-center justify-center shrink-0">
+                    <i data-lucide="activity" class="w-4 h-4 text-[#8FA9B8]"></i>
+                  </div>
+                  <h4 class="text-xs sm:text-sm font-semibold text-[var(--mc-text-primary)]">Cognitive Equilibrium</h4>
+                </div>
+                <span class="text-[10px] font-mono text-[#9BB7A5] font-bold">96% Optimal</span>
+              </div>
+
+              <!-- Mini 3-Metric Matrix Grid -->
+              <div class="grid grid-cols-3 gap-1.5 py-1 text-center font-mono">
+                <div class="p-2 rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)]">
+                  <div class="text-[9px] text-[var(--mc-text-muted)]">CBT Clean</div>
+                  <div id="equilibrium-cbt-clearance" class="text-xs font-semibold text-[#9BB7A5] mt-0.5">94%</div>
+                </div>
+                <div class="p-2 rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)]">
+                  <div class="text-[9px] text-[var(--mc-text-muted)]">Resilience</div>
+                  <div id="equilibrium-resilience" class="text-xs font-semibold text-[#8FA9B8] mt-0.5">88%</div>
+                </div>
+                <div class="p-2 rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)]">
+                  <div class="text-[9px] text-[var(--mc-text-muted)]">Focus Hours</div>
+                  <div id="equilibrium-focus" class="text-xs font-semibold text-[#C5AA78] mt-0.5">3.5 hrs</div>
+                </div>
+              </div>
+
+              <p class="text-[11px] text-[var(--mc-text-secondary)] leading-relaxed mt-1" id="cross-track-synthesis-text">
+                Your afternoon energy aligns with deep work execution. Morning deadlines showed zero cognitive distortions.
+              </p>
+            </div>
+
+            <div class="pt-2 border-t border-[var(--mc-border-subtle)] flex items-center justify-between text-[10px]">
+              <span class="text-[var(--mc-text-muted)]">Radar Analytics</span>
+              <button type="button" onclick="switchTab('analytics')" class="text-[#8FA9B8] font-mono font-bold hover:underline">MindPulse Radar →</button>
+            </div>
           </div>
+
         </div>
 
-        <!-- Directional Summary of Completed Tasks & Execution Duration -->
-        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 shadow-sm flex flex-col gap-3.5" id="harmony-goals-directional-card">
-          <div class="flex items-center justify-between flex-wrap gap-2">
-            <div class="flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-500 dark:text-amber-400 flex items-center justify-center font-bold">
-                <i data-lucide="compass" class="w-4 h-4 text-amber-500 dark:text-amber-400"></i>
-              </div>
-              <div>
-                <h4 class="text-sm font-bold text-slate-900 dark:text-white">Directional Task & Goal Completion Summary</h4>
-                <p class="text-xs text-slate-500 dark:text-slate-400">Time invested across North Star, Deep Work, and Wellness domains</p>
-              </div>
-            </div>
-            <div class="flex items-center gap-2">
-              <span id="harmony-total-duration-badge" class="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30 flex items-center gap-1">
-                <i data-lucide="clock" class="w-3 h-3 text-amber-500"></i>
-                <span>3h 15m Total Time</span>
-              </span>
-              <span id="harmony-velocity-badge" class="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30 flex items-center gap-1">
-                <i data-lucide="target" class="w-3 h-3 text-emerald-500"></i>
-                <span>75% Velocity</span>
-              </span>
-            </div>
-          </div>
-
-          <!-- Dynamic Directional Breakdown Grid -->
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5" id="harmony-goals-category-grid">
-            <!-- Dynamically populated via renderTodayGoal() -->
-          </div>
-
-          <!-- Directional Synthesis Statement -->
-          <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5 text-xs text-slate-700 dark:text-slate-300 leading-relaxed" id="harmony-goals-narrative">
-            <!-- Dynamically populated narrative -->
-          </div>
-        </div>
-
-        <!-- Gentle Self-Awareness Journal Rhythm & Themes -->
-        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 shadow-sm flex flex-col gap-3">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-500 flex items-center justify-center">
-                <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
-              </div>
-              <div>
-                <h4 class="text-sm font-bold text-slate-900 dark:text-white">Your Journal Rhythm & Themes</h4>
-                <p class="text-xs text-slate-500 dark:text-slate-400">Mindful self-awareness without productivity pressure</p>
-              </div>
-            </div>
-            <span id="journal-stat-month" class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-500/30">
-              0 Entries This Month
-            </span>
-          </div>
-
-          <div class="grid grid-cols-3 gap-2.5 text-center">
-            <div class="p-3 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5">
-              <div id="journal-stat-total" class="text-lg font-bold text-slate-900 dark:text-white font-mono">0</div>
-              <div class="text-[10px] text-slate-500 uppercase font-mono">Total Entries</div>
-            </div>
-            <div class="p-3 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5">
-              <div id="journal-stat-days" class="text-lg font-bold text-slate-900 dark:text-white font-mono">0</div>
-              <div class="text-[10px] text-slate-500 uppercase font-mono">Writing Days</div>
-            </div>
-            <div class="p-3 rounded-xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5">
-              <div id="journal-stat-clarity" class="text-lg font-bold text-emerald-600 dark:text-emerald-400 font-mono">0%</div>
-              <div class="text-[10px] text-slate-500 uppercase font-mono">Clarity Index</div>
-            </div>
-          </div>
-
-          <div class="pt-3 border-t border-slate-100 dark:border-white/5">
-            <div class="text-xs font-bold text-slate-800 dark:text-slate-200 mb-2">Most Explored Life Themes:</div>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/5 flex items-center justify-between text-xs">
-                <span class="flex items-center gap-1.5"><i data-lucide="briefcase" class="w-3.5 h-3.5 text-blue-500"></i><span>Career</span></span>
-                <span id="journal-theme-career" class="font-mono text-slate-500 font-bold">0</span>
-              </div>
-              <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/5 flex items-center justify-between text-xs">
-                <span class="flex items-center gap-1.5"><i data-lucide="book-open" class="w-3.5 h-3.5 text-amber-500"></i><span>Learning</span></span>
-                <span id="journal-theme-learning" class="font-mono text-slate-500 font-bold">0</span>
-              </div>
-              <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/5 flex items-center justify-between text-xs">
-                <span class="flex items-center gap-1.5"><i data-lucide="heart" class="w-3.5 h-3.5 text-emerald-500"></i><span>Mindful</span></span>
-                <span id="journal-theme-mindful" class="font-mono text-slate-500 font-bold">0</span>
-              </div>
-              <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/5 flex items-center justify-between text-xs">
-                <span class="flex items-center gap-1.5"><i data-lucide="zap" class="w-3.5 h-3.5 text-rose-500"></i><span>Movement</span></span>
-                <span id="journal-theme-movement" class="font-mono text-slate-500 font-bold">0</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- Cognitive Reflections Vault (Exclusive to Daily Harmony) -->
+        <!-- Cognitive Reflections Vault (Consolidated in Sanctuary Pulse) -->
         <div class="mc-card p-4 sm:p-5 space-y-3">
           <div class="flex items-center justify-between border-b border-[var(--mc-border-subtle)] pb-2.5">
             <div class="flex items-center gap-2.5">
@@ -1293,10 +1146,11 @@
             <!-- Rendered via JS -->
           </div>
         </div>
+
       </div>
 
       <!-- =================================================================== -->
-      <!-- PAGE 3: MEMORY LANE & LONGITUDINAL REFLECTION LOOPS -->
+      <!-- PAGE 4: MEMORY LANE & LONGITUDINAL REFLECTION LOOPS -->
       <!-- =================================================================== -->
       <div id="journal-track-memory_lane" class="hidden space-y-4">
         <!-- Longitudinal Reflection Loop Banner (Warm Sunset Amber & Terracotta Palette) -->
@@ -4671,6 +4525,145 @@
         </button>
       </div>
 
+    </div>
+  </div>
+  <!-- ===================================================================== -->
+  <!-- MODAL: ADD / EDIT NOTE (WITH 1-TAP SYNC TO GOALS) -->
+  <!-- ===================================================================== -->
+  <div id="note-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
+    <div class="mc-card max-w-lg w-full my-auto shadow-2xl p-5 sm:p-6 space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-[var(--mc-border-subtle)]">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-500 flex items-center justify-center">
+            <i data-lucide="edit-3" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-[var(--mc-text-primary)]" id="note-modal-title">Create Smart Note</h3>
+            <p class="text-[11px] text-[var(--mc-text-secondary)]">Capture thoughts, meeting notes or to-dos with instant goal sync</p>
+          </div>
+        </div>
+        <button onclick="closeNoteModal()" class="text-[var(--mc-text-muted)] hover:text-[var(--mc-text-primary)] p-1 cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form onsubmit="submitNoteForm(event)" class="space-y-3 text-xs">
+        <input type="hidden" id="note-edit-id" value="">
+        
+        <div>
+          <label class="text-[var(--mc-text-secondary)] font-semibold block mb-1">Note Title *</label>
+          <input type="text" id="note-title-input" required placeholder="e.g. Architecture Decisions / Ideas" class="mc-input w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] placeholder-[var(--mc-text-muted)] border-[var(--mc-border-default)] text-xs p-2.5 rounded-xl">
+        </div>
+
+        <div>
+          <label class="text-[var(--mc-text-secondary)] font-semibold block mb-1">Note Content *</label>
+          <textarea id="note-content-input" required rows="4" placeholder="Write your notes, key takeaways, checklist..." class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] placeholder-[var(--mc-text-muted)] text-xs p-2.5 rounded-xl border border-[var(--mc-border-default)] focus:outline-none focus:border-[var(--mc-accent)] leading-relaxed"></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div>
+            <label class="text-[var(--mc-text-secondary)] font-semibold block mb-1">Category / Tag</label>
+            <select id="note-tag-select" class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] text-xs p-2.5 rounded-xl border border-[var(--mc-border-default)] focus:outline-none">
+              <option value="Idea">💡 Idea & Brainstorm</option>
+              <option value="Work" selected>💼 Work & Architecture</option>
+              <option value="Personal">🌿 Personal & Wellness</option>
+              <option value="Checklist">✅ Checklist / Tasks</option>
+            </select>
+          </div>
+
+          <!-- 🎯 1-TAP SYNC TO GOALS OPTION -->
+          <div class="flex items-center pt-5">
+            <label class="flex items-center gap-2 cursor-pointer text-xs font-semibold text-[var(--mc-text-primary)] p-2 rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] w-full">
+              <input type="checkbox" id="note-sync-to-goals" class="w-4 h-4 accent-[#5E856F] cursor-pointer">
+              <span class="flex items-center gap-1 text-emerald-500 dark:text-emerald-400 font-bold">
+                <i data-lucide="target" class="w-3.5 h-3.5"></i>
+                <span>Sync to Daily Goals</span>
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-[var(--mc-border-subtle)]">
+          <button type="button" onclick="closeNoteModal()" class="btn-secondary text-xs">Cancel</button>
+          <button type="submit" class="btn-primary text-xs font-semibold px-4">
+            <i data-lucide="check" class="w-3.5 h-3.5 text-white"></i>
+            <span>Save Note</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: ADD / EDIT SMART ALERT & PAYMENT REMINDER -->
+  <!-- ===================================================================== -->
+  <div id="alert-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
+    <div class="mc-card max-w-lg w-full my-auto shadow-2xl p-5 sm:p-6 space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-[var(--mc-border-subtle)]">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-500 flex items-center justify-center">
+            <i data-lucide="alarm-clock" class="w-4 h-4 text-rose-500"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-[var(--mc-text-primary)]" id="alert-modal-title">Create Smart Alert</h3>
+            <p class="text-[11px] text-[var(--mc-text-secondary)]">Payment reminder, medication check-in or critical time alert</p>
+          </div>
+        </div>
+        <button onclick="closeAlertModal()" class="text-[var(--mc-text-muted)] hover:text-[var(--mc-text-primary)] p-1 cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form onsubmit="submitAlertForm(event)" class="space-y-3 text-xs">
+        <input type="hidden" id="alert-edit-id" value="">
+        
+        <div>
+          <label class="text-[var(--mc-text-secondary)] font-semibold block mb-1">Alert Title *</label>
+          <input type="text" id="alert-title-input" required placeholder="e.g. AWS Cloud Hosting Payment / Credit Card Bill" class="mc-input w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] placeholder-[var(--mc-text-muted)] text-xs p-2.5 rounded-xl border border-[var(--mc-border-default)]">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div>
+            <label class="text-[var(--mc-text-secondary)] font-semibold block mb-1">Alert Type</label>
+            <select id="alert-type-select" class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] text-xs p-2.5 rounded-xl border border-[var(--mc-border-default)] focus:outline-none">
+              <option value="payment" selected>💳 Payment / Bill Reminder</option>
+              <option value="deadline">⏰ Critical Deadline</option>
+              <option value="health">💊 Health & Medication</option>
+              <option value="habit">🌿 Habit & Check-in</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-[var(--mc-text-secondary)] font-semibold block mb-1">Due Date *</label>
+            <input type="date" id="alert-date-input" required class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] text-xs p-2 rounded-xl border border-[var(--mc-border-default)] font-mono">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div>
+            <label class="text-[var(--mc-text-secondary)] font-semibold block mb-1">Time (optional)</label>
+            <input type="time" id="alert-time-input" class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] text-xs p-2 rounded-xl border border-[var(--mc-border-default)] font-mono">
+          </div>
+
+          <div>
+            <label class="text-[var(--mc-text-secondary)] font-semibold block mb-1">Frequency</label>
+            <select id="alert-frequency-select" class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] text-xs p-2.5 rounded-xl border border-[var(--mc-border-default)] focus:outline-none">
+              <option value="once" selected>One-time Alert</option>
+              <option value="monthly">Monthly Recurring</option>
+              <option value="weekly">Weekly Recurring</option>
+              <option value="daily">Daily Recurring</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-[var(--mc-border-subtle)]">
+          <button type="button" onclick="closeAlertModal()" class="btn-secondary text-xs">Cancel</button>
+          <button type="submit" class="btn-primary text-xs font-semibold px-4">
+            <i data-lucide="bell" class="w-3.5 h-3.5 text-white"></i>
+            <span>Save Alert</span>
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </body>
