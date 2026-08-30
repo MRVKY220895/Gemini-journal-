@@ -1,3 +1,10 @@
+function setChronoViewMode(mode) {
+  if (typeof setTimelineViewMode === 'function') {
+    setTimelineViewMode(mode);
+  }
+}
+window.setChronoViewMode = setChronoViewMode;
+
 
 // =============================================================================
 // INTERACTIVE "GUIDE ME THROUGH" ONBOARDING WALKTHROUGH CONTROLLER
@@ -4616,25 +4623,32 @@ function getChronologicalEvents(journals) {
 
   }
 
-  // 6. Add Synced Notes into Goals Timeline Stream
-  if (state.notesList && Array.isArray(state.notesList) && (state.diaryRangeMode === 'all' || isSelectedToday)) {
-    state.notesList.filter(n => n.syncToGoal).forEach(n => {
+  // 6. Add Synced Captures (Checklists, Tasks & Notes) into Living Timeline Stream
+  const captures = state.capturesList || state.notesList || [];
+  if (Array.isArray(captures) && (state.diaryRangeMode === 'all' || isSelectedToday)) {
+    captures.filter(c => c.syncToJournal || c.syncToGoal).forEach(c => {
+      const isChecklist = c.type === 'checklist';
+      const isTask = c.type === 'task';
+      const isDone = Boolean(c.completed);
+      const timeVal = c.dueTime || '11:00';
+      const checklistSummary = isChecklist && c.items ? c.items.map(i => `${i.completed ? '✓' : '○'} ${i.text}`).join(' • ') : '';
+
       events.push({
-        id: `note_goal_${n.id}`,
-        type: 'goal',
-        time: '11:00',
-        rawHour: 11,
+        id: `capture_event_${c.id}`,
+        type: 'task',
+        time: timeVal,
+        rawHour: parseInt(timeVal.substring(0, 2), 10) || 11,
         entryDate: selectedDate,
         dateHeader: selectedDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
-        title: `[Note] ${n.title}`,
-        content: n.content,
-        isCompleted: false,
-        category: 'work',
-        categoryLabel: n.tag || 'Smart Note',
-        mood: 'Goal from Note',
-        cbtNote: null,
-        location: 'Notes & Alerts System',
-        energy: 'Actionable Note',
+        title: `${isChecklist ? '✅ [Checklist] ' : isTask ? '⏰ [Task] ' : '📝 [Note] '} ${c.title}`,
+        content: isChecklist ? checklistSummary : (c.content || 'Synced capture item'),
+        isCompleted: isDone,
+        category: c.tag || 'Sanctuary',
+        categoryLabel: `${c.tag || 'Action'} • ${isChecklist ? 'Checklist' : isTask ? 'Task' : 'Note'}`,
+        mood: isDone ? 'Completed Capture' : 'Action In-Flight',
+        cbtNote: c.dueDate ? `Deadline: ${c.dueDate}` : null,
+        location: 'Notes & Tasks Sanctuary',
+        energy: isDone ? 'Captured Complete' : 'Active Goal',
         photoUrl: null
       });
     });
@@ -14184,163 +14198,225 @@ function openMoodPickerModal() {
 }
 
 
+
 // =============================================================================
-// SMART NOTES & ALERTS SYSTEM CONTROLLER (WITH GOALS SYNC & AUDIO CHIMES)
+// ADVANCED NOTES, INTERACTIVE CHECKLISTS & DEADLINE TASKS CONTROLLER
 // =============================================================================
 
-state.notesList = [];
-state.alertsList = [];
-state.notesFilter = 'all';
+state.capturesList = [];
+state.capturesFilter = 'all';
 
 function initNotesAndAlerts() {
   try {
-    const savedNotes = localStorage.getItem('mind_cave_notes_list');
-    if (savedNotes) {
-      state.notesList = JSON.parse(savedNotes);
+    const saved = localStorage.getItem('mind_cave_captures_list') || localStorage.getItem('mind_cave_notes_list');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      // Migrate old formats if necessary
+      state.capturesList = parsed.map(item => ({
+        id: item.id || `cap_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+        type: item.type || (item.items ? 'checklist' : item.dueDate ? 'task' : 'note'),
+        title: item.title || 'Untitled Capture',
+        content: item.content || '',
+        items: item.items || (item.content && item.content.includes('\n') ? item.content.split('\n').map(t => ({ id: `chk_${Math.random()}`, text: t.replace(/^[-*•\d.]+\s*/, ''), completed: false })) : []),
+        dueDate: item.dueDate || '',
+        dueTime: item.time || '',
+        priority: item.priority || 'medium',
+        tag: item.tag || 'Work',
+        completed: Boolean(item.completed),
+        completedAt: item.completedAt || null,
+        syncToJournal: item.syncToJournal !== undefined ? item.syncToJournal : Boolean(item.syncToGoal),
+        updatedAt: item.updatedAt || Date.now()
+      }));
     } else {
-      // Default initial notes
-      state.notesList = [
+      // Default demo rich captures
+      state.capturesList = [
         {
-          id: 'note_1',
-          title: 'Mind Cave System Architecture & Next Milestones',
-          content: '1. Fast-path local token verification\n2. Multi-track journaling with Living Timeline\n3. Zero-knowledge client encryption vault active',
+          id: 'cap_1',
+          type: 'checklist',
+          title: 'System Release & Milestone Verification',
+          items: [
+            { id: 'c1', text: 'Fast-path local token verification', completed: true },
+            { id: 'c2', text: 'Living Timeline multi-track integration', completed: true },
+            { id: 'c3', text: 'Interactive Checklist with strikethrough', completed: false },
+            { id: 'c4', text: 'Zero-knowledge client encryption audit', completed: false }
+          ],
           tag: 'Work',
-          syncToGoal: true,
+          priority: 'high',
+          syncToJournal: true,
+          completed: false,
           updatedAt: Date.now() - 3600000
         },
         {
-          id: 'note_2',
-          title: 'Weekly Mindfulness & Focus Anchors',
-          content: 'Practice 30-min morning deep focus window without notifications. Celebrate small wins daily.',
-          tag: 'Personal',
-          syncToGoal: false,
-          updatedAt: Date.now() - 7200000
-        }
-      ];
-      localStorage.setItem('mind_cave_notes_list', JSON.stringify(state.notesList));
-    }
-
-    const savedAlerts = localStorage.getItem('mind_cave_alerts_list');
-    if (savedAlerts) {
-      state.alertsList = JSON.parse(savedAlerts);
-    } else {
-      // Default initial alerts
-      state.alertsList = [
-        {
-          id: 'alert_1',
-          title: 'Cloud Server Infrastructure Bill',
-          type: 'payment',
+          id: 'cap_2',
+          type: 'task',
+          title: 'AWS Cloud Hosting & Database Renewal',
+          content: 'Verify auto-debit invoice and audit bandwidth limits for private cloud instances.',
           dueDate: new Date(Date.now() + 86400000 * 3).toISOString().split('T')[0],
-          time: '10:00',
-          frequency: 'monthly',
+          dueTime: '10:00',
+          priority: 'high',
+          tag: 'Finance',
+          syncToJournal: true,
           completed: false,
-          createdAt: Date.now()
+          updatedAt: Date.now() - 7200000
         },
         {
-          id: 'alert_2',
-          title: 'Evening Reflection & Gratitude Log',
-          type: 'habit',
-          dueDate: new Date().toISOString().split('T')[0],
-          time: '20:30',
-          frequency: 'daily',
+          id: 'cap_3',
+          type: 'note',
+          title: 'Weekly Stoic & Mindfulness Anchors',
+          content: 'Practice 30-min morning deep focus window without notifications. Celebrate small wins daily and maintain 92% cognitive equilibrium.',
+          tag: 'Personal',
+          syncToJournal: false,
           completed: false,
-          createdAt: Date.now()
+          updatedAt: Date.now() - 10800000
         }
       ];
-      localStorage.setItem('mind_cave_alerts_list', JSON.stringify(state.alertsList));
+      localStorage.setItem('mind_cave_captures_list', JSON.stringify(state.capturesList));
     }
   } catch (e) {
-    state.notesList = [];
-    state.alertsList = [];
+    state.capturesList = [];
   }
 
   renderNotesCards();
-  renderAlertsCards();
   startLiveSanctuaryClock();
 }
 
-// ─── LIVE SANCTUARY PULSE CLOCK ───
-function startLiveSanctuaryClock() {
-  function updateClock() {
-    const now = new Date();
-    const clockEl = document.getElementById('pulse-live-clock');
-    const windowEl = document.getElementById('pulse-circadian-window');
-    
-    if (clockEl) {
-      clockEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    }
-
-    if (windowEl) {
-      const hour = now.getHours();
-      if (hour >= 6 && hour < 11) {
-        windowEl.textContent = 'Morning Flow & High-Agency Clarity';
-      } else if (hour >= 11 && hour < 15) {
-        windowEl.textContent = 'Peak Analytical Sprint & Focus Window';
-      } else if (hour >= 15 && hour < 19) {
-        windowEl.textContent = 'Creative Synthesis & Strategic Execution';
-      } else {
-        windowEl.textContent = 'Neural Wind-down & Restorative Harmony';
-      }
-    }
-  }
-
-  updateClock();
-  setInterval(updateClock, 1000);
-}
-
-// ─── RENDER NOTES CARDS ───
+// ─── RENDER CAPTURES GRID (NOTES, CHECKLISTS, TASKS) ───
 function renderNotesCards() {
   const container = document.getElementById('notes-cards-grid');
-  const countBadge = document.getElementById('notes-count-badge');
   if (!container) return;
 
-  let list = state.notesList || [];
-  if (state.notesFilter === 'todos') {
-    list = list.filter(n => n.syncToGoal);
-  } else if (state.notesFilter === 'notes') {
-    list = list.filter(n => !n.syncToGoal);
+  let list = state.capturesList || [];
+  if (state.capturesFilter === 'checklist') {
+    list = list.filter(n => n.type === 'checklist');
+  } else if (state.capturesFilter === 'task') {
+    list = list.filter(n => n.type === 'task');
+  } else if (state.capturesFilter === 'note') {
+    list = list.filter(n => n.type === 'note');
+  } else if (state.capturesFilter === 'synced') {
+    list = list.filter(n => n.syncToJournal);
   }
-
-  if (countBadge) countBadge.textContent = `${list.length} Notes`;
 
   if (list.length === 0) {
     container.innerHTML = `
-      <div class="col-span-full p-6 text-center rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] space-y-2">
-        <p class="text-xs text-[var(--mc-text-muted)]">No notes matching filter. Click "+ New Note" to capture ideas.</p>
-        <button onclick="openNewNoteModal()" class="btn-primary !py-1 !px-3 text-xs">+ Create Note</button>
+      <div class="col-span-full p-8 text-center rounded-3xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] space-y-3">
+        <div class="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-500 mx-auto">
+          <i data-lucide="check-square" class="w-5 h-5"></i>
+        </div>
+        <h4 class="text-sm font-bold text-[var(--mc-text-primary)]">No Items Matching Filter</h4>
+        <p class="text-xs text-[var(--mc-text-muted)]">Create an interactive checklist, task with deadline, or smart note.</p>
+        <div class="flex items-center justify-center gap-2 pt-1">
+          <button onclick="openNewCaptureModal('checklist')" class="btn-primary !py-1 !px-3 text-xs">+ Checklist</button>
+          <button onclick="openNewCaptureModal('task')" class="btn-secondary !py-1 !px-3 text-xs">+ Task</button>
+        </div>
       </div>
     `;
+    refreshIcons();
     return;
   }
 
-  container.innerHTML = list.map(note => {
-    const formattedDate = new Date(note.updatedAt || Date.now()).toLocaleDateString([], { month: 'short', day: 'numeric' });
+  container.innerHTML = list.map(item => {
+    const isChecklist = item.type === 'checklist';
+    const isTask = item.type === 'task';
+    const isNote = item.type === 'note';
+
+    // Checklist stats
+    const totalItems = (item.items || []).length;
+    const completedItems = (item.items || []).filter(i => i.completed).length;
+    const isChecklistAllDone = totalItems > 0 && completedItems === totalItems;
+    const pct = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : (item.completed ? 100 : 0);
+
+    const isDone = isChecklist ? isChecklistAllDone : Boolean(item.completed);
+    const completedTimeStr = item.completedAt ? new Date(item.completedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+
     return `
-      <div class="mc-card p-4 rounded-2xl border border-[var(--mc-border-default)] flex flex-col justify-between space-y-3 hover:border-[var(--mc-accent)]/50 transition-all shadow-sm">
+      <div class="mc-card p-4 rounded-3xl border ${isDone ? 'border-emerald-500/30 bg-emerald-950/10 dark:bg-emerald-950/15' : 'border-[var(--mc-border-default)]'} flex flex-col justify-between space-y-3 hover:border-[var(--mc-accent)]/50 transition-all shadow-sm group">
         <div>
-          <div class="flex items-start justify-between gap-2">
-            <h4 class="text-xs sm:text-sm font-bold text-[var(--mc-text-primary)] leading-snug">${escapeHtml(note.title)}</h4>
-            <span class="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full ${note.tag === 'Work' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/30' : note.tag === 'Idea' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'} shrink-0">${escapeHtml(note.tag || 'Note')}</span>
+          <!-- Header: Type Badge, Priority & Actions -->
+          <div class="flex items-start justify-between gap-2 mb-2">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full ${isChecklist ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : isTask ? 'bg-cyan-500/15 text-cyan-400 border border-cyan-500/30' : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'} flex items-center gap-1">
+                <i data-lucide="${isChecklist ? 'check-square' : isTask ? 'clock' : 'file-text'}" class="w-3 h-3"></i>
+                <span>${isChecklist ? 'Checklist' : isTask ? 'Task / Deadline' : 'Note'}</span>
+              </span>
+              <span class="text-[9px] font-mono font-semibold px-2 py-0.5 rounded-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-secondary)] border border-[var(--mc-border-subtle)]">${escapeHtml(item.tag || 'Work')}</span>
+              ${item.priority === 'high' ? '<span class="text-[9px] font-mono font-bold text-rose-400 bg-rose-500/10 px-1.5 py-0.2 rounded border border-rose-500/30">🔴 High</span>' : ''}
+            </div>
+
+            <div class="flex items-center gap-1 shrink-0">
+              <button onclick="openNewCaptureModal('${item.type}', '${item.id}')" class="text-xs text-[var(--mc-text-muted)] hover:text-[var(--mc-text-primary)] p-1 transition-colors" title="Edit Item">
+                <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+              </button>
+              <button onclick="deleteCaptureItem('${item.id}')" class="text-xs text-[var(--mc-text-muted)] hover:text-rose-400 p-1 transition-colors" title="Delete Item">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
           </div>
-          <p class="text-xs text-[var(--mc-text-secondary)] leading-relaxed mt-2 whitespace-pre-line line-clamp-4">${escapeHtml(note.content)}</p>
+
+          <!-- Title with Strike-out when Completed -->
+          <div class="flex items-start gap-2.5">
+            ${isTask ? `
+              <button type="button" onclick="toggleTaskCompleted('${item.id}')" class="w-5 h-5 rounded-lg border flex items-center justify-center mt-0.5 shrink-0 transition-colors ${item.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-[var(--mc-border-default)] hover:border-emerald-400'}" title="Toggle Complete">
+                <i data-lucide="check" class="w-3.5 h-3.5 ${item.completed ? 'block' : 'hidden'} text-white"></i>
+              </button>
+            ` : ''}
+            <div class="min-w-0 flex-1">
+              <h4 class="text-xs sm:text-sm font-bold text-[var(--mc-text-primary)] leading-snug ${isDone ? 'line-through text-[var(--mc-text-muted)] opacity-80' : ''}">${escapeHtml(item.title)}</h4>
+            </div>
+          </div>
+
+          <!-- CHECKLIST SUB-ITEMS (INTERACTIVE STRIKE-OUT) -->
+          ${isChecklist && item.items && item.items.length > 0 ? `
+            <div class="space-y-1.5 mt-2.5 pt-2 border-t border-[var(--mc-border-subtle)]">
+              ${item.items.map((subItem, idx) => `
+                <div class="flex items-center gap-2 text-xs text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] p-1 rounded-lg hover:bg-[var(--mc-bg-tertiary)] transition-all cursor-pointer" onclick="toggleChecklistSubItem('${item.id}', ${idx})">
+                  <div class="w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${subItem.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-[var(--mc-border-default)] bg-[var(--mc-bg-secondary)]'}">
+                    <i data-lucide="check" class="w-3 h-3 ${subItem.completed ? 'block' : 'hidden'} text-white"></i>
+                  </div>
+                  <span class="truncate ${subItem.completed ? 'line-through text-[var(--mc-text-muted)] opacity-70' : ''}">${escapeHtml(subItem.text)}</span>
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+
+          <!-- TASK DEADLINE & CONTENT -->
+          ${isTask ? `
+            <div class="mt-2 text-xs space-y-1.5">
+              ${item.content ? `<p class="text-[11px] text-[var(--mc-text-secondary)] line-clamp-2">${escapeHtml(item.content)}</p>` : ''}
+              <div class="flex items-center gap-2 text-[10px] font-mono text-[var(--mc-text-muted)] mt-1 flex-wrap">
+                <span class="flex items-center gap-1 font-semibold ${isDone ? 'text-emerald-400' : 'text-amber-400'}">
+                  <i data-lucide="calendar" class="w-3 h-3"></i>
+                  <span>${item.dueDate ? 'Due: ' + item.dueDate : 'No Deadline'}${item.dueTime ? ' ' + item.dueTime : ''}</span>
+                </span>
+                ${isDone ? `<span class="text-emerald-400 font-bold">✓ Captured ${completedTimeStr}</span>` : ''}
+              </div>
+            </div>
+          ` : ''}
+
+          <!-- NOTE CONTENT -->
+          ${isNote && item.content ? `
+            <p class="text-xs text-[var(--mc-text-secondary)] leading-relaxed mt-2 whitespace-pre-line line-clamp-4">${escapeHtml(item.content)}</p>
+          ` : ''}
         </div>
 
+        <!-- Footer Bar: Progress / Sync Status -->
         <div class="pt-2 border-t border-[var(--mc-border-subtle)] flex items-center justify-between gap-2">
-          <div class="flex items-center gap-1.5">
-            <button onclick="toggleNoteSyncToGoal('${note.id}')" class="text-[10px] font-mono px-2 py-0.5 rounded-lg border transition-all flex items-center gap-1 ${note.syncToGoal ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/40 font-bold' : 'bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-muted)] border-[var(--mc-border-default)]'}" title="Toggle automatic synchronization with Daily Goals deck">
-              <i data-lucide="${note.syncToGoal ? 'check-circle' : 'circle'}" class="w-3 h-3 text-emerald-400"></i>
-              <span>${note.syncToGoal ? '🎯 Synced to Goals' : 'Sync to Goals'}</span>
+          <!-- Left: Sync with Journal & Completion status -->
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <button onclick="toggleCaptureJournalSync('${item.id}')" class="text-[10px] font-mono px-2 py-0.5 rounded-lg border transition-all flex items-center gap-1 ${item.syncToJournal ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/40 font-bold' : 'bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-muted)] border-[var(--mc-border-default)]'}" title="Toggle automatic synchronization with Living Timeline">
+              <i data-lucide="${item.syncToJournal ? 'check-circle' : 'circle'}" class="w-3 h-3 text-emerald-400"></i>
+              <span>${item.syncToJournal ? '🔗 Synced to Timeline' : 'Sync to Journal'}</span>
             </button>
-            <span class="text-[9px] text-[var(--mc-text-muted)] font-mono">${formattedDate}</span>
           </div>
 
-          <div class="flex items-center gap-1">
-            <button onclick="openNewNoteModal('${note.id}')" class="text-xs text-[var(--mc-text-muted)] hover:text-[var(--mc-text-primary)] p-1 transition-colors" title="Edit Note">
-              <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
-            </button>
-            <button onclick="deleteNote('${note.id}')" class="text-xs text-[var(--mc-text-muted)] hover:text-rose-400 p-1 transition-colors" title="Delete Note">
-              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-            </button>
+          <!-- Right: Progress Indicator -->
+          <div class="text-[10px] font-mono font-bold">
+            ${isChecklist ? `
+              <span class="${isChecklistAllDone ? 'text-emerald-400' : 'text-[#9BB7A5]'}">${completedItems}/${totalItems} Done (${pct}%)</span>
+            ` : isDone ? `
+              <span class="text-emerald-400">✅ Completed</span>
+            ` : `
+              <span class="text-[var(--mc-text-muted)]">In Progress</span>
+            `}
           </div>
         </div>
       </div>
@@ -14350,262 +14426,250 @@ function renderNotesCards() {
   refreshIcons();
 }
 
-// ─── RENDER ALERTS CARDS ───
-function renderAlertsCards() {
-  const container = document.getElementById('alerts-cards-list');
-  const countBadge = document.getElementById('alerts-count-badge');
-  if (!container) return;
+// ─── CHECKLIST / TASK INTERACTIVE TOGGLES ───
+function toggleChecklistSubItem(captureId, subIndex) {
+  const item = state.capturesList.find(c => c.id === captureId);
+  if (!item || !item.items || !item.items[subIndex]) return;
 
-  const list = state.alertsList || [];
-  if (countBadge) countBadge.textContent = `${list.length} Alerts`;
-
-  if (list.length === 0) {
-    container.innerHTML = `
-      <div class="p-6 text-center rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] space-y-2">
-        <p class="text-xs text-[var(--mc-text-muted)]">No active payment reminders or alerts. Click "+ Add Alert" to schedule one.</p>
-        <button onclick="openNewAlertModal()" class="btn-secondary !py-1 !px-3 text-xs text-amber-400">+ Add Alert</button>
-      </div>
-    `;
-    return;
+  item.items[subIndex].completed = !item.items[subIndex].completed;
+  
+  // Check if all are done
+  const allDone = item.items.every(i => i.completed);
+  if (allDone && !item.completed) {
+    item.completed = true;
+    item.completedAt = Date.now();
+    showToast('🎉 Checklist completed!');
+  } else if (!allDone && item.completed) {
+    item.completed = false;
+    item.completedAt = null;
   }
 
-  container.innerHTML = list.map(alert => {
-    const isPayment = alert.type === 'payment';
-    const isDeadline = alert.type === 'deadline';
-    const isHealth = alert.type === 'health';
-    
-    return `
-      <div class="p-3.5 rounded-2xl bg-[var(--mc-bg-tertiary)] border ${alert.completed ? 'border-[var(--mc-border-subtle)] opacity-60' : isPayment ? 'border-amber-500/30' : 'border-[var(--mc-border-default)]'} flex items-start justify-between gap-3 transition-all hover:border-[var(--mc-accent)]/50 shadow-sm">
-        <div class="flex items-start gap-2.5 min-w-0">
-          <button onclick="toggleAlertComplete('${alert.id}')" class="w-5 h-5 rounded-lg border flex items-center justify-center mt-0.5 shrink-0 transition-colors ${alert.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-[var(--mc-border-default)] hover:border-emerald-400'}">
-            <i data-lucide="check" class="w-3.5 h-3.5 ${alert.completed ? 'block' : 'hidden'} text-white"></i>
-          </button>
-          <div class="min-w-0">
-            <div class="flex items-center gap-1.5 flex-wrap">
-              <h4 class="text-xs font-bold text-[var(--mc-text-primary)] ${alert.completed ? 'line-through' : ''}">${escapeHtml(alert.title)}</h4>
-              <span class="text-[9px] font-mono px-1.5 py-0.2 rounded-full ${isPayment ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : isDeadline ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30' : 'bg-cyan-500/15 text-cyan-400 border border-cyan-500/30'} uppercase font-bold">${isPayment ? 'Payment' : isDeadline ? 'Deadline' : isHealth ? 'Health' : 'Habit'}</span>
-            </div>
-            <div class="flex items-center gap-2 text-[10px] text-[var(--mc-text-muted)] font-mono mt-1 flex-wrap">
-              <span>📅 ${alert.dueDate || 'Today'}</span>
-              ${alert.time ? `<span>⏰ ${alert.time}</span>` : ''}
-              <span class="capitalize">🔁 ${alert.frequency || 'Once'}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="flex items-center gap-1 shrink-0">
-          <button onclick="openNewAlertModal('${alert.id}')" class="text-xs text-[var(--mc-text-muted)] hover:text-[var(--mc-text-primary)] p-1 transition-colors" title="Edit Alert">
-            <i data-lucide="edit-2" class="w-3 h-3"></i>
-          </button>
-          <button onclick="deleteAlert('${alert.id}')" class="text-xs text-[var(--mc-text-muted)] hover:text-rose-400 p-1 transition-colors" title="Delete Alert">
-            <i data-lucide="trash-2" class="w-3 h-3"></i>
-          </button>
-        </div>
-      </div>
-    `;
-  }).join('');
-
-  refreshIcons();
+  saveCaptures();
+  renderNotesCards();
+  if (item.syncToJournal) renderChronoTimeline(false);
 }
 
-// ─── NOTE CRUD HANDLERS ───
-function openNewNoteModal(noteId = null) {
-  const modal = document.getElementById('note-modal');
-  const titleEl = document.getElementById('note-modal-title');
-  const editIdInput = document.getElementById('note-edit-id');
-  const titleInput = document.getElementById('note-title-input');
-  const contentInput = document.getElementById('note-content-input');
-  const tagSelect = document.getElementById('note-tag-select');
-  const syncCheckbox = document.getElementById('note-sync-to-goals');
+function toggleTaskCompleted(captureId) {
+  const item = state.capturesList.find(c => c.id === captureId);
+  if (!item) return;
 
-  if (noteId) {
-    const note = state.notesList.find(n => n.id === noteId);
-    if (note) {
-      if (titleEl) titleEl.textContent = 'Edit Note';
-      if (editIdInput) editIdInput.value = note.id;
-      if (titleInput) titleInput.value = note.title;
-      if (contentInput) contentInput.value = note.content;
-      if (tagSelect) tagSelect.value = note.tag || 'Work';
-      if (syncCheckbox) syncCheckbox.checked = Boolean(note.syncToGoal);
+  item.completed = !item.completed;
+  item.completedAt = item.completed ? Date.now() : null;
+  saveCaptures();
+  renderNotesCards();
+  if (item.syncToJournal) renderChronoTimeline(false);
+  showToast(item.completed ? '✅ Task marked as completed & captured!' : 'Task re-opened.');
+}
+
+function toggleCaptureJournalSync(captureId) {
+  const item = state.capturesList.find(c => c.id === captureId);
+  if (!item) return;
+
+  item.syncToJournal = !item.syncToJournal;
+  saveCaptures();
+  renderNotesCards();
+  renderChronoTimeline(false);
+  showToast(item.syncToJournal ? '🔗 Synced with Living Timeline!' : 'Unsynced from Journal.');
+}
+
+function deleteCaptureItem(captureId) {
+  if (!confirm('Delete this item?')) return;
+  state.capturesList = state.capturesList.filter(c => c.id !== captureId);
+  saveCaptures();
+  renderNotesCards();
+  renderChronoTimeline(false);
+  showToast('Item deleted.');
+}
+
+function saveCaptures() {
+  state.notesList = state.capturesList;
+  localStorage.setItem('mind_cave_captures_list', JSON.stringify(state.capturesList));
+  localStorage.setItem('mind_cave_notes_list', JSON.stringify(state.capturesList));
+}
+
+// ─── UNIFIED CAPTURE MODAL LOGIC ───
+let currentModalType = 'checklist';
+
+function openNewCaptureModal(type = 'checklist', editId = null) {
+  currentModalType = type;
+  const modal = document.getElementById('capture-modal');
+  const titleEl = document.getElementById('capture-modal-title');
+  const editIdInput = document.getElementById('capture-edit-id');
+  const titleInput = document.getElementById('capture-title-input');
+  const contentInput = document.getElementById('capture-content-input');
+  const dateInput = document.getElementById('capture-deadline-date');
+  const timeInput = document.getElementById('capture-deadline-time');
+  const prioritySelect = document.getElementById('capture-priority-select');
+  const tagSelect = document.getElementById('capture-tag-select');
+  const syncCheck = document.getElementById('capture-sync-journal');
+  const itemsContainer = document.getElementById('checklist-items-container');
+
+  if (itemsContainer) itemsContainer.innerHTML = '';
+
+  if (editId) {
+    const item = state.capturesList.find(c => c.id === editId);
+    if (item) {
+      currentModalType = item.type || 'checklist';
+      if (titleEl) titleEl.textContent = `Edit ${currentModalType === 'checklist' ? 'Checklist' : currentModalType === 'task' ? 'Task' : 'Note'}`;
+      if (editIdInput) editIdInput.value = item.id;
+      if (titleInput) titleInput.value = item.title;
+      if (contentInput) contentInput.value = item.content || '';
+      if (dateInput) dateInput.value = item.dueDate || '';
+      if (timeInput) timeInput.value = item.dueTime || '';
+      if (prioritySelect) prioritySelect.value = item.priority || 'medium';
+      if (tagSelect) tagSelect.value = item.tag || 'Work';
+      if (syncCheck) syncCheck.checked = Boolean(item.syncToJournal);
+
+      if (item.type === 'checklist' && item.items) {
+        item.items.forEach(sub => addChecklistItemInput(sub.text));
+      }
     }
   } else {
-    if (titleEl) titleEl.textContent = 'Create Smart Note';
+    if (titleEl) titleEl.textContent = `Create ${type === 'checklist' ? 'Checklist' : type === 'task' ? 'Task & Deadline' : 'Smart Note'}`;
     if (editIdInput) editIdInput.value = '';
     if (titleInput) titleInput.value = '';
     if (contentInput) contentInput.value = '';
+    if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
+    if (timeInput) timeInput.value = '18:00';
+    if (prioritySelect) prioritySelect.value = 'medium';
     if (tagSelect) tagSelect.value = 'Work';
-    if (syncCheckbox) syncCheckbox.checked = false;
+    if (syncCheck) syncCheck.checked = true;
+
+    if (type === 'checklist') {
+      addChecklistItemInput('');
+      addChecklistItemInput('');
+    }
   }
 
+  setCaptureTypeInModal(currentModalType);
   if (modal) modal.classList.remove('hidden');
   refreshIcons();
 }
 
-function closeNoteModal() {
-  const modal = document.getElementById('note-modal');
+function setCaptureTypeInModal(type) {
+  currentModalType = type;
+  document.getElementById('capture-selected-type').value = type;
+
+  const tabChecklist = document.getElementById('modal-tab-checklist');
+  const tabTask = document.getElementById('modal-tab-task');
+  const tabNote = document.getElementById('modal-tab-note');
+  const sectionChecklist = document.getElementById('capture-checklist-section');
+  const sectionTask = document.getElementById('capture-task-section');
+  const sectionNote = document.getElementById('capture-note-section');
+
+  [tabChecklist, tabTask, tabNote].forEach(t => {
+    if (t) t.className = 'flex-1 py-1.5 rounded-lg transition-all text-center text-[var(--mc-text-muted)] cursor-pointer';
+  });
+
+  if (type === 'checklist') {
+    if (tabChecklist) tabChecklist.className = 'flex-1 py-1.5 rounded-lg bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] font-bold text-center cursor-pointer';
+    if (sectionChecklist) sectionChecklist.classList.remove('hidden');
+    if (sectionTask) sectionTask.classList.add('hidden');
+    if (sectionNote) sectionNote.classList.remove('hidden');
+  } else if (type === 'task') {
+    if (tabTask) tabTask.className = 'flex-1 py-1.5 rounded-lg bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] font-bold text-center cursor-pointer';
+    if (sectionChecklist) sectionChecklist.classList.add('hidden');
+    if (sectionTask) sectionTask.classList.remove('hidden');
+    if (sectionNote) sectionNote.classList.remove('hidden');
+  } else {
+    if (tabNote) tabNote.className = 'flex-1 py-1.5 rounded-lg bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] font-bold text-center cursor-pointer';
+    if (sectionChecklist) sectionChecklist.classList.add('hidden');
+    if (sectionTask) sectionTask.classList.add('hidden');
+    if (sectionNote) sectionNote.classList.remove('hidden');
+  }
+}
+
+function addChecklistItemInput(val = '') {
+  const container = document.getElementById('checklist-items-container');
+  if (!container) return;
+
+  const div = document.createElement('div');
+  div.className = 'flex items-center gap-2';
+  div.innerHTML = `
+    <input type="text" value="${escapeHtml(val)}" placeholder="Checklist step / item..." class="checklist-sub-input flex-1 bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] placeholder-[var(--mc-text-muted)] text-xs p-2 rounded-xl border border-[var(--mc-border-default)]">
+    <button type="button" onclick="this.parentElement.remove()" class="text-[var(--mc-text-muted)] hover:text-rose-400 p-1">
+      <i data-lucide="x" class="w-3.5 h-3.5"></i>
+    </button>
+  `;
+  container.appendChild(div);
+  refreshIcons();
+}
+
+function closeCaptureModal() {
+  const modal = document.getElementById('capture-modal');
   if (modal) modal.classList.add('hidden');
 }
 
-function submitNoteForm(event) {
+function submitCaptureForm(event) {
   event.preventDefault();
-  const editId = document.getElementById('note-edit-id')?.value;
-  const title = document.getElementById('note-title-input')?.value?.trim();
-  const content = document.getElementById('note-content-input')?.value?.trim();
-  const tag = document.getElementById('note-tag-select')?.value || 'Work';
-  const syncToGoal = document.getElementById('note-sync-to-goals')?.checked ?? false;
+  const editId = document.getElementById('capture-edit-id')?.value;
+  const type = currentModalType;
+  const title = document.getElementById('capture-title-input')?.value?.trim();
+  const content = document.getElementById('capture-content-input')?.value?.trim() || '';
+  const dueDate = document.getElementById('capture-deadline-date')?.value || '';
+  const dueTime = document.getElementById('capture-deadline-time')?.value || '';
+  const priority = document.getElementById('capture-priority-select')?.value || 'medium';
+  const tag = document.getElementById('capture-tag-select')?.value || 'Work';
+  const syncToJournal = document.getElementById('capture-sync-journal')?.checked ?? true;
 
-  if (!title || !content) return;
+  if (!title) return;
+
+  // Gather checklist items
+  let items = [];
+  if (type === 'checklist') {
+    const inputs = document.querySelectorAll('.checklist-sub-input');
+    inputs.forEach((inp, i) => {
+      const txt = inp.value.trim();
+      if (txt) {
+        items.push({ id: `chk_${Date.now()}_${i}`, text: txt, completed: false });
+      }
+    });
+  }
 
   if (editId) {
-    const idx = state.notesList.findIndex(n => n.id === editId);
+    const idx = state.capturesList.findIndex(c => c.id === editId);
     if (idx !== -1) {
-      state.notesList[idx] = {
-        ...state.notesList[idx],
+      state.capturesList[idx] = {
+        ...state.capturesList[idx],
+        type,
         title,
         content,
+        items: type === 'checklist' && items.length > 0 ? items : state.capturesList[idx].items,
+        dueDate,
+        dueTime,
+        priority,
         tag,
-        syncToGoal,
+        syncToJournal,
         updatedAt: Date.now()
       };
     }
   } else {
-    state.notesList.unshift({
-      id: `note_${Date.now()}`,
+    state.capturesList.unshift({
+      id: `cap_${Date.now()}`,
+      type,
       title,
       content,
+      items,
+      dueDate,
+      dueTime,
+      priority,
       tag,
-      syncToGoal,
+      completed: false,
+      completedAt: null,
+      syncToJournal,
       updatedAt: Date.now()
     });
   }
 
-  localStorage.setItem('mind_cave_notes_list', JSON.stringify(state.notesList));
-  closeNoteModal();
+  saveCaptures();
+  closeCaptureModal();
   renderNotesCards();
-  showToast(editId ? 'Note updated successfully!' : 'Note saved! ' + (syncToGoal ? 'Synced to Daily Goals 🎯' : ''));
-}
-
-function deleteNote(noteId) {
-  if (!confirm('Delete this note?')) return;
-  state.notesList = state.notesList.filter(n => n.id !== noteId);
-  localStorage.setItem('mind_cave_notes_list', JSON.stringify(state.notesList));
-  renderNotesCards();
-  showToast('Note removed.');
-}
-
-function toggleNoteSyncToGoal(noteId) {
-  const note = state.notesList.find(n => n.id === noteId);
-  if (note) {
-    note.syncToGoal = !note.syncToGoal;
-    localStorage.setItem('mind_cave_notes_list', JSON.stringify(state.notesList));
-    renderNotesCards();
-    showToast(note.syncToGoal ? '🎯 Note synced to Daily Goals deck!' : 'Note unsynced from Goals.');
-  }
-}
-
-// ─── ALERT CRUD HANDLERS ───
-function openNewAlertModal(alertId = null) {
-  const modal = document.getElementById('alert-modal');
-  const titleEl = document.getElementById('alert-modal-title');
-  const editIdInput = document.getElementById('alert-edit-id');
-  const titleInput = document.getElementById('alert-title-input');
-  const typeSelect = document.getElementById('alert-type-select');
-  const dateInput = document.getElementById('alert-date-input');
-  const timeInput = document.getElementById('alert-time-input');
-  const freqSelect = document.getElementById('alert-frequency-select');
-
-  if (alertId) {
-    const alertItem = state.alertsList.find(a => a.id === alertId);
-    if (alertItem) {
-      if (titleEl) titleEl.textContent = 'Edit Smart Alert';
-      if (editIdInput) editIdInput.value = alertItem.id;
-      if (titleInput) titleInput.value = alertItem.title;
-      if (typeSelect) typeSelect.value = alertItem.type || 'payment';
-      if (dateInput) dateInput.value = alertItem.dueDate || '';
-      if (timeInput) timeInput.value = alertItem.time || '';
-      if (freqSelect) freqSelect.value = alertItem.frequency || 'once';
-    }
-  } else {
-    if (titleEl) titleEl.textContent = 'Create Smart Alert';
-    if (editIdInput) editIdInput.value = '';
-    if (titleInput) titleInput.value = '';
-    if (typeSelect) typeSelect.value = 'payment';
-    if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
-    if (timeInput) timeInput.value = '10:00';
-    if (freqSelect) freqSelect.value = 'once';
-  }
-
-  if (modal) modal.classList.remove('hidden');
-  refreshIcons();
-}
-
-function closeAlertModal() {
-  const modal = document.getElementById('alert-modal');
-  if (modal) modal.classList.add('hidden');
-}
-
-function submitAlertForm(event) {
-  event.preventDefault();
-  const editId = document.getElementById('alert-edit-id')?.value;
-  const title = document.getElementById('alert-title-input')?.value?.trim();
-  const type = document.getElementById('alert-type-select')?.value || 'payment';
-  const dueDate = document.getElementById('alert-date-input')?.value;
-  const time = document.getElementById('alert-time-input')?.value || '';
-  const frequency = document.getElementById('alert-frequency-select')?.value || 'once';
-
-  if (!title || !dueDate) return;
-
-  if (editId) {
-    const idx = state.alertsList.findIndex(a => a.id === editId);
-    if (idx !== -1) {
-      state.alertsList[idx] = {
-        ...state.alertsList[idx],
-        title,
-        type,
-        dueDate,
-        time,
-        frequency
-      };
-    }
-  } else {
-    state.alertsList.unshift({
-      id: `alert_${Date.now()}`,
-      title,
-      type,
-      dueDate,
-      time,
-      frequency,
-      completed: false,
-      createdAt: Date.now()
-    });
-  }
-
-  localStorage.setItem('mind_cave_alerts_list', JSON.stringify(state.alertsList));
-  closeAlertModal();
-  renderAlertsCards();
-  showToast(editId ? 'Alert updated!' : '⏰ Alert & Payment Reminder scheduled!');
-}
-
-function deleteAlert(alertId) {
-  if (!confirm('Delete this alert?')) return;
-  state.alertsList = state.alertsList.filter(a => a.id !== alertId);
-  localStorage.setItem('mind_cave_alerts_list', JSON.stringify(state.alertsList));
-  renderAlertsCards();
-  showToast('Alert removed.');
-}
-
-function toggleAlertComplete(alertId) {
-  const alertItem = state.alertsList.find(a => a.id === alertId);
-  if (alertItem) {
-    alertItem.completed = !alertItem.completed;
-    localStorage.setItem('mind_cave_alerts_list', JSON.stringify(state.alertsList));
-    renderAlertsCards();
-    showToast(alertItem.completed ? '✅ Alert marked done!' : 'Alert re-activated.');
-  }
+  if (syncToJournal) renderChronoTimeline(false);
+  showToast(`${type === 'checklist' ? 'Checklist' : type === 'task' ? 'Task & Deadline' : 'Note'} saved! ${syncToJournal ? '🔗 Synced with Journal' : ''}`);
 }
 
 function setNotesFilter(filter, btn) {
-  state.notesFilter = filter;
+  state.capturesFilter = filter;
   document.querySelectorAll('.notes-filter-btn').forEach(b => {
     b.className = 'notes-filter-btn text-xs px-3 py-1.5 rounded-xl bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-secondary)] border border-[var(--mc-border-default)] font-semibold cursor-pointer';
   });
@@ -14613,32 +14677,32 @@ function setNotesFilter(filter, btn) {
     btn.className = 'notes-filter-btn active text-xs px-3 py-1.5 rounded-xl bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] font-semibold cursor-pointer';
   }
   renderNotesCards();
-  renderAlertsCards();
 }
 
 function filterNotesAndAlerts(query) {
   const q = (query || '').toLowerCase().trim();
   if (!q) {
     renderNotesCards();
-    renderAlertsCards();
     return;
   }
   
   const container = document.getElementById('notes-cards-grid');
   if (container) {
-    const filteredNotes = (state.notesList || []).filter(n => 
+    const filtered = (state.capturesList || []).filter(n => 
       (n.title && n.title.toLowerCase().includes(q)) || 
       (n.content && n.content.toLowerCase().includes(q)) ||
       (n.tag && n.tag.toLowerCase().includes(q))
     );
-    container.innerHTML = filteredNotes.map(note => `
+    container.innerHTML = filtered.map(item => `
       <div class="mc-card p-4 rounded-2xl border border-[var(--mc-accent-25)] space-y-2">
-        <h4 class="text-xs font-bold text-[var(--mc-text-primary)]">${escapeHtml(note.title)}</h4>
-        <p class="text-xs text-[var(--mc-text-secondary)] line-clamp-3">${escapeHtml(note.content)}</p>
+        <h4 class="text-xs font-bold text-[var(--mc-text-primary)]">${escapeHtml(item.title)}</h4>
+        <p class="text-xs text-[var(--mc-text-secondary)] line-clamp-3">${escapeHtml(item.content || '')}</p>
       </div>
     `).join('');
+    refreshIcons();
   }
 }
+
 
 
 // ─── LIVING TIMELINE MEDIA FILTER (ALL | PHOTOS | TEXT ONLY) ───

@@ -1120,73 +1120,61 @@
             <!-- =================================================================== -->
       <!-- PAGE 4: NOTES & SMART ALERTS SYSTEM (INTEGRATED JOURNAL TRACK) -->
       <!-- =================================================================== -->
+            <!-- =================================================================== -->
+      <!-- PAGE 4: NOTES, CHECKLISTS & SMART TASKS SANCTUARY -->
+      <!-- =================================================================== -->
       <div id="journal-track-notes" class="hidden max-w-6xl mx-auto w-full space-y-4">
         
-        <!-- Top Notes & Alerts Command Header -->
+        <!-- Command Header with 3 Capture Triggers -->
         <div class="mc-card p-4 sm:p-5 rounded-3xl border border-[var(--mc-border-default)] shadow-md bg-gradient-to-br from-[var(--mc-bg-secondary)] via-[var(--mc-bg-tertiary)] to-[var(--mc-bg-secondary)] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-500 shrink-0">
-              <i data-lucide="bell-ring" class="w-5 h-5 text-amber-500"></i>
+              <i data-lucide="check-square" class="w-5 h-5 text-amber-500"></i>
             </div>
             <div>
               <div class="flex items-center gap-2 flex-wrap">
-                <h3 class="text-base sm:text-lg font-bold text-[var(--mc-text-primary)]">Notes & Smart Alerts System</h3>
-                <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/30 font-semibold">2-Way Goals Sync</span>
+                <h3 class="text-base sm:text-lg font-bold text-[var(--mc-text-primary)]">Notes, Checklists & Smart Tasks</h3>
+                <span class="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-semibold">2-Way Journal Sync</span>
               </div>
-              <p class="text-xs text-[var(--mc-text-secondary)] mt-0.5">Quick notes, meeting summaries, payment reminders & automatic Goals projection</p>
+              <p class="text-xs text-[var(--mc-text-secondary)] mt-0.5">Interactive multi-item checklists, deadline tasks, quick notes & automatic timeline integration</p>
             </div>
           </div>
 
-          <div class="flex items-center gap-2 flex-wrap">
-            <button onclick="openNewNoteModal()" class="btn-primary text-xs !py-1.5 !px-3 flex items-center gap-1.5 cursor-pointer shadow-sm font-semibold">
-              <i data-lucide="edit" class="w-3.5 h-3.5 text-white"></i>
-              <span>+ New Note</span>
+          <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+            <button onclick="openNewCaptureModal('checklist')" class="btn-primary text-xs !py-1.5 !px-3 flex items-center gap-1.5 cursor-pointer shadow-sm font-semibold">
+              <i data-lucide="check-square" class="w-3.5 h-3.5 text-white"></i>
+              <span>+ Checklist</span>
             </button>
-            <button onclick="openNewAlertModal()" class="btn-secondary text-xs !py-1.5 !px-3 flex items-center gap-1.5 cursor-pointer text-amber-400 font-semibold">
-              <i data-lucide="alarm-clock" class="w-3.5 h-3.5 text-amber-500"></i>
-              <span>+ Add Alert</span>
+            <button onclick="openNewCaptureModal('task')" class="btn-secondary text-xs !py-1.5 !px-3 flex items-center gap-1.5 cursor-pointer text-cyan-400 font-semibold">
+              <i data-lucide="clock" class="w-3.5 h-3.5 text-cyan-400"></i>
+              <span>+ Task / Deadline</span>
+            </button>
+            <button onclick="openNewCaptureModal('note')" class="btn-secondary text-xs !py-1.5 !px-3 flex items-center gap-1.5 cursor-pointer text-amber-400 font-semibold">
+              <i data-lucide="file-text" class="w-3.5 h-3.5 text-amber-500"></i>
+              <span>+ Note</span>
             </button>
           </div>
         </div>
 
-        <!-- Filter and Search Bar -->
+        <!-- Filter and Search Ribbon -->
         <div class="flex items-center justify-between gap-3 flex-wrap">
-          <div class="relative flex-1 min-w-[200px]">
+          <div class="relative flex-1 min-w-[220px]">
             <i data-lucide="search" class="w-3.5 h-3.5 text-[var(--mc-text-muted)] absolute left-3 top-1/2 -translate-y-1/2"></i>
-            <input type="text" id="notes-search-input" oninput="filterNotesAndAlerts(this.value)" placeholder="Search notes, payment reminders & tasks..." class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] placeholder-[var(--mc-text-muted)] text-xs pl-8 pr-3 py-1.5 rounded-xl border border-[var(--mc-border-default)] focus:outline-none focus:border-[var(--mc-accent)]">
+            <input type="text" id="notes-search-input" oninput="filterNotesAndAlerts(this.value)" placeholder="Search checklists, tasks, deadlines & notes..." class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] placeholder-[var(--mc-text-muted)] text-xs pl-8 pr-3 py-2 rounded-xl border border-[var(--mc-border-default)] focus:outline-none focus:border-[var(--mc-accent)]">
           </div>
 
           <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
             <button onclick="setNotesFilter('all', this)" class="notes-filter-btn active text-xs px-3 py-1.5 rounded-xl bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] font-semibold cursor-pointer">All Items</button>
-            <button onclick="setNotesFilter('notes', this)" class="notes-filter-btn text-xs px-3 py-1.5 rounded-xl bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-secondary)] border border-[var(--mc-border-default)] font-semibold cursor-pointer">📝 Notes</button>
-            <button onclick="setNotesFilter('alerts', this)" class="notes-filter-btn text-xs px-3 py-1.5 rounded-xl bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-secondary)] border border-[var(--mc-border-default)] font-semibold cursor-pointer">💳 Payment & Alerts</button>
-            <button onclick="setNotesFilter('todos', this)" class="notes-filter-btn text-xs px-3 py-1.5 rounded-xl bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-secondary)] border border-[var(--mc-border-default)] font-semibold cursor-pointer">🎯 Synced to Goals</button>
+            <button onclick="setNotesFilter('checklist', this)" class="notes-filter-btn text-xs px-3 py-1.5 rounded-xl bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-secondary)] border border-[var(--mc-border-default)] font-semibold cursor-pointer">✅ Checklists</button>
+            <button onclick="setNotesFilter('task', this)" class="notes-filter-btn text-xs px-3 py-1.5 rounded-xl bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-secondary)] border border-[var(--mc-border-default)] font-semibold cursor-pointer">⏰ Tasks & Deadlines</button>
+            <button onclick="setNotesFilter('note', this)" class="notes-filter-btn text-xs px-3 py-1.5 rounded-xl bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-secondary)] border border-[var(--mc-border-default)] font-semibold cursor-pointer">📝 Smart Notes</button>
+            <button onclick="setNotesFilter('synced', this)" class="notes-filter-btn text-xs px-3 py-1.5 rounded-xl bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-secondary)] border border-[var(--mc-border-default)] font-semibold cursor-pointer">🔗 Synced with Journal</button>
           </div>
         </div>
 
-        <!-- 2-Column Notes & Alerts Layout -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-          <!-- Left: Smart Notes Cards (7 Cols) -->
-          <div class="lg:col-span-7 space-y-2.5">
-            <div class="flex items-center justify-between px-1">
-              <h4 class="text-xs font-semibold text-[var(--mc-text-primary)] uppercase tracking-wider font-mono">Scratchpad & Notes</h4>
-              <span id="notes-count-badge" class="text-[10px] font-mono px-2 py-0.2 rounded-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-muted)] border border-[var(--mc-border-default)]">0 Notes</span>
-            </div>
-            <div id="notes-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              <!-- Rendered via JS -->
-            </div>
-          </div>
-
-          <!-- Right: Active Alerts & Reminders (5 Cols) -->
-          <div class="lg:col-span-5 space-y-2.5">
-            <div class="flex items-center justify-between px-1">
-              <h4 class="text-xs font-semibold text-[var(--mc-text-primary)] uppercase tracking-wider font-mono">Active Alerts & Reminders</h4>
-              <span id="alerts-count-badge" class="text-[10px] font-mono px-2 py-0.2 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/30">0 Alerts</span>
-            </div>
-            <div id="alerts-cards-list" class="space-y-2">
-              <!-- Rendered via JS -->
-            </div>
-          </div>
+        <!-- 3-Column Responsive Capture Masonry Grid -->
+        <div id="notes-cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+          <!-- Dynamically populated via JS -->
         </div>
 
       </div>
@@ -4569,88 +4557,114 @@
 
     </div>
   </div>
+    <!-- ===================================================================== -->
+  <!-- MODAL: UNIFIED CAPTURE MODAL (CHECKLIST, SMART TASK & NOTE) -->
   <!-- ===================================================================== -->
-  <!-- MODAL: ADD / EDIT NOTE (WITH 1-TAP SYNC TO GOALS) -->
-  <!-- ===================================================================== -->
-  <div id="note-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
+  <div id="capture-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
     <div class="mc-card max-w-lg w-full my-auto shadow-2xl p-5 sm:p-6 space-y-4">
       <div class="flex items-center justify-between pb-3 border-b border-[var(--mc-border-subtle)]">
         <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-500 flex items-center justify-center">
-            <i data-lucide="edit-3" class="w-4 h-4"></i>
+          <div class="w-8 h-8 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-500 flex items-center justify-center" id="capture-modal-icon-wrap">
+            <i data-lucide="check-square" class="w-4 h-4" id="capture-modal-icon"></i>
           </div>
           <div>
-            <h3 class="text-base font-bold text-[var(--mc-text-primary)]" id="note-modal-title">Create Smart Note</h3>
-            <p class="text-[11px] text-[var(--mc-text-secondary)]">Capture thoughts, meeting notes or to-dos with instant goal sync</p>
+            <h3 class="text-base font-bold text-[var(--mc-text-primary)]" id="capture-modal-title">Create Item</h3>
+            <p class="text-[11px] text-[var(--mc-text-secondary)]" id="capture-modal-subtitle">Configure checklist, task deadline, or note with journal sync</p>
           </div>
         </div>
-        <button onclick="closeNoteModal()" class="text-[var(--mc-text-muted)] hover:text-[var(--mc-text-primary)] p-1 cursor-pointer">
+        <button onclick="closeCaptureModal()" class="text-[var(--mc-text-muted)] hover:text-[var(--mc-text-primary)] p-1 cursor-pointer">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
-      <form onsubmit="submitNoteForm(event)" class="space-y-3 text-xs">
-        <input type="hidden" id="note-edit-id" value="">
+      <!-- Type Switcher Tabs inside Modal -->
+      <div class="flex gap-1 bg-[var(--mc-bg-tertiary)] p-1 rounded-xl border border-[var(--mc-border-default)] text-xs font-semibold">
+        <button type="button" onclick="setCaptureTypeInModal('checklist')" id="modal-tab-checklist" class="flex-1 py-1.5 rounded-lg transition-all text-center cursor-pointer">✅ Checklist</button>
+        <button type="button" onclick="setCaptureTypeInModal('task')" id="modal-tab-task" class="flex-1 py-1.5 rounded-lg transition-all text-center cursor-pointer">⏰ Task / Deadline</button>
+        <button type="button" onclick="setCaptureTypeInModal('note')" id="modal-tab-note" class="flex-1 py-1.5 rounded-lg transition-all text-center cursor-pointer">📝 Note</button>
+      </div>
+
+      <form onsubmit="submitCaptureForm(event)" class="space-y-3 text-xs">
+        <input type="hidden" id="capture-edit-id" value="">
+        <input type="hidden" id="capture-selected-type" value="checklist">
         
         <div>
-          <label class="text-[var(--mc-text-secondary)] font-semibold block mb-1">Note Title *</label>
-          <input type="text" id="note-title-input" required placeholder="e.g. Architecture Decisions / Ideas" class="mc-input w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] placeholder-[var(--mc-text-muted)] border-[var(--mc-border-default)] text-xs p-2.5 rounded-xl">
+          <label class="text-[var(--mc-text-secondary)] font-semibold block mb-1">Title *</label>
+          <input type="text" id="capture-title-input" required placeholder="e.g. Weekly Release Sprint / Grocery Checklist" class="mc-input w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] placeholder-[var(--mc-text-muted)] text-xs p-2.5 rounded-xl border border-[var(--mc-border-default)]">
         </div>
 
-        <div>
-          <label class="text-[var(--mc-text-secondary)] font-semibold block mb-1">Note Content *</label>
-          <textarea id="note-content-input" required rows="4" placeholder="Write your notes, key takeaways, checklist..." class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] placeholder-[var(--mc-text-muted)] text-xs p-2.5 rounded-xl border border-[var(--mc-border-default)] focus:outline-none focus:border-[var(--mc-accent)] leading-relaxed"></textarea>
+        <!-- Section 1: Checklist Dynamic Sub-items -->
+        <div id="capture-checklist-section" class="space-y-2">
+          <label class="text-[var(--mc-text-secondary)] font-semibold flex items-center justify-between">
+            <span>Checklist Items</span>
+            <button type="button" onclick="addChecklistItemInput()" class="text-[10px] text-emerald-400 font-mono font-bold hover:underline">+ Add Item</button>
+          </label>
+          <div id="checklist-items-container" class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+            <!-- Dynamically populated via JS -->
+          </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        <!-- Section 2: Task Deadline & Priority Inputs -->
+        <div id="capture-task-section" class="hidden space-y-2.5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div>
+              <label class="text-[var(--mc-text-secondary)] font-semibold block mb-1">Deadline Date *</label>
+              <input type="date" id="capture-deadline-date" class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] text-xs p-2 rounded-xl border border-[var(--mc-border-default)] font-mono">
+            </div>
+            <div>
+              <label class="text-[var(--mc-text-secondary)] font-semibold block mb-1">Deadline Time (optional)</label>
+              <input type="time" id="capture-deadline-time" class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] text-xs p-2 rounded-xl border border-[var(--mc-border-default)] font-mono">
+            </div>
+          </div>
           <div>
-            <label class="text-[var(--mc-text-secondary)] font-semibold block mb-1">Category / Tag</label>
-            <select id="note-tag-select" class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] text-xs p-2.5 rounded-xl border border-[var(--mc-border-default)] focus:outline-none">
-              <option value="Idea">💡 Idea & Brainstorm</option>
+            <label class="text-[var(--mc-text-secondary)] font-semibold block mb-1">Priority</label>
+            <select id="capture-priority-select" class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] text-xs p-2 rounded-xl border border-[var(--mc-border-default)] focus:outline-none">
+              <option value="high">🔴 High Priority</option>
+              <option value="medium" selected>🟡 Medium Priority</option>
+              <option value="low">🟢 Normal / Low Priority</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Section 3: Smart Note Description -->
+        <div id="capture-note-section" class="space-y-1">
+          <label class="text-[var(--mc-text-secondary)] font-semibold block mb-1" id="capture-desc-label">Description / Note Details</label>
+          <textarea id="capture-content-input" rows="3" placeholder="Add additional context, notes, or takeaways..." class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] placeholder-[var(--mc-text-muted)] text-xs p-2.5 rounded-xl border border-[var(--mc-border-default)] focus:outline-none focus:border-[var(--mc-accent)] leading-relaxed"></textarea>
+        </div>
+
+        <!-- Tags & Sync with Journal Controls -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+          <div>
+            <label class="text-[var(--mc-text-secondary)] font-semibold block mb-1">Category Tag</label>
+            <select id="capture-tag-select" class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] text-xs p-2 rounded-xl border border-[var(--mc-border-default)] focus:outline-none">
               <option value="Work" selected>💼 Work & Architecture</option>
+              <option value="Idea">💡 Idea & Creativity</option>
               <option value="Personal">🌿 Personal & Wellness</option>
-              <option value="Checklist">✅ Checklist / Tasks</option>
+              <option value="Finance">💳 Finance & Bills</option>
             </select>
           </div>
 
-          <!-- 🎯 1-TAP SYNC TO GOALS OPTION -->
           <div class="flex items-center pt-5">
             <label class="flex items-center gap-2 cursor-pointer text-xs font-semibold text-[var(--mc-text-primary)] p-2 rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] w-full">
-              <input type="checkbox" id="note-sync-to-goals" class="w-4 h-4 accent-[#5E856F] cursor-pointer">
-              <span class="flex items-center gap-1 text-emerald-500 dark:text-emerald-400 font-bold">
-                <i data-lucide="target" class="w-3.5 h-3.5"></i>
-                <span>Sync to Daily Goals</span>
+              <input type="checkbox" id="capture-sync-journal" checked class="w-4 h-4 accent-[#5E856F] cursor-pointer">
+              <span class="flex items-center gap-1 text-emerald-400 font-bold">
+                <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+                <span>Sync with Journal</span>
               </span>
             </label>
           </div>
         </div>
 
         <div class="flex items-center justify-end gap-2 pt-3 border-t border-[var(--mc-border-subtle)]">
-          <button type="button" onclick="closeNoteModal()" class="btn-secondary text-xs">Cancel</button>
+          <button type="button" onclick="closeCaptureModal()" class="btn-secondary text-xs">Cancel</button>
           <button type="submit" class="btn-primary text-xs font-semibold px-4">
             <i data-lucide="check" class="w-3.5 h-3.5 text-white"></i>
-            <span>Save Note</span>
+            <span>Save Item</span>
           </button>
         </div>
       </form>
     </div>
   </div>
-
-  <!-- ===================================================================== -->
-  <!-- MODAL: ADD / EDIT SMART ALERT & PAYMENT REMINDER -->
-  <!-- ===================================================================== -->
-  <div id="alert-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
-    <div class="mc-card max-w-lg w-full my-auto shadow-2xl p-5 sm:p-6 space-y-4">
-      <div class="flex items-center justify-between pb-3 border-b border-[var(--mc-border-subtle)]">
-        <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-500 flex items-center justify-center">
-            <i data-lucide="alarm-clock" class="w-4 h-4 text-rose-500"></i>
-          </div>
-          <div>
-            <h3 class="text-base font-bold text-[var(--mc-text-primary)]" id="alert-modal-title">Create Smart Alert</h3>
-            <p class="text-[11px] text-[var(--mc-text-secondary)]">Payment reminder, medication check-in or critical time alert</p>
-          </div>
-        </div>
         <button onclick="closeAlertModal()" class="text-[var(--mc-text-muted)] hover:text-[var(--mc-text-primary)] p-1 cursor-pointer">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
