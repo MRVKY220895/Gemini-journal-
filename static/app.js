@@ -1,5 +1,110 @@
 
 // =============================================================================
+// INTERACTIVE "GUIDE ME THROUGH" ONBOARDING WALKTHROUGH CONTROLLER
+// =============================================================================
+
+let currentGuideStep = 1;
+const TOTAL_GUIDE_STEPS = 5;
+
+function openOnboardingGuide(startStep = 1) {
+  currentGuideStep = startStep;
+  goToOnboardingStep(currentGuideStep);
+  const modal = document.getElementById('onboarding-guide-modal');
+  if (modal) modal.classList.remove('hidden');
+  refreshIcons();
+}
+
+function closeOnboardingGuide(markCompleted = true) {
+  const modal = document.getElementById('onboarding-guide-modal');
+  if (modal) modal.classList.add('hidden');
+  if (markCompleted) {
+    try {
+      localStorage.setItem('mind_cave_guided_tour_completed', 'true');
+    } catch (e) {}
+  }
+}
+
+function goToOnboardingStep(stepNumber) {
+  if (stepNumber < 1) stepNumber = 1;
+  if (stepNumber > TOTAL_GUIDE_STEPS) stepNumber = TOTAL_GUIDE_STEPS;
+  currentGuideStep = stepNumber;
+
+  // Hide all slides, show target slide
+  for (let i = 1; i <= TOTAL_GUIDE_STEPS; i++) {
+    const slide = document.getElementById(`guide-slide-${i}`);
+    if (slide) {
+      if (i === currentGuideStep) {
+        slide.classList.remove('hidden');
+      } else {
+        slide.classList.add('hidden');
+      }
+    }
+  }
+
+  // Update step indicator
+  const indicator = document.getElementById('guide-step-indicator');
+  if (indicator) indicator.textContent = `Step ${currentGuideStep} of ${TOTAL_GUIDE_STEPS}`;
+
+  // Update step dots
+  const dots = document.querySelectorAll('.guide-dot');
+  dots.forEach((dot, idx) => {
+    if (idx + 1 === currentGuideStep) {
+      dot.className = 'guide-dot w-4 h-2 rounded-full bg-[var(--mc-accent)] transition-all cursor-pointer';
+    } else if (idx + 1 < currentGuideStep) {
+      dot.className = 'guide-dot w-2 h-2 rounded-full bg-emerald-400 transition-all cursor-pointer';
+    } else {
+      dot.className = 'guide-dot w-2 h-2 rounded-full bg-[var(--mc-border-default)] transition-all cursor-pointer';
+    }
+  });
+
+  // Update Prev / Next buttons
+  const prevBtn = document.getElementById('guide-prev-btn');
+  const nextBtnText = document.getElementById('guide-next-btn-text');
+
+  if (prevBtn) {
+    if (currentGuideStep === 1) prevBtn.classList.add('hidden');
+    else prevBtn.classList.remove('hidden');
+  }
+
+  if (nextBtnText) {
+    if (currentGuideStep === TOTAL_GUIDE_STEPS) {
+      nextBtnText.textContent = 'Get Started →';
+    } else {
+      nextBtnText.textContent = 'Next Step';
+    }
+  }
+
+  refreshIcons();
+}
+
+function nextOnboardingStep() {
+  if (currentGuideStep >= TOTAL_GUIDE_STEPS) {
+    closeOnboardingGuide(true);
+    showToast('Welcome to Mind Cave! Explore Studio or log your first moment.');
+  } else {
+    goToOnboardingStep(currentGuideStep + 1);
+  }
+}
+
+function prevOnboardingStep() {
+  if (currentGuideStep > 1) {
+    goToOnboardingStep(currentGuideStep - 1);
+  }
+}
+
+function checkFirstTimeOnboarding() {
+  try {
+    const completed = localStorage.getItem('mind_cave_guided_tour_completed');
+    if (!completed) {
+      setTimeout(() => {
+        openOnboardingGuide(1);
+      }, 700);
+    }
+  } catch (e) {}
+}
+
+
+// =============================================================================
 // NAVIGATION DIRECTORY COLLAPSIBLE ACCORDION SYSTEM
 // =============================================================================
 
@@ -758,6 +863,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initLanguage();
   initMediaMode();
   updateUserUI();
+  checkFirstTimeOnboarding();
   initDiarySpace();
   initTodayGoal();
   initHabitTracker();
