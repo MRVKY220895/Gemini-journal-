@@ -335,7 +335,7 @@
         <div class="absolute -right-12 -bottom-12 w-64 h-64 rounded-full bg-[var(--mc-accent-10)] blur-3xl pointer-events-none"></div>
       </div>
 
-      <!-- ─── DAILY BOOSTER: KEY ACHIEVEMENTS & MOMENTUM METRICS ─── -->
+      <!-- ─── DAILY BOOSTER: GENUINE ACHIEVEMENTS & MOMENTUM METRICS ─── -->
       <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <!-- Metric 1: Consistency Streak -->
         <div class="mc-card p-4 rounded-2xl border border-[var(--mc-border-default)] flex flex-col justify-between space-y-2 hover:border-amber-500/40 transition-all">
@@ -346,13 +346,13 @@
             </div>
           </div>
           <div>
-            <div class="text-xl sm:text-2xl font-extrabold text-[var(--mc-text-primary)] font-mono" id="booster-streak-days">14 Days</div>
-            <div class="text-[11px] text-amber-600 dark:text-amber-400 font-semibold flex items-center gap-1 mt-0.5">
-              <span>★ Top 5% Mindful Habit</span>
+            <div class="text-xl sm:text-2xl font-extrabold text-[var(--mc-text-primary)] font-mono" id="booster-streak-days">0 Days</div>
+            <div class="text-[11px] text-amber-600 dark:text-amber-400 font-semibold flex items-center gap-1 mt-0.5 truncate" id="booster-streak-sub">
+              <span>🌱 Start your first daily habit</span>
             </div>
           </div>
           <div class="w-full h-1.5 bg-[var(--mc-border-subtle)] rounded-full overflow-hidden">
-            <div class="h-full bg-amber-500 rounded-full" style="width: 80%;"></div>
+            <div class="h-full bg-amber-500 rounded-full transition-all duration-500" id="booster-streak-bar" style="width: 0%;"></div>
           </div>
         </div>
 
@@ -365,13 +365,13 @@
             </div>
           </div>
           <div>
-            <div class="text-xl sm:text-2xl font-extrabold text-[var(--mc-text-primary)] font-mono" id="booster-clarity-score">92% Optimal</div>
-            <div class="text-[11px] text-[#9BB7A5] font-semibold flex items-center gap-1 mt-0.5">
-              <span>● Calm & Clear State</span>
+            <div class="text-xl sm:text-2xl font-extrabold text-[var(--mc-text-primary)] font-mono" id="booster-clarity-score">0% Baseline</div>
+            <div class="text-[11px] text-[#9BB7A5] font-semibold flex items-center gap-1 mt-0.5 truncate" id="booster-clarity-sub">
+              <span>🌿 Log 1st journal reflection</span>
             </div>
           </div>
           <div class="w-full h-1.5 bg-[var(--mc-border-subtle)] rounded-full overflow-hidden">
-            <div class="h-full bg-[#9BB7A5] rounded-full" style="width: 92%;"></div>
+            <div class="h-full bg-[#9BB7A5] rounded-full transition-all duration-500" id="booster-clarity-bar" style="width: 0%;"></div>
           </div>
         </div>
 
@@ -384,13 +384,13 @@
             </div>
           </div>
           <div>
-            <div class="text-xl sm:text-2xl font-extrabold text-[var(--mc-text-primary)] font-mono" id="booster-goals-completed">3 / 4 Executed</div>
-            <div class="text-[11px] text-[#8FA9B8] font-semibold flex items-center gap-1 mt-0.5">
-              <span>75% Daily Execution</span>
+            <div class="text-xl sm:text-2xl font-extrabold text-[var(--mc-text-primary)] font-mono" id="booster-goals-completed">0 / 0 Executed</div>
+            <div class="text-[11px] text-[#8FA9B8] font-semibold flex items-center gap-1 mt-0.5 truncate" id="booster-goals-sub">
+              <span>🎯 Add today's first goal</span>
             </div>
           </div>
           <div class="w-full h-1.5 bg-[var(--mc-border-subtle)] rounded-full overflow-hidden">
-            <div class="h-full bg-[#8FA9B8] rounded-full" style="width: 75%;"></div>
+            <div class="h-full bg-[#8FA9B8] rounded-full transition-all duration-500" id="booster-goals-bar" style="width: 0%;"></div>
           </div>
         </div>
 
@@ -403,13 +403,13 @@
             </div>
           </div>
           <div>
-            <div class="text-xl sm:text-2xl font-extrabold text-[var(--mc-text-primary)] font-mono" id="booster-milestones-count">6 Milestones</div>
-            <div class="text-[11px] text-[#C5AA78] font-semibold flex items-center gap-1 mt-0.5">
-              <span>AES-256 Vault Encrypted</span>
+            <div class="text-xl sm:text-2xl font-extrabold text-[var(--mc-text-primary)] font-mono" id="booster-milestones-count">0 Milestones</div>
+            <div class="text-[11px] text-[#C5AA78] font-semibold flex items-center gap-1 mt-0.5 truncate" id="booster-milestones-sub">
+              <span>✨ Create a milestone quest</span>
             </div>
           </div>
           <div class="w-full h-1.5 bg-[var(--mc-border-subtle)] rounded-full overflow-hidden">
-            <div class="h-full bg-[#C5AA78] rounded-full" style="width: 100%;"></div>
+            <div class="h-full bg-[#C5AA78] rounded-full transition-all duration-500" id="booster-milestones-bar" style="width: 0%;"></div>
           </div>
         </div>
       </div>
@@ -458,46 +458,12 @@
               <i data-lucide="award" class="w-3.5 h-3.5 text-amber-500"></i>
               <span>Life Mastery Badges</span>
             </span>
-            <span class="text-[10px] font-mono text-amber-500 font-bold bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/30">Level 3 Master</span>
+            <span id="user-mastery-level-badge" class="text-[10px] font-mono text-amber-500 font-bold bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/30">Level 1 Initiate</span>
           </div>
 
-          <!-- Badges Grid -->
-          <div class="grid grid-cols-2 gap-2 text-xs py-1">
-            <div class="p-2.5 rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] space-y-1">
-              <div class="flex items-center justify-between">
-                <i data-lucide="shield" class="w-4 h-4 text-emerald-400"></i>
-                <span class="text-[9px] font-mono text-emerald-400 font-bold uppercase">Unlocked</span>
-              </div>
-              <div class="font-semibold text-[var(--mc-text-primary)] text-[11px]">Zero Distortion</div>
-              <div class="text-[9px] text-[var(--mc-text-muted)]">94% Cognitive Clarity</div>
-            </div>
-
-            <div class="p-2.5 rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] space-y-1">
-              <div class="flex items-center justify-between">
-                <i data-lucide="flame" class="w-4 h-4 text-amber-500"></i>
-                <span class="text-[9px] font-mono text-amber-500 font-bold uppercase">Active</span>
-              </div>
-              <div class="font-semibold text-[var(--mc-text-primary)] text-[11px]">14-Day Streak</div>
-              <div class="text-[9px] text-[var(--mc-text-muted)]">Daily Self-Awareness</div>
-            </div>
-
-            <div class="p-2.5 rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] space-y-1">
-              <div class="flex items-center justify-between">
-                <i data-lucide="compass" class="w-4 h-4 text-cyan-400"></i>
-                <span class="text-[9px] font-mono text-cyan-400 font-bold uppercase">Unlocked</span>
-              </div>
-              <div class="font-semibold text-[var(--mc-text-primary)] text-[11px]">Socratic Clarity</div>
-              <div class="text-[9px] text-[var(--mc-text-muted)]">First Principles Active</div>
-            </div>
-
-            <div class="p-2.5 rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] space-y-1">
-              <div class="flex items-center justify-between">
-                <i data-lucide="heart-pulse" class="w-4 h-4 text-rose-400"></i>
-                <span class="text-[9px] font-mono text-rose-400 font-bold uppercase">Unlocked</span>
-              </div>
-              <div class="font-semibold text-[var(--mc-text-primary)] text-[11px]">Circadian Rest</div>
-              <div class="text-[9px] text-[var(--mc-text-muted)]">Bio Sanctuary Synced</div>
-            </div>
+          <!-- Dynamic Badges Grid -->
+          <div class="grid grid-cols-2 gap-2 text-xs py-1" id="home-badges-grid">
+            <!-- Rendered dynamically based on real user actions -->
           </div>
 
           <button onclick="openMoodPickerModal()" class="btn-secondary !py-2 text-xs flex items-center justify-center gap-1.5 w-full cursor-pointer">
