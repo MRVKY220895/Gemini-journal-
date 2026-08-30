@@ -818,11 +818,11 @@
         <button onclick="switchJournalTrack('chrono')" id="track-btn-chrono" class="track-tab-btn active-chrono shrink-0 !text-[11px] sm:!text-xs !py-1 sm:!py-1.5 !px-2.5 sm:!px-3">
           <i data-lucide="calendar" class="w-3.5 h-3.5"></i><span>Living Timeline</span>
         </button>
-        <button onclick="switchJournalTrack('sanctuary')" id="track-btn-sanctuary" class="track-tab-btn shrink-0 !text-[11px] sm:!text-xs !py-1 sm:!py-1.5 !px-2.5 sm:!px-3">
-          <i data-lucide="heart-pulse" class="w-3.5 h-3.5 text-rose-400"></i><span>Bio Sanctuary</span>
-        </button>
         <button onclick="switchJournalTrack('harmony')" id="track-btn-harmony" class="track-tab-btn shrink-0 !text-[11px] sm:!text-xs !py-1 sm:!py-1.5 !px-2.5 sm:!px-3">
           <i data-lucide="activity" class="w-3.5 h-3.5 text-[#9BB7A5]"></i><span>Sanctuary Pulse</span>
+        </button>
+        <button onclick="switchJournalTrack('sanctuary')" id="track-btn-sanctuary" class="track-tab-btn shrink-0 !text-[11px] sm:!text-xs !py-1 sm:!py-1.5 !px-2.5 sm:!px-3">
+          <i data-lucide="heart-pulse" class="w-3.5 h-3.5 text-rose-400"></i><span>Bio Sanctuary</span>
         </button>
         <button onclick="switchJournalTrack('notes')" id="track-btn-notes" class="track-tab-btn shrink-0 !text-[11px] sm:!text-xs !py-1 sm:!py-1.5 !px-2.5 sm:!px-3">
           <i data-lucide="bell-ring" class="w-3.5 h-3.5 text-amber-500"></i><span>Notes & Alerts</span>
@@ -1004,7 +1004,7 @@
               </div>
 
               <!-- Unrestricted Habit List (No Ellipsis Truncation) -->
-              <div id="sanctuary-habit-tracker-list" class="space-y-2 py-1">
+              <div id="sanctuary-habit-tracker-list" class="space-y-2 py-1 habit-tracker-list-container">
                 <!-- Dynamically populated via renderHabitTracker() -->
               </div>
             </div>
@@ -1386,7 +1386,7 @@
                 <p class="text-[11px] text-slate-400 mb-3">Micro-habits compounding daily cognitive clarity and vitality.</p>
 
                 <!-- Habit List -->
-                <div class="space-y-2" id="sanctuary-habit-tracker-list">
+                <div class="space-y-2 habit-tracker-list-container" id="bio-habit-tracker-list">
                   <!-- Rendered dynamically via JS -->
                 </div>
               </div>

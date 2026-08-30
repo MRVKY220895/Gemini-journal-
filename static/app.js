@@ -9771,16 +9771,38 @@ function updateArchivedHabitsBadges() {
 
 
 function renderHabitTracker() {
+  // Ensure default habits if empty
+  if (!state.habitsList || state.habitsList.length === 0) {
+    try {
+      const saved = localStorage.getItem('mind_cave_habits_list');
+      if (saved) state.habitsList = JSON.parse(saved);
+    } catch (e) {}
 
-  const containers = [
+    if (!state.habitsList || state.habitsList.length === 0) {
+      const todayDayIdx = (new Date().getDay() + 6) % 7;
+      state.habitsList = [
+        { id: 'h1', title: 'Daily Optimal Hydration', emoji: '💧', icon: '💧', type: 'counter', targetCount: 8, unit: 'glasses', currentCount: 6, streak: 14, isTimelineShortcut: true, history: [true, true, true, true, true, true, true] },
+        { id: 'h2', title: '30m Deep Socratic Work', emoji: '💻', icon: '💻', type: 'boolean', target: '30 mins', streak: 12, isTimelineShortcut: true, history: [true, true, true, true, true, true, false] },
+        { id: 'h3', title: 'Mindful Nature Walk', emoji: '👟', icon: '👟', type: 'boolean', target: '20 mins', streak: 8, isTimelineShortcut: true, history: [true, true, true, false, true, true, true] },
+        { id: 'h4', title: 'Stoic Cognitive Reframing', emoji: '🧠', icon: '🧠', type: 'boolean', target: '1 reflection', streak: 19, isTimelineShortcut: true, history: [true, true, true, true, true, true, true] },
+        { id: 'h5', title: '10 Pages Philosophical Reading', emoji: '📖', icon: '📖', type: 'counter', targetCount: 10, unit: 'pages', currentCount: 10, streak: 7, isTimelineShortcut: true, history: [true, true, true, true, true, true, true] },
+        { id: 'h6', title: 'Circadian Sleep Wind-Down', emoji: '🌙', icon: '🌙', type: 'boolean', target: '11:00 PM', streak: 21, isTimelineShortcut: true, history: [true, true, true, true, true, true, true] }
+      ];
+      try {
+        localStorage.setItem('mind_cave_habits_list', JSON.stringify(state.habitsList));
+      } catch (e) {}
+    }
+  }
 
+  const containerSet = new Set([
+    ...Array.from(document.querySelectorAll('.habit-tracker-list-container')),
     document.getElementById('habit-tracker-list'),
-
     document.getElementById('modal-habit-tracker-list'),
+    document.getElementById('sanctuary-habit-tracker-list'),
+    document.getElementById('bio-habit-tracker-list')
+  ].filter(Boolean));
 
-    document.getElementById('sanctuary-habit-tracker-list')
-
-  ].filter(Boolean);
+  const containers = Array.from(containerSet);
 
 
 
