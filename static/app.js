@@ -3938,48 +3938,42 @@ function syncExactTimeFromHour(hourVal) {
 
 
 function switchJournalTrack(trackId) {
-
-  const tracks = ['chrono', 'harmony', 'memory_lane', 'memory', 'sanctuary', 'cbt', 'cycle', 'circadian'];
+  const tracks = ['chrono', 'harmony', 'notes', 'memory_lane', 'memory', 'sanctuary', 'cbt', 'cycle', 'circadian'];
 
   tracks.forEach(t => {
-
     const el = document.getElementById(`journal-track-${t}`);
-
     const btn = document.getElementById(`track-btn-${t}`);
-
     if (el) el.classList.add('hidden');
-
-    if (btn) btn.className = 'track-tab-btn';
-
+    if (btn) {
+      btn.className = 'track-tab-btn shrink-0 !text-[11px] sm:!text-xs !py-1 sm:!py-1.5 !px-2.5 sm:!px-3';
+      btn.classList.remove('active-chrono', 'font-bold');
+    }
   });
 
-
-
   const activeEl = document.getElementById(`journal-track-${trackId}`);
-
   const activeBtn = document.getElementById(`track-btn-${trackId}`);
-
   if (activeEl) activeEl.classList.remove('hidden');
-
-  if (activeBtn) activeBtn.className = `track-tab-btn active-${trackId}`;
-
-
-
-  if (trackId === 'chrono') renderChronoTimeline();
-
-  if (trackId === 'sanctuary' || trackId === 'cbt') {
-
-    renderCBTHeatmap();
-
-    renderHabitTracker();
-
-    renderBucketList();
-
+  if (activeBtn) {
+    activeBtn.className = 'track-tab-btn active-chrono shrink-0 !text-[11px] sm:!text-xs !py-1 sm:!py-1.5 !px-2.5 sm:!px-3 font-bold';
   }
 
+  if (trackId === 'chrono') renderChronoTimeline();
+  if (trackId === 'notes') renderNotesCards();
+  if (trackId === 'harmony') {
+    if (typeof renderHabitTracker === 'function') renderHabitTracker();
+    if (typeof renderDashboardMilestoneRadar === 'function') renderDashboardMilestoneRadar();
+    if (typeof renderJournalCards === 'function') renderJournalCards(state.journalsCache || []);
+    if (typeof renderHarmonyDashboard === 'function') renderHarmonyDashboard();
+  }
+  if (trackId === 'sanctuary' || trackId === 'cbt') {
+    renderCBTHeatmap();
+    renderHabitTracker();
+    renderBucketList();
+  }
+  if (trackId === 'memory_lane') renderMemoryLane();
   if (trackId === 'memory') renderMemoryPhotos();
-
 }
+window.switchJournalTrack = switchJournalTrack;
 
 
 
