@@ -1810,17 +1810,17 @@ function appendChatMessage(role, content, authorName, modelTag, cognitiveData = 
   if (isUser) {
     msgDiv.innerHTML = `
       <div class="chat-msg-user-card" id="${turnId}">
-        <div class="flex items-center justify-between gap-3 mb-1 text-[11px] text-blue-300 font-semibold">
+        <div class="flex items-center justify-between gap-3 mb-1 text-[11px] text-[var(--mc-accent)] font-medium">
           <span>${escapeHtml(authorName)}</span>
           <div class="flex items-center gap-2">
-            <button type="button" onclick="translateCardMessage('${turnId}', this)" class="text-[10px] text-blue-200/80 hover:text-white px-1.5 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 flex items-center gap-1 transition-colors" title="Translate Native ⇄ English">
+            <button type="button" onclick="translateCardMessage('${turnId}', this)" class="text-[10px] text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] px-1.5 py-0.5 rounded bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] flex items-center gap-1 transition-colors" title="Translate Native ⇄ English">
               <i data-lucide="globe" class="w-2.5 h-2.5 text-cyan-300"></i>
               <span>Translate</span>
             </button>
             <span class="text-[10px] text-slate-400 font-mono">You</span>
           </div>
         </div>
-        <div class="text-sm text-slate-100 whitespace-pre-wrap leading-relaxed user-bubble-content">${escapeHtml(content)}</div>
+        <div class="text-sm text-[var(--mc-text-primary)] whitespace-pre-wrap leading-relaxed user-bubble-content">${escapeHtml(content)}</div>
       </div>
     `;
   } else {
@@ -1834,17 +1834,17 @@ function appendChatMessage(role, content, authorName, modelTag, cognitiveData = 
         <!-- Header -->
         <div class="flex items-center justify-between gap-2 mb-3">
           <div class="flex items-center gap-2">
-            <div class="w-6 h-6 rounded-lg bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center text-white text-xs shadow-sm">
+            <div class="w-6 h-6 rounded-lg bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] flex items-center justify-center text-xs">
               <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
             </div>
             <span class="text-xs font-bold text-slate-900 dark:text-white">${escapeHtml(authorName)}</span>
-            <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-mono border border-emerald-500/30 flex items-center gap-1">
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-[var(--mc-accent-12)] text-[var(--mc-accent)] font-mono border border-[var(--mc-accent-25)] flex items-center gap-1">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
               <span>Gemini 3.5 Live</span>
             </span>
           </div>
 
-          <span class="text-[10px] font-mono text-slate-400 bg-black/40 px-2 py-0.5 rounded border border-white/5">
+          <span class="text-[10px] font-mono text-[var(--mc-text-secondary)] bg-[var(--mc-bg-secondary)] px-2 py-0.5 rounded border border-[var(--mc-border-subtle)]">
             ${escapeHtml(cognitiveData?.primary_emotion || 'Seeking Direction')}
           </span>
         </div>
@@ -1894,13 +1894,13 @@ function appendChatMessage(role, content, authorName, modelTag, cognitiveData = 
           <!-- Tags & Distortions -->
           <div class="flex flex-wrap items-center gap-1.5">
             ${distortions.map(d => `
-              <span class="bg-amber-950/50 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full text-[10px] font-medium flex items-center gap-1">
+              <span class="bg-[var(--mc-bg-secondary)] text-[var(--mc-text-secondary)] border border-[var(--mc-border-subtle)] px-2 py-0.5 rounded-full text-[10px] font-medium flex items-center gap-1">
                 <i data-lucide="alert-triangle" class="w-3 h-3 text-amber-400"></i>
                 <span>${escapeHtml(d)}</span>
               </span>
             `).join('')}
             ${tags.map(t => `
-              <span class="bg-blue-950/40 text-blue-300 border border-blue-500/20 px-2 py-0.5 rounded-full text-[10px] font-mono">
+              <span class="bg-[var(--mc-bg-secondary)] text-[var(--mc-text-secondary)] border border-[var(--mc-border-subtle)] px-2 py-0.5 rounded-full text-[10px] font-mono">
                 ${escapeHtml(t)}
               </span>
             `).join('')}
@@ -1908,19 +1908,19 @@ function appendChatMessage(role, content, authorName, modelTag, cognitiveData = 
 
           <!-- Action Buttons -->
           <div class="flex items-center gap-1.5">
-            <button type="button" onclick="translateCardMessage('${turnId}', this)" class="text-xs text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 cursor-pointer" title="Translate Native ⇄ English">
+            <button type="button" onclick="translateCardMessage('${turnId}', this)" class="btn-secondary text-xs !py-1 !px-2.5 flex items-center gap-1 cursor-pointer text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)]" title="Translate Native ⇄ English">
               <i data-lucide="globe" class="w-3 h-3 text-emerald-400"></i>
               <span>Translate</span>
             </button>
-            <button type="button" onclick="narrateMessageFromCard('${turnId}', this)" class="text-xs text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 cursor-pointer" title="Listen to AI voice narration">
+            <button type="button" onclick="narrateMessageFromCard('${turnId}', this)" class="btn-secondary text-xs !py-1 !px-2.5 flex items-center gap-1 cursor-pointer text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)]" title="Listen to AI voice narration">
               <i data-lucide="volume-2" class="w-3 h-3 text-cyan-400"></i>
               <span>Listen</span>
             </button>
-            <button type="button" onclick="saveMessageFromCard('${turnId}', '${escapeHtml(cognitiveData?.primary_emotion || 'Reflective')}', this)" class="text-xs text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer" title="Save to Journal">
+            <button type="button" onclick="saveMessageFromCard('${turnId}', '${escapeHtml(cognitiveData?.primary_emotion || 'Reflective')}', this)" class="btn-secondary text-xs !py-1 !px-2.5 flex items-center gap-1.5 cursor-pointer text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)]" title="Save to Journal">
               <i data-lucide="heart" class="w-3 h-3 text-rose-400"></i>
               <span>Save to Journal</span>
             </button>
-            <button type="button" onclick="copyMessageFromCard('${turnId}', this)" class="text-xs text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 cursor-pointer" title="Copy response">
+            <button type="button" onclick="copyMessageFromCard('${turnId}', this)" class="btn-secondary text-xs !py-1 !px-2.5 flex items-center gap-1 cursor-pointer text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)]" title="Copy response">
               <i data-lucide="copy" class="w-3 h-3 text-slate-400"></i>
               <span>Copy</span>
             </button>
@@ -9074,7 +9074,7 @@ function renderHabitTracker() {
 
                     <div class="w-12 sm:w-16 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden flex">
 
-                      <div class="h-full ${isDoneToday ? 'bg-emerald-500' : 'bg-cyan-500'} rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+                      <div class="h-full bg-[#5E856F] rounded-full transition-all duration-300" style="width: ${pct}%"></div>
 
                     </div>
 
@@ -9104,9 +9104,9 @@ function renderHabitTracker() {
 
                 <button type="button" onclick="incrementHabitCount('${h.id}', -1)" class="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-white dark:bg-black/40 hover:bg-slate-200 dark:hover:bg-white/20 text-slate-700 dark:text-slate-300 flex items-center justify-center font-bold text-xs transition-colors" title="Subtract 1 ${unit}">-</button>
 
-                <span class="px-1.5 font-mono font-bold text-[11px] sm:text-xs ${isDoneToday ? 'text-emerald-600 dark:text-emerald-400' : 'text-cyan-600 dark:text-cyan-300'}">${currentCount}/${targetCount}</span>
+                <span class="px-1.5 font-mono font-bold text-[11px] sm:text-xs text-[var(--mc-text-primary)] font-medium">${currentCount}/${targetCount}</span>
 
-                <button type="button" onclick="incrementHabitCount('${h.id}', 1)" class="px-1.5 sm:px-2 h-5 sm:h-6 rounded-lg ${isDoneToday ? 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-sm' : 'bg-cyan-500 text-white hover:bg-cyan-600 shadow-sm'} flex items-center gap-0.5 font-bold text-xs transition-colors" title="Log +1 ${unit}">
+                <button type="button" onclick="incrementHabitCount('${h.id}', 1)" class="px-1.5 sm:px-2 h-5 sm:h-6 rounded-lg ${isDoneToday ? 'bg-[#5E856F] text-white hover:opacity-90 shadow-sm' : 'bg-[#5E856F] text-white hover:opacity-90 shadow-sm'} flex items-center gap-0.5 font-bold text-xs transition-colors" title="Log +1 ${unit}">
 
                   <i data-lucide="plus" class="w-3 h-3 text-white"></i>
 
@@ -9136,7 +9136,7 @@ function renderHabitTracker() {
 
               <!-- 1-Tap Today Action Button -->
 
-              <button type="button" onclick="toggleHabitToday('${h.id}')" class="px-2 sm:px-2.5 py-1 rounded-xl text-[11px] sm:text-xs font-bold flex items-center gap-1 sm:gap-1.5 transition-all cursor-pointer ${isDoneToday ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20 hover:bg-emerald-600' : 'bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:border-cyan-400 hover:text-cyan-500'}" title="Toggle completion for Today (${currentDayName})">
+              <button type="button" onclick="toggleHabitToday('${h.id}')" class="px-2 sm:px-2.5 py-1 rounded-xl text-[11px] sm:text-xs font-bold flex items-center gap-1 sm:gap-1.5 transition-all cursor-pointer ${isDoneToday ? 'bg-[#5E856F] text-white shadow-sm hover:opacity-90' : 'btn-secondary !py-1 !px-2.5'}" title="Toggle completion for Today (${currentDayName})">
 
                 <i data-lucide="${isDoneToday ? 'check-circle' : 'circle'}" class="w-3 h-3 sm:w-3.5 sm:h-3.5 ${isDoneToday ? 'text-white' : 'text-slate-400'}"></i>
 
@@ -9206,7 +9206,7 @@ function renderHabitTracker() {
 
   pills.forEach(p => {
 
-    p.innerHTML = `<i data-lucide="check-circle" class="w-3 h-3 text-cyan-500"></i><span>${doneCount}/${totalHabits} Done Today (${habitPct}%)</span>`;
+    p.innerHTML = `<i data-lucide="check-circle" class="w-3 h-3 text-[var(--mc-accent)]"></i><span>${doneCount}/${totalHabits} Done Today (${habitPct}%)</span>`;
 
   });
 
@@ -10627,24 +10627,8 @@ function initBucketList() {
 
 
 function getCategoryColorClasses(color) {
-
-  const colorMap = {
-
-    cyan: 'text-cyan-400 bg-cyan-950/60 border-cyan-500/30',
-
-    indigo: 'text-indigo-400 bg-indigo-950/60 border-indigo-500/30',
-
-    amber: 'text-amber-400 bg-amber-950/60 border-amber-500/30',
-
-    emerald: 'text-emerald-400 bg-emerald-950/60 border-emerald-500/30',
-
-    purple: 'text-purple-400 bg-purple-950/60 border-purple-500/30',
-
-    rose: 'text-rose-400 bg-rose-950/60 border-rose-500/30',
-
-    pink: 'text-pink-400 bg-pink-950/60 border-pink-500/30'
-
-  };
+  return 'text-[var(--mc-text-secondary)] bg-[var(--mc-bg-secondary)] border-[var(--mc-border-subtle)]';
+};
 
   return colorMap[color] || 'text-slate-300 bg-black/40 border-white/10';
 
@@ -10864,7 +10848,7 @@ function filterBucketListByStatus(status, btnEl) {
 
     p.classList.remove('active', 'bg-[#5E856F]/20', 'text-pink-400', 'border-pink-500/30');
 
-    p.classList.add('bg-slate-100', 'dark:bg-black/40', 'text-slate-600', 'dark:text-slate-400', 'border-slate-200', 'dark:border-white/5');
+    p.classList.add('bg-[var(--mc-bg-tertiary)]', 'text-[var(--mc-text-secondary)]', 'border-[var(--mc-border-subtle)]');
 
   });
 
@@ -10872,7 +10856,7 @@ function filterBucketListByStatus(status, btnEl) {
 
     btnEl.classList.add('active', 'bg-[#5E856F]/20', 'text-pink-400', 'border-pink-500/30');
 
-    btnEl.classList.remove('bg-slate-100', 'dark:bg-black/40', 'text-slate-600', 'dark:text-slate-400', 'border-slate-200', 'dark:border-white/5');
+    btnEl.classList.remove('bg-[var(--mc-bg-tertiary)]', 'text-[var(--mc-text-secondary)]', 'border-[var(--mc-border-subtle)]');
 
   }
 
@@ -10893,8 +10877,25 @@ function filterBucketListByCategory(cat) {
 
 
 function formatTargetDateCountdown(targetDateStr) {
-
-  if (!targetDateStr) return { text: 'Aspiration', badgeClass: 'text-amber-300' };
+  if (!targetDateStr) return { text: 'Aspiration', badgeClass: 'text-[var(--mc-text-muted)]' };
+  const target = new Date(targetDateStr);
+  const now = new Date();
+  if (isNaN(target.getTime())) return { text: targetDateStr, badgeClass: 'text-[var(--mc-text-muted)]' };
+  const diffMs = target.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+  const dateFormatted = target.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  if (diffDays < 0) {
+    return { text: `${dateFormatted} • Passed`, badgeClass: 'text-[var(--mc-text-muted)]' };
+  } else if (diffDays <= 90) {
+    return { text: `${dateFormatted} • ~${diffDays}d left`, badgeClass: 'text-[var(--mc-accent)]' };
+  } else if (diffDays <= 365) {
+    const months = Math.round(diffDays / 30);
+    return { text: `${dateFormatted} • ~${months} mo`, badgeClass: 'text-[var(--mc-text-secondary)]' };
+  } else {
+    const years = (diffDays / 365).toFixed(1);
+    return { text: `${dateFormatted} • ~${years} yrs`, badgeClass: 'text-[var(--mc-text-secondary)]' };
+  }
+};
 
   const target = new Date(targetDateStr);
 
@@ -11299,17 +11300,11 @@ function renderBucketList() {
 
 
   const statusMap = {
-
-    vision: { label: 'Future Vision', icon: 'sparkles', badge: 'bg-blue-950/60 text-blue-300 border-blue-500/30' },
-
-    planning: { label: 'Planning', icon: 'clipboard-list', badge: 'bg-amber-950/60 text-amber-300 border-amber-500/30' },
-
-    in_action: { label: 'In Action', icon: 'zap', badge: 'bg-cyan-950/60 text-cyan-300 border-cyan-500/30' },
-
-    final_stretch: { label: 'Final Stretch', icon: 'target', badge: 'bg-purple-950/60 text-purple-300 border-purple-500/30' },
-
-    fulfilled: { label: 'Fulfilled', icon: 'trophy', badge: 'bg-emerald-950/60 text-emerald-300 border-emerald-500/30' }
-
+    vision: { label: 'Future Vision', icon: 'sparkles', badge: 'bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-secondary)] border-[var(--mc-border-subtle)]' },
+    planning: { label: 'Planning', icon: 'clipboard-list', badge: 'bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-secondary)] border-[var(--mc-border-subtle)]' },
+    in_action: { label: 'In Action', icon: 'zap', badge: 'bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border-[var(--mc-accent-25)]' },
+    final_stretch: { label: 'Final Stretch', icon: 'target', badge: 'bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border-[var(--mc-accent-25)]' },
+    fulfilled: { label: 'Fulfilled', icon: 'trophy', badge: 'bg-[#5E856F]/15 text-[#5E856F] border-[#5E856F]/30' }
   };
 
 
@@ -11489,9 +11484,9 @@ function renderBucketList() {
 
                   return `
 
-                    <label class="p-1.5 rounded-xl border flex items-start gap-2 cursor-pointer transition-all ${isStepDone ? 'bg-emerald-500/10 border-emerald-500/30 text-slate-400 line-through' : 'bg-black/30 border-white/5 hover:border-pink-500/30 text-slate-200'}">
+                    <label class="p-1.5 rounded-xl border flex items-start gap-2 cursor-pointer transition-all ${isStepDone ? 'bg-[var(--mc-accent-10)] border-[var(--mc-accent-25)] text-[var(--mc-text-muted)] line-through' : 'bg-[var(--mc-bg-secondary)] border-[var(--mc-border-subtle)] hover:border-[var(--mc-border-default)] text-[var(--mc-text-primary)]'}">
 
-                      <input type="checkbox" ${isStepDone ? 'checked' : ''} onchange="toggleBucketPlanStep('${b.id}', ${idx})" class="mt-0.5 w-3.5 h-3.5 rounded text-[var(--mc-accent)] bg-slate-900 border-slate-700 cursor-pointer">
+                      <input type="checkbox" ${isStepDone ? 'checked' : ''} onchange="toggleBucketPlanStep('${b.id}', ${idx})" class="mt-0.5 w-3.5 h-3.5 rounded text-[#5E856F] bg-[var(--mc-bg-secondary)] border-[var(--mc-border-default)] cursor-pointer">
 
                       <span class="text-[11px] leading-tight flex-1">${escapeHtml(step.replace(/^[0-9•\-\.]+\s*/, ''))}</span>
 
