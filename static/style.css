@@ -3177,164 +3177,101 @@ body.light .chat-msg-ai-card {
 
 
 /* ==========================================================================
-   INTELLIGENT AUTO-ALIGN MODAL SYSTEM & PREMIUM TYPOGRAPHY
+   STREAMLINED RESPONSIVE MODAL SYSTEM & CRISP PROPORTIONS
    ========================================================================== */
 
-/* 1. Modal backdrop sits cleanly above all layers */
+/* 1. Modal backdrop sits cleanly above all mobile & desktop layers */
 div[id$="-modal"],
-.fixed.inset-0.z-50,
-#master-menu-modal,
-#journal-modal,
-#auth-modal,
-#chat-history-modal,
-#task-modal,
-#sketch-modal,
-#memory-reader-modal,
-#memory-compare-modal,
-#journey-evolution-modal,
-#gemini-key-modal,
-#scrapbook-modal,
-#goal-modal,
-#habit-modal,
-#archived-habits-modal,
-#shortcuts-modal,
-#bucket-modal,
-#bucket-categories-modal,
-#blocker-modal,
-#notifications-modal,
-#factory-reset-modal,
-#goals-habits-modal,
-#persona-edit-modal {
+.fixed.inset-0.z-50 {
   z-index: 10050 !important;
-  align-items: center !important;
-  justify-content: center !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Global Modal Typography Standards (Desktop & Tablet) */
-div[id$="-modal"] h3 {
-  font-size: 1.0625rem !important;
-  font-weight: 600 !important;
-  letter-spacing: -0.015em !important;
-  line-height: 1.3 !important;
+div[id$="-modal"].hidden {
+  display: none !important;
 }
 
-div[id$="-modal"] p,
-div[id$="-modal"] .text-secondary-subtle {
-  font-size: 0.8125rem !important;
-  line-height: 1.45 !important;
+/* Modal Dialog Card Standards */
+div[id$="-modal"] > div.mc-card,
+div[id$="-modal"] > div.double-bezel,
+div[id$="-modal"] .modal-dialog-compact,
+div[id$="-modal"] .modal-card {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 32rem !important; /* 512px */
+  max-height: calc(100dvh - 2rem) !important;
+  max-height: calc(100vh - 2rem) !important;
+  margin: auto !important;
+  border-radius: 1.25rem !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
 }
 
-div[id$="-modal"] label {
-  font-size: 0.8125rem !important;
-  font-weight: 600 !important;
-  letter-spacing: -0.01em !important;
-  margin-bottom: 0.25rem !important;
-}
-
-div[id$="-modal"] .mc-input,
+/* Form inputs & textareas */
 div[id$="-modal"] input[type="text"],
 div[id$="-modal"] input[type="time"],
 div[id$="-modal"] input[type="date"],
 div[id$="-modal"] select {
-  font-size: 0.875rem !important;
+  font-size: 0.8125rem !important;
   line-height: 1.4 !important;
-  padding: 0.55rem 0.85rem !important;
-  border-radius: 0.75rem !important;
+  padding: 0.45rem 0.65rem !important;
+  border-radius: 0.625rem !important;
 }
 
 div[id$="-modal"] textarea {
-  font-size: 0.875rem !important;
-  line-height: 1.55 !important;
-  padding: 0.65rem 0.85rem !important;
-  border-radius: 0.75rem !important;
-  min-height: 95px !important;
+  font-size: 0.8125rem !important;
+  line-height: 1.5 !important;
+  padding: 0.5rem 0.65rem !important;
+  border-radius: 0.625rem !important;
+  min-height: 75px !important;
 }
 
-div[id$="-modal"] .btn-primary,
-div[id$="-modal"] button[type="submit"],
-div[id$="-modal"] button.btn-secondary,
-div[id$="-modal"] .btn-cancel {
-  font-size: 0.875rem !important;
-  font-weight: 600 !important;
-  padding: 0.55rem 1.1rem !important;
-  border-radius: 0.75rem !important;
-  letter-spacing: -0.01em !important;
-}
-
-/* Mobile Specific Auto-Scaling (Max-Width: 640px) */
+/* Mobile Specific Auto-Alignment (Screen width <= 640px) */
 @media (max-width: 640px) {
-  /* Modal backdrop padding */
   div[id$="-modal"] {
-    padding: 0.75rem 0.5rem !important;
+    padding: 0.5rem !important;
   }
 
-  /* Modal cards auto-fit and scale */
-  div[id$="-modal"] > div,
-  div[id$="-modal"] .mc-card,
+  div[id$="-modal"] > div.mc-card,
+  div[id$="-modal"] > div.double-bezel,
   div[id$="-modal"] .modal-dialog-compact,
   div[id$="-modal"] .modal-card {
-    width: 100% !important;
     max-width: calc(100vw - 1rem) !important;
-    max-height: calc(100dvh - 1.5rem) !important;
-    max-height: calc(100vh - 1.5rem) !important;
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    padding: 1.1rem 1.15rem !important;
-    border-radius: 1.25rem !important;
-    margin: auto !important;
+    max-height: calc(100dvh - 1.25rem) !important;
+    max-height: calc(100vh - 1.25rem) !important;
+    padding: 0.875rem !important;
+    border-radius: 1rem !important;
   }
 
-  /* Modal Headers on Mobile */
   div[id$="-modal"] h3 {
-    font-size: 1rem !important;
-    font-weight: 600 !important;
-    line-height: 1.3 !important;
+    font-size: 0.875rem !important;
   }
 
   div[id$="-modal"] p {
-    font-size: 0.75rem !important;
-    line-height: 1.4 !important;
+    font-size: 0.6875rem !important;
   }
 
   div[id$="-modal"] label {
-    font-size: 0.8125rem !important;
-    font-weight: 600 !important;
-  }
-
-  /* Inputs & Textareas on Mobile (16px to prevent iOS auto-zoom while maintaining crisp layout) */
-  div[id$="-modal"] .mc-input,
-  div[id$="-modal"] input[type="text"],
-  div[id$="-modal"] input[type="time"],
-  div[id$="-modal"] input[type="date"],
-  div[id$="-modal"] select {
-    font-size: 0.875rem !important;
-    padding: 0.5rem 0.75rem !important;
-    border-radius: 0.75rem !important;
+    font-size: 0.75rem !important;
   }
 
   div[id$="-modal"] textarea {
-    font-size: 0.875rem !important;
-    line-height: 1.5 !important;
-    min-height: 90px !important;
-    max-height: 160px !important;
-    padding: 0.55rem 0.75rem !important;
+    min-height: 70px !important;
+    max-height: 130px !important;
   }
 
-  /* Tone / Mood Pills on Mobile */
-  div[id$="-modal"] button.mood-pill,
-  div[id$="-modal"] .mood-btn {
-    font-size: 0.75rem !important;
-    padding: 0.35rem 0.7rem !important;
-    font-weight: 500 !important;
+  div[id$="-modal"] .mood-chip {
+    font-size: 0.6875rem !important;
+    padding: 0.25rem 0.55rem !important;
   }
 
-  /* Action Buttons on Mobile */
   div[id$="-modal"] .btn-primary,
   div[id$="-modal"] button[type="submit"],
   div[id$="-modal"] button.btn-secondary {
-    font-size: 0.8125rem !important;
-    font-weight: 600 !important;
-    padding: 0.55rem 1rem !important;
-    border-radius: 0.75rem !important;
+    font-size: 0.75rem !important;
+    padding: 0.4rem 0.75rem !important;
   }
 }

@@ -2488,101 +2488,104 @@
   <!-- ===================================================================== -->
   <!-- MODAL: LOG JOURNAL MOMENT (DISTRACTION-FREE QUIET BENTO EDITOR) -->
   <!-- ===================================================================== -->
-  <div id="journal-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
-    <div class="mc-card max-w-xl w-full my-auto shadow-2xl p-5 sm:p-6">
-      <div class="flex items-center justify-between mb-4 border-b border-[var(--mc-border-subtle)] pb-3">
+    <div id="journal-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-2.5 sm:p-4 hidden overflow-y-auto">
+    <div class="mc-card max-w-lg w-full my-auto shadow-2xl p-4 sm:p-5 flex flex-col max-h-[92vh] sm:max-h-[88vh]">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-2.5 mb-2.5 border-b border-[var(--mc-border-subtle)] shrink-0">
         <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-xl bg-[var(--mc-accent-12)] border border-[var(--mc-accent-25)] flex items-center justify-center text-[var(--mc-accent)] text-xs">
-            <i data-lucide="edit-3" class="w-4 h-4"></i>
+          <div class="w-7 h-7 rounded-xl bg-[var(--mc-accent-12)] border border-[var(--mc-accent-25)] flex items-center justify-center text-[var(--mc-accent)] text-xs shrink-0">
+            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
           </div>
           <div>
-            <h3 class="text-base font-semibold text-[var(--mc-text-primary)]" id="journal-modal-title">Log Reflection</h3>
-            <p class="text-[11px] text-[var(--mc-text-secondary)]" id="journal-modal-subtitle">Capture your thoughts, mood, and state with clarity</p>
+            <h3 class="text-sm sm:text-base font-semibold text-[var(--mc-text-primary)] leading-tight" id="journal-modal-title">Log Reflection</h3>
+            <p class="text-[11px] text-[var(--mc-text-secondary)] mt-0.5" id="journal-modal-subtitle">Capture your thoughts, mood, and state with clarity</p>
           </div>
         </div>
-        <button onclick="closeNewJournalModal()" class="text-[var(--mc-text-muted)] hover:text-[var(--mc-text-primary)] transition-colors p-1 cursor-pointer">
-          <i data-lucide="x" class="w-5 h-5"></i>
+        <button onclick="closeNewJournalModal()" class="text-[var(--mc-text-muted)] hover:text-[var(--mc-text-primary)] transition-colors p-1.5 cursor-pointer rounded-lg hover:bg-[var(--mc-bg-tertiary)]">
+          <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
 
-      <form onsubmit="submitNewJournal(event)" class="space-y-4 text-xs">
+      <!-- Modal Body (Scrollable if viewport is small) -->
+      <form onsubmit="submitNewJournal(event)" class="space-y-3 overflow-y-auto flex-1 pr-0.5">
         <input type="hidden" id="journal-edit-id" value="">
+        
         <!-- Title & Time Row -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
           <div class="sm:col-span-2">
-            <label class="text-[var(--mc-text-secondary)] block mb-1 font-medium">Moment Title</label>
-            <input type="text" id="journal-title-input" required placeholder="What is on your mind?" class="mc-input w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] placeholder-[var(--mc-text-muted)] border-[var(--mc-border-default)]">
+            <label class="text-[11px] font-semibold text-[var(--mc-text-secondary)] block mb-1">Moment Title</label>
+            <input type="text" id="journal-title-input" required placeholder="What is on your mind?" class="mc-input w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] placeholder-[var(--mc-text-muted)] border-[var(--mc-border-default)] text-xs sm:text-sm !py-1.5 !px-2.5">
           </div>
 
           <div>
             <div class="flex items-center justify-between mb-1">
-              <label class="text-[var(--mc-text-secondary)] font-medium">Time</label>
+              <label class="text-[11px] font-semibold text-[var(--mc-text-secondary)]">Time</label>
               <button type="button" onclick="setMomentTimeToNow()" class="text-[10px] text-[var(--mc-accent)] hover:underline font-medium cursor-pointer">Now</button>
             </div>
-            <input type="time" id="journal-exact-time-input" class="mc-input w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] font-mono border-[var(--mc-border-default)]">
+            <input type="time" id="journal-exact-time-input" class="mc-input w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] font-mono border-[var(--mc-border-default)] text-xs sm:text-sm !py-1.5 !px-2.5">
             <input type="hidden" id="journal-hour-input" value="12:00">
             <input type="hidden" id="journal-track-select" value="chrono">
           </div>
         </div>
 
-        <!-- Distraction-Free Textarea -->
+        <!-- Reflection Textarea -->
         <div>
           <div class="flex items-center justify-between mb-1">
-            <label class="text-[var(--mc-text-secondary)] font-medium">Reflection & Thoughts</label>
-            <button type="button" onclick="toggleVoiceInput('journal-content-input', 'voice-indicator-journal')" class="text-[11px] text-[var(--mc-accent)] hover:opacity-80 flex items-center gap-1 bg-[var(--mc-accent-10)] px-2.5 py-0.5 rounded-lg border border-[var(--mc-accent-25)] transition-all cursor-pointer font-medium">
+            <label class="text-[11px] font-semibold text-[var(--mc-text-secondary)]">Reflection & Thoughts</label>
+            <button type="button" onclick="toggleVoiceInput('journal-content-input', 'voice-indicator-journal')" class="text-[10px] text-[var(--mc-accent)] hover:opacity-80 flex items-center gap-1 bg-[var(--mc-accent-10)] px-2 py-0.5 rounded-lg border border-[var(--mc-accent-25)] transition-all cursor-pointer font-medium">
               <i data-lucide="mic" class="w-3 h-3"></i>
               <span id="voice-indicator-journal">Voice Input</span>
             </button>
           </div>
-          <textarea id="journal-content-input" required rows="6" placeholder="Start writing... What thoughts or feelings arose? What perspective feels most grounding?" class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] placeholder-[var(--mc-text-muted)] text-sm p-3.5 rounded-xl border border-[var(--mc-border-default)] focus:border-[var(--mc-accent)] focus:outline-none resize-y font-sans leading-relaxed min-h-[160px]"></textarea>
+          <textarea id="journal-content-input" required rows="3" placeholder="Start writing... What thoughts or feelings arose? What perspective feels most grounding?" class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] placeholder-[var(--mc-text-muted)] text-xs sm:text-sm p-2.5 sm:p-3 rounded-xl border border-[var(--mc-border-default)] focus:border-[var(--mc-accent)] focus:outline-none resize-y font-sans leading-relaxed min-h-[85px] max-h-[160px]"></textarea>
         </div>
 
         <!-- Mood & Energy Bar -->
-        <div class="p-3.5 rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] space-y-3">
+        <div class="p-2.5 sm:p-3 rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] space-y-2">
           <div class="flex items-center justify-between">
-            <label class="text-[var(--mc-text-secondary)] font-medium">Emotional Tone</label>
-            <span id="mood-pulse-label" class="text-[11px] text-[var(--mc-accent)] font-mono font-medium">Calm & Content</span>
+            <label class="text-[11px] font-semibold text-[var(--mc-text-secondary)]">Emotional Tone</label>
+            <span id="mood-pulse-label" class="text-[10px] text-[var(--mc-accent)] font-mono font-medium">Calm & Content</span>
           </div>
-          <div class="flex items-center justify-around gap-1.5 flex-wrap" id="mood-chip-group">
-            <button type="button" onclick="selectMoodChip('Heavy', 'Heavy', this)" class="mood-chip text-xs font-medium px-3 py-1 rounded-full bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] transition-colors cursor-pointer" title="Heavy / Challenged">Heavy</button>
-            <button type="button" onclick="selectMoodChip('Neutral', 'Neutral', this)" class="mood-chip text-xs font-medium px-3 py-1 rounded-full bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] transition-colors cursor-pointer" title="Neutral">Neutral</button>
-            <button type="button" onclick="selectMoodChip('Calm', 'Calm', this)" class="mood-chip selected text-xs font-medium px-3 py-1 rounded-full bg-[var(--mc-accent-12)] border border-[var(--mc-accent-40)] text-[var(--mc-accent)] transition-colors cursor-pointer" title="Calm">Calm</button>
-            <button type="button" onclick="selectMoodChip('Joyful', 'Joyful', this)" class="mood-chip text-xs font-medium px-3 py-1 rounded-full bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] transition-colors cursor-pointer" title="Joyful / Grateful">Joyful</button>
-            <button type="button" onclick="selectMoodChip('Energized', 'Energized', this)" class="mood-chip text-xs font-medium px-3 py-1 rounded-full bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] transition-colors cursor-pointer" title="Energized / Flow">Energized</button>
+          <div class="flex items-center justify-between gap-1 flex-wrap" id="mood-chip-group">
+            <button type="button" onclick="selectMoodChip('Heavy', 'Heavy', this)" class="mood-chip text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] transition-colors cursor-pointer" title="Heavy / Challenged">Heavy</button>
+            <button type="button" onclick="selectMoodChip('Neutral', 'Neutral', this)" class="mood-chip text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] transition-colors cursor-pointer" title="Neutral">Neutral</button>
+            <button type="button" onclick="selectMoodChip('Calm', 'Calm', this)" class="mood-chip selected text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-[var(--mc-accent-12)] border border-[var(--mc-accent-40)] text-[var(--mc-accent)] transition-colors cursor-pointer" title="Calm">Calm</button>
+            <button type="button" onclick="selectMoodChip('Joyful', 'Joyful', this)" class="mood-chip text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] transition-colors cursor-pointer" title="Joyful / Grateful">Joyful</button>
+            <button type="button" onclick="selectMoodChip('Energized', 'Energized', this)" class="mood-chip text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] transition-colors cursor-pointer" title="Energized / Flow">Energized</button>
           </div>
 
-          <div class="pt-2 border-t border-[var(--mc-border-subtle)] flex items-center justify-between gap-4">
-            <label class="text-[11px] text-[var(--mc-text-secondary)] whitespace-nowrap">Energy: <strong id="energy-val-lbl" class="text-[var(--mc-accent)] font-mono">7/10</strong></label>
-            <input type="range" id="journal-energy-slider" min="1" max="10" value="7" class="w-full accent-[#5E856F] cursor-pointer" oninput="document.getElementById('energy-val-lbl').textContent = this.value + '/10'">
+          <div class="pt-1.5 border-t border-[var(--mc-border-subtle)] flex items-center justify-between gap-3">
+            <label class="text-[10px] text-[var(--mc-text-secondary)] font-medium whitespace-nowrap">Energy: <strong id="energy-val-lbl" class="text-[var(--mc-accent)] font-mono font-semibold">7/10</strong></label>
+            <input type="range" id="journal-energy-slider" min="1" max="10" value="7" class="w-full accent-[#5E856F] cursor-pointer h-1.5" oninput="document.getElementById('energy-val-lbl').textContent = this.value + '/10'">
           </div>
         </div>
 
         <!-- Tags & Photo Row -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
           <div>
-            <label class="text-[var(--mc-text-secondary)] block mb-1 font-medium">Tags (optional)</label>
-            <input type="text" id="journal-tags-input" placeholder="#reflection, #clarity" class="mc-input w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] placeholder-[var(--mc-text-muted)] border-[var(--mc-border-default)]">
+            <label class="text-[11px] font-semibold text-[var(--mc-text-secondary)] block mb-1">Tags (optional)</label>
+            <input type="text" id="journal-tags-input" placeholder="#reflection, #clarity" class="mc-input w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] placeholder-[var(--mc-text-muted)] border-[var(--mc-border-default)] text-xs !py-1.5 !px-2.5">
           </div>
           <div>
-            <label class="text-[var(--mc-text-secondary)] block mb-1 font-medium">Attach Photo</label>
-            <input type="file" id="journal-photo-input" accept="image/*" class="text-xs text-[var(--mc-text-secondary)] file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-[var(--mc-bg-tertiary)] file:text-[var(--mc-text-primary)] hover:file:opacity-80 cursor-pointer" onchange="handleJournalPhotoUpload(event)">
+            <label class="text-[11px] font-semibold text-[var(--mc-text-secondary)] block mb-1">Attach Photo</label>
+            <input type="file" id="journal-photo-input" accept="image/*" class="text-[11px] text-[var(--mc-text-secondary)] file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[10px] file:font-medium file:bg-[var(--mc-bg-tertiary)] file:text-[var(--mc-text-primary)] hover:file:opacity-80 cursor-pointer" onchange="handleJournalPhotoUpload(event)">
           </div>
         </div>
 
         <!-- Photo Preview Box -->
-        <div id="journal-photo-preview-box" class="hidden relative rounded-xl overflow-hidden max-h-48 border border-[var(--mc-border-default)]">
+        <div id="journal-photo-preview-box" class="hidden relative rounded-xl overflow-hidden max-h-36 border border-[var(--mc-border-default)]">
           <img id="journal-photo-preview-img" src="" alt="Photo Preview" class="w-full h-full object-cover">
-          <button type="button" onclick="removeJournalPhoto()" class="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/70 text-white flex items-center justify-center hover:bg-black">
-            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+          <button type="button" onclick="removeJournalPhoto()" class="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-black/70 text-white flex items-center justify-center hover:bg-black">
+            <i data-lucide="x" class="w-3 h-3"></i>
           </button>
         </div>
 
-        <!-- Form Actions -->
-        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-[var(--mc-border-subtle)]">
-          <button type="button" onclick="closeNewJournalModal()" class="btn-secondary text-xs">Cancel</button>
-          <button type="submit" id="btn-submit-journal" class="btn-primary text-xs font-medium px-5">
-            <i data-lucide="check" class="w-4 h-4"></i>
-            <span>Save Reflection</span>
+        <!-- Form Actions Footer -->
+        <div class="flex items-center justify-end gap-2 pt-2.5 border-t border-[var(--mc-border-subtle)] shrink-0">
+          <button type="button" onclick="closeNewJournalModal()" class="btn-secondary !py-1.5 !px-3.5 text-xs font-semibold">Cancel</button>
+          <button type="submit" id="btn-submit-journal" class="btn-primary !py-1.5 !px-4 text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer">
+            <i data-lucide="check" class="w-3.5 h-3.5 text-white"></i>
+            <span id="journal-submit-btn-text">Save Reflection</span>
           </button>
         </div>
       </form>
