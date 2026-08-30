@@ -2991,20 +2991,44 @@ function updateMediaModeUI() {
 
 
 
+// =============================================================================
+// MEDIA & TEXT VIEW MODE TOGGLE (ALL / TEXT ONLY / PHOTOS ONLY)
+// =============================================================================
+
 function toggleMediaMode() {
+  if (!state.mediaMode || state.mediaMode === 'all') {
+    state.mediaMode = 'text';
+  } else if (state.mediaMode === 'text') {
+    state.mediaMode = 'photos';
+  } else {
+    state.mediaMode = 'all';
+  }
 
-  state.mediaMode = state.mediaMode === 'photos' ? 'compact' : 'photos';
+  const labelEl = document.getElementById('media-mode-label');
+  const iconEl = document.getElementById('media-mode-icon');
+  const btnEl = document.getElementById('media-mode-toggle-btn');
 
-  localStorage.setItem('mind_cave_media_mode', state.mediaMode);
-
-  updateMediaModeUI();
+  if (labelEl && iconEl) {
+    if (state.mediaMode === 'text') {
+      labelEl.textContent = 'Text Only';
+      iconEl.setAttribute('data-lucide', 'file-text');
+      if (btnEl) btnEl.classList.add('border-[var(--mc-accent)]', 'text-[var(--mc-accent)]');
+      showToast('Switched to Text-Only timeline view');
+    } else if (state.mediaMode === 'photos') {
+      labelEl.textContent = 'Photos Only';
+      iconEl.setAttribute('data-lucide', 'image');
+      if (btnEl) btnEl.classList.add('border-[var(--mc-accent)]', 'text-[var(--mc-accent)]');
+      showToast('Switched to Photos-Only timeline view');
+    } else {
+      labelEl.textContent = 'All Content';
+      iconEl.setAttribute('data-lucide', 'layers');
+      if (btnEl) btnEl.classList.remove('border-[var(--mc-accent)]', 'text-[var(--mc-accent)]');
+      showToast('Showing all timeline content & media');
+    }
+    if (window.lucide) lucide.createIcons();
+  }
 
   renderChronoTimeline();
-
-  renderMemoryPhotos();
-
-  showToast(state.mediaMode === 'compact' ? 'Lightweight Mode: Photos collapsed for fast reading.' : 'Rich Media Mode: Photos enabled across journal.');
-
 }
 
 

@@ -1086,32 +1086,57 @@ html:not(.dark) .synthesis-chip {
   border-radius: 9999px;
 }
 
-/* Mood Pulse Picker Chips */
+/* Quiet Bento Mood Pulse Picker Chips */
 .mood-chip {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  padding: 0.35rem 0.85rem;
   border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--mc-bg-secondary);
+  border: 1px solid var(--mc-border-subtle);
+  color: var(--mc-text-secondary);
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 1rem;
+  transition: all 0.18s ease;
+  font-size: 0.75rem;
+  font-weight: 500;
+  width: auto;
+  height: auto;
 }
 
 .mood-chip:hover {
-  transform: scale(1.15);
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: var(--mc-border-strong);
+  color: var(--mc-text-primary);
+  background: var(--mc-bg-tertiary);
 }
 
 .mood-chip.selected {
-  background: rgba(6, 182, 212, 0.25);
-  border-color: #06b6d4;
-  box-shadow: 0 0 12px rgba(6, 182, 212, 0.5);
-  transform: scale(1.15);
+  background: var(--mc-accent-12) !important;
+  border-color: var(--mc-accent) !important;
+  color: var(--mc-accent) !important;
+  font-weight: 600;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+html.light .mood-chip,
+html:not(.dark) .mood-chip {
+  background: #FFFFFF;
+  border-color: var(--mc-border-default);
+  color: #55606B;
+}
+
+html.light .mood-chip:hover,
+html:not(.dark) .mood-chip:hover {
+  background: #F1F4F1;
+  color: #191D1B;
+}
+
+html.light .mood-chip.selected,
+html:not(.dark) .mood-chip.selected {
+  background: rgba(94, 133, 111, 0.12) !important;
+  border-color: #5E856F !important;
+  color: #5E856F !important;
 }
 
 /* Cycle Tracking Phase Bar */
