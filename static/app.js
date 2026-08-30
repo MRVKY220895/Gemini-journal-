@@ -1,4 +1,22 @@
 
+function updateComposerModelStatus(isLive, modelName = 'gemini-3.5-flash-lite') {
+  const dot = document.getElementById('gemini-key-dot');
+  const label = document.getElementById('gemini-key-label');
+  const pill = document.getElementById('composer-model-pill');
+  if (!dot || !label) return;
+
+  if (isLive) {
+    dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0';
+    label.textContent = `${modelName.replace('gemini-', 'Gemini ')} (Live)`;
+    if (pill) pill.title = `${modelName} Live Cloud Connected. Click to inspect AI settings.`;
+  } else {
+    dot.className = 'w-2 h-2 rounded-full bg-amber-400 shrink-0';
+    label.textContent = 'Local Sanctuary (Offline)';
+    if (pill) pill.title = 'Running on offline Local Sanctuary. Click to enter a live Gemini API key.';
+  }
+}
+
+
 // =============================================================================
 // DYNAMIC USER PERSONA & COGNITIVE IDENTITY CONTROLLER
 // =============================================================================
@@ -211,23 +229,14 @@ function removeLoadingIndicator() {
 // ULTRA-FAST DEBOUNCED ICON & RENDER ENGINE (60FPS ZERO-JANK)
 // =============================================================================
 
-let _lucideScheduled = false;
 function refreshIcons(container = null) {
-  if (!window.lucide) return;
-  if (container) {
+  if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
     try {
-      window.lucide.createIcons({ root: container });
-      return;
-    } catch (e) {}
+      lucide.createIcons();
+    } catch (e) {
+      console.debug('Lucide render notice:', e);
+    }
   }
-  if (_lucideScheduled) return;
-  _lucideScheduled = true;
-  requestAnimationFrame(() => {
-    try {
-      if (window.lucide) window.refreshIcons();
-    } catch (e) {}
-    _lucideScheduled = false;
-  });
 }
 
 
@@ -2014,9 +2023,9 @@ function updateContextualSuggestions(userMessage, cognitiveData) {
 
   container.innerHTML = suggestions.map(s => `
 
-    <button onclick="insertPrompt('${escapeHtml(s.text).replace(/'/g, "\\'")}')" class="text-xs text-slate-300 hover:text-white bg-slate-900/90 hover:bg-slate-800 px-3.5 py-1.5 rounded-full border border-white/10 transition-all shrink-0 flex items-center gap-1.5 shadow-sm">
+    <button onclick="insertPrompt('${escapeHtml(s.text).replace(/'/g, "\\'")}')" class="text-xs text-[var(--mc-text-primary)] hover:bg-[var(--mc-bg-elevation)] bg-[var(--mc-bg-secondary)] px-3.5 py-1.5 rounded-full border border-[var(--mc-border-default)] transition-all shrink-0 flex items-center gap-1.5 shadow-sm cursor-pointer">
 
-      <i data-lucide="${s.icon}" class="w-3.5 h-3.5 text-cyan-400 shrink-0"></i> <span>${escapeHtml(s.text)}</span>
+      <i data-lucide="${s.icon}" class="w-3.5 h-3.5 text-[var(--mc-accent)] shrink-0"></i> <span>${escapeHtml(s.text)}</span>
 
     </button>
 
@@ -2081,7 +2090,7 @@ function appendErrorCard(errorMessage, retryPrompt) {
   refreshIcons();
 }
 
-function appendChatMessage(role, content, authorName, modelTag, cognitiveData = null, originalPrompt = "", isRecord = true) {
+function appendChatMessage(role, content, authorName, modelTag, cognitiveData = null, originalPrompt = "", latencyMs = null, isRecord = true) {
   const container = document.getElementById('chat-messages');
   if (!container) return;
 
@@ -2105,7 +2114,7 @@ function appendChatMessage(role, content, authorName, modelTag, cognitiveData = 
 
     if (!Array.isArray(state.chatHistory)) state.chatHistory = [];
 
-    state.chatHistory.push({ role, content, authorName, modelTag, cognitiveData, originalPrompt, timestamp: Date.now() });
+    state.chatHistory.push({ role, content, authorName, modelTag, cognitiveData, originalPrompt, latencyMs, timestamp: Date.now() });
 
     const userKey = 'mind_cave_chat_history_' + (state.currentUser?.uid || 'guest');
 
@@ -2150,19 +2159,34 @@ function appendChatMessage(role, content, authorName, modelTag, cognitiveData = 
     msgDiv.innerHTML = `
       <div class="chat-msg-ai-card group" id="${turnId}">
         <!-- Header -->
-        <div class="flex items-center justify-between gap-2 mb-3">
-          <div class="flex items-center gap-2">
-            <div class="w-6 h-6 rounded-lg bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] flex items-center justify-center text-xs">
-              <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+        <div class="flex items-center justify-between gap-2 mb-3 flex-wrap">
+          <div class="flex items-center gap-2 flex-wrap">
+            <div class="w-7 h-7 rounded-xl bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] flex items-center justify-center text-xs shrink-0 shadow-sm">
+              <i data-lucide="sparkles" class="w-4 h-4 text-[#9BB7A5]"></i>
             </div>
-            <span class="text-xs font-bold text-slate-900 dark:text-white">${escapeHtml(authorName)}</span>
-            <span class="text-[10px] px-2 py-0.5 rounded-full ${modelTag === 'local-cognitive-engine' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)]'} font-mono flex items-center gap-1">
-              <span class="w-1.5 h-1.5 rounded-full ${modelTag === 'local-cognitive-engine' ? 'bg-amber-400' : 'bg-emerald-400 animate-pulse'}"></span>
-              <span>${modelTag === 'local-cognitive-engine' ? 'Local Sanctuary' : escapeHtml(modelTag || 'Gemini Cloud Live')}</span>
-            </span>
+            <span class="text-xs font-bold text-[var(--mc-text-primary)]">${escapeHtml(authorName)}</span>
+            
+            ${modelTag === 'local-cognitive-engine' ? `
+              <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30 font-mono font-semibold flex items-center gap-1.5 shadow-sm" title="Running offline via Local Cognitive Sanctuary">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                <span>Local Sanctuary (Offline)</span>
+              </span>
+            ` : `
+              <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-mono font-semibold flex items-center gap-1.5 shadow-sm" title="Connected Live to Google Cloud Gemini">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>${escapeHtml(modelTag || 'gemini-3.5-flash-lite')}</span>
+              </span>
+            `}
+
+            ${latencyMs ? `
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)] text-[var(--mc-accent)] font-semibold flex items-center gap-1 shadow-sm" title="Gemini API Response Generation Time: ${latencyMs}ms">
+                <i data-lucide="zap" class="w-3 h-3 text-amber-400"></i>
+                <span>${(latencyMs > 100 ? (latencyMs / 1000).toFixed(2) : latencyMs)}s</span>
+              </span>
+            ` : ''}
           </div>
 
-          <span class="text-[10px] font-mono text-[var(--mc-text-secondary)] bg-[var(--mc-bg-secondary)] px-2 py-0.5 rounded border border-[var(--mc-border-subtle)]">
+          <span class="text-[10px] font-mono text-[var(--mc-text-secondary)] bg-[var(--mc-bg-secondary)] px-2.5 py-0.5 rounded-full border border-[var(--mc-border-subtle)] font-medium">
             ${escapeHtml(cognitiveData?.primary_emotion || 'Seeking Direction')}
           </span>
         </div>
@@ -2270,7 +2294,7 @@ function restoreChatHistory() {
         container.className = "flex-1 flex flex-col justify-start overflow-y-auto space-y-6 px-1 py-4 mb-2";
         container.innerHTML = '';
         history.forEach(item => {
-          appendChatMessage(item.role, item.content, item.authorName, item.modelTag, item.cognitiveData, item.originalPrompt, false);
+          appendChatMessage(item.role, item.content, item.authorName, item.modelTag, item.cognitiveData, item.originalPrompt, item.latencyMs || null, false);
         });
         const lastUser = history.filter(h => h.role === 'user').slice(-1)[0];
         if (lastUser) updateSessionTitle(lastUser.content);
