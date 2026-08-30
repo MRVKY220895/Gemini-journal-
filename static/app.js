@@ -1,3 +1,57 @@
+async function deleteJournalEntry(journalId, event) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  if (!confirm('Permanently delete this reflection from your timeline?')) return;
+
+  const cleanId = (journalId || '').toString().replace(/^journal_/, '').trim();
+
+  // 1. Optimistic removal from cache for instant 0ms DOM update
+  if (!state.journalsCache || !Array.isArray(state.journalsCache)) {
+    try {
+      const cached = localStorage.getItem('mind_cave_cached_journals');
+      state.journalsCache = cached ? JSON.parse(cached) : [];
+    } catch (e) {
+      state.journalsCache = [];
+    }
+  }
+
+  state.journalsCache = state.journalsCache.filter(j => {
+    const jId = (j.id || '').toString();
+    return jId !== cleanId && jId !== journalId && `journal_${jId}` !== journalId;
+  });
+
+  try {
+    localStorage.setItem('mind_cave_cached_journals', JSON.stringify(state.journalsCache));
+  } catch (e) {}
+
+  // 2. Re-render Timeline and Cards immediately
+  renderChronoTimeline(false);
+  const gridContainer = document.getElementById('journals-grid');
+  if (gridContainer && typeof renderJournalCards === 'function') {
+    renderJournalCards(state.journalsCache);
+  }
+
+  showToast('Reflection deleted successfully.');
+
+  // 3. Send DELETE request to server
+  try {
+    const response = await fetch(`/api/journals/${cleanId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+
+    if (!response.ok) {
+      console.warn('Server delete returned non-200, syncing...');
+    }
+  } catch (err) {
+    console.debug('Background delete sync notice:', err);
+  }
+}
+
+
 
 function renderJournalCards(journals) {
   const container = document.getElementById('journals-grid');
@@ -6141,10 +6195,7 @@ Includes Canvas Sketch`;
   } catch (e) {}
 
   // Instantly re-render Timeline and Cards DOM in 0ms
-  const timelineContainer = document.getElementById('chrono-timeline-list');
-  if (timelineContainer && typeof _renderTimelineDom === 'function') {
-    _renderTimelineDom(state.journalsCache, timelineContainer);
-  }
+  renderChronoTimeline(false);
   const gridContainer = document.getElementById('journals-grid');
   if (gridContainer && typeof renderJournalCards === 'function') {
     renderJournalCards(state.journalsCache);
@@ -6186,9 +6237,7 @@ Includes Canvas Sketch`;
         try {
           localStorage.setItem('mind_cave_cached_journals', JSON.stringify(state.journalsCache));
         } catch (e) {}
-        if (timelineContainer && typeof _renderTimelineDom === 'function') {
-          _renderTimelineDom(state.journalsCache, timelineContainer);
-        }
+        renderChronoTimeline(false);
         if (gridContainer && typeof renderJournalCards === 'function') {
           renderJournalCards(state.journalsCache);
         }
