@@ -1170,125 +1170,80 @@ function closeMasterMenuModal() {
 
 
 function navigateToSection(tabId, subTrack = null) {
-
   closeMasterMenuModal();
-
   switchTab(tabId);
-
   if (subTrack && tabId === 'journals') {
-
     switchJournalTrack(subTrack);
-
   }
-
 }
-
-
 
 function navigateToStudioPersona(personaId) {
-
   closeMasterMenuModal();
-
   switchTab('studio');
-
   selectPersona(personaId);
-
 }
 
-
-
 // =============================================================================
-
-// TAB NAVIGATION
-
+// TAB NAVIGATION (5 Core Destinations: Overview, Journals, Studio, Analytics, Security)
 // =============================================================================
-
-
 
 function switchTab(tabId) {
-
-  // If target is one of the journal sub-pages
+  if (!tabId) tabId = 'overview';
 
   const journalSubPages = ['chrono', 'harmony', 'memory_lane', 'memory', 'photos', 'sanctuary'];
-
   if (journalSubPages.includes(tabId)) {
-
     const trackTarget = tabId === 'photos' ? 'memory' : tabId;
-
     switchTab('journals');
-
     switchJournalTrack(trackTarget);
-
     return;
-
   }
 
-
-
-  const views = ['studio', 'journals', 'analytics', 'security'];
-
+  const views = ['overview', 'journals', 'studio', 'analytics', 'security'];
   views.forEach(v => {
-
     const viewEl = document.getElementById(`view-${v}`);
-
     const btnEl = document.getElementById(`tab-btn-${v}`);
-
     const mobileBtnEl = document.getElementById(`mobile-tab-${v}`);
 
     if (v === tabId) {
-
       if (viewEl) viewEl.classList.remove('hidden');
-
       if (btnEl) btnEl.classList.add('active');
-
       if (mobileBtnEl) {
-
-        mobileBtnEl.classList.add('active', 'text-cyan-400');
-
-        mobileBtnEl.classList.remove('text-slate-400');
-
+        mobileBtnEl.classList.add('active', 'text-[#9BB7A5]');
+        mobileBtnEl.classList.remove('text-[#6F7881]', 'text-slate-400');
       }
-
     } else {
-
       if (viewEl) viewEl.classList.add('hidden');
-
       if (btnEl) btnEl.classList.remove('active');
-
       if (mobileBtnEl) {
-
-        mobileBtnEl.classList.remove('active', 'text-cyan-400');
-
-        mobileBtnEl.classList.add('text-slate-400');
-
+        mobileBtnEl.classList.remove('active', 'text-[#9BB7A5]', 'text-cyan-400');
+        mobileBtnEl.classList.add('text-[#6F7881]');
       }
-
     }
-
   });
 
-
-
   if (tabId === 'journals') {
-
     loadJournals();
-
     renderChronoTimeline();
-
   }
-
   if (tabId === 'studio') restoreChatHistory();
   if (tabId === 'analytics') loadAnalytics();
   if (tabId === 'security') loadSecurityAudit();
   updateAllDashboardStats();
+
+  if (window.lucide) lucide.createIcons();
 }
 
-
+function insertPromptAndOpenStudio(promptText) {
+  switchTab('studio');
+  const input = document.getElementById('chat-input');
+  if (input) {
+    input.value = promptText;
+    input.focus();
+  }
+}
 
 // =============================================================================
-
 // MULTI-TURN AI CHAT & JOURNALING STUDIO
-
 // =============================================================================
 
 
@@ -5855,11 +5810,11 @@ function initAnalyticsCharts() {
         datasets: [{
           label: 'Cognitive Vector (%)',
           data: (localStorage.getItem('mind_cave_is_reset') || (state.journals && state.journals.length === 0)) ? [0, 0, 0, 0, 0, 0] : [65, 70, 75, 60, 68, 62],
-          backgroundColor: 'rgba(59, 130, 246, 0.2)',
-          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(155, 183, 165, 0.12)',
+          borderColor: '#9BB7A5',
           borderWidth: 2,
-          pointBackgroundColor: '#60a5fa',
-          pointBorderColor: '#fff'
+          pointBackgroundColor: '#9BB7A5',
+          pointBorderColor: '#111417'
         }]
       },
       options: {
@@ -5867,9 +5822,9 @@ function initAnalyticsCharts() {
         maintainAspectRatio: false,
         scales: {
           r: {
-            angleLines: { color: 'rgba(255, 255, 255, 0.08)' },
-            grid: { color: 'rgba(255, 255, 255, 0.08)' },
-            pointLabels: { color: '#94a3b8', font: { size: 11, family: 'Plus Jakarta Sans' } },
+            angleLines: { color: 'rgba(255, 255, 255, 0.06)' },
+            grid: { color: 'rgba(255, 255, 255, 0.06)' },
+            pointLabels: { color: '#A5ADB5', font: { size: 11, family: 'Inter' } },
             suggestedMin: 0,
             suggestedMax: 100,
             ticks: { display: false }
@@ -5897,26 +5852,26 @@ function initAnalyticsCharts() {
           {
             label: 'Resilience',
             data: isClean ? [0, 0, 0, 0, 0, 0, 0] : [64, 68, 72, 70, 78, 83, 88],
-            borderColor: '#10b981',
-            backgroundColor: 'rgba(16, 185, 129, 0.12)',
-            borderWidth: 2.5,
-            pointBackgroundColor: '#10b981',
-            pointBorderColor: '#ffffff',
-            pointRadius: 4,
-            pointHoverRadius: 6,
+            borderColor: '#9BB7A5',
+            backgroundColor: 'rgba(155, 183, 165, 0.08)',
+            borderWidth: 2,
+            pointBackgroundColor: '#9BB7A5',
+            pointBorderColor: '#111417',
+            pointRadius: 3.5,
+            pointHoverRadius: 5,
             tension: 0.35,
             fill: true
           },
           {
             label: 'Clarity',
             data: isClean ? [0, 0, 0, 0, 0, 0, 0] : [58, 64, 69, 74, 76, 82, 86],
-            borderColor: '#06b6d4',
-            backgroundColor: 'rgba(6, 182, 212, 0.12)',
-            borderWidth: 2.5,
-            pointBackgroundColor: '#06b6d4',
-            pointBorderColor: '#ffffff',
-            pointRadius: 4,
-            pointHoverRadius: 6,
+            borderColor: '#8FA9B8',
+            backgroundColor: 'rgba(143, 169, 184, 0.08)',
+            borderWidth: 2,
+            pointBackgroundColor: '#8FA9B8',
+            pointBorderColor: '#111417',
+            pointRadius: 3.5,
+            pointHoverRadius: 5,
             tension: 0.35,
             fill: true
           }
@@ -7267,13 +7222,9 @@ function escapeHtml(str) {
 
 
 function showToast(msg) {
-
   const toast = document.createElement('div');
-
-  toast.className = 'fixed bottom-4 right-4 z-50 bg-slate-900 text-white text-xs px-4 py-2.5 rounded-full border border-blue-500/40 shadow-xl transition-all';
-
+  toast.className = 'fixed bottom-5 right-5 z-50 bg-[#161A1E] text-[#F2F4F5] text-xs px-4 py-2.5 rounded-full border border-[#30373E] shadow-2xl transition-all font-medium';
   toast.textContent = msg;
-
   document.body.appendChild(toast);
 
   setTimeout(() => {
