@@ -3174,3 +3174,99 @@ body.light .chat-msg-ai-card {
     z-index: 9999 !important;
   }
 }
+
+
+/* ==========================================================================
+   INTELLIGENT MOBILE AUTO-ALIGN MODAL SYSTEM (ALL MODALS AUTO-RESPONSIVE)
+   ========================================================================== */
+
+/* 1. Modal backdrop must be above mobile bottom navigation (9999) */
+div[id$="-modal"],
+.fixed.inset-0.z-50,
+#master-menu-modal,
+#journal-modal,
+#auth-modal,
+#chat-history-modal,
+#task-modal,
+#sketch-modal,
+#memory-reader-modal,
+#memory-compare-modal,
+#journey-evolution-modal,
+#gemini-key-modal,
+#scrapbook-modal,
+#goal-modal,
+#habit-modal,
+#archived-habits-modal,
+#shortcuts-modal,
+#bucket-modal,
+#bucket-categories-modal,
+#blocker-modal,
+#notifications-modal,
+#factory-reset-modal,
+#goals-habits-modal,
+#persona-edit-modal {
+  z-index: 10050 !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+@media (max-width: 640px) {
+  /* Modal backdrop padding */
+  div[id$="-modal"] {
+    padding: 0.75rem 0.625rem !important;
+  }
+
+  /* Modal cards auto-fit and scale */
+  div[id$="-modal"] > div,
+  div[id$="-modal"] .mc-card,
+  div[id$="-modal"] .modal-dialog-compact,
+  div[id$="-modal"] .modal-card {
+    width: 100% !important;
+    max-width: calc(100vw - 1.25rem) !important;
+    max-height: calc(100dvh - 1.75rem) !important;
+    max-height: calc(100vh - 1.75rem) !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 1rem 1.125rem !important;
+    border-radius: 1.25rem !important;
+    margin: auto !important;
+  }
+
+  /* Modal Headers */
+  div[id$="-modal"] h3 {
+    font-size: 0.9375rem !important;
+    line-height: 1.25 !important;
+  }
+  div[id$="-modal"] p {
+    font-size: 0.6875rem !important;
+  }
+
+  /* Form inputs & textareas inside modals */
+  div[id$="-modal"] form {
+    gap: 0.5rem !important;
+  }
+  div[id$="-modal"] .mc-input,
+  div[id$="-modal"] input[type="text"],
+  div[id$="-modal"] input[type="time"],
+  div[id$="-modal"] input[type="date"],
+  div[id$="-modal"] select {
+    padding: 0.45rem 0.65rem !important;
+    font-size: 0.8125rem !important;
+    border-radius: 0.75rem !important;
+  }
+  div[id$="-modal"] textarea {
+    min-height: 75px !important;
+    max-height: 130px !important;
+    padding: 0.45rem 0.65rem !important;
+    font-size: 0.8125rem !important;
+  }
+
+  /* Buttons & Footers */
+  div[id$="-modal"] .btn-primary,
+  div[id$="-modal"] button[type="submit"],
+  div[id$="-modal"] button.btn-secondary {
+    padding: 0.45rem 0.875rem !important;
+    font-size: 0.75rem !important;
+    border-radius: 0.75rem !important;
+  }
+}
