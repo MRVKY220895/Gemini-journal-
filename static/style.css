@@ -1310,6 +1310,8 @@ html.dark .text-slate-400 {
 html.light .eyebrow-badge,
 html:not(.dark) .eyebrow-badge {
   background: rgba(14, 165, 233, 0.1) !important;
+}
+
 /* Light Mode Persona & Tab Active States */
 html.light .persona-btn.active,
 body.light .persona-btn.active,
@@ -1735,8 +1737,6 @@ html:not(.dark) .synthesis-mini-chip {
 html.light .journal-page-header h2,
 html:not(.dark) .journal-page-header h2 {
   color: #0f172a !important;
-}
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
 }
 
 html.light .bg-slate-900\/70,
@@ -3274,4 +3274,35 @@ div[id$="-modal"] textarea {
     font-size: 0.75rem !important;
     padding: 0.4rem 0.75rem !important;
   }
+}
+
+/* Fix Language & Header Dropdown Overflow */
+.floating-nav,
+header.floating-nav,
+.header,
+header {
+  overflow: visible !important;
+}
+
+#language-picker-container {
+  position: relative !important;
+  z-index: 1000 !important;
+}
+
+#language-dropdown-menu {
+  position: absolute !important;
+  top: calc(100% + 6px) !important;
+  right: 0 !important;
+  z-index: 10000 !important;
+  min-width: 14rem !important;
+  max-height: 20rem !important;
+  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.35), 0 0 0 1px var(--mc-border-default) !important;
+  background: var(--mc-bg-secondary) !important;
+  border: 1px solid var(--mc-border-default) !important;
+}
+
+html.light #language-dropdown-menu {
+  background: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.08) !important;
 }

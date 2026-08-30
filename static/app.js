@@ -112,12 +112,14 @@ function toggleDirectorySection(sectionId) {
   const sectionEl = document.getElementById(sectionId);
   const chevronEl = document.getElementById(`${sectionId}-chevron`);
   if (!sectionEl) return;
-  const isHidden = sectionEl.classList.contains('hidden');
+  const isHidden = sectionEl.classList.contains('hidden') || sectionEl.style.display === 'none';
   if (isHidden) {
     sectionEl.classList.remove('hidden');
+    sectionEl.style.display = 'block';
     if (chevronEl) chevronEl.style.transform = 'rotate(180deg)';
   } else {
     sectionEl.classList.add('hidden');
+    sectionEl.style.display = 'none';
     if (chevronEl) chevronEl.style.transform = 'rotate(0deg)';
   }
 }
@@ -128,9 +130,11 @@ function toggleAllDirectorySections(expand = true) {
     const chevron = document.getElementById(`${s.id}-chevron`);
     if (expand) {
       s.classList.remove('hidden');
+      s.style.display = 'block';
       if (chevron) chevron.style.transform = 'rotate(180deg)';
     } else {
       s.classList.add('hidden');
+      s.style.display = 'none';
       if (chevron) chevron.style.transform = 'rotate(0deg)';
     }
   });
@@ -3024,10 +3028,20 @@ const langMetadata = {
 };
 
 function toggleLanguageDropdown(event) {
-  if (event) event.stopPropagation();
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
   const menu = document.getElementById('language-dropdown-menu');
   if (!menu) return;
-  menu.classList.toggle('hidden');
+  const isHidden = menu.classList.contains('hidden') || menu.style.display === 'none';
+  if (isHidden) {
+    menu.classList.remove('hidden');
+    menu.style.display = 'block';
+  } else {
+    menu.classList.add('hidden');
+    menu.style.display = 'none';
+  }
 }
 
 function closeLanguageDropdown() {
@@ -7770,7 +7784,7 @@ function updateBiometricUIStatus() {
       badge.className = 'text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 font-bold';
     } else {
       badge.textContent = 'Not Linked';
-      badge.className = 'text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700';
+      badge.className = 'text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-muted)] border border-[var(--mc-border-default)] font-semibold';
     }
   }
 
