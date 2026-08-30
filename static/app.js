@@ -5920,132 +5920,74 @@ function filterDiaryTimeline(query) {
 
 
 async function submitNewJournal(event) {
+  if (event) event.preventDefault();
 
-  event.preventDefault();
-
-  const title = document.getElementById('journal-title-input').value.trim();
-
-  const content = document.getElementById('journal-content-input').value.trim();
-
+  const title = (document.getElementById('journal-title-input')?.value || 'Moment Reflection').trim();
+  const content = (document.getElementById('journal-content-input')?.value || '').trim();
   const exactTime = document.getElementById('journal-exact-time-input')?.value;
+  const hour = exactTime || document.getElementById('journal-hour-input')?.value || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const track = document.getElementById('journal-track-select')?.value || 'chrono';
+  const energy = document.getElementById('journal-energy-slider')?.value || '7';
+  const isEncrypted = document.getElementById('journal-encrypt-checkbox')?.checked ?? false;
+  const locChecked = document.getElementById('journal-location-check')?.checked ?? false;
+  const locationStr = locChecked ? 'Connaught Place, New Delhi' : 'Private Sanctuary';
+  const linkUrl = document.getElementById('journal-link-input')?.value?.trim() || '';
 
-  const hour = exactTime || document.getElementById('journal-hour-input').value;
-
-  const track = document.getElementById('journal-track-select').value;
-
-  const energy = document.getElementById('journal-energy-slider').value;
-
-  const isEncrypted = document.getElementById('journal-encrypt-checkbox').checked;
-
-  const locChecked = document.getElementById('journal-location-check').checked;
-
-  const locationStr = locChecked ? 'Connaught Place, New Delhi' : 'Private Location';
-
-  const linkUrl = document.getElementById('journal-link-input')?.value.trim();
-
-
+  const moodName = (typeof currentSelectedMood !== 'undefined' && currentSelectedMood?.name) ? currentSelectedMood.name : 'Calm';
 
   // If photo attached, save to memory photos
-
-  if (attachedPhotoBase64) {
-
-    memoryPhotosList.unshift({
-
-      id: `photo_${Date.now()}`,
-
-      hour: hour,
-
-      url: attachedPhotoBase64,
-
-      caption: title || content.substring(0, 40),
-
-      location: locationStr,
-
-      mood: currentSelectedMood.name,
-
-      energy: `${energy}/10`
-
-    });
-
+  if (typeof attachedPhotoBase64 !== 'undefined' && attachedPhotoBase64) {
+    if (typeof memoryPhotosList !== 'undefined' && Array.isArray(memoryPhotosList)) {
+      memoryPhotosList.unshift({
+        id: `photo_${Date.now()}`,
+        hour: hour,
+        url: attachedPhotoBase64,
+        caption: title || content.substring(0, 40),
+        location: locationStr,
+        mood: moodName,
+        energy: `${energy}/10`
+      });
+    }
   }
 
-
-
   let finalContent = `${content}\n\nLocation: ${locationStr} • Energy: ${energy}/10 • Track: ${track}`;
-
   if (linkUrl) finalContent += `\nReference: ${linkUrl}`;
-
-  if (attachedFileName) finalContent += `\nAttachment: ${attachedFileName}`;
-
-  if (attachedSketchBase64) finalContent += `\nIncludes Canvas Sketch`;
-
-
+  if (typeof attachedFileName !== 'undefined' && attachedFileName) finalContent += `\nAttachment: ${attachedFileName}`;
+  if (typeof attachedSketchBase64 !== 'undefined' && attachedSketchBase64) finalContent += `\nIncludes Canvas Sketch`;
 
   try {
-
     const response = await fetch('/api/journals', {
-
       method: 'POST',
-
       headers: getAuthHeaders(),
-
       body: JSON.stringify({
-
         title: `[${hour}] ${title}`,
-
         content: finalContent,
-
-        persona: state.currentPersona,
-
-        mood: currentSelectedMood.name,
-
-        tags: [track, currentSelectedMood.name, hour],
-
+        persona: state.currentPersona || 'cbt_reflector',
+        mood: moodName,
+        tags: [track, moodName, hour],
         is_encrypted: isEncrypted
-
       })
-
     });
-
-
 
     if (!response.ok) throw new Error('Failed to create journal entry.');
 
-
-
     closeNewJournalModal();
-
-    document.getElementById('journal-title-input').value = '';
-
-    document.getElementById('journal-content-input').value = '';
-
-    removeAttachedPhoto();
-
-    removeAttachedSketch();
-
-    removeAttachedFile();
-
+    if (document.getElementById('journal-title-input')) document.getElementById('journal-title-input').value = '';
+    if (document.getElementById('journal-content-input')) document.getElementById('journal-content-input').value = '';
+    if (typeof removeAttachedPhoto === 'function') removeAttachedPhoto();
+    if (typeof removeAttachedSketch === 'function') removeAttachedSketch();
+    if (typeof removeAttachedFile === 'function') removeAttachedFile();
     if (document.getElementById('journal-link-input')) document.getElementById('journal-link-input').value = '';
 
-    
-
     // Refresh all views
-
-    loadJournals();
-
-    renderChronoTimeline();
-
-    renderMemoryPhotos();
-
+    if (typeof loadJournals === 'function') loadJournals();
+    if (typeof renderChronoTimeline === 'function') renderChronoTimeline();
+    if (typeof renderMemoryPhotos === 'function') renderMemoryPhotos();
     state.journalsCache = null;
-    showToast(`Chronicle moment for ${hour} saved with rich media attachments!`);
-
+    showToast(`Reflection moment for ${hour} saved successfully!`);
   } catch (error) {
-
-    alert(`Error: ${error.message}`);
-
+    showToast(`Error saving journal: ${error.message}`);
   }
-
 }
 
 
