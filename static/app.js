@@ -4669,10 +4669,11 @@ function getChronologicalEvents(journals) {
   });
 
   // Instant mode filtering
-  if (state.mediaMode === 'photos') {
+  const activeMedia = state.diaryMediaMode || state.mediaMode || 'all';
+  if (activeMedia === 'photos') {
     return events.filter(e => e.type === 'photo' || Boolean(e.photoUrl));
-  } else if (state.mediaMode === 'text') {
-    return events.filter(e => e.type !== 'photo');
+  } else if (activeMedia === 'text') {
+    return events.filter(e => e.type !== 'photo' && !e.photoUrl);
   }
 
   return events;
@@ -14768,27 +14769,25 @@ function filterNotesAndAlerts(query) {
 // ─── LIVING TIMELINE MEDIA FILTER (ALL | PHOTOS | TEXT ONLY) ───
 function setDiaryMediaMode(mode) {
   state.diaryMediaMode = mode || 'all';
+  state.mediaMode = mode || 'all';
   
   const allBtn = document.getElementById('media-mode-all-btn');
   const photosBtn = document.getElementById('media-mode-photos-btn');
   const textBtn = document.getElementById('media-mode-text-btn');
 
-  [allBtn, photosBtn, textBtn].forEach(b => {
-    if (b) {
-      b.className = 'px-2 sm:px-2.5 py-1 rounded-lg font-semibold text-[var(--mc-text-muted)] hover:text-[var(--mc-text-primary)] text-[11px] sm:text-xs flex items-center gap-1 cursor-pointer';
-    }
-  });
+  const inactiveClass = 'px-2 sm:px-2.5 py-1 rounded-lg font-medium text-[var(--mc-text-muted)] hover:text-[var(--mc-text-primary)] hover:bg-[var(--mc-bg-secondary)] text-[11px] sm:text-xs flex items-center gap-1 cursor-pointer transition-all border border-transparent';
+  const activeClass = 'px-2 sm:px-2.5 py-1 rounded-lg font-bold bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] text-[11px] sm:text-xs flex items-center gap-1 cursor-pointer shadow-sm transition-all';
 
-  if (mode === 'all' && allBtn) {
-    allBtn.className = 'px-2 sm:px-2.5 py-1 rounded-lg font-semibold bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] text-[11px] sm:text-xs flex items-center gap-1 cursor-pointer';
-  } else if (mode === 'photos' && photosBtn) {
-    photosBtn.className = 'px-2 sm:px-2.5 py-1 rounded-lg font-semibold bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] text-[11px] sm:text-xs flex items-center gap-1 cursor-pointer';
-  } else if (mode === 'text' && textBtn) {
-    textBtn.className = 'px-2 sm:px-2.5 py-1 rounded-lg font-semibold bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] text-[11px] sm:text-xs flex items-center gap-1 cursor-pointer';
-  }
+  if (allBtn) allBtn.className = (mode === 'all') ? activeClass : inactiveClass;
+  if (photosBtn) photosBtn.className = (mode === 'photos') ? activeClass : inactiveClass;
+  if (textBtn) textBtn.className = (mode === 'text') ? activeClass : inactiveClass;
 
   renderChronoTimeline(false);
+  
+  const label = mode === 'all' ? '✨ Showing All Moments' : mode === 'photos' ? '🖼️ Filtered to Photo Moments' : '📝 Filtered to Text Reflections';
+  showToast(label);
 }
+window.setDiaryMediaMode = setDiaryMediaMode;
 
 
 // ─── GLOBAL WINDOW EXPORTS FOR EVENT HANDLERS ───
