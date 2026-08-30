@@ -4234,9 +4234,9 @@ function closeNewJournalModal() {
 
 let timelineViewMode = 'stream';
 
-let storyCurrentIndex = 0;
+var storyCurrentIndex = typeof storyCurrentIndex !== 'undefined' ? storyCurrentIndex : 0;
 
-let storyEventsCache = [];
+var storyEventsCache = typeof storyEventsCache !== 'undefined' ? storyEventsCache : [];
 
 
 
@@ -5238,8 +5238,9 @@ async function renderChronoTimeline(forceFetch = false) {
 // STORY FLOW CAROUSEL / TIMELINE SLIDE REVIEW (SWIPE & DRAG)
 // =============================================================================
 
-let storyCurrentIndex = 0;
-let storyEventsCache = [];
+// Story Carousel State Initialized
+if (typeof storyCurrentIndex === 'undefined') var storyCurrentIndex = 0;
+if (typeof storyEventsCache === 'undefined') var storyEventsCache = [];
 
 function prevStorySlide() {
   if (storyCurrentIndex > 0) {
