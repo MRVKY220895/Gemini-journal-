@@ -6051,6 +6051,7 @@ async function submitNewJournal(event) {
   const encryptCheck = document.getElementById('journal-encrypt-checkbox');
   const locCheck = document.getElementById('journal-location-check');
   const linkInput = document.getElementById('journal-link-input');
+  const editIdInput = document.getElementById('journal-edit-id');
 
   const title = (titleInput?.value || 'Moment Reflection').trim();
   const content = (contentInput?.value || '').trim();
@@ -6062,21 +6063,24 @@ async function submitNewJournal(event) {
   const locChecked = locCheck?.checked ?? false;
   const locationStr = locChecked ? 'Connaught Place, New Delhi' : 'Private Sanctuary';
   const linkUrl = linkInput?.value?.trim() || '';
+  const editId = editIdInput?.value?.trim() || '';
+  const isEditMode = Boolean(editId);
 
   const moodName = (typeof currentSelectedMood !== 'undefined' && currentSelectedMood?.name) ? currentSelectedMood.name : 'Calm';
 
-  // 1. Close modal IMMEDIATELY for instantaneous UI feedback
+  // 1. Close modal IMMEDIATELY
   closeNewJournalModal();
 
-  // 2. Clear inputs immediately
+  // 2. Clear form inputs immediately
   if (titleInput) titleInput.value = '';
   if (contentInput) contentInput.value = '';
   if (linkInput) linkInput.value = '';
+  if (editIdInput) editIdInput.value = '';
   if (typeof removeAttachedPhoto === 'function') removeAttachedPhoto();
   if (typeof removeAttachedSketch === 'function') removeAttachedSketch();
   if (typeof removeAttachedFile === 'function') removeAttachedFile();
 
-  // If photo attached, save to memory photos
+  // If photo attached, save to memory photos list
   if (typeof attachedPhotoBase64 !== 'undefined' && attachedPhotoBase64) {
     if (typeof memoryPhotosList !== 'undefined' && Array.isArray(memoryPhotosList)) {
       memoryPhotosList.unshift({
@@ -6091,15 +6095,66 @@ async function submitNewJournal(event) {
     }
   }
 
-  let finalContent = `${content}\n\nLocation: ${locationStr} • Energy: ${energy}/10 • Track: ${track}`;
-  if (linkUrl) finalContent += `\nReference: ${linkUrl}`;
-  if (typeof attachedFileName !== 'undefined' && attachedFileName) finalContent += `\nAttachment: ${attachedFileName}`;
-  if (typeof attachedSketchBase64 !== 'undefined' && attachedSketchBase64) finalContent += `\nIncludes Canvas Sketch`;
+  let finalContent = `${content}`;
+  if (!finalContent.includes('Location:')) {
+    finalContent += `
+
+Location: ${locationStr} • Energy: ${energy}/10 • Track: ${track}`;
+  }
+  if (linkUrl && !finalContent.includes(linkUrl)) finalContent += `
+Reference: ${linkUrl}`;
+  if (typeof attachedFileName !== 'undefined' && attachedFileName) finalContent += `
+Attachment: ${attachedFileName}`;
+  if (typeof attachedSketchBase64 !== 'undefined' && attachedSketchBase64) finalContent += `
+Includes Canvas Sketch`;
+
+  // 3. Optimistic 0ms timeline update
+  const optimisticEntry = {
+    id: editId || `local_${Date.now()}`,
+    title: `[${hour}] ${title}`,
+    content: finalContent,
+    persona: state.currentPersona || 'cbt_reflector',
+    mood: moodName,
+    tags: [track, moodName, hour],
+    is_encrypted: isEncrypted,
+    created_at: Math.floor(Date.now() / 1000),
+    updated_at: Math.floor(Date.now() / 1000)
+  };
+
+  if (!state.journalsCache || !Array.isArray(state.journalsCache)) {
+    state.journalsCache = [];
+  }
+
+  if (isEditMode) {
+    const idx = state.journalsCache.findIndex(j => j.id && j.id.toString() === editId);
+    if (idx !== -1) {
+      state.journalsCache[idx] = { ...state.journalsCache[idx], ...optimisticEntry };
+    } else {
+      state.journalsCache.unshift(optimisticEntry);
+    }
+  } else {
+    state.journalsCache.unshift(optimisticEntry);
+  }
 
   try {
-    const editId = document.getElementById('journal-edit-id')?.value;
-    const isEditMode = Boolean(editId && editId.trim());
+    localStorage.setItem('mind_cave_cached_journals', JSON.stringify(state.journalsCache));
+  } catch (e) {}
 
+  // Instantly re-render Timeline and Cards DOM in 0ms
+  const timelineContainer = document.getElementById('chrono-timeline-list');
+  if (timelineContainer && typeof _renderTimelineDom === 'function') {
+    _renderTimelineDom(state.journalsCache, timelineContainer);
+  }
+  const gridContainer = document.getElementById('journals-grid');
+  if (gridContainer && typeof renderJournalCards === 'function') {
+    renderJournalCards(state.journalsCache);
+  }
+  if (typeof renderMemoryPhotos === 'function') renderMemoryPhotos();
+
+  showToast(isEditMode ? 'Reflection updated!' : `Reflection moment for ${hour} saved!`);
+
+  // 4. Background persistence with server synchronization
+  try {
     const endpoint = isEditMode ? `/api/journals/${editId}` : '/api/journals';
     const reqMethod = isEditMode ? 'PUT' : 'POST';
 
@@ -6116,19 +6171,34 @@ async function submitNewJournal(event) {
       })
     });
 
-    if (!response.ok) {
+    if (response.ok) {
+      const data = await response.json();
+      if (data.entry) {
+        // Sync database entry ID and timestamps into cache
+        if (isEditMode) {
+          const idx = state.journalsCache.findIndex(j => j.id === editId);
+          if (idx !== -1) state.journalsCache[idx] = data.entry;
+        } else {
+          const idx = state.journalsCache.findIndex(j => j.id === optimisticEntry.id);
+          if (idx !== -1) state.journalsCache[idx] = data.entry;
+          else state.journalsCache[0] = data.entry;
+        }
+        try {
+          localStorage.setItem('mind_cave_cached_journals', JSON.stringify(state.journalsCache));
+        } catch (e) {}
+        if (timelineContainer && typeof _renderTimelineDom === 'function') {
+          _renderTimelineDom(state.journalsCache, timelineContainer);
+        }
+        if (gridContainer && typeof renderJournalCards === 'function') {
+          renderJournalCards(state.journalsCache);
+        }
+      }
+    } else {
       const errData = await response.json().catch(() => ({}));
-      throw new Error(errData.detail || errData.message || 'Failed to create journal entry.');
+      throw new Error(errData.detail || errData.message || 'Server returned error.');
     }
-
-    // Refresh all views
-    if (typeof loadJournals === 'function') loadJournals();
-    if (typeof renderChronoTimeline === 'function') renderChronoTimeline();
-    if (typeof renderMemoryPhotos === 'function') renderMemoryPhotos();
-    state.journalsCache = null;
-    showToast(`Reflection moment for ${hour} saved successfully!`);
   } catch (error) {
-    showToast(`Error saving journal: ${error.message}`);
+    console.debug('Background journal sync notice:', error);
   }
 }
 
