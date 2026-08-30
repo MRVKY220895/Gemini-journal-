@@ -2990,12 +2990,16 @@ body.light .chat-msg-ai-card {
    AI STUDIO BOUNDED VIEWPORT & ZERO-BLEED SCROLL SYSTEM
    ========================================================================== */
 
-#view-studio {
+#view-studio.hidden {
+  display: none !important;
+}
+
+#view-studio:not(.hidden) {
   height: calc(100vh - 5.75rem);
   max-height: calc(100vh - 5.75rem);
   height: calc(100dvh - 5.75rem);
   max-height: calc(100dvh - 5.75rem);
-  display: flex;
+  display: flex !important;
   flex-direction: column;
   overflow: hidden;
   position: relative;
