@@ -3117,3 +3117,20 @@ body.light .chat-msg-ai-card {
     font-size: 0.7rem !important;
   }
 }
+
+
+/* Header Wrap & Zero-Overlap System */
+.studio-container {
+  padding-top: 0.75rem !important;
+  position: relative;
+}
+
+#view-overview, #view-journals, #view-analytics, #view-security {
+  padding-top: 0.5rem;
+}
+
+.floating-nav {
+  position: relative !important;
+  top: auto !important;
+  margin: 0 auto !important;
+}
