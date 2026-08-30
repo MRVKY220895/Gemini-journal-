@@ -37,7 +37,7 @@ window.setChronoViewMode = setChronoViewMode;
 // =============================================================================
 
 let currentGuideStep = 1;
-const TOTAL_GUIDE_STEPS = 5;
+const TOTAL_GUIDE_STEPS = 6;
 
 function openOnboardingGuide(startStep = 1) {
   currentGuideStep = startStep;
