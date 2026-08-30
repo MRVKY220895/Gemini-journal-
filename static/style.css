@@ -3155,3 +3155,22 @@ body.light .chat-msg-ai-card {
     padding: 0.25rem 0.4rem !important;
   }
 }
+
+
+/* Comprehensive Mobile Layout Spacing & Zero-Overlap */
+@media (max-width: 767px) {
+  .studio-container {
+    padding-top: 0.5rem !important;
+    padding-bottom: 5.5rem !important;
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+  .floating-nav {
+    padding: 0.35rem 0.75rem !important;
+    max-width: 100% !important;
+  }
+  .mobile-bottom-nav {
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15) !important;
+    z-index: 9999 !important;
+  }
+}

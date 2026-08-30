@@ -125,26 +125,26 @@
         <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-[#9BB7A5]/15 border border-[#9BB7A5]/30 flex items-center justify-center text-[#9BB7A5]">
           <i data-lucide="compass" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#9BB7A5]"></i>
         </div>
-        <span class="text-xs sm:text-sm font-semibold tracking-tight text-[var(--mc-text-primary)] whitespace-nowrap hidden sm:inline">Mind Cave</span>
+        <span class="text-xs sm:text-sm font-bold tracking-tight text-[var(--mc-text-primary)] whitespace-nowrap">Mind Cave</span>
       </div>
     </div>
 
-    <!-- Master Navigation Tabs (5 Core Destinations - Always Available on All Screens) -->
-    <nav class="flex items-center gap-0.5 sm:gap-1 nav-pill-track shrink-0">
-      <button onclick="switchTab('overview')" id="tab-btn-overview" class="tab-btn active flex items-center gap-1 sm:gap-1.5 whitespace-nowrap !py-1 !px-2 sm:!px-3 text-xs" title="Home Sanctuary">
-        <i data-lucide="home" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Home</span>
+    <!-- Master Navigation Tabs (Desktop / Tablet Header Nav) -->
+    <nav class="hidden md:flex items-center gap-1 nav-pill-track shrink-0">
+      <button onclick="switchTab('overview')" id="tab-btn-overview" class="tab-btn active flex items-center gap-1.5 whitespace-nowrap !py-1 !px-3 text-xs" title="Home Sanctuary">
+        <i data-lucide="home" class="w-3.5 h-3.5"></i> <span>Home</span>
       </button>
-      <button onclick="switchTab('journals')" id="tab-btn-journals" class="tab-btn flex items-center gap-1 sm:gap-1.5 whitespace-nowrap !py-1 !px-2 sm:!px-3 text-xs" title="Journal & Memory Lane">
-        <i data-lucide="book-open" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Journal</span>
+      <button onclick="switchTab('journals')" id="tab-btn-journals" class="tab-btn flex items-center gap-1.5 whitespace-nowrap !py-1 !px-3 text-xs" title="Journal & Memory Lane">
+        <i data-lucide="book-open" class="w-3.5 h-3.5"></i> <span>Journal</span>
       </button>
-      <button onclick="switchTab('studio')" id="tab-btn-studio" class="tab-btn flex items-center gap-1 sm:gap-1.5 whitespace-nowrap !py-1 !px-2 sm:!px-3 text-xs" title="AI Reflective Studio">
-        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-[#9BB7A5]"></i> <span class="hidden sm:inline">Studio</span>
+      <button onclick="switchTab('studio')" id="tab-btn-studio" class="tab-btn flex items-center gap-1.5 whitespace-nowrap !py-1 !px-3 text-xs" title="AI Reflective Studio">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-[#9BB7A5]"></i> <span>Studio</span>
       </button>
-      <button onclick="switchTab('analytics')" id="tab-btn-analytics" class="tab-btn flex items-center gap-1 sm:gap-1.5 whitespace-nowrap !py-1 !px-2 sm:!px-3 text-xs" title="MindPulse Life Intelligence">
-        <i data-lucide="activity" class="w-3.5 h-3.5 text-[#8FA9B8]"></i> <span class="hidden sm:inline">MindPulse</span>
+      <button onclick="switchTab('analytics')" id="tab-btn-analytics" class="tab-btn flex items-center gap-1.5 whitespace-nowrap !py-1 !px-3 text-xs" title="MindPulse Life Intelligence">
+        <i data-lucide="activity" class="w-3.5 h-3.5 text-[#8FA9B8]"></i> <span>MindPulse</span>
       </button>
-      <button onclick="switchTab('security')" id="tab-btn-security" class="tab-btn flex items-center gap-1 sm:gap-1.5 whitespace-nowrap !py-1 !px-2 sm:!px-3 text-xs" title="Private Encrypted Vault">
-        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-[#91B59D]"></i> <span class="hidden sm:inline">Vault</span>
+      <button onclick="switchTab('security')" id="tab-btn-security" class="tab-btn flex items-center gap-1.5 whitespace-nowrap !py-1 !px-3 text-xs" title="Private Encrypted Vault">
+        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-[#91B59D]"></i> <span>Vault</span>
       </button>
     </nav>
 
@@ -329,7 +329,7 @@
           <span class="text-[10px] font-mono text-[var(--mc-text-muted)] uppercase tracking-wider">Pillars</span>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3.5">
           <!-- Pillar 1: Conversational AI Partner -->
           <div class="mc-card p-5 flex flex-col justify-between space-y-3 cursor-pointer group hover:border-[var(--mc-accent)] transition-all" onclick="switchTab('studio')">
             <div class="flex items-center justify-between">
@@ -384,7 +384,25 @@
             </div>
           </div>
 
-          <!-- Pillar 4: Zero-Knowledge Private Vault -->
+          <!-- Pillar 4: Bio Sanctuary (Circadian & Vitality Intelligence) -->
+          <div class="mc-card p-5 flex flex-col justify-between space-y-3 cursor-pointer group hover:border-[#9BB7A5] transition-all" onclick="navigateToSection('journals', 'sanctuary')">
+            <div class="flex items-center justify-between">
+              <div class="w-9 h-9 rounded-xl bg-[#9BB7A5]/15 border border-[#9BB7A5]/30 text-[#9BB7A5] flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                <i data-lucide="heart-pulse" class="w-4 h-4 text-[#9BB7A5]"></i>
+              </div>
+              <span class="text-[10px] font-mono text-[#9BB7A5] bg-[#9BB7A5]/10 px-2 py-0.5 rounded-full font-semibold">Bio Sanctuary</span>
+            </div>
+            <div>
+              <h3 class="text-sm font-semibold text-[var(--mc-text-primary)] group-hover:text-[#9BB7A5] transition-colors">Bio Sanctuary & Vitality</h3>
+              <p class="text-xs text-[var(--mc-text-secondary)] mt-1 leading-relaxed">Align your journaling and deep work with circadian rhythms, diurnal stamina peaks, and cycle intelligence.</p>
+            </div>
+            <div class="text-[11px] text-[#9BB7A5] font-semibold flex items-center gap-1 pt-1">
+              <span>Explore Sanctuary</span>
+              <i data-lucide="arrow-right" class="w-3 h-3 group-hover:translate-x-1 transition-transform"></i>
+            </div>
+          </div>
+
+          <!-- Pillar 5: Zero-Knowledge Private Vault -->
           <div class="mc-card p-5 flex flex-col justify-between space-y-3 cursor-pointer group hover:border-[#91B59D] transition-all" onclick="switchTab('security')">
             <div class="flex items-center justify-between">
               <div class="w-9 h-9 rounded-xl bg-[#91B59D]/15 border border-[#91B59D]/30 text-[#91B59D] flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
@@ -3907,6 +3925,92 @@
                 <div class="text-[10px] text-[var(--mc-text-muted)]">Automated credential checks</div>
               </div>
             </div>
+          <!-- Section 5: About Each Section & Capabilities Guide -->
+          <div class="menu-section-box p-3.5 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)] space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-lg bg-[var(--mc-accent-12)] text-[var(--mc-accent)] flex items-center justify-center shrink-0">
+                  <i data-lucide="help-circle" class="w-4 h-4"></i>
+                </div>
+                <h4 class="text-xs sm:text-sm font-semibold text-[var(--mc-text-primary)]">About Mind Cave Sections & Uses</h4>
+              </div>
+              <span class="text-[10px] font-mono text-[var(--mc-text-muted)] uppercase">Capabilities Guide</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+              <div class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] space-y-1">
+                <span class="font-semibold text-[var(--mc-accent)] flex items-center gap-1"><i data-lucide="home" class="w-3 h-3"></i><span>Home Sanctuary:</span></span>
+                <p class="text-[11px] text-[var(--mc-text-secondary)] leading-relaxed">Central landing hub, prompt starters, daily emotional equilibrium score, and core system overview.</p>
+              </div>
+              <div class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] space-y-1">
+                <span class="font-semibold text-[#8FA9B8] flex items-center gap-1"><i data-lucide="book-open" class="w-3 h-3"></i><span>Living Journal:</span></span>
+                <p class="text-[11px] text-[var(--mc-text-secondary)] leading-relaxed">Multi-track journaling: Living Timeline, Daily Harmony audio, 30-day Memory Lane, and photo scrapbooks.</p>
+              </div>
+              <div class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] space-y-1">
+                <span class="font-semibold text-[#9BB7A5] flex items-center gap-1"><i data-lucide="sparkles" class="w-3 h-3"></i><span>AI Reflective Studio:</span></span>
+                <p class="text-[11px] text-[var(--mc-text-secondary)] leading-relaxed">Empathetic CBT reframing, Socratic ideation, executive strategy, and native multilingual voice/text chat.</p>
+              </div>
+              <div class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] space-y-1">
+                <span class="font-semibold text-[#C5AA78] flex items-center gap-1"><i data-lucide="activity" class="w-3 h-3"></i><span>MindPulse Intelligence:</span></span>
+                <p class="text-[11px] text-[var(--mc-text-secondary)] leading-relaxed">Cognitive bias detection, emotional equilibrium radar, habit velocity, and longitudinal mental models.</p>
+              </div>
+              <div class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] space-y-1">
+                <span class="font-semibold text-[#91B59D] flex items-center gap-1"><i data-lucide="shield-check" class="w-3 h-3"></i><span>Private Vault:</span></span>
+                <p class="text-[11px] text-[var(--mc-text-secondary)] leading-relaxed">Zero-knowledge client-side AES-256-GCM encryption, biometric access, and cloud sync isolation.</p>
+              </div>
+              <div class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] space-y-1">
+                <span class="font-semibold text-rose-400 flex items-center gap-1"><i data-lucide="heart-pulse" class="w-3 h-3"></i><span>Bio Sanctuary:</span></span>
+                <p class="text-[11px] text-[var(--mc-text-secondary)] leading-relaxed">Circadian alignment, diurnal energy tracks, and biological vitality metrics for restorative wellness.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 6: Direct Feedback & Contact -->
+          <div class="menu-section-box p-3.5 rounded-2xl bg-gradient-to-br from-[var(--mc-bg-tertiary)] to-[var(--mc-bg-secondary)] border border-[var(--mc-border-default)] space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-lg bg-emerald-500/15 text-emerald-400 flex items-center justify-center shrink-0">
+                  <i data-lucide="message-circle" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <h4 class="text-xs sm:text-sm font-semibold text-[var(--mc-text-primary)]">Feedback & Direct Contact</h4>
+                  <p class="text-[10px] text-[var(--mc-text-muted)]">Share your suggestions, report issues, or connect directly with the creators</p>
+                </div>
+              </div>
+              <span class="text-[10px] font-mono text-emerald-400 font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30">Direct Support</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+              <!-- WhatsApp Contact Button -->
+              <a href="https://wa.me/919092312025?text=Hello%20Mind%20Cave%20Team%2C%20I%20have%20feedback%20regarding%20the%20app%3A%20" target="_blank" rel="noopener noreferrer" class="p-3 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 flex items-center justify-between transition-all group cursor-pointer text-decoration-none">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+                    <i data-lucide="phone-call" class="w-4 h-4"></i>
+                  </div>
+                  <div>
+                    <div class="font-bold text-xs text-[var(--mc-text-primary)] group-hover:text-emerald-400 transition-colors">WhatsApp Support</div>
+                    <div class="text-[11px] text-emerald-400 font-mono font-semibold">+91 9092312025</div>
+                  </div>
+                </div>
+                <i data-lucide="arrow-up-right" class="w-4 h-4 text-emerald-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"></i>
+              </a>
+
+              <!-- Email Feedback Button -->
+              <a href="mailto:support@mindcave.app?subject=Mind%20Cave%20App%20Feedback" class="p-3 rounded-2xl bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-400 flex items-center justify-between transition-all group cursor-pointer text-decoration-none">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400">
+                    <i data-lucide="mail" class="w-4 h-4"></i>
+                  </div>
+                  <div>
+                    <div class="font-bold text-xs text-[var(--mc-text-primary)] group-hover:text-blue-400 transition-colors">Email Feedback</div>
+                    <div class="text-[11px] text-blue-400 font-mono">support@mindcave.app</div>
+                  </div>
+                </div>
+                <i data-lucide="arrow-up-right" class="w-4 h-4 text-blue-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"></i>
+              </a>
+            </div>
+          </div>
+
             <div class="pt-2 mt-2 border-t border-[var(--mc-border-subtle)] flex items-center justify-between">
               <span class="text-[10px] text-[#B9858B] font-semibold flex items-center gap-1"><i data-lucide="alert-triangle" class="w-3 h-3"></i><span>Danger Zone: Permanent Factory Reset</span></span>
               <button onclick="closeMasterMenuModal(); openFactoryResetModal();" class="text-[10px] px-2 py-1 rounded-lg bg-[#B9858B]/10 hover:bg-[#B9858B]/20 text-[#B9858B] border border-[#B9858B]/30 font-bold transition-colors">Wipe & Reset Everything →</button>
