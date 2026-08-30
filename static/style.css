@@ -3069,3 +3069,51 @@ body.light .chat-msg-ai-card {
   background: var(--mc-bg-elevation);
   border-color: var(--mc-accent);
 }
+
+
+/* ==========================================================================
+   INTELLIGENT COMPACT MODAL SYSTEM (ALL RESOLUTIONS)
+   ========================================================================== */
+
+.modal-dialog-compact {
+  max-height: 88vh !important;
+  max-height: 88dvh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  border-radius: 1.5rem !important;
+  padding: 1.25rem 1.5rem !important;
+  overflow: hidden !important;
+  box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5) !important;
+}
+
+@media (max-width: 640px) {
+  .modal-dialog-compact {
+    max-height: 92vh !important;
+    max-height: 92dvh !important;
+    padding: 1rem 1.125rem !important;
+    border-radius: 1.25rem !important;
+  }
+}
+
+.modal-scroll-body {
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  padding-right: 0.25rem !important;
+  margin-right: -0.25rem !important;
+}
+
+/* Floating Navigation Compact Fit on Mobile */
+@media (max-width: 640px) {
+  .floating-nav {
+    padding: 0.35rem 0.5rem !important;
+    gap: 0.25rem !important;
+  }
+  .nav-pill-track .tab-btn {
+    padding: 0.3rem 0.5rem !important;
+    font-size: 0.7rem !important;
+  }
+  .nav-action-btn {
+    padding: 0.3rem 0.45rem !important;
+    font-size: 0.7rem !important;
+  }
+}

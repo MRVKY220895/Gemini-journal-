@@ -128,22 +128,22 @@
       </div>
     </div>
 
-    <!-- Master Navigation Tabs (5 Core Destinations) -->
-    <nav class="hidden md:flex items-center gap-1 nav-pill-track shrink-0">
-      <button onclick="switchTab('overview')" id="tab-btn-overview" class="tab-btn active flex items-center gap-1.5 whitespace-nowrap">
-        <i data-lucide="home" class="w-3.5 h-3.5"></i> <span>Home</span>
+    <!-- Master Navigation Tabs (5 Core Destinations - Always Available on All Screens) -->
+    <nav class="flex items-center gap-1 nav-pill-track shrink-0 overflow-x-auto no-scrollbar max-w-[55vw] sm:max-w-none">
+      <button onclick="switchTab('overview')" id="tab-btn-overview" class="tab-btn active flex items-center gap-1 sm:gap-1.5 whitespace-nowrap !py-1 !px-2 sm:!px-3 text-xs" title="Home Sanctuary">
+        <i data-lucide="home" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Home</span>
       </button>
-      <button onclick="switchTab('journals')" id="tab-btn-journals" class="tab-btn flex items-center gap-1.5 whitespace-nowrap">
-        <i data-lucide="book-open" class="w-3.5 h-3.5"></i> <span>Journal</span>
+      <button onclick="switchTab('journals')" id="tab-btn-journals" class="tab-btn flex items-center gap-1 sm:gap-1.5 whitespace-nowrap !py-1 !px-2 sm:!px-3 text-xs" title="Journal & Memory Lane">
+        <i data-lucide="book-open" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Journal</span>
       </button>
-      <button onclick="switchTab('studio')" id="tab-btn-studio" class="tab-btn flex items-center gap-1.5 whitespace-nowrap">
-        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> <span>Studio</span>
+      <button onclick="switchTab('studio')" id="tab-btn-studio" class="tab-btn flex items-center gap-1 sm:gap-1.5 whitespace-nowrap !py-1 !px-2 sm:!px-3 text-xs" title="AI Reflective Studio">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-[#9BB7A5]"></i> <span class="hidden sm:inline">Studio</span>
       </button>
-      <button onclick="switchTab('analytics')" id="tab-btn-analytics" class="tab-btn flex items-center gap-1.5 whitespace-nowrap">
-        <i data-lucide="activity" class="w-3.5 h-3.5"></i> <span>MindPulse</span>
+      <button onclick="switchTab('analytics')" id="tab-btn-analytics" class="tab-btn flex items-center gap-1 sm:gap-1.5 whitespace-nowrap !py-1 !px-2 sm:!px-3 text-xs" title="MindPulse Life Intelligence">
+        <i data-lucide="activity" class="w-3.5 h-3.5 text-[#8FA9B8]"></i> <span class="hidden sm:inline">MindPulse</span>
       </button>
-      <button onclick="switchTab('security')" id="tab-btn-security" class="tab-btn flex items-center gap-1.5 whitespace-nowrap">
-        <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> <span>Vault</span>
+      <button onclick="switchTab('security')" id="tab-btn-security" class="tab-btn flex items-center gap-1 sm:gap-1.5 whitespace-nowrap !py-1 !px-2 sm:!px-3 text-xs" title="Private Encrypted Vault">
+        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-[#91B59D]"></i> <span class="hidden sm:inline">Vault</span>
       </button>
     </nav>
 
@@ -568,6 +568,11 @@
         <!-- Double-Bezel Hardware Capsule -->
         <form id="chat-form" onsubmit="sendChatMessage(event)" class="composer-outer">
           <div class="composer-inner flex flex-col gap-2">
+        <!-- Auto Language Detection Badge in Studio Composer -->
+        <div id="composer-lang-badge" class="hidden items-center gap-1 px-2.5 py-0.5 rounded-full bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] text-[10px] font-mono text-[var(--mc-accent)] self-start mb-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="composer-lang-text">Detected: தமிழ் (Tamil)</span>
+        </div>
             <textarea 
               id="chat-input" 
               rows="2" 

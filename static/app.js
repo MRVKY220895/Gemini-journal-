@@ -1,5 +1,46 @@
 
 // =============================================================================
+// INTELLIGENT AUTOMATIC NATIVE LANGUAGE DETECTOR
+// =============================================================================
+
+function detectScriptLanguage(text) {
+  if (!text || text.trim().length < 2) return null;
+
+  // Indian Regional Languages (Unicode Ranges)
+  if (/[\u0B80-\u0BFF]/.test(text)) return { code: 'ta', name: 'தமிழ் (Tamil)', flag: '🇮🇳' };
+  if (/[\u0900-\u097F]/.test(text)) return { code: 'hi', name: 'हिंदी (Hindi)', flag: '🇮🇳' };
+  if (/[\u0C00-\u0C7F]/.test(text)) return { code: 'te', name: 'తెలుగు (Telugu)', flag: '🇮🇳' };
+  if (/[\u0D00-\u0D7F]/.test(text)) return { code: 'ml', name: 'മലയാളം (Malayalam)', flag: '🇮🇳' };
+  if (/[\u0C80-\u0CFF]/.test(text)) return { code: 'kn', name: 'ಕನ್ನಡ (Kannada)', flag: '🇮🇳' };
+  if (/[\u0980-\u09FF]/.test(text)) return { code: 'bn', name: 'বাংলা (Bengali)', flag: '🇮🇳' };
+  if (/[\u0600-\u06FF]/.test(text)) return { code: 'ar', name: 'العربية (Arabic)', flag: '🇸🇦' };
+  if (/[\u3040-\u30FF]/.test(text)) return { code: 'ja', name: '日本語 (Japanese)', flag: '🇯🇵' };
+  if (/[\u4E00-\u9FFF]/.test(text)) return { code: 'zh', name: '中文 (Chinese)', flag: '🇨🇳' };
+  if (/[\u0400-\u04FF]/.test(text)) return { code: 'ru', name: 'Русский (Russian)', flag: '🇷🇺' };
+
+  return null;
+}
+
+function handleChatInputLanguageDetect() {
+  const input = document.getElementById('chat-input');
+  const badge = document.getElementById('composer-lang-badge');
+  const badgeText = document.getElementById('composer-lang-text');
+  if (!input || !badge || !badgeText) return;
+
+  const detected = detectScriptLanguage(input.value);
+  if (detected) {
+    badge.classList.remove('hidden');
+    badge.classList.add('flex');
+    badgeText.textContent = `Auto-Detected: ${detected.name}`;
+    localStorage.setItem('mind_cave_detected_lang', detected.code);
+  } else {
+    badge.classList.add('hidden');
+    badge.classList.remove('flex');
+  }
+}
+
+
+// =============================================================================
 // GUEST ONBOARDING & AUTHENTICATION CONTROLLER
 // =============================================================================
 
