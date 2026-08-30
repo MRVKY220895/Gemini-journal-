@@ -1,5 +1,5 @@
-# Docker Build Ignore List
-.dockerignore
+# Google Cloud Build & Deployment Ignore List
+.gcloudignore
 .git
 .gitignore
 .venv/
