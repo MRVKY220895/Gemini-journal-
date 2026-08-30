@@ -1,4 +1,48 @@
 
+function appendLoadingIndicator() {
+  const container = document.getElementById('chat-messages');
+  if (!container) return;
+
+  // Remove any existing loader
+  removeLoadingIndicator();
+
+  const loaderDiv = document.createElement('div');
+  loaderDiv.id = 'ai-loading-indicator';
+  loaderDiv.className = 'w-full my-2 transition-all duration-300';
+  loaderDiv.innerHTML = `
+    <div class="chat-msg-ai-card border-[var(--mc-border-default)] bg-[var(--mc-bg-secondary)] flex items-center justify-between p-4 rounded-2xl shadow-sm">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-xl bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] flex items-center justify-center text-xs shrink-0">
+          <i data-lucide="sparkles" class="w-4 h-4 text-[#9BB7A5]"></i>
+        </div>
+        <div class="space-y-1.5">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-semibold text-[var(--mc-text-primary)]">Reflective Partner</span>
+            <span class="text-[10px] font-mono text-[var(--mc-accent)] px-2 py-0.5 rounded-full bg-[var(--mc-accent-12)] border border-[var(--mc-accent-25)] flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+              <span>Reflecting with Gemini Cloud...</span>
+            </span>
+          </div>
+          <div class="flex items-center gap-1.5 pt-0.5">
+            <span class="w-2 h-2 rounded-full bg-[#9BB7A5] animate-bounce" style="animation-delay: 0ms"></span>
+            <span class="w-2 h-2 rounded-full bg-[#9BB7A5] animate-bounce" style="animation-delay: 150ms"></span>
+            <span class="w-2 h-2 rounded-full bg-[#9BB7A5] animate-bounce" style="animation-delay: 300ms"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  container.appendChild(loaderDiv);
+  container.scrollTop = container.scrollHeight;
+  refreshIcons(loaderDiv);
+}
+
+function removeLoadingIndicator() {
+  const loader = document.getElementById('ai-loading-indicator');
+  if (loader) loader.remove();
+}
+
+
 // =============================================================================
 // ULTRA-FAST DEBOUNCED ICON & RENDER ENGINE (60FPS ZERO-JANK)
 // =============================================================================
@@ -1538,7 +1582,7 @@ async function sendChatMessage(event) {
 
   sendBtn.classList.add('opacity-50');
 
-
+  appendLoadingIndicator();
 
   try {
 
@@ -1569,6 +1613,7 @@ async function sendChatMessage(event) {
 
 
     if (response.status === 503) {
+      removeLoadingIndicator();
       const errData = await response.json().catch(() => ({}));
       const errCode = errData.code || 'api_unavailable';
       appendGeminiUnavailableCard(errCode, message);
@@ -1585,7 +1630,7 @@ async function sendChatMessage(event) {
 
     state.currentSessionId = data.session_id;
 
-
+    removeLoadingIndicator();
 
     // Append Calm, Editorial AI Response
 
@@ -1603,6 +1648,7 @@ async function sendChatMessage(event) {
 
     console.error('Chat error:', error);
 
+    removeLoadingIndicator();
     appendErrorCard(error.message, message);
 
   } finally {
