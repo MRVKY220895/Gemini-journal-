@@ -1154,7 +1154,7 @@
             <div class="double-bezel-inner p-4 flex flex-col justify-between h-full">
               <div>
                 <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                  <h3 class="text-xs font-semibold text-[var(--mc-text-primary)] flex items-center gap-1.5">
                     <i data-lucide="brain" class="w-4 h-4 text-purple-400"></i> CBT Emotional Resilience
                   </h3>
                   <span class="text-[10px] text-purple-300 font-mono">30 Days</span>
@@ -1175,7 +1175,7 @@
             <div class="double-bezel-inner p-4 flex flex-col justify-between h-full">
               <div>
                 <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                  <h3 class="text-xs font-semibold text-[var(--mc-text-primary)] flex items-center gap-1.5">
                     <i data-lucide="zap" class="w-4 h-4 text-amber-400"></i> Diurnal Stamina Curve
                   </h3>
                   <span class="text-[10px] text-amber-300 font-mono">Bio Sync</span>
@@ -1210,7 +1210,7 @@
             <div class="double-bezel-inner p-4 flex flex-col justify-between h-full">
               <div>
                 <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                  <h3 class="text-xs font-semibold text-[var(--mc-text-primary)] flex items-center gap-1.5">
                     <i data-lucide="activity" class="w-4 h-4 text-emerald-400"></i> Google Fit & Health Connect
                   </h3>
                   <button onclick="syncGoogleFitData()" class="text-[10px] text-emerald-400 hover:underline font-mono">Sync</button>
@@ -1257,7 +1257,7 @@
                     <div class="w-6 h-6 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
                       <i data-lucide="flame" class="w-3.5 h-3.5"></i>
                     </div>
-                    <h3 class="text-xs font-bold text-white">Daily Habit Tracker & Streaks</h3>
+                    <h3 class="text-xs font-semibold text-[var(--mc-text-primary)]">Daily Habit Tracker & Streaks</h3>
                   </div>
                   <div class="flex items-center gap-2">
                     <button type="button" onclick="refreshHabitsTracker(this)" class="text-[10px] text-slate-400 hover:text-cyan-300 font-mono flex items-center gap-1 transition-colors group" title="Refresh & Recalculate Habit Streaks">
@@ -1305,7 +1305,7 @@
                     <div class="w-6 h-6 rounded-lg bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400">
                       <i data-lucide="pie-chart" class="w-3.5 h-3.5"></i>
                     </div>
-                    <h3 class="text-xs font-bold text-white">Plan vs. Action Velocity</h3>
+                    <h3 class="text-xs font-semibold text-[var(--mc-text-primary)]">Plan vs. Action Velocity</h3>
                   </div>
                   <span class="text-[10px] text-blue-300 font-mono">Friction Log</span>
                 </div>
@@ -1416,7 +1416,7 @@
 
         <!-- Saved Longitudinal Journal Vault -->
         <div>
-          <h3 class="text-xs font-bold text-white mb-2.5">Cognitive Reflections Vault</h3>
+          <h3 class="text-xs font-semibold text-[var(--mc-text-primary)] mb-2.5">Cognitive Reflections Vault</h3>
           <div id="journals-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             <!-- Rendered via JS -->
           </div>
@@ -1435,7 +1435,7 @@
               <i data-lucide="image" class="w-4 h-4"></i>
             </div>
             <div>
-              <h4 class="text-xs font-bold text-white flex items-center gap-2">
+              <h4 class="text-xs font-semibold text-[var(--mc-text-primary)] flex items-center gap-2">
                 <span>Google Photos Memory Stream</span>
                 <span class="text-[10px] text-amber-300 bg-amber-950/50 border border-amber-500/30 px-2 py-0.5 rounded-full font-mono">Cloud Active</span>
               </h4>
@@ -2503,7 +2503,7 @@
           <!-- Item Category -->
           <div>
             <label class="text-slate-300 block mb-1 font-semibold">Item Category</label>
-            <select id="task-category-select" class="w-full bg-slate-900 text-slate-200 text-xs p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-blue-500">
+            <select id="task-category-select" class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] text-xs p-2.5 rounded-xl border border-[var(--mc-border-default)] focus:outline-none focus:border-blue-500">
               <option value="todo">Actionable To-Do Task</option>
               <option value="reminder">Time-Specific Reminder</option>
               <option value="milestone">Important Date / Milestone</option>
@@ -2572,7 +2572,7 @@
               <i data-lucide="pen-tool" class="w-4 h-4"></i>
             </div>
             <div>
-              <h3 class="text-sm font-bold text-white">Canvas Sketch & Doodle Pad</h3>
+              <h3 class="text-sm font-semibold text-[var(--mc-text-primary)]">Canvas Sketch & Doodle Pad</h3>
               <p class="text-[10px] text-slate-400">Draw a diagram, emotion, or visual concept</p>
             </div>
           </div>
@@ -3155,7 +3155,7 @@
           <div id="habit-boolean-fields-group" class="grid grid-cols-2 gap-2">
             <div>
               <label class="text-slate-300 block mb-1 font-semibold">Target Frequency</label>
-              <select id="habit-freq-select" class="w-full bg-slate-900 text-slate-200 text-xs p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-500">
+              <select id="habit-freq-select" class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] text-xs p-2.5 rounded-xl border border-[var(--mc-border-default)] focus:outline-none focus:border-amber-500">
                 <option value="daily">Daily (Every Day)</option>
                 <option value="weekdays">Weekdays Only</option>
                 <option value="3x_week">3x per Week</option>
@@ -3163,7 +3163,7 @@
             </div>
             <div>
               <label class="text-slate-300 block mb-1 font-semibold">Goal Description / Unit</label>
-              <input type="text" id="habit-target-unit-input" placeholder="e.g. 15 mins / 8 hours" class="w-full bg-slate-900 text-slate-200 text-xs p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-500">
+              <input type="text" id="habit-target-unit-input" placeholder="e.g. 15 mins / 8 hours" class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] text-xs p-2.5 rounded-xl border border-[var(--mc-border-default)] focus:outline-none focus:border-amber-500">
             </div>
           </div>
 
@@ -3180,7 +3180,7 @@
               </div>
               <div>
                 <label class="text-slate-300 block mb-1 font-semibold">Unit Metric</label>
-                <input type="text" id="habit-unit-name-input" placeholder="e.g. glasses, cups, reps, km" value="glasses" class="w-full bg-slate-900 text-slate-200 text-xs p-2 rounded-xl border border-slate-700 focus:outline-none focus:border-cyan-400">
+                <input type="text" id="habit-unit-name-input" placeholder="e.g. glasses, cups, reps, km" value="glasses" class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] text-xs p-2 rounded-xl border border-[var(--mc-border-default)] focus:outline-none focus:border-cyan-400">
               </div>
               <div>
                 <label class="text-slate-300 block mb-1 font-semibold">Done Today</label>
@@ -3329,13 +3329,13 @@
                 <label class="text-slate-300 font-semibold">Domain Category</label>
                 <button type="button" onclick="openBucketCategoriesModal()" class="text-[10px] text-pink-400 hover:underline font-semibold font-mono">+ Customize</button>
               </div>
-              <select id="bucket-category-select" class="w-full bg-slate-900 text-slate-200 text-xs p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-pink-500">
+              <select id="bucket-category-select" class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] text-xs p-2.5 rounded-xl border border-[var(--mc-border-default)] focus:outline-none focus:border-pink-500">
                 <!-- Dynamically populated from state.bucketCategories -->
               </select>
             </div>
             <div>
               <label class="text-slate-300 block mb-1 font-semibold">Execution Status</label>
-              <select id="bucket-status-select" onchange="onBucketStatusSelectChange(this.value)" class="w-full bg-slate-900 text-slate-200 text-xs p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-pink-500">
+              <select id="bucket-status-select" onchange="onBucketStatusSelectChange(this.value)" class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] text-xs p-2.5 rounded-xl border border-[var(--mc-border-default)] focus:outline-none focus:border-pink-500">
                 <option value="vision">✨ Future Vision (10%)</option>
                 <option value="planning">📋 Planning & Preparing (35%)</option>
                 <option value="in_action">⚡ In Action / Executing (60%)</option>
@@ -3348,7 +3348,7 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <div>
               <label class="text-slate-300 block mb-1 font-semibold">Target Completion Date</label>
-              <input type="date" id="bucket-target-date-input" class="w-full bg-slate-900 text-slate-200 text-xs p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-pink-500 font-mono cursor-pointer">
+              <input type="date" id="bucket-target-date-input" class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] text-xs p-2.5 rounded-xl border border-[var(--mc-border-default)] focus:outline-none focus:border-pink-500 font-mono cursor-pointer">
             </div>
             <div>
               <div class="flex items-center justify-between mb-1">
@@ -3414,7 +3414,7 @@
         <!-- Add New Category Form -->
         <form onsubmit="submitNewBucketCategory(event)" class="flex items-center gap-2">
           <input type="text" id="new-category-name-input" required placeholder="e.g. Spiritual / Family" class="flex-1 bg-black/60 text-slate-200 text-xs p-2 rounded-xl border border-slate-700 focus:outline-none focus:border-pink-500">
-          <select id="new-category-color-select" class="bg-slate-900 text-slate-200 text-xs p-2 rounded-xl border border-slate-700 focus:outline-none focus:border-pink-500">
+          <select id="new-category-color-select" class="bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] text-xs p-2 rounded-xl border border-[var(--mc-border-default)] focus:outline-none focus:border-pink-500">
             <option value="pink">Pink</option>
             <option value="cyan">Cyan</option>
             <option value="purple">Purple</option>
@@ -3921,7 +3921,7 @@
               <div class="flex items-center justify-between border-b border-white/5 pb-2">
                 <div class="flex items-center gap-2">
                   <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
-                  <h4 class="text-xs font-bold text-white uppercase tracking-wider font-mono">Today's Achievable Goals</h4>
+                  <h4 class="text-xs font-semibold text-[var(--mc-text-primary)] uppercase tracking-wider font-mono">Today's Achievable Goals</h4>
                 </div>
                 <div class="flex items-center gap-1.5">
                   <span id="modal-goals-completed-badge" class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 font-mono font-bold flex items-center gap-1">
@@ -3963,7 +3963,7 @@
               <div class="flex items-center justify-between border-b border-white/5 pb-2 flex-wrap gap-1">
                 <div class="flex items-center gap-2">
                   <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
-                  <h4 class="text-xs font-bold text-white uppercase tracking-wider font-mono">Daily Habits & Streaks</h4>
+                  <h4 class="text-xs font-semibold text-[var(--mc-text-primary)] uppercase tracking-wider font-mono">Daily Habits & Streaks</h4>
                 </div>
                 <div class="flex items-center gap-2">
                   <button type="button" onclick="refreshHabitsTracker(this)" class="text-[10px] text-slate-400 hover:text-cyan-300 font-mono flex items-center gap-1 transition-colors group" title="Refresh & Recalculate Habit Streaks">
