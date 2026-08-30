@@ -1,3 +1,27 @@
+
+// ─── REFRESH MIND CAVE JOURNAL (IN-PLACE SYNCHRONIZATION) ───
+async function refreshCurrentJournalView() {
+  const icon = document.querySelector('#btn-journal-refresh i');
+  if (icon) icon.classList.add('animate-spin');
+
+  try {
+    if (typeof loadJournals === 'function') await loadJournals();
+    if (typeof renderChronoTimeline === 'function') await renderChronoTimeline(true);
+    if (typeof renderHabitTracker === 'function') renderHabitTracker();
+    if (typeof renderDashboardMilestoneRadar === 'function') renderDashboardMilestoneRadar();
+    if (typeof renderNotesCards === 'function') renderNotesCards();
+    if (typeof updateAllDashboardStats === 'function') updateAllDashboardStats();
+    showToast('🔄 Mind Cave Journal synchronized!');
+  } catch (e) {
+    showToast('Journal refreshed.');
+  } finally {
+    setTimeout(() => {
+      if (icon) icon.classList.remove('animate-spin');
+    }, 600);
+  }
+}
+window.refreshCurrentJournalView = refreshCurrentJournalView;
+
 function setChronoViewMode(mode) {
   if (typeof setTimelineViewMode === 'function') {
     setTimelineViewMode(mode);
@@ -5207,189 +5231,129 @@ async function renderChronoTimeline(forceFetch = false) {
 
 
 
-// =============================================================================
 
+// =============================================================================
 // STORY FLOW CAROUSEL / TIMELINE SLIDE REVIEW (SWIPE & DRAG)
-
 // =============================================================================
 
+let storyCurrentIndex = 0;
+let storyEventsCache = [];
 
+function prevStorySlide() {
+  if (storyCurrentIndex > 0) {
+    storyCurrentIndex--;
+    updateStoryCarouselSlide();
+  }
+}
+window.prevStorySlide = prevStorySlide;
 
-function renderStoryCarousel(events) {
+function nextStorySlide() {
+  if (storyCurrentIndex < (storyEventsCache.length - 1)) {
+    storyCurrentIndex++;
+    updateStoryCarouselSlide();
+  }
+}
+window.nextStorySlide = nextStorySlide;
 
-  const track = document.getElementById('story-carousel-track');
+function goToStorySlide(index) {
+  storyCurrentIndex = index;
+  updateStoryCarouselSlide();
+}
+window.goToStorySlide = goToStorySlide;
 
-  const dots = document.getElementById('story-dots-container');
-
+function updateStoryCarouselSlide() {
+  const track = document.getElementById('chrono-story-track') || document.getElementById('story-carousel-track');
   const indicator = document.getElementById('story-progress-indicator');
+  const dotsContainer = document.getElementById('story-dots-container');
 
-  if (!track || !dots) return;
-
-
-
-  const dateFormatted = (state.selectedDiaryDate || new Date()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-
-
-
-  if (events.length === 0) {
-
-    track.innerHTML = `
-
-      <div class="story-slide-card text-center justify-center items-center py-12">
-
-        <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-300 mx-auto mb-3">
-
-          <i data-lucide="book-open" class="w-6 h-6"></i>
-
-        </div>
-
-        <h4 class="text-base font-bold text-white">No Story Slides for ${dateFormatted}</h4>
-
-        <p class="text-xs text-slate-400 max-w-xs mt-1">Capture a moment to begin your interactive story review.</p>
-
-      </div>
-
-    `;
-
-    dots.innerHTML = '';
-
-    if (indicator) indicator.textContent = '0 Moments';
-
-    refreshIcons();
-
-    return;
-
+  if (track) {
+    track.style.transform = `translateX(-${storyCurrentIndex * 100}%)`;
   }
 
+  if (indicator && storyEventsCache.length > 0) {
+    indicator.textContent = `Moment ${storyCurrentIndex + 1} of ${storyEventsCache.length}`;
+  }
 
+  if (dotsContainer && storyEventsCache.length > 0) {
+    dotsContainer.innerHTML = storyEventsCache.map((_, i) => `
+      <button onclick="goToStorySlide(${i})" class="w-2.5 h-2.5 rounded-full transition-all cursor-pointer ${i === storyCurrentIndex ? 'bg-[var(--mc-accent)] w-6' : 'bg-[var(--mc-border-default)] hover:bg-[var(--mc-text-muted)]'}"></button>
+    `).join('');
+  }
+}
 
-  storyCurrentIndex = Math.min(storyCurrentIndex, events.length - 1);
+function renderStoryCarousel(events) {
+  const track = document.getElementById('chrono-story-track') || document.getElementById('story-carousel-track');
+  const dots = document.getElementById('story-dots-container');
+  const indicator = document.getElementById('story-progress-indicator');
 
+  if (!track) return;
 
+  storyEventsCache = events || [];
+  const dateFormatted = (state.selectedDiaryDate || new Date()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
-  track.innerHTML = events.map((ev, i) => `
-
-    <div class="story-slide-card">
-
-      <div>
-
-        <!-- Slide Top Header -->
-
-        <div class="flex items-center justify-between gap-2 border-b border-white/10 pb-3 mb-4">
-
-          <div class="flex items-center gap-2">
-
-            <span class="font-mono text-xs font-bold text-cyan-400 bg-cyan-950/60 border border-cyan-500/30 px-2.5 py-1 rounded-full flex items-center gap-1">
-
-              <i data-lucide="clock" class="w-3 h-3"></i>
-
-              <span>${ev.time}</span>
-
-            </span>
-
-            <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-200">
-
-              ${escapeHtml(ev.mood)}
-
-            </span>
-
-          </div>
-
-          <span class="text-[11px] text-slate-400 font-mono">${escapeHtml(ev.location)}</span>
-
+  if (storyEventsCache.length === 0) {
+    track.innerHTML = `
+      <div class="w-full shrink-0 p-8 text-center bg-[var(--mc-bg-tertiary)] rounded-2xl border border-[var(--mc-border-subtle)] space-y-3">
+        <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-500 mx-auto">
+          <i data-lucide="book-open" class="w-6 h-6"></i>
         </div>
+        <h4 class="text-sm font-bold text-[var(--mc-text-primary)]">No Story Slides for ${dateFormatted}</h4>
+        <p class="text-xs text-[var(--mc-text-muted)] max-w-xs mx-auto">Capture a reflection, habit, or task to begin your interactive story review.</p>
+        <button onclick="openNewJournalModal()" class="btn-primary text-xs !py-1.5 !px-3 mx-auto">+ Log Moment</button>
+      </div>
+    `;
+    if (dots) dots.innerHTML = '';
+    if (indicator) indicator.textContent = '0 Moments';
+    refreshIcons();
+    return;
+  }
 
+  storyCurrentIndex = Math.min(storyCurrentIndex, storyEventsCache.length - 1);
+  if (storyCurrentIndex < 0) storyCurrentIndex = 0;
 
+  track.innerHTML = storyEventsCache.map((ev, i) => `
+    <div class="w-full shrink-0 min-w-full p-5 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)] flex flex-col justify-between space-y-4">
+      <div>
+        <!-- Slide Top Header -->
+        <div class="flex items-center justify-between gap-2 border-b border-[var(--mc-border-subtle)] pb-3 mb-3">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="font-mono text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+              <i data-lucide="clock" class="w-3 h-3"></i>
+              <span>${escapeHtml(ev.time)}</span>
+            </span>
+            <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] text-[var(--mc-text-primary)]">
+              ${escapeHtml(ev.mood || 'Reflective')}
+            </span>
+          </div>
+          <span class="text-[11px] text-[var(--mc-text-muted)] font-mono">${escapeHtml(ev.location || 'Mind Sanctuary')}</span>
+        </div>
 
         <!-- Title & Content -->
-
-        <h3 class="text-lg font-bold text-white mb-2 leading-snug">${escapeHtml(ev.title)}</h3>
-
-        <p class="text-sm text-slate-300 leading-relaxed font-sans">${escapeHtml(ev.content)}</p>
-
-
+        <h3 class="text-base sm:text-lg font-bold text-[var(--mc-text-primary)] mb-2 leading-snug">${escapeHtml(ev.title)}</h3>
+        <p class="text-xs sm:text-sm text-[var(--mc-text-secondary)] leading-relaxed">${escapeHtml(ev.content)}</p>
 
         <!-- Optional CBT Note -->
-
         ${ev.cbtNote ? `
-
-          <div class="p-3 rounded-2xl bg-purple-950/40 border border-purple-500/30 text-xs text-purple-200 italic mt-4 flex items-start gap-2">
-
+          <div class="p-3 rounded-2xl bg-purple-500/10 border border-purple-500/30 text-xs text-purple-300 italic mt-3 flex items-start gap-2">
             <i data-lucide="sparkles" class="w-4 h-4 text-purple-400 shrink-0 mt-0.5"></i>
-
             <span>CBT Reframing: "${escapeHtml(ev.cbtNote)}"</span>
-
           </div>
-
         ` : ''}
-
       </div>
 
-
-
-      <!-- Slide Image & Footer (Respecting Global Media Mode) -->
-
-      <div class="mt-4 pt-3 border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-
-        ${ev.photoUrl ? (
-
-          state.mediaMode === 'compact' ? `
-
-            <div class="flex items-center gap-2 p-2 rounded-xl bg-black/40 border border-white/10 text-xs text-amber-300">
-
-              <i data-lucide="image" class="w-4 h-4 text-amber-400"></i>
-
-              <span class="font-mono text-[11px]">1 Media Moment Stamped</span>
-
-            </div>
-
-          ` : `
-
-            <div class="rounded-xl overflow-hidden border border-white/10 max-h-36 w-full sm:w-64">
-
-              <img src="${ev.photoUrl}" alt="${escapeHtml(ev.title)}" class="w-full h-full object-cover">
-
-            </div>
-
-          `
-
-        ) : '<div></div>'}
-
-
-
-        <div class="flex items-center gap-3 text-xs text-slate-400 self-end sm:self-auto">
-
-          <span>Energy: <strong class="text-amber-400 font-mono">${ev.energy || '8/10'}</strong></span>
-
-          <span>•</span>
-
-          <span class="font-mono">Moment ${i + 1} of ${events.length}</span>
-
+      <!-- Slide Image & Footer -->
+      ${ev.photoUrl ? `
+        <div class="rounded-2xl overflow-hidden border border-[var(--mc-border-subtle)] max-h-48 w-full">
+          <img src="${ev.photoUrl}" alt="${escapeHtml(ev.title)}" class="w-full h-full object-cover">
         </div>
-
-      </div>
-
+      ` : ''}
     </div>
-
   `).join('');
 
-
-
-  // Render Pagination Dots
-
-  dots.innerHTML = events.map((_, i) => `
-
-    <div class="story-dot ${i === storyCurrentIndex ? 'active' : ''}" onclick="goToStorySlide(${i})"></div>
-
-  `).join('');
-
-
-
-  updateStorySlidePosition();
-
+  updateStoryCarouselSlide();
   refreshIcons();
-
 }
+
 
 
 
@@ -12746,108 +12710,65 @@ function setScrapbookTheme(theme) {
 
 // Canvas Text Auto-Wrapping Engine
 
+
 function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 4) {
-
   if (!text) return y;
-
+  ctx.textAlign = 'left';
   const words = text.split(' ');
-
   let line = '';
-
   let linesDrawn = 0;
 
-
-
   for (let n = 0; n < words.length; n++) {
-
     const testLine = line + words[n] + ' ';
-
     const metrics = ctx.measureText(testLine);
-
     if (metrics.width > maxWidth && n > 0) {
-
       ctx.fillText(line.trim(), x, y);
-
       line = words[n] + ' ';
-
       y += lineHeight;
-
       linesDrawn++;
-
-      if (linesDrawn >= maxLines - 1 && n < words.length - 1) {
-
-        let remaining = words.slice(n).join(' ');
-
-        while (ctx.measureText(remaining + '...').width > maxWidth && remaining.length > 0) {
-
-          remaining = remaining.substring(0, remaining.length - 1);
-
-        }
-
-        ctx.fillText(remaining + '...', x, y);
-
-        return y + lineHeight;
-
-      }
-
+      if (linesDrawn >= maxLines) break;
     } else {
-
       line = testLine;
-
     }
-
   }
-
-  ctx.fillText(line.trim(), x, y);
-
-  return y + lineHeight;
-
+  if (linesDrawn < maxLines && line.trim()) {
+    ctx.fillText(line.trim(), x, y);
+    y += lineHeight;
+  }
+  return y;
 }
 
-
+function setScrapbookTheme(theme, btn) {
+  state.scrapbookTheme = theme || 'sanctuary';
+  document.querySelectorAll('#scrapbook-theme-selector .scrapbook-theme-btn').forEach(b => {
+    b.classList.remove('active', 'border-emerald-500', 'bg-[var(--mc-accent-12)]');
+    b.classList.add('border-[var(--mc-border-subtle)]');
+  });
+  if (btn) {
+    btn.classList.add('active', 'border-emerald-500', 'bg-[var(--mc-accent-12)]');
+  }
+  renderScrapbookCard();
+}
+window.setScrapbookTheme = setScrapbookTheme;
 
 function renderScrapbookCard() {
-
   const canvas = document.getElementById('scrapbook-render-canvas');
-
   if (!canvas) return;
 
-
-
   const ctx = canvas.getContext('2d');
-
   const width = canvas.width = 880;
-
   const height = canvas.height = 1150;
 
-
-
-  // Selected font
-
   const fontSelect = document.getElementById('scrapbook-font-select');
-
   const selectedFont = fontSelect ? fontSelect.value : "'Caveat', cursive";
 
-
-
-  // Checkbox toggles
-
   const incGoal = document.getElementById('scrap-toggle-goal')?.checked ?? true;
-
   const incHabits = document.getElementById('scrap-toggle-habits')?.checked ?? true;
-
   const incMetrics = document.getElementById('scrap-toggle-metrics')?.checked ?? true;
-
   const incPolaroid = document.getElementById('scrap-toggle-polaroid')?.checked ?? true;
-
   const incReflection = document.getElementById('scrap-toggle-reflection')?.checked ?? true;
 
-
-
-  // Theme palettes (Cottagecore, Vintage Botanical, Muji Grid, Midnight Velvet)
-
   const themes = {
-
     sanctuary: {
       bg: '#141816',
       pageInner: '#1b221e',
@@ -12886,744 +12807,359 @@ function renderScrapbookCard() {
       polaroidBg: '#ffffff',
       flameColor: '#c5aa78'
     },
-
     vintage: {
-
       bg: '#eddcc9',
-
       pageInner: '#f9f3ea',
-
       ink: '#2b2015',
-
       inkLight: '#594432',
-
       accent1: '#b45309',
-
       accent2: '#78350f',
-
       accent3: '#047857',
-
       washi1: '#e8d7c4',
-
       washi2: '#d8c2ad',
-
       washi3: '#fed7aa',
-
       tapeBorder: '#92400e',
-
       paperLines: '#e6d4c0',
-
       cardBg1: '#f5ebe0',
-
       cardBg2: '#ede0d4',
-
       cardBg3: '#ffedd5',
-
       polaroidBg: '#faf5ee',
-
       flameColor: '#d97706'
-
     },
-
     notebook: {
-
       bg: '#f1f5f9',
-
       pageInner: '#ffffff',
-
       ink: '#0f172a',
-
       inkLight: '#475569',
-
       accent1: '#0284c7',
-
       accent2: '#4f46e5',
-
       accent3: '#059669',
-
       washi1: '#e2e8f0',
-
       washi2: '#bae6fd',
-
       washi3: '#fef08a',
-
       tapeBorder: '#38bdf8',
-
       paperLines: '#e2e8f0',
-
       cardBg1: '#f8fafc',
-
       cardBg2: '#f0f9ff',
-
       cardBg3: '#fefce8',
-
       polaroidBg: '#ffffff',
-
       flameColor: '#ea580c'
-
     },
-
     cyber: {
-
       bg: '#05070d',
-
       pageInner: '#0b0f19',
-
       ink: '#f8fafc',
-
       inkLight: '#94a3b8',
-
       accent1: '#f43f5e',
-
       accent2: '#06b6d4',
-
       accent3: '#10b981',
-
       washi1: '#1e293b',
-
       washi2: '#164e63',
-
       washi3: '#831843',
-
       tapeBorder: '#38bdf8',
-
       paperLines: '#1e293b',
-
       cardBg1: '#111827',
-
       cardBg2: '#082f49',
-
       cardBg3: '#4c0519',
-
       polaroidBg: '#1e293b',
-
       flameColor: '#fb923c'
-
     }
-
   };
 
+  const t = themes[state.scrapbookTheme] || themes.sanctuary;
 
-
-  const t = themes[state.scrapbookTheme] || themes.pastel;
-
-
-
-  // 1. Canvas Background
-
+  // 1. Background
   ctx.fillStyle = t.bg;
-
   ctx.fillRect(0, 0, width, height);
 
-
-
-  // 2. Inner Textured Sheet with High-End Drop Shadow
-
+  // 2. Inner Page
   ctx.save();
-
   ctx.fillStyle = t.pageInner;
-
   ctx.shadowColor = 'rgba(0, 0, 0, 0.16)';
-
   ctx.shadowBlur = 28;
-
   ctx.shadowOffsetY = 10;
-
   ctx.beginPath();
-
   ctx.roundRect(45, 30, width - 90, height - 60, 24);
-
   ctx.fill();
-
   ctx.restore();
 
-
-
-  // 3. Realistic Spiral Notebook Wire Binder on Left
-
+  // 3. Spiral Binder
   for (let y = 65; y < height - 60; y += 38) {
-
-    // Punch Hole
-
     ctx.beginPath();
-
     ctx.arc(68, y, 6.5, 0, Math.PI * 2);
-
-    ctx.fillStyle = state.scrapbookTheme === 'cyber' ? '#05070d' : '#cbd5e1';
-
+    ctx.fillStyle = state.scrapbookTheme === 'cyber' || state.scrapbookTheme === 'sanctuary' ? '#0b0f19' : '#cbd5e1';
     ctx.fill();
 
-
-
-    // Metallic Double Wire Ring
-
     ctx.beginPath();
-
     ctx.ellipse(62, y, 16, 4.5, -0.18, 0, Math.PI * 2);
-
     ctx.strokeStyle = state.scrapbookTheme === 'cyber' ? '#38bdf8' : '#64748b';
-
     ctx.lineWidth = 2.5;
-
     ctx.stroke();
-
   }
 
-
-
-  // 4. Subtle Ruled Journal Lines
-
+  // 4. Ruled Journal Lines
   ctx.strokeStyle = t.paperLines;
-
   ctx.lineWidth = 1;
-
   for (let y = 145; y < height - 70; y += 34) {
-
     ctx.beginPath();
-
     ctx.moveTo(100, y);
-
     ctx.lineTo(width - 65, y);
-
     ctx.stroke();
-
   }
 
-
-
-  // 5. Header Section: Title + Date Washi + Stickers
-
+  // 5. Header Section
+  ctx.textAlign = 'left';
   ctx.fillStyle = t.ink;
-
-  ctx.font = `bold 42px ${selectedFont}`;
-
+  ctx.font = `bold 40px ${selectedFont}`;
   const d = state.selectedDiaryDate || new Date();
-
   const dateStr = d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' });
-
   ctx.fillText("✦ TODAY'S CHRONICLE ✦", 110, 85);
 
-
-
-  // Date Washi Tape Banner
-
   ctx.save();
-
   ctx.fillStyle = t.washi2;
-
   ctx.beginPath();
-
-  ctx.roundRect(110, 98, 300, 30, 8);
-
+  ctx.roundRect(110, 98, 320, 30, 8);
   ctx.fill();
-
   ctx.restore();
 
-
-
+  ctx.textAlign = 'left';
   ctx.font = `bold 21px ${selectedFont}`;
-
   ctx.fillStyle = t.accent2;
-
   ctx.fillText(`📅 ${dateStr}`, 124, 120);
 
-
-
-  // Doodle Stickers & Sparkles
-
+  ctx.textAlign = 'right';
   ctx.font = `28px ${selectedFont}`;
-
   ctx.fillStyle = t.accent1;
+  ctx.fillText("✨ 🌸 ♡ ☕ ✦", width - 80, 85);
 
-  ctx.fillText("✨ 🌸 ♡ ☕ ✦", width - 240, 85);
-
-
-
-  // =========================================================================
-
-  // 2-COLUMN BALANCED AESTHETIC GRID
-
-  // Left Column: x = 110, width = 345 px
-
-  // Right Column: x = 480, width = 335 px
-
-  // =========================================================================
-
-
-
-  // --- LEFT COLUMN 1: NORTH STAR GOAL ---
-
+  // 6. Left Column Layout
   let leftY = 148;
 
   if (incGoal) {
-
     ctx.save();
-
+    ctx.textAlign = 'left';
     ctx.fillStyle = t.cardBg1;
-
     ctx.beginPath();
-
     ctx.roundRect(110, leftY, 345, 115, 16);
-
     ctx.fill();
-
     ctx.strokeStyle = t.tapeBorder;
-
     ctx.lineWidth = 1.5;
-
     ctx.setLineDash([5, 4]);
-
     ctx.stroke();
-
-
-
-    // Washi Tape on top left
 
     ctx.fillStyle = t.washi1;
-
     ctx.setLineDash([]);
-
     ctx.fillRect(145, leftY - 8, 80, 18);
-
     ctx.restore();
 
-
-
+    ctx.textAlign = 'left';
     ctx.fillStyle = t.ink;
-
     ctx.font = `bold 24px ${selectedFont}`;
-
     ctx.fillText("🎯 North Star Goal", 125, leftY + 34);
 
-
-
     ctx.font = `20px ${selectedFont}`;
-
     ctx.fillStyle = t.inkLight;
-
     const goalText = `"${state.todayGoal?.text || 'Ship core system architecture & complete 30m mindful walk'}"`;
-
     wrapCanvasText(ctx, goalText, 125, leftY + 62, 315, 23, 2);
 
-
-
     leftY += 132;
-
   }
-
-
-
-  // --- LEFT COLUMN 2: DAILY HABIT STREAKS (FULL TITLES, NO TRUNCATION) ---
 
   if (incHabits) {
-
-    const activeHabits = state.habitsList.slice(0, 5);
-
+    const activeHabits = (state.habitsList || []).slice(0, 5);
     const boxHeight = 70 + (activeHabits.length * 36);
 
-
-
     ctx.save();
-
+    ctx.textAlign = 'left';
     ctx.fillStyle = t.cardBg2;
-
     ctx.beginPath();
-
     ctx.roundRect(110, leftY, 345, boxHeight, 16);
-
     ctx.fill();
-
     ctx.strokeStyle = t.accent2;
-
     ctx.lineWidth = 1.2;
-
     ctx.stroke();
-
-
-
-    // Washi Tape
 
     ctx.fillStyle = t.washi2;
-
     ctx.fillRect(160, leftY - 8, 85, 18);
-
     ctx.restore();
 
-
-
+    ctx.textAlign = 'left';
     ctx.fillStyle = t.ink;
-
     ctx.font = `bold 24px ${selectedFont}`;
-
     ctx.fillText("🌿 Daily Habit Streaks", 125, leftY + 34);
 
-
-
     let habitRowY = leftY + 68;
-
     const todayDayIdx = (new Date().getDay() + 6) % 7;
 
-
-
     activeHabits.forEach((h) => {
-
-      const isDone = h.history[todayDayIdx];
-
-      // Habit Emoji & Title
-
+      const isDone = h.history ? h.history[todayDayIdx] : false;
+      ctx.textAlign = 'left';
       ctx.font = `21px ${selectedFont}`;
-
       ctx.fillStyle = isDone ? t.accent3 : t.ink;
-
       ctx.fillText(`${isDone ? '✓' : '○'} ${h.emoji || '💧'} ${h.title}`, 125, habitRowY);
 
-
-
-      // Streak flame on right edge
-
+      ctx.textAlign = 'right';
       ctx.font = `bold 19px ${selectedFont}`;
-
       ctx.fillStyle = t.flameColor;
-
-      ctx.fillText(`🔥 ${h.streak}d`, 390, habitRowY);
-
-
+      ctx.fillText(`🔥 ${h.streak || 1}d`, 435, habitRowY);
 
       habitRowY += 36;
-
     });
 
-
-
     leftY += boxHeight + 16;
-
   }
 
-
-
-  // --- LEFT COLUMN 3: PLAN VS ACTION VELOCITY ---
-
-  if (incMetrics && leftY < 920) {
-
+  if (incMetrics && leftY < 850) {
     ctx.save();
-
+    ctx.textAlign = 'left';
     ctx.fillStyle = t.cardBg3;
-
     ctx.beginPath();
-
-    ctx.roundRect(110, leftY, 345, 160, 16);
-
+    ctx.roundRect(110, leftY, 345, 155, 16);
     ctx.fill();
-
     ctx.strokeStyle = t.accent1;
-
     ctx.lineWidth = 1;
-
     ctx.stroke();
 
-
-
-    // Washi
-
     ctx.fillStyle = t.washi3;
-
     ctx.fillRect(210, leftY - 8, 80, 18);
-
     ctx.restore();
 
-
-
+    ctx.textAlign = 'left';
     ctx.fillStyle = t.ink;
-
     ctx.font = `bold 23px ${selectedFont}`;
-
     ctx.fillText("⚡ Plan vs. Action Velocity", 125, leftY + 34);
 
-
-
     ctx.font = `bold 19px ${selectedFont}`;
-
     ctx.fillStyle = t.accent1;
-
-    ctx.fillText("80% Execution • 4/5 Tasks Completed", 125, leftY + 60);
-
-
+    ctx.fillText("80% Execution • 4/5 Tasks Completed", 125, leftY + 62);
 
     ctx.font = `20px ${selectedFont}`;
-
     ctx.fillStyle = t.inkLight;
+    ctx.fillText("☑ Core Architecture Sprint", 125, leftY + 92);
+    ctx.fillText("☑ 15m Mindfulness Stroll", 125, leftY + 118);
+    ctx.fillText("☑ CBT Distortion Reframing", 125, leftY + 144);
 
-    ctx.fillText("☑ Core Architecture Sprint", 125, leftY + 90);
-
-    ctx.fillText("☑ 15m Mindfulness Stroll", 125, leftY + 116);
-
-    ctx.fillText("☑ CBT Distortion Reframing", 125, leftY + 142);
-
-
-
-    leftY += 175;
-
+    leftY += 170;
   }
 
-
-
-  // --- RIGHT COLUMN 1: POLAROID PHOTO ---
-
+  // 7. Right Column Layout
   let rightY = 148;
 
   if (incPolaroid) {
-
     ctx.save();
-
-    ctx.translate(645, rightY + 130);
-
-    ctx.rotate(-0.035); // Subtle authentic tilt
-
-
-
-    // Polaroid Card Sheet
+    ctx.translate(635, rightY + 115);
+    ctx.rotate(-0.03);
 
     ctx.fillStyle = t.polaroidBg;
-
     ctx.shadowColor = 'rgba(0, 0, 0, 0.18)';
-
     ctx.shadowBlur = 18;
-
     ctx.shadowOffsetY = 8;
-
     ctx.beginPath();
-
-    ctx.roundRect(-145, -135, 290, 275, 10);
-
+    ctx.roundRect(-135, -125, 270, 245, 10);
     ctx.fill();
-
     ctx.restore();
 
-
-
-    // Draw Photo Content
-
     ctx.save();
+    ctx.translate(635, rightY + 115);
+    ctx.rotate(-0.03);
 
-    ctx.translate(645, rightY + 130);
-
-    ctx.rotate(-0.035);
-
-
-
-    // Inner Photo Box
-
-    ctx.fillStyle = state.scrapbookTheme === 'cyber' ? '#1e293b' : '#f1f5f9';
-
-    ctx.fillRect(-130, -120, 260, 185);
-
-
-
-    // Snapshot Graphic & Text
-
-    ctx.fillStyle = t.accent2;
-
-    ctx.font = `bold 22px ${selectedFont}`;
+    ctx.fillStyle = state.scrapbookTheme === 'cyber' || state.scrapbookTheme === 'sanctuary' ? '#141c18' : '#f1f5f9';
+    ctx.fillRect(-120, -110, 240, 160);
 
     ctx.textAlign = 'center';
-
+    ctx.fillStyle = t.accent2;
+    ctx.font = `bold 21px ${selectedFont}`;
     ctx.fillText("📸 Memory Snapshot", 0, -35);
 
-
-
     ctx.font = `18px ${selectedFont}`;
-
     ctx.fillStyle = t.inkLight;
-
     ctx.fillText("📍 Studio Sanctuary Flow", 0, -5);
-
     ctx.fillText("🌅 9.4/10 Vitality State", 0, 22);
 
-
-
-    // Handwritten Caption below photo
-
-    ctx.font = `bold 23px ${selectedFont}`;
-
+    ctx.font = `bold 22px ${selectedFont}`;
     ctx.fillStyle = t.ink;
-
-    ctx.fillText("Serenity & Clarity ✦", 0, 105);
-
-
-
-    // Polaroid Top Scotch Tape
-
-    ctx.rotate(0.035);
+    ctx.fillText("Serenity & Clarity ✦", 0, 95);
 
     ctx.fillStyle = t.washi1;
-
-    ctx.fillRect(-55, -150, 110, 24);
-
+    ctx.fillRect(-50, -135, 100, 22);
     ctx.restore();
 
-
-
-    rightY += 300;
-
+    rightY += 265;
   }
-
-
-
-  // --- RIGHT COLUMN 2: CBT REFLECTION & WISDOM NOTE ---
 
   if (incReflection) {
-
     ctx.save();
-
+    ctx.textAlign = 'left';
     ctx.fillStyle = t.cardBg1;
-
     ctx.beginPath();
-
-    ctx.roundRect(480, rightY, 335, 240, 16);
-
+    ctx.roundRect(480, rightY, 335, 215, 16);
     ctx.fill();
-
     ctx.strokeStyle = t.tapeBorder;
-
     ctx.lineWidth = 1.4;
-
     ctx.stroke();
 
-
-
-    // Top Washi
-
     ctx.fillStyle = t.washi1;
-
     ctx.fillRect(525, rightY - 8, 80, 18);
-
     ctx.restore();
 
-
-
+    ctx.textAlign = 'left';
     ctx.fillStyle = t.ink;
+    ctx.font = `bold 23px ${selectedFont}`;
+    ctx.fillText("💭 Daily Reflection & CBT", 498, rightY + 34);
 
-    ctx.font = `bold 24px ${selectedFont}`;
-
-    ctx.fillText("💭 Daily Reflection & CBT Insight", 498, rightY + 34);
-
-
-
-    ctx.font = `italic 21px ${selectedFont}`;
-
+    ctx.font = `italic 20px ${selectedFont}`;
     ctx.fillStyle = t.inkLight;
-
     const quote = "Energy aligned with execution. Morning resistance was reframed into decoupled milestones. Deep flow maintained.";
-
-    wrapCanvasText(ctx, `"${quote}"`, 498, rightY + 66, 300, 25, 4);
-
-
-
-    // Cognitive Harmony Tag Pill
+    wrapCanvasText(ctx, `"${quote}"`, 498, rightY + 64, 300, 24, 3);
 
     ctx.save();
-
     ctx.fillStyle = t.washi2;
-
     ctx.beginPath();
-
-    ctx.roundRect(498, rightY + 185, 290, 34, 10);
-
+    ctx.roundRect(498, rightY + 165, 298, 34, 10);
     ctx.fill();
-
     ctx.restore();
 
-
-
+    ctx.textAlign = 'left';
     ctx.font = `bold 19px ${selectedFont}`;
-
     ctx.fillStyle = t.accent3;
+    ctx.fillText("🌿 96% Mental Equilibrium", 515, rightY + 188);
 
-    ctx.fillText("🌿 96% Mental Equilibrium", 515, rightY + 208);
-
-
-
-    rightY += 255;
-
+    rightY += 230;
   }
 
+  // 8. Bottom Life Bucket Milestone Card
+  const bottomY = Math.max(leftY, rightY, 680) + 15;
+  if (bottomY < 1050) {
+    ctx.save();
+    ctx.textAlign = 'left';
+    ctx.fillStyle = t.cardBg2;
+    ctx.beginPath();
+    ctx.roundRect(110, bottomY, 705, 115, 16);
+    ctx.fill();
+    ctx.strokeStyle = t.accent2;
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
 
+    ctx.fillStyle = t.ink;
+    ctx.font = `bold 22px ${selectedFont}`;
+    ctx.fillText("🌅 Life Bucket List Milestone Progress:", 135, bottomY + 34);
 
-  // =========================================================================
+    ctx.font = `20px ${selectedFont}`;
+    ctx.fillStyle = t.inkLight;
+    ctx.fillText("• Scuba dive the Great Barrier Reef ✨", 135, bottomY + 64);
+    ctx.fillText("• Published Open-Source AI Architecture Benchmark [Achieved ✓]", 135, bottomY + 92);
+    ctx.restore();
+  }
 
-  // FOOTER: BUCKET LIST DREAMS & SIGNATURE
-
-  // =========================================================================
-
-  const footerY = 945;
-
+  // 9. Watermark
   ctx.save();
-
-  ctx.fillStyle = t.washi3;
-
-  ctx.beginPath();
-
-  ctx.roundRect(110, footerY, width - 200, 95, 16);
-
-  ctx.fill();
-
-  ctx.strokeStyle = t.accent1;
-
-  ctx.lineWidth = 1;
-
-  ctx.stroke();
-
-  ctx.restore();
-
-
-
-  ctx.fillStyle = t.ink;
-
-  ctx.font = `bold 22px ${selectedFont}`;
-
-  ctx.fillText("🌠 Life Bucket List Milestone Progress:", 130, footerY + 32);
-
-
-
-  ctx.font = `20px ${selectedFont}`;
-
-  ctx.fillStyle = t.inkLight;
-
-  const bucketDream = state.bucketList?.[0]?.title || "Scuba dive the Great Barrier Reef (2027)";
-
-  ctx.fillText(`• ${bucketDream} ✨`, 130, footerY + 58);
-
-  ctx.fillText("• Published Open-Source AI Architecture Benchmark [Achieved ✓]", 130, footerY + 82);
-
-
-
-  // Bottom Signature Stamp
-
-  ctx.font = `bold 21px ${selectedFont}`;
-
+  ctx.textAlign = 'right';
+  ctx.font = `bold 18px ${selectedFont}`;
   ctx.fillStyle = t.accent1;
-
-  ctx.fillText("✍ Mind Cave Life Intelligence Journal", width - 390, height - 48);
-
+  ctx.fillText("✍ Mind Cave Life Intelligence Journal", width - 75, height - 42);
+  ctx.restore();
 }
-
-
-
-function generateNanoBananaScrapbookArt() {
-
-  showToast('Nano Banana: Crafting custom AI aesthetic doodles & watercolor stickers...');
-
-  setTimeout(() => {
-
-    renderScrapbookCard();
-
-    showToast('Nano Banana AI Artwork applied to your Scrapbook Card!');
-
-  }, 400);
-
-}
-
-
+window.renderScrapbookCard = renderScrapbookCard;
 
 function downloadScrapbookPNG() {
 
