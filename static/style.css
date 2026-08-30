@@ -602,7 +602,7 @@ body.light .chat-msg-user-card {
 }
 
 /* ==========================================================================
-   PRIMARY COMPOSER HARDWARE CAPSULE
+   PRIMARY COMPOSER HARDWARE CAPSULE (CLEAN ZERO-LINE DESIGN)
    ========================================================================== */
 
 .composer-wrap {
@@ -613,17 +613,15 @@ body.light .chat-msg-user-card {
   margin-top: 1rem;
 }
 
-.composer-outer {
-  background: transparent;
-  border: none;
-  padding: 0;
-  box-shadow: none;
-  transition: all 0.2s ease;
-}
-
+.composer-outer,
+.composer-outer:focus,
 .composer-outer:focus-within {
-  border-color: var(--mc-accent-40);
-  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.25), 0 0 0 1px var(--mc-accent-25);
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 .composer-inner {
@@ -633,20 +631,28 @@ body.light .chat-msg-user-card {
   border: 1px solid var(--mc-border-default);
   border-radius: 1.5rem;
   padding: 0.75rem 1.125rem 0.625rem 1.125rem;
-  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.1);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
+
 .composer-inner:focus-within {
-  border-color: var(--mc-accent-40);
-  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.15), 0 0 0 1px var(--mc-accent-25);
+  border-color: var(--mc-accent);
+  box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.15), 0 0 0 1px var(--mc-accent-25);
 }
 
-
-
-
-.composer-inner:focus-within {
-  border-color: var(--mc-accent-40);
-  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.15), 0 0 0 1px var(--mc-accent-25);
+/* Eliminate all rectangular focus borders/outlines on the composer textarea */
+#chat-input,
+.composer-inner textarea,
+#chat-input:focus,
+.composer-inner textarea:focus,
+#chat-input:active,
+.composer-inner textarea:active {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
 }
 
 /* Prompt Starter Cards (Empty Hero Stage) */
