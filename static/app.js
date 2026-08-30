@@ -1,3 +1,36 @@
+
+// =============================================================================
+// NAVIGATION DIRECTORY COLLAPSIBLE ACCORDION SYSTEM
+// =============================================================================
+
+function toggleDirectorySection(sectionId) {
+  const sectionEl = document.getElementById(sectionId);
+  const chevronEl = document.getElementById(`${sectionId}-chevron`);
+  if (!sectionEl) return;
+  const isHidden = sectionEl.classList.contains('hidden');
+  if (isHidden) {
+    sectionEl.classList.remove('hidden');
+    if (chevronEl) chevronEl.style.transform = 'rotate(180deg)';
+  } else {
+    sectionEl.classList.add('hidden');
+    if (chevronEl) chevronEl.style.transform = 'rotate(0deg)';
+  }
+}
+
+function toggleAllDirectorySections(expand = true) {
+  const sections = document.querySelectorAll('.dir-accordion-content');
+  sections.forEach(s => {
+    const chevron = document.getElementById(`${s.id}-chevron`);
+    if (expand) {
+      s.classList.remove('hidden');
+      if (chevron) chevron.style.transform = 'rotate(180deg)';
+    } else {
+      s.classList.add('hidden');
+      if (chevron) chevron.style.transform = 'rotate(0deg)';
+    }
+  });
+}
+
 async function deleteJournalEntry(journalId, event) {
   if (event) {
     event.preventDefault();

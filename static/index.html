@@ -3708,316 +3708,376 @@
   <!-- ===================================================================== -->
   <!-- MASTER NAVIGATION & HIERARCHICAL SECTION DIRECTORY MODAL -->
   <!-- ===================================================================== -->
-  <div id="master-menu-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-xl hidden overflow-y-auto">
-    <div class="double-bezel max-w-3xl w-full my-auto shadow-2xl">
-      <div class="double-bezel-inner p-4 sm:p-6 max-h-[88vh] overflow-y-auto flex flex-col gap-3.5">
+    <!-- ===================================================================== -->
+  <!-- MASTER NAVIGATION & HIERARCHICAL SECTION DIRECTORY (COLLAPSIBLE LIST) -->
+  <!-- ===================================================================== -->
+  <div id="master-menu-modal" class="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-black/80 backdrop-blur-xl hidden overflow-y-auto">
+    <div class="double-bezel max-w-2xl w-full my-auto shadow-2xl">
+      <div class="double-bezel-inner p-3.5 sm:p-5 max-h-[90vh] sm:max-h-[86vh] overflow-y-auto flex flex-col gap-2.5">
         <!-- Modal Header -->
-        <div class="flex items-center justify-between pb-3 border-b border-[var(--mc-border-subtle)] shrink-0">
+        <div class="flex items-center justify-between pb-2.5 border-b border-[var(--mc-border-subtle)] shrink-0">
           <div class="flex items-center gap-2.5">
-            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#9BB7A5]/15 border border-[#9BB7A5]/30 flex items-center justify-center text-[#9BB7A5] shrink-0">
-              <i data-lucide="compass" class="w-4 h-4 sm:w-5 sm:h-5 text-[#9BB7A5]"></i>
+            <div class="w-8 h-8 rounded-xl bg-[#9BB7A5]/15 border border-[#9BB7A5]/30 flex items-center justify-center text-[#9BB7A5] shrink-0">
+              <i data-lucide="compass" class="w-4 h-4 text-[#9BB7A5]"></i>
             </div>
             <div>
-              <h3 class="text-base font-semibold text-[var(--mc-text-primary)] tracking-tight flex items-center gap-2">
-                <span>Mind Cave Navigation Directory</span>
-                <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#9BB7A5]/15 text-[#9BB7A5] border border-[#9BB7A5]/30">Master Index</span>
+              <h3 class="text-sm sm:text-base font-semibold text-[var(--mc-text-primary)] tracking-tight flex items-center gap-2">
+                <span>Navigation Directory</span>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#9BB7A5]/15 text-[#9BB7A5] border border-[#9BB7A5]/30">Directory</span>
               </h3>
-              <p class="text-[11px] text-[var(--mc-text-secondary)]">All cognitive features, journaling tracks & system configurations</p>
+              <p class="text-[11px] text-[var(--mc-text-secondary)]">Collapsible index of cognitive tracks, tools & system settings</p>
             </div>
           </div>
-          <button onclick="closeMasterMenuModal()" class="w-8 h-8 rounded-xl bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-bg-elevation)] text-[var(--mc-text-muted)] hover:text-[var(--mc-text-primary)] flex items-center justify-center transition-colors">
-            <i data-lucide="x" class="w-4 h-4"></i>
-          </button>
+          <div class="flex items-center gap-1.5">
+            <button type="button" onclick="toggleAllDirectorySections(true)" class="text-[10px] font-mono px-2 py-1 rounded-lg bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-bg-elevation)] text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] border border-[var(--mc-border-subtle)] cursor-pointer" title="Expand all sections">Expand All</button>
+            <button type="button" onclick="toggleAllDirectorySections(false)" class="text-[10px] font-mono px-2 py-1 rounded-lg bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-bg-elevation)] text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] border border-[var(--mc-border-subtle)] cursor-pointer" title="Collapse all sections">Collapse</button>
+            <button onclick="closeMasterMenuModal()" class="w-7 h-7 rounded-xl bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-bg-elevation)] text-[var(--mc-text-muted)] hover:text-[var(--mc-text-primary)] flex items-center justify-center transition-colors ml-1 cursor-pointer">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+          </div>
         </div>
 
-        <!-- Hierarchical Tree Grid -->
-        <div class="space-y-3.5 pt-1">
+        <!-- Collapsible Accordion List Container -->
+        <div class="space-y-2 pt-0.5 text-xs">
 
-          <!-- Section 0: System Settings, Theme & Notifications -->
-          <div class="p-3.5 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)] shadow-sm space-y-2.5">
-            <div class="flex items-center justify-between">
+          <!-- Accordion 0: System Preferences & Configuration -->
+          <div class="rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)] overflow-hidden transition-all">
+            <button type="button" onclick="toggleDirectorySection('dir-section-0')" class="w-full p-2.5 sm:p-3 flex items-center justify-between hover:bg-[var(--mc-bg-elevation)] transition-colors text-left cursor-pointer">
               <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded-lg bg-[#9BB7A5]/15 text-[#9BB7A5] flex items-center justify-center">
+                <div class="w-6 h-6 rounded-lg bg-[#9BB7A5]/15 text-[#9BB7A5] flex items-center justify-center shrink-0">
                   <i data-lucide="sliders" class="w-3.5 h-3.5"></i>
                 </div>
-                <span class="text-xs font-semibold text-[var(--mc-text-primary)] uppercase tracking-wider font-mono">System Preferences & Settings</span>
+                <span class="font-semibold text-[var(--mc-text-primary)] text-xs">System Preferences & Settings</span>
               </div>
-              <span class="text-[10px] text-[#9BB7A5] font-mono px-2 py-0.5 rounded-full bg-[#9BB7A5]/10 border border-[#9BB7A5]/25">Live Sync</span>
-            </div>
-
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-              <!-- Theme Toggle Button -->
-              <button onclick="toggleTheme()" class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] hover:bg-[var(--mc-bg-elevation)] border border-[var(--mc-border-subtle)] hover:border-[#C5AA78]/50 text-left transition-all flex flex-col justify-between gap-1.5 group cursor-pointer shadow-sm">
-                <div class="flex items-center justify-between">
-                  <i id="menu-theme-icon" data-lucide="sun" class="w-4 h-4 text-amber-400"></i>
-                  <span class="text-[10px] font-mono text-[var(--mc-text-muted)] group-hover:text-amber-400">Toggle</span>
-                </div>
-                <div>
-                  <div class="font-semibold text-[var(--mc-text-primary)]" id="menu-theme-label">Theme Mode</div>
-                  <div class="text-[10px] text-[var(--mc-text-muted)]" id="menu-theme-sublabel">Light / Dark</div>
-                </div>
-              </button>
-
-              <!-- Notifications Button -->
-              <button onclick="closeMasterMenuModal(); openNotificationsModal();" class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] hover:bg-[var(--mc-bg-elevation)] border border-[var(--mc-border-subtle)] hover:border-[#9BB7A5]/50 text-left transition-all flex flex-col justify-between gap-1.5 group cursor-pointer shadow-sm">
-                <div class="flex items-center justify-between">
-                  <i data-lucide="bell" class="w-4 h-4 text-amber-400"></i>
-                  <span class="text-[10px] font-mono text-[#91B59D]">Active</span>
-                </div>
-                <div>
-                  <div class="font-semibold text-[var(--mc-text-primary)]">Notifications</div>
-                  <div class="text-[10px] text-[var(--mc-text-muted)]">Alarms & Check-ins</div>
-                </div>
-              </button>
-
-              <!-- Account & Biological Profile -->
-              <button onclick="closeMasterMenuModal(); openAuthModal();" class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] hover:bg-[var(--mc-bg-elevation)] border border-[var(--mc-border-subtle)] hover:border-[#8FA9B8]/50 text-left transition-all flex flex-col justify-between gap-1.5 group cursor-pointer shadow-sm">
-                <div class="flex items-center justify-between">
-                  <i data-lucide="user-check" class="w-4 h-4 text-[#8FA9B8]"></i>
-                  <span class="text-[10px] font-mono text-[#8FA9B8]">Bio Profile</span>
-                </div>
-                <div>
-                  <div class="font-semibold text-[var(--mc-text-primary)]">Profile & Bio</div>
-                  <div class="text-[10px] text-[var(--mc-text-muted)]">Gender & Vitality</div>
-                </div>
-              </button>
-
-              <!-- Gemini API Key Setup -->
-              <button onclick="closeMasterMenuModal(); openGeminiKeyModal();" class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] hover:bg-[var(--mc-bg-elevation)] border border-[var(--mc-border-subtle)] hover:border-[#9BB7A5]/50 text-left transition-all flex flex-col justify-between gap-1.5 group cursor-pointer shadow-sm">
-                <div class="flex items-center justify-between">
-                  <i data-lucide="sparkles" class="w-4 h-4 text-[#9BB7A5]"></i>
-                  <span class="text-[10px] font-mono text-[#9BB7A5]">Gemini 3.5</span>
-                </div>
-                <div>
-                  <div class="font-semibold text-[var(--mc-text-primary)]">AI Studio Key</div>
-                  <div class="text-[10px] text-[var(--mc-text-muted)]">Config & Privacy</div>
-                </div>
-              </button>
-            </div>
-          </div>
-          
-          <!-- Section 1: Studio (AI Sanctuary) -->
-          <div class="menu-section-box p-3.5 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)] transition-all hover:border-[#9BB7A5]/40">
-            <div class="flex items-center justify-between mb-2">
-              <div class="flex items-center gap-2 cursor-pointer group" onclick="navigateToSection('studio')">
-                <div class="w-7 h-7 rounded-lg bg-[#9BB7A5]/15 text-[#9BB7A5] flex items-center justify-center shrink-0">
-                  <i data-lucide="sparkles" class="w-4 h-4"></i>
-                </div>
-                <h4 class="text-xs sm:text-sm font-semibold text-[var(--mc-text-primary)] group-hover:text-[#9BB7A5] transition-colors">1. Studio — AI Cognitive Sanctuary</h4>
-              </div>
-              <button onclick="navigateToSection('studio')" class="text-[11px] px-2.5 py-0.5 rounded-full bg-[#9BB7A5]/15 text-[#9BB7A5] border border-[#9BB7A5]/30 font-semibold hover:bg-[#9BB7A5]/25 transition-colors">Open Studio →</button>
-            </div>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs pt-1">
-              <button onclick="navigateToStudioPersona('cbt_reflector')" class="p-2 rounded-xl bg-[var(--mc-bg-secondary)] hover:bg-[var(--mc-bg-elevation)] border border-[var(--mc-border-subtle)] hover:border-[#9BB7A5]/40 text-left transition-colors">
-                <div class="font-semibold text-[#9BB7A5] flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i><span>Reflect</span></div>
-                <div class="text-[10px] text-[var(--mc-text-muted)]">CBT Reframing</div>
-              </button>
-              <button onclick="navigateToStudioPersona('socratic_brainstormer')" class="p-2 rounded-xl bg-[var(--mc-bg-secondary)] hover:bg-[var(--mc-bg-elevation)] border border-[var(--mc-border-subtle)] hover:border-[#C5AA78]/40 text-left transition-colors">
-                <div class="font-semibold text-[#C5AA78] flex items-center gap-1.5"><i data-lucide="lightbulb" class="w-3.5 h-3.5"></i><span>Brainstorm</span></div>
-                <div class="text-[10px] text-[var(--mc-text-muted)]">Socratic Ideation</div>
-              </button>
-              <button onclick="navigateToStudioPersona('executive_strategist')" class="p-2 rounded-xl bg-[var(--mc-bg-secondary)] hover:bg-[var(--mc-bg-elevation)] border border-[var(--mc-border-subtle)] hover:border-[#8FA9B8]/40 text-left transition-colors">
-                <div class="font-semibold text-[#8FA9B8] flex items-center gap-1.5"><i data-lucide="target" class="w-3.5 h-3.5"></i><span>Strategize</span></div>
-                <div class="text-[10px] text-[var(--mc-text-muted)]">Execution Velocity</div>
-              </button>
-              <button onclick="navigateToStudioPersona('shadow_work_analyst')" class="p-2 rounded-xl bg-[var(--mc-bg-secondary)] hover:bg-[var(--mc-bg-elevation)] border border-[var(--mc-border-subtle)] hover:border-[#91B59D]/40 text-left transition-colors">
-                <div class="font-semibold text-[#91B59D] flex items-center gap-1.5"><i data-lucide="moon" class="w-3.5 h-3.5"></i><span>Shadow Work</span></div>
-                <div class="text-[10px] text-[var(--mc-text-muted)]">Blindspot Analysis</div>
-              </button>
-            </div>
-          </div>
-
-          <!-- Section 2: Journal & Life Intelligence -->
-          <div class="menu-section-box p-3.5 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)] transition-all hover:border-[#9BB7A5]/40">
-            <div class="flex items-center justify-between mb-2">
-              <div class="flex items-center gap-2 cursor-pointer group" onclick="navigateToSection('journals', 'chrono')">
-                <div class="w-7 h-7 rounded-lg bg-[#9BB7A5]/15 text-[#9BB7A5] flex items-center justify-center shrink-0">
-                  <i data-lucide="book-open" class="w-4 h-4"></i>
-                </div>
-                <h4 class="text-xs sm:text-sm font-semibold text-[var(--mc-text-primary)] group-hover:text-[#9BB7A5] transition-colors">2. Journal — Life Intelligence System</h4>
-              </div>
-              <button onclick="navigateToSection('journals', 'chrono')" class="text-[11px] px-2.5 py-0.5 rounded-full bg-[#9BB7A5]/15 text-[#9BB7A5] border border-[#9BB7A5]/30 font-semibold hover:bg-[#9BB7A5]/25 transition-colors">Open Journal →</button>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-xs pt-1">
-              <button onclick="navigateToSection('journals', 'chrono')" class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] hover:bg-[var(--mc-bg-elevation)] border border-[var(--mc-border-subtle)] hover:border-[#9BB7A5]/40 text-left transition-colors flex items-center justify-between">
-                <div>
-                  <div class="font-semibold text-[var(--mc-text-primary)] flex items-center gap-1.5"><i data-lucide="calendar" class="w-3.5 h-3.5 text-[#9BB7A5]"></i><span>Living Timeline</span></div>
-                  <div class="text-[10px] text-[var(--mc-text-muted)]">Chronicle & 1-Tap Habits</div>
-                </div>
-                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-[var(--mc-text-muted)]"></i>
-              </button>
-              <button onclick="navigateToSection('journals', 'harmony')" class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] hover:bg-[var(--mc-bg-elevation)] border border-[var(--mc-border-subtle)] hover:border-[#91B59D]/40 text-left transition-colors flex items-center justify-between">
-                <div>
-                  <div class="font-semibold text-[#91B59D] flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5 text-[#91B59D]"></i><span>Daily Harmony</span></div>
-                  <div class="text-[10px] text-[var(--mc-text-muted)]">96% Equilibrium & Audio</div>
-                </div>
-                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-[var(--mc-text-muted)]"></i>
-              </button>
-              <button onclick="navigateToSection('journals', 'memory_lane')" class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] hover:bg-[var(--mc-bg-elevation)] border border-[var(--mc-border-subtle)] hover:border-[#C5AA78]/40 text-left transition-colors flex items-center justify-between">
-                <div>
-                  <div class="font-semibold text-[#C5AA78] flex items-center gap-1.5"><i data-lucide="history" class="w-3.5 h-3.5 text-[#C5AA78]"></i><span>Memory Lane</span></div>
-                  <div class="text-[10px] text-[var(--mc-text-muted)]">30-Day Decision Recall</div>
-                </div>
-                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-[var(--mc-text-muted)]"></i>
-              </button>
-              <button onclick="navigateToSection('journals', 'memory')" class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] hover:bg-[var(--mc-bg-elevation)] border border-[var(--mc-border-subtle)] hover:border-[#8FA9B8]/40 text-left transition-colors flex items-center justify-between">
-                <div>
-                  <div class="font-semibold text-[#8FA9B8] flex items-center gap-1.5"><i data-lucide="image" class="w-3.5 h-3.5 text-[#8FA9B8]"></i><span>Photo Stream</span></div>
-                  <div class="text-[10px] text-[var(--mc-text-muted)]">Photos & Scrapbook</div>
-                </div>
-                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-[var(--mc-text-muted)]"></i>
-              </button>
-              <button onclick="navigateToSection('journals', 'sanctuary')" class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] hover:bg-[var(--mc-bg-elevation)] border border-[var(--mc-border-subtle)] hover:border-[#9BB7A5]/40 text-left transition-colors flex items-center justify-between">
-                <div>
-                  <div class="font-semibold text-[#9BB7A5] flex items-center gap-1.5"><i data-lucide="heart-pulse" class="w-3.5 h-3.5 text-[#9BB7A5]"></i><span>Bio Sanctuary</span></div>
-                  <div class="text-[10px] text-[var(--mc-text-muted)]">Milestone Dreams & Radar</div>
-                </div>
-                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-[var(--mc-text-muted)]"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- Section 3: MindPulse Cognitive Intelligence -->
-          <div class="menu-section-box p-3.5 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)] transition-all hover:border-[#8FA9B8]/40">
-            <div class="flex items-center justify-between mb-2">
-              <div class="flex items-center gap-2 cursor-pointer group" onclick="navigateToSection('analytics')">
-                <div class="w-7 h-7 rounded-lg bg-[#8FA9B8]/15 text-[#8FA9B8] flex items-center justify-center shrink-0">
-                  <i data-lucide="activity" class="w-4 h-4"></i>
-                </div>
-                <h4 class="text-xs sm:text-sm font-semibold text-[var(--mc-text-primary)] group-hover:text-[#8FA9B8] transition-colors">3. MindPulse — Cognitive Intelligence</h4>
-              </div>
-              <button onclick="navigateToSection('analytics')" class="text-[11px] px-2.5 py-0.5 rounded-full bg-[#8FA9B8]/15 text-[#8FA9B8] border border-[#8FA9B8]/30 font-semibold hover:bg-[#8FA9B8]/25 transition-colors">Open MindPulse →</button>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs pt-1">
-              <div class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)]">
-                <div class="font-semibold text-[#8FA9B8] flex items-center gap-1.5"><i data-lucide="brain" class="w-3.5 h-3.5"></i><span>8 Distortion Patterns</span></div>
-                <div class="text-[10px] text-[var(--mc-text-muted)]">Real-time cognitive bias analysis</div>
-              </div>
-              <div class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)]">
-                <div class="font-semibold text-[#9BB7A5] flex items-center gap-1.5"><i data-lucide="radar" class="w-3.5 h-3.5"></i><span>6-Factor Emotion Radar</span></div>
-                <div class="text-[10px] text-[var(--mc-text-muted)]">Joy, Clarity, Resilience, Focus</div>
-              </div>
-              <div class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)]">
-                <div class="font-semibold text-[#91B59D] flex items-center gap-1.5"><i data-lucide="activity" class="w-3.5 h-3.5"></i><span>Guided Reflections</span></div>
-                <div class="text-[10px] text-[var(--mc-text-muted)]">Decatastrophizing & Continuum</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Section 4: Vault & Security -->
-          <div class="menu-section-box p-3.5 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)] transition-all hover:border-[#91B59D]/40">
-            <div class="flex items-center justify-between mb-2">
-              <div class="flex items-center gap-2 cursor-pointer group" onclick="navigateToSection('security')">
-                <div class="w-7 h-7 rounded-lg bg-[#91B59D]/15 text-[#91B59D] flex items-center justify-center shrink-0">
-                  <i data-lucide="shield-check" class="w-4 h-4"></i>
-                </div>
-                <h4 class="text-xs sm:text-sm font-semibold text-[var(--mc-text-primary)] group-hover:text-[#91B59D] transition-colors">4. Vault — Privacy & Security Hardening</h4>
-              </div>
-              <button onclick="navigateToSection('security')" class="text-[11px] px-2.5 py-0.5 rounded-full bg-[#91B59D]/15 text-[#91B59D] border border-[#91B59D]/30 font-semibold hover:bg-[#91B59D]/25 transition-colors">Open Vault →</button>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs pt-1">
-              <div class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)]">
-                <div class="font-semibold text-[#91B59D] flex items-center gap-1.5"><i data-lucide="lock" class="w-3.5 h-3.5"></i><span>Client AES-256 Vault</span></div>
-                <div class="text-[10px] text-[var(--mc-text-muted)]">Zero-knowledge local encryption</div>
-              </div>
-              <div class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)]">
-                <div class="font-semibold text-[#8FA9B8] flex items-center gap-1.5"><i data-lucide="shield" class="w-3.5 h-3.5"></i><span>Multi-Tenant Isolation</span></div>
-                <div class="text-[10px] text-[var(--mc-text-muted)]">Strict tenant boundaries</div>
-              </div>
-              <div class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)]">
-                <div class="font-semibold text-[#C5AA78] flex items-center gap-1.5"><i data-lucide="search" class="w-3.5 h-3.5"></i><span>Live Security Audit</span></div>
-                <div class="text-[10px] text-[var(--mc-text-muted)]">Automated credential checks</div>
-              </div>
-            </div>
-          <!-- Section 5: About Each Section & Capabilities Guide -->
-          <div class="menu-section-box p-3.5 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)] space-y-3">
-            <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
-                <div class="w-7 h-7 rounded-lg bg-[var(--mc-accent-12)] text-[var(--mc-accent)] flex items-center justify-center shrink-0">
-                  <i data-lucide="help-circle" class="w-4 h-4"></i>
-                </div>
-                <h4 class="text-xs sm:text-sm font-semibold text-[var(--mc-text-primary)]">About Mind Cave Sections & Uses</h4>
+                <span class="text-[10px] text-[#9BB7A5] font-mono px-1.5 py-0.5 rounded bg-[#9BB7A5]/10 border border-[#9BB7A5]/25">4 Tools</span>
+                <i data-lucide="chevron-down" id="dir-section-0-chevron" class="w-4 h-4 text-[var(--mc-text-muted)] transition-transform duration-200" style="transform: rotate(180deg);"></i>
               </div>
-              <span class="text-[10px] font-mono text-[var(--mc-text-muted)] uppercase">Capabilities Guide</span>
-            </div>
+            </button>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-              <div class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] space-y-1">
-                <span class="font-semibold text-[var(--mc-accent)] flex items-center gap-1"><i data-lucide="home" class="w-3 h-3"></i><span>Home Sanctuary:</span></span>
-                <p class="text-[11px] text-[var(--mc-text-secondary)] leading-relaxed">Central landing hub, prompt starters, daily emotional equilibrium score, and core system overview.</p>
-              </div>
-              <div class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] space-y-1">
-                <span class="font-semibold text-[#8FA9B8] flex items-center gap-1"><i data-lucide="book-open" class="w-3 h-3"></i><span>Living Journal:</span></span>
-                <p class="text-[11px] text-[var(--mc-text-secondary)] leading-relaxed">Multi-track journaling: Living Timeline, Daily Harmony audio, 30-day Memory Lane, and photo scrapbooks.</p>
-              </div>
-              <div class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] space-y-1">
-                <span class="font-semibold text-[#9BB7A5] flex items-center gap-1"><i data-lucide="sparkles" class="w-3 h-3"></i><span>AI Reflective Studio:</span></span>
-                <p class="text-[11px] text-[var(--mc-text-secondary)] leading-relaxed">Empathetic CBT reframing, Socratic ideation, executive strategy, and native multilingual voice/text chat.</p>
-              </div>
-              <div class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] space-y-1">
-                <span class="font-semibold text-[#C5AA78] flex items-center gap-1"><i data-lucide="activity" class="w-3 h-3"></i><span>MindPulse Intelligence:</span></span>
-                <p class="text-[11px] text-[var(--mc-text-secondary)] leading-relaxed">Cognitive bias detection, emotional equilibrium radar, habit velocity, and longitudinal mental models.</p>
-              </div>
-              <div class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] space-y-1">
-                <span class="font-semibold text-[#91B59D] flex items-center gap-1"><i data-lucide="shield-check" class="w-3 h-3"></i><span>Private Vault:</span></span>
-                <p class="text-[11px] text-[var(--mc-text-secondary)] leading-relaxed">Zero-knowledge client-side AES-256-GCM encryption, biometric access, and cloud sync isolation.</p>
-              </div>
-              <div class="p-2.5 rounded-xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] space-y-1">
-                <span class="font-semibold text-rose-400 flex items-center gap-1"><i data-lucide="heart-pulse" class="w-3 h-3"></i><span>Bio Sanctuary:</span></span>
-                <p class="text-[11px] text-[var(--mc-text-secondary)] leading-relaxed">Circadian alignment, diurnal energy tracks, and biological vitality metrics for restorative wellness.</p>
+            <div id="dir-section-0" class="dir-accordion-content px-2 pb-2.5 pt-1 border-t border-[var(--mc-border-subtle)] space-y-1">
+              <div class="divide-y divide-[var(--mc-border-subtle)]">
+                <!-- Theme Mode Row -->
+                <div onclick="toggleTheme()" class="p-2 rounded-lg hover:bg-[var(--mc-bg-secondary)] flex items-center justify-between transition-colors cursor-pointer group">
+                  <div class="flex items-center gap-2.5">
+                    <i id="menu-theme-icon" data-lucide="sun" class="w-4 h-4 text-amber-400 shrink-0"></i>
+                    <div>
+                      <div class="font-semibold text-[var(--mc-text-primary)] group-hover:text-amber-400 transition-colors" id="menu-theme-label">Theme Mode</div>
+                      <div class="text-[10px] text-[var(--mc-text-muted)]" id="menu-theme-sublabel">Toggle between Light & Dark theme</div>
+                    </div>
+                  </div>
+                  <span class="text-[10px] font-mono text-[var(--mc-text-muted)] px-2 py-0.5 rounded bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)]">Toggle ⇄</span>
+                </div>
+
+                <!-- Notifications Row -->
+                <div onclick="closeMasterMenuModal(); openNotificationsModal();" class="p-2 rounded-lg hover:bg-[var(--mc-bg-secondary)] flex items-center justify-between transition-colors cursor-pointer group">
+                  <div class="flex items-center gap-2.5">
+                    <i data-lucide="bell" class="w-4 h-4 text-amber-400 shrink-0"></i>
+                    <div>
+                      <div class="font-semibold text-[var(--mc-text-primary)] group-hover:text-amber-400 transition-colors">Notifications & Alarms</div>
+                      <div class="text-[10px] text-[var(--mc-text-muted)]">Manage daily reflection check-ins & sounds</div>
+                    </div>
+                  </div>
+                  <span class="text-[10px] font-mono text-emerald-400 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30">Active</span>
+                </div>
+
+                <!-- Bio Profile Row -->
+                <div onclick="closeMasterMenuModal(); openAuthModal();" class="p-2 rounded-lg hover:bg-[var(--mc-bg-secondary)] flex items-center justify-between transition-colors cursor-pointer group">
+                  <div class="flex items-center gap-2.5">
+                    <i data-lucide="user-check" class="w-4 h-4 text-[#8FA9B8] shrink-0"></i>
+                    <div>
+                      <div class="font-semibold text-[var(--mc-text-primary)] group-hover:text-[#8FA9B8] transition-colors">Account & Biological Profile</div>
+                      <div class="text-[10px] text-[var(--mc-text-muted)]">Biological gender, vitality tracks & persona settings</div>
+                    </div>
+                  </div>
+                  <span class="text-[10px] font-mono text-[#8FA9B8] px-2 py-0.5 rounded bg-[#8FA9B8]/10 border border-[#8FA9B8]/30">Profile →</span>
+                </div>
+
+                <!-- AI Studio Key Setup Row -->
+                <div onclick="closeMasterMenuModal(); openGeminiKeyModal();" class="p-2 rounded-lg hover:bg-[var(--mc-bg-secondary)] flex items-center justify-between transition-colors cursor-pointer group">
+                  <div class="flex items-center gap-2.5">
+                    <i data-lucide="sparkles" class="w-4 h-4 text-[#9BB7A5] shrink-0"></i>
+                    <div>
+                      <div class="font-semibold text-[var(--mc-text-primary)] group-hover:text-[#9BB7A5] transition-colors">Google Gemini API Key</div>
+                      <div class="text-[10px] text-[var(--mc-text-muted)]">Gemini 3.5 Flash Lite live key configuration</div>
+                    </div>
+                  </div>
+                  <span class="text-[10px] font-mono text-[#9BB7A5] px-2 py-0.5 rounded bg-[#9BB7A5]/10 border border-[#9BB7A5]/30">Config →</span>
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- Section 6: Direct Feedback & Contact -->
-          <div class="menu-section-box p-3.5 rounded-2xl bg-gradient-to-br from-[var(--mc-bg-tertiary)] to-[var(--mc-bg-secondary)] border border-[var(--mc-border-default)] space-y-3">
-            <div class="flex items-center justify-between">
+          <!-- Accordion 1: Studio (AI Sanctuary) -->
+          <div class="rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)] overflow-hidden transition-all">
+            <button type="button" onclick="toggleDirectorySection('dir-section-1')" class="w-full p-2.5 sm:p-3 flex items-center justify-between hover:bg-[var(--mc-bg-elevation)] transition-colors text-left cursor-pointer">
               <div class="flex items-center gap-2">
-                <div class="w-7 h-7 rounded-lg bg-emerald-500/15 text-emerald-400 flex items-center justify-center shrink-0">
-                  <i data-lucide="message-circle" class="w-4 h-4"></i>
+                <div class="w-6 h-6 rounded-lg bg-[#9BB7A5]/15 text-[#9BB7A5] flex items-center justify-center shrink-0">
+                  <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
                 </div>
-                <div>
-                  <h4 class="text-xs sm:text-sm font-semibold text-[var(--mc-text-primary)]">Feedback & Direct Contact</h4>
-                  <p class="text-[10px] text-[var(--mc-text-muted)]">Share your suggestions, report issues, or connect directly with the creators</p>
+                <span class="font-semibold text-[var(--mc-text-primary)] text-xs">1. Studio — AI Cognitive Sanctuary</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] text-[#9BB7A5] font-mono px-1.5 py-0.5 rounded bg-[#9BB7A5]/10 border border-[#9BB7A5]/25">4 Personas</span>
+                <i data-lucide="chevron-down" id="dir-section-1-chevron" class="w-4 h-4 text-[var(--mc-text-muted)] transition-transform duration-200" style="transform: rotate(180deg);"></i>
+              </div>
+            </button>
+
+            <div id="dir-section-1" class="dir-accordion-content px-2 pb-2.5 pt-1 border-t border-[var(--mc-border-subtle)] space-y-1">
+              <div class="divide-y divide-[var(--mc-border-subtle)]">
+                <div onclick="navigateToStudioPersona('cbt_reflector')" class="p-2 rounded-lg hover:bg-[var(--mc-bg-secondary)] flex items-center justify-between transition-colors cursor-pointer group">
+                  <div class="flex items-center gap-2.5">
+                    <i data-lucide="heart" class="w-4 h-4 text-[#9BB7A5] shrink-0"></i>
+                    <div>
+                      <div class="font-semibold text-[#9BB7A5]">CBT Reflector (Cognitive Reframing)</div>
+                      <div class="text-[10px] text-[var(--mc-text-muted)]">Empathetic cognitive reframing without interrogation</div>
+                    </div>
+                  </div>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-[var(--mc-text-muted)] group-hover:text-[#9BB7A5] transition-colors"></i>
+                </div>
+
+                <div onclick="navigateToStudioPersona('socratic_brainstormer')" class="p-2 rounded-lg hover:bg-[var(--mc-bg-secondary)] flex items-center justify-between transition-colors cursor-pointer group">
+                  <div class="flex items-center gap-2.5">
+                    <i data-lucide="lightbulb" class="w-4 h-4 text-[#C5AA78] shrink-0"></i>
+                    <div>
+                      <div class="font-semibold text-[#C5AA78]">Socratic Brainstormer (First Principles)</div>
+                      <div class="text-[10px] text-[var(--mc-text-muted)]">Unpack hidden assumptions and unlock creative ideas</div>
+                    </div>
+                  </div>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-[var(--mc-text-muted)] group-hover:text-[#C5AA78] transition-colors"></i>
+                </div>
+
+                <div onclick="navigateToStudioPersona('executive_strategist')" class="p-2 rounded-lg hover:bg-[var(--mc-bg-secondary)] flex items-center justify-between transition-colors cursor-pointer group">
+                  <div class="flex items-center gap-2.5">
+                    <i data-lucide="target" class="w-4 h-4 text-[#8FA9B8] shrink-0"></i>
+                    <div>
+                      <div class="font-semibold text-[#8FA9B8]">Executive Strategist (High Agency)</div>
+                      <div class="text-[10px] text-[var(--mc-text-muted)]">Translate aspirations into actionable 3-phase roadmaps</div>
+                    </div>
+                  </div>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-[var(--mc-text-muted)] group-hover:text-[#8FA9B8] transition-colors"></i>
+                </div>
+
+                <div onclick="navigateToStudioPersona('shadow_work_analyst')" class="p-2 rounded-lg hover:bg-[var(--mc-bg-secondary)] flex items-center justify-between transition-colors cursor-pointer group">
+                  <div class="flex items-center gap-2.5">
+                    <i data-lucide="moon" class="w-4 h-4 text-[#91B59D] shrink-0"></i>
+                    <div>
+                      <div class="font-semibold text-[#91B59D]">Shadow Work Analyst (Subconscious Patterns)</div>
+                      <div class="text-[10px] text-[var(--mc-text-muted)]">Gentle inquiry into triggers, avoidance & recurring loops</div>
+                    </div>
+                  </div>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-[var(--mc-text-muted)] group-hover:text-[#91B59D] transition-colors"></i>
                 </div>
               </div>
-              <span class="text-[10px] font-mono text-emerald-400 font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30">Direct Support</span>
             </div>
+          </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
-              <!-- WhatsApp Contact Button -->
-              <a href="https://wa.me/919092312025?text=Hello%20Mind%20Cave%20Team%2C%20I%20have%20feedback%20regarding%20the%20app%3A%20" target="_blank" rel="noopener noreferrer" class="p-3 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 flex items-center justify-between transition-all group cursor-pointer text-decoration-none">
-                <div class="flex items-center gap-2.5">
-                  <div class="w-8 h-8 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+          <!-- Accordion 2: Journal (Life Intelligence System) -->
+          <div class="rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)] overflow-hidden transition-all">
+            <button type="button" onclick="toggleDirectorySection('dir-section-2')" class="w-full p-2.5 sm:p-3 flex items-center justify-between hover:bg-[var(--mc-bg-elevation)] transition-colors text-left cursor-pointer">
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-lg bg-[#9BB7A5]/15 text-[#9BB7A5] flex items-center justify-center shrink-0">
+                  <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+                </div>
+                <span class="font-semibold text-[var(--mc-text-primary)] text-xs">2. Journal — Life Intelligence System</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] text-[#9BB7A5] font-mono px-1.5 py-0.5 rounded bg-[#9BB7A5]/10 border border-[#9BB7A5]/25">5 Tracks</span>
+                <i data-lucide="chevron-down" id="dir-section-2-chevron" class="w-4 h-4 text-[var(--mc-text-muted)] transition-transform duration-200" style="transform: rotate(180deg);"></i>
+              </div>
+            </button>
+
+            <div id="dir-section-2" class="dir-accordion-content px-2 pb-2.5 pt-1 border-t border-[var(--mc-border-subtle)] space-y-1">
+              <div class="divide-y divide-[var(--mc-border-subtle)]">
+                <div onclick="navigateToSection('journals', 'chrono')" class="p-2 rounded-lg hover:bg-[var(--mc-bg-secondary)] flex items-center justify-between transition-colors cursor-pointer group">
+                  <div class="flex items-center gap-2.5">
+                    <i data-lucide="calendar" class="w-4 h-4 text-[#9BB7A5] shrink-0"></i>
+                    <div>
+                      <div class="font-semibold text-[var(--mc-text-primary)] group-hover:text-[#9BB7A5] transition-colors">Living Timeline</div>
+                      <div class="text-[10px] text-[var(--mc-text-muted)]">Chronological moment stream, tasks, 1-tap edits & daily rhythm</div>
+                    </div>
+                  </div>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-[var(--mc-text-muted)] group-hover:text-[#9BB7A5] transition-colors"></i>
+                </div>
+
+                <div onclick="navigateToSection('journals', 'harmony')" class="p-2 rounded-lg hover:bg-[var(--mc-bg-secondary)] flex items-center justify-between transition-colors cursor-pointer group">
+                  <div class="flex items-center gap-2.5">
+                    <i data-lucide="headphones" class="w-4 h-4 text-[#91B59D] shrink-0"></i>
+                    <div>
+                      <div class="font-semibold text-[var(--mc-text-primary)] group-hover:text-[#91B59D] transition-colors">Daily Harmony & Audio</div>
+                      <div class="text-[10px] text-[var(--mc-text-muted)]">Equilibrium scores, soundscapes & vocal synthesis</div>
+                    </div>
+                  </div>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-[var(--mc-text-muted)] group-hover:text-[#91B59D] transition-colors"></i>
+                </div>
+
+                <div onclick="navigateToSection('journals', 'memory_lane')" class="p-2 rounded-lg hover:bg-[var(--mc-bg-secondary)] flex items-center justify-between transition-colors cursor-pointer group">
+                  <div class="flex items-center gap-2.5">
+                    <i data-lucide="history" class="w-4 h-4 text-[#C5AA78] shrink-0"></i>
+                    <div>
+                      <div class="font-semibold text-[var(--mc-text-primary)] group-hover:text-[#C5AA78] transition-colors">Memory Lane</div>
+                      <div class="text-[10px] text-[var(--mc-text-muted)]">Longitudinal growth recall and 30-day decision evolution</div>
+                    </div>
+                  </div>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-[var(--mc-text-muted)] group-hover:text-[#C5AA78] transition-colors"></i>
+                </div>
+
+                <div onclick="navigateToSection('journals', 'memory')" class="p-2 rounded-lg hover:bg-[var(--mc-bg-secondary)] flex items-center justify-between transition-colors cursor-pointer group">
+                  <div class="flex items-center gap-2.5">
+                    <i data-lucide="image" class="w-4 h-4 text-[#8FA9B8] shrink-0"></i>
+                    <div>
+                      <div class="font-semibold text-[var(--mc-text-primary)] group-hover:text-[#8FA9B8] transition-colors">Photo Stream & Scrapbook</div>
+                      <div class="text-[10px] text-[var(--mc-text-muted)]">Visual memory grid, attached sketches & moments</div>
+                    </div>
+                  </div>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-[var(--mc-text-muted)] group-hover:text-[#8FA9B8] transition-colors"></i>
+                </div>
+
+                <div onclick="navigateToSection('journals', 'sanctuary')" class="p-2 rounded-lg hover:bg-[var(--mc-bg-secondary)] flex items-center justify-between transition-colors cursor-pointer group">
+                  <div class="flex items-center gap-2.5">
+                    <i data-lucide="heart-pulse" class="w-4 h-4 text-rose-400 shrink-0"></i>
+                    <div>
+                      <div class="font-semibold text-[var(--mc-text-primary)] group-hover:text-rose-400 transition-colors">Bio Sanctuary & Vitality</div>
+                      <div class="text-[10px] text-[var(--mc-text-muted)]">Circadian alignment, diurnal energy tracks & restorative habits</div>
+                    </div>
+                  </div>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-[var(--mc-text-muted)] group-hover:text-rose-400 transition-colors"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Accordion 3: MindPulse Cognitive Intelligence -->
+          <div class="rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)] overflow-hidden transition-all">
+            <button type="button" onclick="toggleDirectorySection('dir-section-3')" class="w-full p-2.5 sm:p-3 flex items-center justify-between hover:bg-[var(--mc-bg-elevation)] transition-colors text-left cursor-pointer">
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-lg bg-[#8FA9B8]/15 text-[#8FA9B8] flex items-center justify-center shrink-0">
+                  <i data-lucide="activity" class="w-3.5 h-3.5"></i>
+                </div>
+                <span class="font-semibold text-[var(--mc-text-primary)] text-xs">3. MindPulse — Cognitive Analytics</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] text-[#8FA9B8] font-mono px-1.5 py-0.5 rounded bg-[#8FA9B8]/10 border border-[#8FA9B8]/25">Metrics</span>
+                <i data-lucide="chevron-down" id="dir-section-3-chevron" class="w-4 h-4 text-[var(--mc-text-muted)] transition-transform duration-200" style="transform: rotate(0deg);"></i>
+              </div>
+            </button>
+
+            <div id="dir-section-3" class="dir-accordion-content hidden px-2 pb-2.5 pt-1 border-t border-[var(--mc-border-subtle)] space-y-1">
+              <div class="divide-y divide-[var(--mc-border-subtle)]">
+                <div onclick="navigateToSection('analytics')" class="p-2 rounded-lg hover:bg-[var(--mc-bg-secondary)] flex items-center justify-between transition-colors cursor-pointer group">
+                  <div class="flex items-center gap-2.5">
+                    <i data-lucide="radar" class="w-4 h-4 text-[#8FA9B8] shrink-0"></i>
+                    <div>
+                      <div class="font-semibold text-[var(--mc-text-primary)] group-hover:text-[#8FA9B8] transition-colors">6-Factor Emotional Radar</div>
+                      <div class="text-[10px] text-[var(--mc-text-muted)]">Joy, Clarity, Resilience, Focus, Calm & Optimism tracking</div>
+                    </div>
+                  </div>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-[var(--mc-text-muted)] group-hover:text-[#8FA9B8] transition-colors"></i>
+                </div>
+
+                <div onclick="navigateToSection('analytics')" class="p-2 rounded-lg hover:bg-[var(--mc-bg-secondary)] flex items-center justify-between transition-colors cursor-pointer group">
+                  <div class="flex items-center gap-2.5">
+                    <i data-lucide="brain" class="w-4 h-4 text-[#9BB7A5] shrink-0"></i>
+                    <div>
+                      <div class="font-semibold text-[var(--mc-text-primary)] group-hover:text-[#9BB7A5] transition-colors">8 Cognitive Distortion Detectors</div>
+                      <div class="text-[10px] text-[var(--mc-text-muted)]">Automated identification of catastrophizing, all-or-nothing loops</div>
+                    </div>
+                  </div>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-[var(--mc-text-muted)] group-hover:text-[#9BB7A5] transition-colors"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Accordion 4: Vault & Privacy Security -->
+          <div class="rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)] overflow-hidden transition-all">
+            <button type="button" onclick="toggleDirectorySection('dir-section-4')" class="w-full p-2.5 sm:p-3 flex items-center justify-between hover:bg-[var(--mc-bg-elevation)] transition-colors text-left cursor-pointer">
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-lg bg-[#91B59D]/15 text-[#91B59D] flex items-center justify-center shrink-0">
+                  <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                </div>
+                <span class="font-semibold text-[var(--mc-text-primary)] text-xs">4. Vault — Privacy & Security Architecture</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] text-[#91B59D] font-mono px-1.5 py-0.5 rounded bg-[#91B59D]/10 border border-[#91B59D]/25">AES-256</span>
+                <i data-lucide="chevron-down" id="dir-section-4-chevron" class="w-4 h-4 text-[var(--mc-text-muted)] transition-transform duration-200" style="transform: rotate(0deg);"></i>
+              </div>
+            </button>
+
+            <div id="dir-section-4" class="dir-accordion-content hidden px-2 pb-2.5 pt-1 border-t border-[var(--mc-border-subtle)] space-y-1">
+              <div class="divide-y divide-[var(--mc-border-subtle)]">
+                <div onclick="navigateToSection('security')" class="p-2 rounded-lg hover:bg-[var(--mc-bg-secondary)] flex items-center justify-between transition-colors cursor-pointer group">
+                  <div class="flex items-center gap-2.5">
+                    <i data-lucide="lock" class="w-4 h-4 text-[#91B59D] shrink-0"></i>
+                    <div>
+                      <div class="font-semibold text-[var(--mc-text-primary)] group-hover:text-[#91B59D] transition-colors">Client AES-256-GCM Encryption</div>
+                      <div class="text-[10px] text-[var(--mc-text-muted)]">Zero-knowledge client-side encryption with local keystores</div>
+                    </div>
+                  </div>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-[var(--mc-text-muted)] group-hover:text-[#91B59D] transition-colors"></i>
+                </div>
+
+                <div onclick="navigateToSection('security')" class="p-2 rounded-lg hover:bg-[var(--mc-bg-secondary)] flex items-center justify-between transition-colors cursor-pointer group">
+                  <div class="flex items-center gap-2.5">
+                    <i data-lucide="shield" class="w-4 h-4 text-[#8FA9B8] shrink-0"></i>
+                    <div>
+                      <div class="font-semibold text-[var(--mc-text-primary)] group-hover:text-[#8FA9B8] transition-colors">Strict User Isolation & Audit</div>
+                      <div class="text-[10px] text-[var(--mc-text-muted)]">Zero cross-tenant leakage with verified token boundaries</div>
+                    </div>
+                  </div>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-[var(--mc-text-muted)] group-hover:text-[#8FA9B8] transition-colors"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Accordion 5: Direct Help & Founder Support -->
+          <div class="rounded-xl bg-gradient-to-br from-[var(--mc-bg-tertiary)] to-[var(--mc-bg-secondary)] border border-[var(--mc-border-default)] overflow-hidden transition-all">
+            <button type="button" onclick="toggleDirectorySection('dir-section-5')" class="w-full p-2.5 sm:p-3 flex items-center justify-between hover:bg-[var(--mc-bg-elevation)] transition-colors text-left cursor-pointer">
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-lg bg-emerald-500/15 text-emerald-400 flex items-center justify-center shrink-0">
+                  <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
+                </div>
+                <span class="font-semibold text-[var(--mc-text-primary)] text-xs">5. Feedback, Support & Contact</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] text-emerald-400 font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/25">Direct Help</span>
+                <i data-lucide="chevron-down" id="dir-section-5-chevron" class="w-4 h-4 text-[var(--mc-text-muted)] transition-transform duration-200" style="transform: rotate(0deg);"></i>
+              </div>
+            </button>
+
+            <div id="dir-section-5" class="dir-accordion-content hidden px-2 pb-2.5 pt-1 border-t border-[var(--mc-border-subtle)] space-y-2">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                <!-- WhatsApp -->
+                <a href="https://wa.me/919092312025?text=Hello%20Mind%20Cave%20Team%2C%20I%20have%20feedback%20regarding%20the%20app%3A%20" target="_blank" rel="noopener noreferrer" class="p-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 flex items-center justify-between transition-all group cursor-pointer text-decoration-none">
+                  <div class="flex items-center gap-2">
                     <i data-lucide="phone-call" class="w-4 h-4"></i>
+                    <div>
+                      <div class="font-bold text-xs text-[var(--mc-text-primary)] group-hover:text-emerald-400 transition-colors">WhatsApp Support</div>
+                      <div class="text-[10px] text-emerald-400 font-mono font-semibold">+91 9092312025</div>
+                    </div>
                   </div>
-                  <div>
-                    <div class="font-bold text-xs text-[var(--mc-text-primary)] group-hover:text-emerald-400 transition-colors">WhatsApp Support</div>
-                    <div class="text-[11px] text-emerald-400 font-mono font-semibold">+91 9092312025</div>
-                  </div>
-                </div>
-                <i data-lucide="arrow-up-right" class="w-4 h-4 text-emerald-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"></i>
-              </a>
+                  <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-emerald-400"></i>
+                </a>
 
-              <!-- Email Feedback Button -->
-              <a href="mailto:Vickykalam34@gmail.com?subject=Mind%20Cave%20App%20Feedback" class="p-3 rounded-2xl bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-400 flex items-center justify-between transition-all group cursor-pointer text-decoration-none">
-                <div class="flex items-center gap-2.5">
-                  <div class="w-8 h-8 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400">
+                <!-- Email -->
+                <a href="mailto:Vickykalam34@gmail.com?subject=Mind%20Cave%20App%20Feedback" class="p-2.5 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-400 flex items-center justify-between transition-all group cursor-pointer text-decoration-none">
+                  <div class="flex items-center gap-2">
                     <i data-lucide="mail" class="w-4 h-4"></i>
+                    <div>
+                      <div class="font-bold text-xs text-[var(--mc-text-primary)] group-hover:text-blue-400 transition-colors">Email Support</div>
+                      <div class="text-[10px] text-blue-400 font-mono">Vickykalam34@gmail.com</div>
+                    </div>
                   </div>
-                  <div>
-                    <div class="font-bold text-xs text-[var(--mc-text-primary)] group-hover:text-blue-400 transition-colors">Email Feedback</div>
-                    <div class="text-[11px] text-blue-400 font-mono">Vickykalam34@gmail.com</div>
-                  </div>
-                </div>
-                <i data-lucide="arrow-up-right" class="w-4 h-4 text-blue-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"></i>
-              </a>
-            </div>
-          </div>
+                  <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-blue-400"></i>
+                </a>
+              </div>
 
-            <div class="pt-2 mt-2 border-t border-[var(--mc-border-subtle)] flex items-center justify-between">
-              <span class="text-[10px] text-[#B9858B] font-semibold flex items-center gap-1"><i data-lucide="alert-triangle" class="w-3 h-3"></i><span>Danger Zone: Permanent Factory Reset</span></span>
-              <button onclick="closeMasterMenuModal(); openFactoryResetModal();" class="text-[10px] px-2 py-1 rounded-lg bg-[#B9858B]/10 hover:bg-[#B9858B]/20 text-[#B9858B] border border-[#B9858B]/30 font-bold transition-colors">Wipe & Reset Everything →</button>
+              <!-- Factory Reset Row -->
+              <div class="pt-2 border-t border-[var(--mc-border-subtle)] flex items-center justify-between">
+                <span class="text-[10px] text-[#B9858B] font-semibold flex items-center gap-1"><i data-lucide="alert-triangle" class="w-3 h-3"></i><span>Danger Zone: Permanent Reset</span></span>
+                <button type="button" onclick="closeMasterMenuModal(); openFactoryResetModal();" class="text-[10px] px-2 py-1 rounded-lg bg-[#B9858B]/10 hover:bg-[#B9858B]/20 text-[#B9858B] border border-[#B9858B]/30 font-bold transition-colors cursor-pointer">Factory Reset Everything →</button>
+              </div>
             </div>
           </div>
 
