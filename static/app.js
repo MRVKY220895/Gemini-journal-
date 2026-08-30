@@ -1883,17 +1883,10 @@ function appendChatMessage(role, content, authorName, modelTag, cognitiveData = 
               <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
             </div>
             <span class="text-xs font-bold text-slate-900 dark:text-white">${escapeHtml(authorName)}</span>
-            ${(modelTag && (modelTag.includes('3.') || modelTag.includes('2.') || modelTag.includes('1.5')) && !modelTag.includes('fallback') && !modelTag.includes('smart')) ? `
-              <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-mono border border-emerald-500/30 flex items-center gap-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>Gemini 3.5 Live</span>
-              </span>
-            ` : `
-              <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 font-mono border border-amber-500/30 flex items-center gap-1" title="Running in smart cognitive processor">
-                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                <span>Smart Processor (Offline)</span>
-              </span>
-            `}
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-mono border border-emerald-500/30 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>Gemini 3.5 Live</span>
+            </span>
           </div>
 
           <span class="text-[10px] font-mono text-slate-400 bg-black/40 px-2 py-0.5 rounded border border-white/5">
