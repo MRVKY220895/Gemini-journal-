@@ -96,6 +96,16 @@ class IsolatedUserStorage:
             """)
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_analytics_user ON analytics(user_id)")
 
+            # User Persona & Cognitive Identity table (Partitioned by user_id)
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS user_personas (
+                    user_id TEXT PRIMARY KEY,
+                    persona_json TEXT NOT NULL,
+                    updated_at REAL NOT NULL
+                )
+            """)
+
+
             conn.commit()
             logger.info("Isolated User Storage database initialized with strict tenant indexes.")
 
@@ -372,6 +382,60 @@ class IsolatedUserStorage:
             "timeline": timeline[-15:]
         }
 
+
+    # =========================================================================
+    # USER PERSONA & COGNITIVE IDENTITY (USER ISOLATED)
+    # =========================================================================
+
+    def get_user_persona(self, user_id: str) -> Dict[str, Any]:
+        """Retrieves the synthesized user persona for the specific user."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT persona_json, updated_at FROM user_personas WHERE user_id = ?", (user_id,))
+            row = cursor.fetchone()
+            if row:
+                try:
+                    data = json.loads(row["persona_json"])
+                    data["last_updated"] = row["updated_at"]
+                    return data
+                except Exception as e:
+                    logger.warning(f"Error parsing persona JSON for {user_id}: {e}")
+
+        # Default initial persona structure
+        return {
+            "user_id": user_id,
+            "archetype": "Reflective Builder & Mindful Practitioner",
+            "core_values": ["Deep Craftsmanship", "High Agency", "Emotional Clarity", "Continuous Growth"],
+            "reflection_style": "Analytical, structured, constructive with bulleted action steps and gentle inquiry",
+            "recurring_themes": ["Product architecture", "Focus discipline", "Cognitive clarity", "Habit consistency"],
+            "triggers_and_stressors": ["Context switching", "Overwhelm from multitasking", "Ambiguity in sprint goals"],
+            "current_milestones": ["Ship deterministic architecture", "Maintain daily reflection streak"],
+            "personal_rules": ["Direct, high-empathy communication", "Action-oriented reframing", "Zero toxic positivity"],
+            "last_updated": time.time(),
+            "synthesis_count": 0
+        }
+
+    def save_user_persona(self, user_id: str, persona_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Saves or updates the synthesized user persona."""
+        now = time.time()
+        persona_data["user_id"] = user_id
+        persona_data["last_updated"] = now
+        json_str = json.dumps(persona_data)
+
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO user_personas (user_id, persona_json, updated_at)
+                VALUES (?, ?, ?)
+                ON CONFLICT(user_id) DO UPDATE SET
+                    persona_json = excluded.persona_json,
+                    updated_at = excluded.updated_at
+            """, (user_id, json_str, now))
+            conn.commit()
+
+        logger.info(f"User persona updated for user_id={user_id}")
+        return persona_data
+
     def reset_user_data(self, user_id: str) -> Dict[str, Any]:
         """
         Permanently wipes all sessions, messages, journals, and analytics
@@ -383,6 +447,7 @@ class IsolatedUserStorage:
             cursor.execute("DELETE FROM sessions WHERE user_id = ?", (user_id,))
             cursor.execute("DELETE FROM journals WHERE user_id = ?", (user_id,))
             cursor.execute("DELETE FROM analytics WHERE user_id = ?", (user_id,))
+            cursor.execute("DELETE FROM user_personas WHERE user_id = ?", (user_id,))
             conn.commit()
             logger.info(f"All isolated data permanently wiped for user_id={user_id}")
 

@@ -93,6 +93,20 @@ class FirestoreManager:
     def record_analytics(self, user_id: str, **kwargs) -> Dict[str, Any]:
         return isolated_storage.record_analytics(user_id, **kwargs)
 
+    def get_user_persona(self, user_id: str) -> Dict[str, Any]:
+        return isolated_storage.get_user_persona(user_id)
+
+    def save_user_persona(self, user_id: str, persona_data: Dict[str, Any]) -> Dict[str, Any]:
+        saved = isolated_storage.save_user_persona(user_id, persona_data)
+        if self.is_live:
+            try:
+                user_ref = self.get_user_doc_ref(user_id)
+                if user_ref:
+                    user_ref.collection("profile").document("persona").set(saved)
+            except Exception as e:
+                logger.warning(f"Failed to sync user persona to Firestore: {e}")
+        return saved
+
     def reset_user_data(self, user_id: str) -> Dict[str, Any]:
         """Permanently wipes all local and Firestore records for the user."""
         res = isolated_storage.reset_user_data(user_id)

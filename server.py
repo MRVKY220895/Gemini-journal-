@@ -83,6 +83,16 @@ class PlanGenerateRequest(BaseModel):
     target_date: Optional[str] = None
 
 
+
+class UserPersonaUpdateRequest(BaseModel):
+    archetype: Optional[str] = None
+    core_values: Optional[List[str]] = None
+    reflection_style: Optional[str] = None
+    recurring_themes: Optional[List[str]] = None
+    triggers_and_stressors: Optional[List[str]] = None
+    current_milestones: Optional[List[str]] = None
+    personal_rules: Optional[List[str]] = None
+
 class TranslateRequest(BaseModel):
     text: str = Field(..., min_length=1)
     target_lang: str = Field("en", description="Target ISO code e.g. en, ta, hi, te, es, fr, de, ja, zh, ar")
@@ -585,6 +595,37 @@ async def factory_reset_all_data(current_user: UserContext = Depends(get_current
     firestore_manager.reset_user_data("guest_user")
     return res
 
+
+
+# =============================================================================
+# DYNAMIC USER PERSONA & COGNITIVE IDENTITY ENDPOINTS
+# =============================================================================
+
+@app.get("/api/user-persona")
+async def get_user_persona(current_user: UserContext = Depends(get_current_user)):
+    """Retrieves the caller's synthesized psychological & cognitive persona."""
+    persona = firestore_manager.get_user_persona(user_id=current_user.uid)
+    return {"status": "success", "persona": persona}
+
+
+@app.post("/api/user-persona")
+async def update_user_persona(req: UserPersonaUpdateRequest, current_user: UserContext = Depends(get_current_user)):
+    """Updates, edits, or imports the caller's user persona."""
+    current = firestore_manager.get_user_persona(user_id=current_user.uid)
+    data = req.dict(exclude_unset=True)
+    current.update(data)
+    saved = firestore_manager.save_user_persona(user_id=current_user.uid, persona_data=current)
+    return {"status": "success", "message": "User persona updated successfully.", "persona": saved}
+
+
+@app.post("/api/user-persona/resynthesize")
+async def resynthesize_persona(current_user: UserContext = Depends(get_current_user)):
+    """Resynthesizes persona from all user journals and chat logs."""
+    journals = firestore_manager.get_journals(user_id=current_user.uid, limit=20)
+    texts = [f"Journal: {j.get('title', '')} - {j.get('content', '')}" for j in journals]
+    messages = [{"role": "user", "content": t} for t in texts]
+    updated = gemini_service.synthesize_and_update_user_persona(user_id=current_user.uid, messages=messages)
+    return {"status": "success", "message": "User persona resynthesized from past reflections.", "persona": updated}
 
 # =============================================================================
 # STATIC ASSET SERVING

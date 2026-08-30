@@ -1,4 +1,168 @@
 
+// =============================================================================
+// DYNAMIC USER PERSONA & COGNITIVE IDENTITY CONTROLLER
+// =============================================================================
+
+async function loadUserPersona() {
+  try {
+    const response = await fetch('/api/user-persona', { headers: getAuthHeaders() });
+    if (!response.ok) return;
+    const data = await response.json();
+    const persona = data.persona || {};
+    state.userPersona = persona;
+
+    // Update UI Deck
+    const archetypeEl = document.getElementById('persona-archetype-lbl');
+    const valuesEl = document.getElementById('persona-values-chips');
+    const styleEl = document.getElementById('persona-style-lbl');
+    const themesEl = document.getElementById('persona-themes-lbl');
+    const milestonesEl = document.getElementById('persona-milestones-lbl');
+    const badgeEl = document.getElementById('persona-synthesis-badge');
+
+    if (archetypeEl) archetypeEl.textContent = persona.archetype || 'Reflective Builder';
+    if (styleEl) styleEl.textContent = persona.reflection_style || 'Analytical & Supportive';
+    if (themesEl) themesEl.textContent = (persona.recurring_themes || []).join(', ') || 'General Wellbeing';
+    if (milestonesEl) milestonesEl.textContent = (persona.current_milestones || []).join(', ') || 'Mindful Presence';
+    if (badgeEl && persona.synthesis_count) {
+      badgeEl.textContent = `Auto-Synced (${persona.synthesis_count} turns)`;
+    }
+
+    if (valuesEl) {
+      const values = persona.core_values || ['Craftsmanship', 'Agency', 'Clarity'];
+      valuesEl.innerHTML = values.map(v => `
+        <span class="px-2 py-0.5 rounded-full bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] text-[var(--mc-text-primary)] text-[10px] font-medium">
+          ${escapeHtml(v)}
+        </span>
+      `).join('');
+    }
+  } catch (e) {
+    console.debug('User persona load notice:', e);
+  }
+}
+
+function openPersonaEditModal() {
+  const p = state.userPersona || {};
+  const archInput = document.getElementById('edit-persona-archetype');
+  const valInput = document.getElementById('edit-persona-values');
+  const styleInput = document.getElementById('edit-persona-style');
+  const themesInput = document.getElementById('edit-persona-themes');
+  const triggersInput = document.getElementById('edit-persona-triggers');
+  const milesInput = document.getElementById('edit-persona-milestones');
+
+  if (archInput) archInput.value = p.archetype || '';
+  if (valInput) valInput.value = (p.core_values || []).join(', ');
+  if (styleInput) styleInput.value = p.reflection_style || '';
+  if (themesInput) themesInput.value = (p.recurring_themes || []).join(', ');
+  if (triggersInput) triggersInput.value = (p.triggers_and_stressors || []).join(', ');
+  if (milesInput) milesInput.value = (p.current_milestones || []).join(', ');
+
+  const modal = document.getElementById('persona-edit-modal');
+  if (modal) modal.classList.remove('hidden');
+}
+
+function closePersonaEditModal() {
+  const modal = document.getElementById('persona-edit-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
+async function saveUserPersonaFromModal(event) {
+  if (event) event.preventDefault();
+  const parseList = (val) => val ? val.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+  const payload = {
+    archetype: document.getElementById('edit-persona-archetype')?.value.trim() || 'Reflective Builder',
+    core_values: parseList(document.getElementById('edit-persona-values')?.value),
+    reflection_style: document.getElementById('edit-persona-style')?.value.trim() || 'Analytical & Supportive',
+    recurring_themes: parseList(document.getElementById('edit-persona-themes')?.value),
+    triggers_and_stressors: parseList(document.getElementById('edit-persona-triggers')?.value),
+    current_milestones: parseList(document.getElementById('edit-persona-milestones')?.value)
+  };
+
+  try {
+    const resp = await fetch('/api/user-persona', {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(payload)
+    });
+    if (!resp.ok) throw new Error('Failed to update persona.');
+    closePersonaEditModal();
+    await loadUserPersona();
+    showToast('User persona memory updated and saved!');
+  } catch (e) {
+    showToast(`Error saving persona: ${e.message}`);
+  }
+}
+
+function exportUserPersonaJSON() {
+  const p = state.userPersona || {
+    archetype: 'Reflective Builder & Mindful Practitioner',
+    core_values: ['Deep Craftsmanship', 'High Agency', 'Emotional Clarity'],
+    reflection_style: 'Analytical & Supportive',
+    recurring_themes: ['Product architecture', 'Focus discipline'],
+    triggers_and_stressors: ['Context switching'],
+    current_milestones: ['Ship deterministic architecture']
+  };
+
+  const blob = new Blob([JSON.stringify(p, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `mind_cave_user_persona_${state.currentUser?.uid || 'user'}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('User persona memory exported as JSON!');
+}
+
+function importUserPersonaFile(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    try {
+      const content = e.target.result;
+      let parsed = {};
+      try {
+        parsed = JSON.parse(content);
+      } catch (jsonErr) {
+        // Fallback for simple text formats
+        parsed = {
+          archetype: 'Imported Custom Persona',
+          reflection_style: content.substring(0, 300)
+        };
+      }
+
+      const resp = await fetch('/api/user-persona', {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(parsed)
+      });
+      if (!resp.ok) throw new Error('Could not save imported persona.');
+      await loadUserPersona();
+      showToast('User persona memory imported successfully!');
+    } catch (err) {
+      showToast(`Import error: ${err.message}`);
+    }
+  };
+  reader.readAsText(file);
+}
+
+async function resynthesizeUserPersona() {
+  showToast('Re-synthesizing persona from your reflection vault...');
+  try {
+    const resp = await fetch('/api/user-persona/resynthesize', {
+      method: 'POST',
+      headers: getAuthHeaders()
+    });
+    if (!resp.ok) throw new Error('Resynthesis failed.');
+    await loadUserPersona();
+    showToast('User persona re-synthesized successfully!');
+  } catch (e) {
+    showToast('Could not resynthesize persona right now.');
+  }
+}
+
+
 function appendLoadingIndicator() {
   const container = document.getElementById('chat-messages');
   if (!container) return;
@@ -790,6 +954,7 @@ function updateUserUI() {
 
 
 function openAuthModal() {
+  loadUserPersona();
 
   updateUserUI(); // Ensure UI is up to date when modal opens
 
