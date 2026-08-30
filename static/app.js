@@ -2954,39 +2954,26 @@ function initMediaMode() {
 
 
 function updateMediaModeUI() {
-
   const btn = document.getElementById('media-mode-toggle-btn');
-
   const icon = document.getElementById('media-mode-icon');
-
   const label = document.getElementById('media-mode-label');
 
-
-
-  const isPhotos = state.mediaMode === 'photos';
-
-  if (icon) {
-
-    icon.setAttribute('data-lucide', isPhotos ? 'image' : 'file-text');
-
-    icon.className = `w-3.5 h-3.5 ${isPhotos ? 'text-amber-400' : 'text-slate-400'}`;
-
+  if (label && icon) {
+    if (state.mediaMode === 'text') {
+      label.textContent = 'Text Only';
+      icon.setAttribute('data-lucide', 'file-text');
+      if (btn) btn.classList.add('border-[var(--mc-accent)]', 'text-[var(--mc-accent)]');
+    } else if (state.mediaMode === 'photos') {
+      label.textContent = 'Photos Only';
+      icon.setAttribute('data-lucide', 'image');
+      if (btn) btn.classList.add('border-[var(--mc-accent)]', 'text-[var(--mc-accent)]');
+    } else {
+      label.textContent = 'All Content';
+      icon.setAttribute('data-lucide', 'layers');
+      if (btn) btn.classList.remove('border-[var(--mc-accent)]', 'text-[var(--mc-accent)]');
+    }
+    if (window.lucide) lucide.createIcons();
   }
-
-  if (label) {
-
-    label.textContent = isPhotos ? 'Photos: On' : 'Light Text';
-
-  }
-
-  if (btn) {
-
-    btn.title = isPhotos ? 'Photos are visible globally (Click for Lightweight Mode)' : 'Lightweight text mode active (Click to show Photos)';
-
-  }
-
-  lucide.createIcons();
-
 }
 
 
@@ -5758,29 +5745,19 @@ async function loadJournals() {
     if (journals.length === 0) {
 
       container.innerHTML = `
-
-        <div class="col-span-full double-bezel text-center py-12">
-
-          <div class="double-bezel-inner p-8">
-
-            <i data-lucide="book-open" class="w-8 h-8 text-slate-500 mx-auto mb-2"></i>
-
-            <p class="text-sm font-semibold text-slate-300">No Journal Entries Found for this User</p>
-
-            <p class="text-xs text-slate-500 mt-1">This demonstrates strict user storage isolation. Create your first reflection!</p>
-
-            <button onclick="openNewJournalModal()" class="btn-island mt-4">
-
-              <span>Write Entry</span>
-
-              <div class="btn-island-icon"><i data-lucide="plus" class="w-4 h-4 text-white"></i></div>
-
-            </button>
-
+        <div class="col-span-full mc-card text-center py-10 px-4 space-y-3">
+          <div class="w-10 h-10 rounded-xl bg-[var(--mc-accent-12)] border border-[var(--mc-accent-25)] text-[var(--mc-accent)] flex items-center justify-center mx-auto">
+            <i data-lucide="book-open" class="w-5 h-5"></i>
           </div>
-
+          <div>
+            <h4 class="text-sm font-semibold text-[var(--mc-text-primary)]">No Journal Entries Found</h4>
+            <p class="text-xs text-[var(--mc-text-secondary)] mt-1 max-w-sm mx-auto">All reflections are encrypted and isolated to your private vault. Create your first reflection to get started.</p>
+          </div>
+          <button onclick="openNewJournalModal()" class="btn-primary text-xs font-semibold px-4 py-2 inline-flex items-center gap-1.5 mx-auto cursor-pointer">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span>Write Reflection</span>
+          </button>
         </div>
-
       `;
 
       lucide.createIcons();
@@ -5793,50 +5770,21 @@ async function loadJournals() {
 
     container.innerHTML = journals.map(j => `
 
-      <div class="double-bezel">
-
-        <div class="double-bezel-inner p-5 flex flex-col justify-between h-full">
-
-          <div>
-
-            <div class="flex items-center justify-between mb-2">
-
-              <span class="eyebrow-badge">${escapeHtml(j.mood || 'Reflective')}</span>
-
-              <span class="text-[10px] text-slate-500 font-mono">${new Date(j.created_at * 1000).toLocaleDateString()}</span>
-
-            </div>
-
-            <h4 class="text-sm font-bold text-white mb-2 line-clamp-1">${escapeHtml(j.title)}</h4>
-
-            <p class="text-xs text-slate-300 line-clamp-3 mb-4">${escapeHtml(j.content)}</p>
-
-            ${j.insights && j.insights.cognitive_reframing ? `
-
-              <div class="p-2.5 rounded-lg bg-blue-950/30 border border-blue-500/20 text-[11px] text-blue-300 italic mb-3">
-
-                "${escapeHtml(j.insights.cognitive_reframing)}"
-
-              </div>
-
-            ` : ''}
-
+      <div class="mc-card p-4 sm:p-5 flex flex-col justify-between h-full space-y-3">
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] font-semibold">${escapeHtml(j.mood || 'Reflective')}</span>
+            <span class="text-[10px] text-[var(--mc-text-muted)] font-mono">${new Date(j.created_at * 1000).toLocaleDateString()}</span>
           </div>
-
-          <div class="flex items-center justify-between pt-3 border-t border-white/5">
-
-            <span class="text-[10px] text-slate-500 font-mono">UID: ${escapeHtml(j.user_id.substring(0, 10))}...</span>
-
-            <button onclick="deleteJournalEntry('${j.id}')" class="text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1">
-
-              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Delete
-
-            </button>
-
-          </div>
-
+          <h4 class="text-sm font-semibold text-[var(--mc-text-primary)] mb-1.5 line-clamp-1">${escapeHtml(j.title)}</h4>
+          <p class="text-xs text-[var(--mc-text-secondary)] line-clamp-3 leading-relaxed">${escapeHtml(j.content)}</p>
         </div>
-
+        <div class="flex items-center justify-between pt-2.5 border-t border-[var(--mc-border-subtle)] text-[10px]">
+          <span class="text-[var(--mc-text-muted)] font-mono">UID: ${escapeHtml((j.user_id || '').substring(0, 10))}...</span>
+          <button onclick="deleteJournalEntry('${j.id}')" class="text-rose-600 dark:text-rose-400 hover:underline flex items-center gap-1 cursor-pointer font-medium">
+            <i data-lucide="trash-2" class="w-3 h-3"></i> <span>Delete</span>
+          </button>
+        </div>
       </div>
 
     `).join('');

@@ -320,7 +320,7 @@ html.light .mc-card {
   position: sticky;
   top: 0.5rem;
   z-index: 50;
-  max-width: 1440px;
+  max-width: 72rem; /* 1152px - exactly matches max-w-6xl */
   width: 100%;
   margin: 0 auto;
   backdrop-filter: blur(24px);
@@ -2891,4 +2891,61 @@ body.light .chat-msg-ai-card {
   background: #FFFFFF !important;
   border-color: var(--mc-border-default) !important;
   color: var(--mc-text-primary) !important;
+}
+
+
+/* ==========================================================================
+   RESPONSIVE MOBILE TYPOGRAPHY & ALIGNMENT ENHANCEMENTS
+   ========================================================================== */
+
+@media (max-width: 640px) {
+  body {
+    padding: 0.5rem 0.5rem 5rem 0.5rem !important;
+  }
+
+  .floating-nav {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 0.35rem 0.5rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+
+  .studio-container {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  .mc-card {
+    padding: 0.875rem 1rem !important;
+    border-radius: var(--radius-lg) !important;
+  }
+
+  h1 { font-size: 1.25rem !important; line-height: 1.35 !important; }
+  h2 { font-size: 1.125rem !important; line-height: 1.35 !important; }
+  h3 { font-size: 0.9375rem !important; line-height: 1.35 !important; }
+  h4 { font-size: 0.875rem !important; line-height: 1.35 !important; }
+
+  /* Date Picker and Search in Chrono */
+  #chrono-date-picker {
+    font-size: 0.75rem !important;
+    height: 1.5rem !important;
+  }
+
+  #memory-search-input {
+    font-size: 0.75rem !important;
+    height: 2rem !important;
+  }
+
+  .diary-day-pill {
+    min-width: 2.5rem !important;
+    padding: 0.35rem 0.25rem !important;
+  }
+
+  .diary-day-pill .day-name {
+    font-size: 0.5625rem !important;
+  }
+
+  .diary-day-pill .day-number {
+    font-size: 0.75rem !important;
+  }
 }
