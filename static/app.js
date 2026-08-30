@@ -124,7 +124,7 @@ async function switchUserProfile(newUid, newName, newToken) {
   renderTodayGoal();
   renderHabitTracker();
   renderBucketList();
-  renderNotesList();
+  if (typeof renderNotesCards === 'function') renderNotesCards();
   setMasterDashboardHorizon(currentDashboardHorizon || 'weekly');
   updateAllDashboardStats();
   refreshIcons();
@@ -14170,6 +14170,7 @@ function initNotesAndAlerts() {
 
 // ─── RENDER CAPTURES GRID (NOTES, CHECKLISTS, TASKS) ───
 function renderNotesCards() {
+window.renderNotesList = renderNotesCards;
   const container = document.getElementById('notes-cards-grid');
   if (!container) return;
 
