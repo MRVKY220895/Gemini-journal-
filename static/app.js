@@ -6112,88 +6112,50 @@ async function saveQuickJournal(title, content, mood) {
 
 
 async function loadJournals() {
-
   const container = document.getElementById('journals-grid');
-
   if (!container) return;
 
-  
-
-  container.innerHTML = '<div class="col-span-full text-center text-slate-500 py-8 text-xs">Loading isolated entries...</div>';
-
-
-
-  try {
-
-    const response = await fetch('/api/journals', {
-
-      headers: getAuthHeaders()
-
-    });
-
-    const data = await response.json();
-
-    const journals = data.journals || [];
-
-
-
-    if (journals.length === 0) {
-
-      container.innerHTML = `
-        <div class="col-span-full mc-card text-center py-10 px-4 space-y-3">
-          <div class="w-10 h-10 rounded-xl bg-[var(--mc-accent-12)] border border-[var(--mc-accent-25)] text-[var(--mc-accent)] flex items-center justify-center mx-auto">
-            <i data-lucide="book-open" class="w-5 h-5"></i>
-          </div>
-          <div>
-            <h4 class="text-sm font-semibold text-[var(--mc-text-primary)]">No Journal Entries Found</h4>
-            <p class="text-xs text-[var(--mc-text-secondary)] mt-1 max-w-sm mx-auto">All reflections are encrypted and isolated to your private vault. Create your first reflection to get started.</p>
-          </div>
-          <button onclick="openNewJournalModal()" class="btn-primary text-xs font-semibold px-4 py-2 inline-flex items-center gap-1.5 mx-auto cursor-pointer">
-            <i data-lucide="plus" class="w-4 h-4"></i>
-            <span>Write Reflection</span>
-          </button>
-        </div>
-      `;
-
-      refreshIcons();
-
-      return;
-
-    }
-
-
-
-    container.innerHTML = journals.map(j => `
-
-      <div class="mc-card p-4 sm:p-5 flex flex-col justify-between h-full space-y-3">
-        <div>
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] font-semibold">${escapeHtml(j.mood || 'Reflective')}</span>
-            <span class="text-[10px] text-[var(--mc-text-muted)] font-mono">${new Date(j.created_at * 1000).toLocaleDateString()}</span>
-          </div>
-          <h4 class="text-sm font-semibold text-[var(--mc-text-primary)] mb-1.5 line-clamp-1">${escapeHtml(j.title)}</h4>
-          <p class="text-xs text-[var(--mc-text-secondary)] line-clamp-3 leading-relaxed">${escapeHtml(j.content)}</p>
-        </div>
-        <div class="flex items-center justify-between pt-2.5 border-t border-[var(--mc-border-subtle)] text-[10px]">
-          <span class="text-[var(--mc-text-muted)] font-mono">UID: ${escapeHtml((j.user_id || '').substring(0, 10))}...</span>
-          <button onclick="deleteJournalEntry('${j.id}')" class="text-rose-600 dark:text-rose-400 hover:underline flex items-center gap-1 cursor-pointer font-medium">
-            <i data-lucide="trash-2" class="w-3 h-3"></i> <span>Delete</span>
-          </button>
-        </div>
-      </div>
-
-    `).join('');
-
-
-
-    refreshIcons();
-
-  } catch (error) {
-
-    container.innerHTML = `<div class="col-span-full text-center text-rose-400 py-8 text-xs">Error loading journals: ${error.message}</div>`;
-
+  // 1. Instant 0ms render from memory or localStorage cache
+  if (!state.journalsCache) {
+    try {
+      const cached = localStorage.getItem('mind_cave_cached_journals');
+      if (cached) state.journalsCache = JSON.parse(cached);
+    } catch (e) {}
   }
 
+  if (state.journalsCache && state.journalsCache.length > 0) {
+    renderJournalCards(state.journalsCache);
+  } else if (!container.hasChildNodes() || container.innerHTML.trim() === '') {
+    container.innerHTML = '<div class="col-span-full text-center text-slate-400 py-6 text-xs animate-pulse">Accessing private vault reflections...</div>';
+  }
+
+  // 2. Fast background revalidation (3s timeout)
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+    const response = await fetch('/api/journals', {
+      headers: getAuthHeaders(),
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+
+    if (response.ok) {
+      const data = await response.json();
+      const journals = data.journals || [];
+      state.journalsCache = journals;
+      try {
+        localStorage.setItem('mind_cave_cached_journals', JSON.stringify(journals));
+      } catch (e) {}
+
+      renderJournalCards(journals);
+    }
+  } catch (error) {
+    // If timeout or error, keep showing cached data seamlessly
+    if (!state.journalsCache || state.journalsCache.length === 0) {
+      renderJournalCards([]);
+    }
+  }
 }
 
 
