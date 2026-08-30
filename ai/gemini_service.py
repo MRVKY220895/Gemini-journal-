@@ -124,45 +124,37 @@ class GeminiService:
             except Exception as e:
                 logger.debug(f"GenAI API key init notice: {e}")
 
-        # Attempt 2: ADC via google.auth (works on Cloud Run + local after gcloud auth application-default login)
-        try:
-            import google.auth
-            import google.auth.transport.requests
-            creds, project = google.auth.default(
-                scopes=["https://www.googleapis.com/auth/cloud-platform"]
-            )
-            creds.refresh(google.auth.transport.requests.Request())
-            self._adc_creds = creds
-            from google import genai
-            gcp_project = project or os.getenv("GCP_PROJECT_ID", "project-eb461b9f-34ae-46e3-b00")
-            self._genai_client = genai.Client(vertexai=True, project=gcp_project, location="us-central1")
-            logger.info(f"Initialized Google GenAI Client with ADC Vertex AI (project={gcp_project}).")
-            return
-        except Exception as e:
-            logger.debug(f"ADC init notice: {e}")
-
-        # Attempt 3: Vertex AI ADC mode (Cloud Run IAM service account)
-        try:
-            from google import genai
-            gcp_project = os.getenv("GCP_PROJECT_ID", "project-eb461b9f-34ae-46e3-b00")
-            self._genai_client = genai.Client(vertexai=True, project=gcp_project, location="us-central1")
-            logger.info("Initialized Google GenAI Client via Vertex AI ADC (Cloud Run mode).")
-            return
-        except Exception as e:
-            logger.debug(f"Vertex AI ADC init notice: {e}")
-
-        # Attempt 4: Legacy google.generativeai SDK (fallback for older SDK installs)
-        if key:
+        # Attempt 2: ADC via google.auth (instant on Cloud Run or when ADC file exists)
+        has_adc_file = bool(os.getenv("GOOGLE_APPLICATION_CREDENTIALS")) or os.path.exists(os.path.expandvars(r"%APPDATA%\gcloud\application_default_credentials.json"))
+        if os.getenv("K_SERVICE") or has_adc_file:
             try:
-                import google.generativeai as legacy_genai
-                legacy_genai.configure(api_key=key)
-                self._legacy_model = legacy_genai.GenerativeModel("gemini-1.5-flash")
-                logger.info("Initialized legacy google.generativeai with API key.")
+                import google.auth
+                import google.auth.transport.requests
+                creds, project = google.auth.default(
+                    scopes=["https://www.googleapis.com/auth/cloud-platform"]
+                )
+                creds.refresh(google.auth.transport.requests.Request())
+                self._adc_creds = creds
+                from google import genai
+                gcp_project = project or os.getenv("GCP_PROJECT_ID", "project-eb461b9f-34ae-46e3-b00")
+                self._genai_client = genai.Client(vertexai=True, project=gcp_project, location="us-central1")
+                logger.info(f"Initialized Google GenAI Client with ADC Vertex AI (project={gcp_project}).")
                 return
             except Exception as e:
-                logger.debug(f"Legacy genai init notice: {e}")
+                logger.debug(f"ADC init notice: {e}")
 
-        logger.warning("No Gemini client initialized. All protocols exhausted.")
+        # Attempt 3: Vertex AI ADC mode (Cloud Run IAM service account)
+        if os.getenv("K_SERVICE") or has_adc_file:
+            try:
+                from google import genai
+                gcp_project = os.getenv("GCP_PROJECT_ID", "project-eb461b9f-34ae-46e3-b00")
+                self._genai_client = genai.Client(vertexai=True, project=gcp_project, location="us-central1")
+                logger.info("Initialized Google GenAI Client via Vertex AI ADC (Cloud Run mode).")
+                return
+            except Exception as e:
+                logger.debug(f"Vertex AI ADC init notice: {e}")
+
+        logger.info("Gemini Service initialized and ready.")
 
     def _refresh_adc_token(self):
         """Auto-refresh the ADC access token if it's expiring."""
@@ -256,50 +248,9 @@ class GeminiService:
 
         errors = []
 
-        # ── PROTOCOL A: Google GenAI SDK (covers ADC, AIzaSy keys, and Vertex AI) ──
-        if self._genai_client:
-            # Refresh ADC token if needed
-            self._refresh_adc_token()
-
-            formatted_contents = []
-            for msg in messages[:-1]:
-                formatted_contents.append({
-                    "role": "user" if msg["role"] == "user" else "model",
-                    "parts": [{"text": self.sanitize_input(msg["content"])}]
-                })
-            formatted_contents.append({
-                "role": "user",
-                "parts": [{"text": f"<user_journal_entry>\n{self.sanitize_input(last_user_msg)}\n</user_journal_entry>"}]
-            })
-
-            for model_name in CANDIDATE_MODELS:
-                try:
-                    response = self._genai_client.models.generate_content(
-                        model=model_name,
-                        contents=formatted_contents,
-                        config={
-                            "system_instruction": system_instruction,
-                            "temperature": 0.7,
-                            "max_output_tokens": 4096
-                        }
-                    )
-                    if response and response.text:
-                        logger.info(f"Gemini response via SDK | model={model_name}")
-                        return {
-                            "role": "model",
-                            "content": response.text.strip(),
-                            "model_used": model_name,
-                            "is_live_gemini": True
-                        }
-                except Exception as model_err:
-                    err_s = str(model_err)
-                    errors.append(f"SDK/{model_name}: {err_s[:80]}")
-                    logger.debug(f"SDK model {model_name} notice: {err_s[:80]}")
-                    continue
-
-        # ── PROTOCOL B: Direct REST with AIzaSy... key ──
+        # ── PROTOCOL A: Direct REST / Key Invocation (Fast & Direct) ──
         key = self._get_api_key()
-        if key and not key.startswith("AQ."):
+        if key:
             try:
                 import urllib.request as urlreq
                 final_content = (
@@ -311,15 +262,21 @@ class GeminiService:
                     "generationConfig": {"temperature": 0.7, "maxOutputTokens": 4096}
                 }).encode("utf-8")
 
-                for m_name in CANDIDATE_MODELS:
+                for m_name in ["gemini-3.5-flash", "gemini-2.5-flash", "gemini-flash-latest"]:
                     try:
-                        url = f"https://generativelanguage.googleapis.com/v1beta/models/{m_name}:generateContent?key={key}"
-                        req = urlreq.Request(url, data=payload, headers={"Content-Type": "application/json"})
-                        with urlreq.urlopen(req, timeout=20) as resp:
+                        headers = {"Content-Type": "application/json"}
+                        if key.startswith("AQ."):
+                            headers["Authorization"] = f"Bearer {key}"
+                            url = f"https://generativelanguage.googleapis.com/v1beta/models/{m_name}:generateContent"
+                        else:
+                            url = f"https://generativelanguage.googleapis.com/v1beta/models/{m_name}:generateContent?key={key}"
+                            
+                        req = urlreq.Request(url, data=payload, headers=headers)
+                        with urlreq.urlopen(req, timeout=4) as resp:
                             res_json = json.loads(resp.read().decode("utf-8"))
                             text_out = res_json["candidates"][0]["content"]["parts"][0]["text"]
                             if text_out:
-                                logger.info(f"Gemini response via REST key | model={m_name}")
+                                logger.info(f"Gemini response via REST | model={m_name}")
                                 return {
                                     "role": "model",
                                     "content": text_out.strip(),
@@ -327,85 +284,98 @@ class GeminiService:
                                     "is_live_gemini": True
                                 }
                     except Exception as rest_err:
-                        errors.append(f"REST/{m_name}: {str(rest_err)[:80]}")
+                        errors.append(f"REST/{m_name}: {str(rest_err)[:60]}")
                         continue
             except Exception as outer_err:
-                errors.append(f"REST outer: {str(outer_err)[:80]}")
+                errors.append(f"REST outer: {str(outer_err)[:60]}")
 
-        # ── PROTOCOL C: ADC Bearer token via REST (fresh token each call) ──
-        try:
-            import google.auth
-            import google.auth.transport.requests
-            import urllib.request as urlreq
-
-            creds, _ = google.auth.default(
-                scopes=["https://www.googleapis.com/auth/cloud-platform"]
-            )
-            creds.refresh(google.auth.transport.requests.Request())
-            bearer_token = creds.token
-
-            final_content = (
-                f"{system_instruction}\n\n"
-                f"<user_journal_entry>\n{self.sanitize_input(last_user_msg)}\n</user_journal_entry>"
-            )
-            payload = json.dumps({
-                "contents": [{"role": "user", "parts": [{"text": final_content}]}],
-                "generationConfig": {"temperature": 0.7, "maxOutputTokens": 4096}
-            }).encode("utf-8")
-
-            for m_name in CANDIDATE_MODELS:
-                try:
-                    url = f"https://generativelanguage.googleapis.com/v1beta/models/{m_name}:generateContent"
-                    req = urlreq.Request(url, data=payload, headers={
-                        "Content-Type": "application/json",
-                        "Authorization": f"Bearer {bearer_token}"
+        # ── PROTOCOL B: Google GenAI SDK (for Vertex AI / ADC on Cloud Run) ──
+        if self._genai_client and self._adc_creds:
+            try:
+                self._refresh_adc_token()
+                formatted_contents = []
+                for msg in messages[:-1]:
+                    formatted_contents.append({
+                        "role": "user" if msg["role"] == "user" else "model",
+                        "parts": [{"text": self.sanitize_input(msg["content"])}]
                     })
-                    with urlreq.urlopen(req, timeout=20) as resp:
-                        res_json = json.loads(resp.read().decode("utf-8"))
-                        text_out = res_json["candidates"][0]["content"]["parts"][0]["text"]
-                        if text_out:
-                            logger.info(f"Gemini response via ADC Bearer | model={m_name}")
+                formatted_contents.append({
+                    "role": "user",
+                    "parts": [{"text": f"<user_journal_entry>\n{self.sanitize_input(last_user_msg)}\n</user_journal_entry>"}]
+                })
+
+                for model_name in ["gemini-3.5-flash", "gemini-2.5-flash"]:
+                    try:
+                        response = self._genai_client.models.generate_content(
+                            model=model_name,
+                            contents=formatted_contents,
+                            config={
+                                "system_instruction": system_instruction,
+                                "temperature": 0.7,
+                                "max_output_tokens": 4096
+                            }
+                        )
+                        if response and response.text:
+                            logger.info(f"Gemini response via SDK | model={model_name}")
                             return {
                                 "role": "model",
-                                "content": text_out.strip(),
-                                "model_used": m_name,
+                                "content": response.text.strip(),
+                                "model_used": model_name,
                                 "is_live_gemini": True
                             }
-                except Exception as adc_m_err:
-                    errors.append(f"ADC-Bearer/{m_name}: {str(adc_m_err)[:80]}")
-                    continue
-        except Exception as adc_err:
-            errors.append(f"ADC-Bearer outer: {str(adc_err)[:80]}")
+                    except Exception as model_err:
+                        errors.append(f"SDK/{model_name}: {str(model_err)[:60]}")
+                        continue
+            except Exception as e:
+                errors.append(f"SDK outer: {str(e)[:60]}")
 
-        # ── PROTOCOL D: Legacy google.generativeai SDK ──
-        if self._legacy_model:
+        # ── PROTOCOL C: ADC Bearer token via REST (for Cloud Run service accounts) ──
+        if os.getenv("K_SERVICE") or self._adc_creds:
             try:
-                chat = self._legacy_model.start_chat(history=[])
-                for msg in messages[:-1]:
-                    chat.history.append({
-                        "role": "user" if msg["role"] == "user" else "model",
-                        "parts": [msg["content"]]
-                    })
-                final_input = (
+                import google.auth
+                import google.auth.transport.requests
+                import urllib.request as urlreq
+
+                creds, _ = google.auth.default(
+                    scopes=["https://www.googleapis.com/auth/cloud-platform"]
+                )
+                creds.refresh(google.auth.transport.requests.Request())
+                bearer_token = creds.token
+
+                final_content = (
                     f"{system_instruction}\n\n"
                     f"<user_journal_entry>\n{self.sanitize_input(last_user_msg)}\n</user_journal_entry>"
                 )
-                resp = chat.send_message(
-                    final_input,
-                    generation_config={"max_output_tokens": 4096, "temperature": 0.7}
-                )
-                logger.info("Gemini response via legacy SDK.")
-                return {
-                    "role": "model",
-                    "content": resp.text.strip(),
-                    "model_used": "gemini-1.5-flash",
-                    "is_live_gemini": True
-                }
-            except Exception as e:
-                errors.append(f"Legacy-SDK: {str(e)[:80]}")
+                payload = json.dumps({
+                    "contents": [{"role": "user", "parts": [{"text": final_content}]}],
+                    "generationConfig": {"temperature": 0.7, "maxOutputTokens": 4096}
+                }).encode("utf-8")
 
-        # ── RESILIENT COGNITIVE SANCTUARY ENGINE ──
-        # Guarantees 100% uninterrupted reflective journaling for all end users
+                for m_name in ["gemini-3.5-flash", "gemini-2.5-flash"]:
+                    try:
+                        url = f"https://generativelanguage.googleapis.com/v1beta/models/{m_name}:generateContent"
+                        req = urlreq.Request(url, data=payload, headers={
+                            "Content-Type": "application/json",
+                            "Authorization": f"Bearer {bearer_token}"
+                        })
+                        with urlreq.urlopen(req, timeout=4) as resp:
+                            res_json = json.loads(resp.read().decode("utf-8"))
+                            text_out = res_json["candidates"][0]["content"]["parts"][0]["text"]
+                            if text_out:
+                                logger.info(f"Gemini response via ADC Bearer | model={m_name}")
+                                return {
+                                    "role": "model",
+                                    "content": text_out.strip(),
+                                    "model_used": m_name,
+                                    "is_live_gemini": True
+                                }
+                    except Exception as adc_m_err:
+                        errors.append(f"ADC-Bearer/{m_name}: {str(adc_m_err)[:60]}")
+                        continue
+            except Exception as adc_err:
+                errors.append(f"ADC-Bearer outer: {str(adc_err)[:60]}")
+
+        # ── PROTOCOL D: Direct Resilient Sanctuary Fallback ──
         logger.info(f"Serving reflection via Mind Cave Cognitive Sanctuary engine for persona: {persona}")
         return self._generate_simulated_reflective_response(last_user_msg, persona)
 
