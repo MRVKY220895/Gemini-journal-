@@ -4215,40 +4215,39 @@
   <!-- MODAL: COLLAPSIBLE 2-TILE FOCUS & HABITS MODAL -->
   <!-- ===================================================================== -->
   <div id="goals-habits-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-5 hidden overflow-y-auto">
-    <div class="double-bezel max-w-5xl w-full my-auto shadow-2xl">
-      <div class="double-bezel-inner p-4 sm:p-6 bg-slate-950/95 border-white/10 space-y-4 max-h-[90vh] overflow-y-auto">
-        <!-- Modal Top Bar -->
-        <div class="flex items-center justify-between pb-3 border-b border-white/10 flex-wrap gap-2">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
-              <i data-lucide="target" class="w-5 h-5 text-amber-400"></i>
-            </div>
-            <div>
-              <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
-                <span>Today's Focus & Habits Hub</span>
-                <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">Focus Deck</span>
-              </h3>
-              <p class="text-xs text-slate-400">Manage achievable goals, start/end duration, daily habit streaks, and shortcuts.</p>
-            </div>
+    <div class="mc-card max-w-5xl w-full my-auto shadow-2xl p-5 sm:p-6 space-y-4 max-h-[90vh] overflow-y-auto border border-[var(--mc-border-default)]">
+      <!-- Modal Top Bar -->
+      <div class="flex items-center justify-between pb-3 border-b border-[var(--mc-border-subtle)] flex-wrap gap-2">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-500 flex items-center justify-center shrink-0">
+            <i data-lucide="target" class="w-5 h-5 text-amber-500"></i>
           </div>
-
-          <div class="flex items-center gap-2">
-            <button type="button" onclick="openNewGoalModal()" class="btn-secondary !py-1.5 !px-3 text-xs flex items-center gap-1 text-amber-300 hover:border-amber-400 font-semibold">
-              <i data-lucide="plus" class="w-3.5 h-3.5 text-amber-400"></i> <span>Goal</span>
-            </button>
-            <button type="button" onclick="openNewHabitModal()" class="btn-secondary !py-1.5 !px-3 text-xs flex items-center gap-1 text-cyan-300 hover:border-cyan-400 font-semibold">
-              <i data-lucide="plus" class="w-3.5 h-3.5 text-cyan-400"></i> <span>Habit</span>
-            </button>
-            <button onclick="closeGoalsHabitsModal()" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
-              <i data-lucide="x" class="w-4 h-4"></i>
-            </button>
+          <div>
+            <h3 class="text-base sm:text-lg font-bold text-[var(--mc-text-primary)] flex items-center gap-2">
+              <span>Today's Focus & Habits Hub</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] font-semibold">Focus Deck</span>
+            </h3>
+            <p class="text-xs text-[var(--mc-text-secondary)]">Manage achievable goals, start/end duration, daily habit streaks, and shortcuts.</p>
           </div>
         </div>
+
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="openNewGoalModal()" class="btn-secondary !py-1.5 !px-3 text-xs flex items-center gap-1 font-semibold cursor-pointer">
+            <i data-lucide="plus" class="w-3.5 h-3.5 text-amber-500"></i> <span>+ Goal</span>
+          </button>
+          <button type="button" onclick="openNewHabitModal()" class="btn-secondary !py-1.5 !px-3 text-xs flex items-center gap-1 font-semibold cursor-pointer">
+            <i data-lucide="plus" class="w-3.5 h-3.5 text-[var(--mc-accent)]"></i> <span>+ Habit</span>
+          </button>
+          <button onclick="closeGoalsHabitsModal()" class="w-8 h-8 rounded-xl bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-bg-elevation)] text-[var(--mc-text-muted)] hover:text-[var(--mc-text-primary)] flex items-center justify-center transition-colors cursor-pointer">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
 
         <!-- 2 Side-by-Side Cards in Modal -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
           <!-- Today's Achievable Goals (Left Column, 7 Cols) -->
-          <div class="lg:col-span-7 flex flex-col justify-between p-4 rounded-2xl bg-black/40 border border-white/10 space-y-3">
+          <div class="lg:col-span-7 flex flex-col justify-between p-4 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)] space-y-3 shadow-sm">
             <div class="space-y-3">
               <div class="flex items-center justify-between border-b border-white/5 pb-2">
                 <div class="flex items-center gap-2">
@@ -4274,23 +4273,23 @@
             </div>
 
             <!-- Directional Summary Footer -->
-            <div class="p-3 rounded-xl bg-slate-900/80 border border-white/5 space-y-1.5 mt-2">
+            <div class="p-3 rounded-xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] space-y-1.5 mt-2">
               <div class="flex items-center justify-between text-xs gap-2">
-                <span class="font-semibold text-slate-300 flex items-center gap-1">
-                  <i data-lucide="pie-chart" class="w-3.5 h-3.5 text-cyan-400"></i>
+                <span class="font-semibold text-[var(--mc-text-primary)] flex items-center gap-1">
+                  <i data-lucide="pie-chart" class="w-3.5 h-3.5 text-[var(--mc-accent)]"></i>
                   <span>Directional Focus Velocity:</span>
                 </span>
-                <span class="font-mono text-cyan-400 font-bold" id="modal-goals-velocity-text">75% Velocity</span>
+                <span class="font-mono text-[var(--mc-accent)] font-bold" id="modal-goals-velocity-text">67% Velocity</span>
               </div>
-              <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden flex">
-                <div id="modal-goals-progress-bar" class="h-full bg-gradient-to-r from-amber-500 to-emerald-500 rounded-full" style="width: 67%;"></div>
+              <div class="w-full h-1.5 bg-[var(--mc-border-subtle)] rounded-full overflow-hidden flex">
+                <div id="modal-goals-progress-bar" class="h-full bg-gradient-to-r from-amber-500 to-[var(--mc-accent)] rounded-full" style="width: 67%;"></div>
               </div>
-              <div class="flex items-center justify-between text-[10px] text-slate-400 pt-0.5 flex-wrap gap-1" id="modal-goals-breakdown-pills"></div>
+              <div class="flex items-center justify-between text-[10px] text-[var(--mc-text-secondary)] pt-0.5 flex-wrap gap-1" id="modal-goals-breakdown-pills"></div>
             </div>
           </div>
 
           <!-- Daily Habits & Streaks (Right Column, 5 Cols) -->
-          <div class="lg:col-span-5 flex flex-col justify-between p-4 rounded-2xl bg-black/40 border border-white/10 space-y-3">
+          <div class="lg:col-span-5 flex flex-col justify-between p-4 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)] space-y-3 shadow-sm">
             <div class="space-y-3">
               <div class="flex items-center justify-between border-b border-white/5 pb-2 flex-wrap gap-1">
                 <div class="flex items-center gap-2">
@@ -4341,7 +4340,6 @@
 
       </div>
     </div>
-  </div>
 
   <div class="mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 w-full z-40 bg-[var(--mc-bg-secondary)] backdrop-blur-2xl border-t border-[var(--mc-border-default)] px-2 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom,0.5rem))] flex items-center justify-around">
     <button onclick="switchTab('overview')" id="mobile-tab-overview" class="mobile-nav-btn active flex flex-col items-center gap-0.5 text-[10px] text-[#9BB7A5] font-medium py-1 px-2 rounded-xl transition-colors">

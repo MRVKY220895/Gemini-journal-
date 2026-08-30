@@ -42,19 +42,28 @@ function openChartInfoModal(chartKey) {
   if (titleEl) titleEl.textContent = info.title;
   if (bodyEl) {
     bodyEl.innerHTML = `
-      <div class="p-3 rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] space-y-1.5">
-        <span class="font-bold text-[var(--mc-text-primary)] block text-xs">📊 What is this graph?</span>
-        <p class="text-[11px] text-[var(--mc-text-secondary)] leading-relaxed">${info.what}</p>
+      <div class="p-3 sm:p-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800/60 border border-slate-300 dark:border-slate-700 space-y-1.5 shadow-sm">
+        <div class="flex items-center gap-1.5 text-xs font-bold text-slate-900 dark:text-slate-100">
+          <span class="text-base">📊</span>
+          <span>What is this graph?</span>
+        </div>
+        <p class="text-xs text-slate-700 dark:text-slate-300 leading-relaxed font-normal">${info.what}</p>
       </div>
 
-      <div class="p-3 rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] space-y-1.5">
-        <span class="font-bold text-[#9BB7A5] block text-xs">⚙️ How is it mathematically calculated?</span>
-        <p class="text-[11px] text-[var(--mc-text-secondary)] leading-relaxed">${info.how.replace(/\n/g, '<br>')}</p>
+      <div class="p-3 sm:p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800/60 space-y-1.5 shadow-sm">
+        <div class="flex items-center gap-1.5 text-xs font-bold text-emerald-900 dark:text-emerald-300">
+          <span class="text-base">⚙️</span>
+          <span>How is it mathematically calculated?</span>
+        </div>
+        <p class="text-xs text-emerald-950 dark:text-emerald-200 leading-relaxed font-normal">${info.how.replace(/\n/g, '<br class="my-1">')}</p>
       </div>
 
-      <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 space-y-1">
-        <span class="font-bold text-amber-400 block text-xs">⏰ When to expect numbers & output:</span>
-        <p class="text-[11px] text-amber-200/90 leading-relaxed">${info.when}</p>
+      <div class="p-3 sm:p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800/60 space-y-1.5 shadow-sm">
+        <div class="flex items-center gap-1.5 text-xs font-bold text-amber-900 dark:text-amber-300">
+          <span class="text-base">⏰</span>
+          <span>When to expect numbers & output:</span>
+        </div>
+        <p class="text-xs text-amber-950 dark:text-amber-100 leading-relaxed font-medium">${info.when}</p>
       </div>
     `;
   }
