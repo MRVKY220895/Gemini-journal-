@@ -1945,9 +1945,9 @@ function appendChatMessage(role, content, authorName, modelTag, cognitiveData = 
               <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
             </div>
             <span class="text-xs font-bold text-slate-900 dark:text-white">${escapeHtml(authorName)}</span>
-            <span class="text-[10px] px-2 py-0.5 rounded-full bg-[var(--mc-accent-12)] text-[var(--mc-accent)] font-mono border border-[var(--mc-accent-25)] flex items-center gap-1">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span>Gemini 3.5 Live</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full ${modelTag === 'local-cognitive-engine' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)]'} font-mono flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full ${modelTag === 'local-cognitive-engine' ? 'bg-amber-400' : 'bg-emerald-400 animate-pulse'}"></span>
+              <span>${modelTag === 'local-cognitive-engine' ? 'Local Sanctuary' : escapeHtml(modelTag || 'Gemini Cloud Live')}</span>
             </span>
           </div>
 
