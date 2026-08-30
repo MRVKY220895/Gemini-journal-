@@ -10957,7 +10957,7 @@ function submitNewHabit(event) {
 
 
     const newHabit = {
-      id: editId || `habit_${Date.now()}`,
+      id: id || `habit_${Date.now()}`,
       title: title,
       emoji: currentSelectedHabitIcon,
       icon: currentSelectedHabitIcon,
@@ -11954,74 +11954,116 @@ function toggleBucketPlanStep(dreamId, stepIndex) {
 
 
 function renderDashboardMilestoneRadar() {
-
+  const sanctuaryContainer = document.getElementById('sanctuary-milestone-radar-list');
   const countBadge = document.getElementById('dashboard-radar-count-badge');
-
   const fulfillmentBadge = document.getElementById('dashboard-radar-fulfillment-badge');
-
   const stepContainer = document.getElementById('dashboard-radar-active-step');
 
+  if (!state.bucketList || state.bucketList.length === 0) {
+    try {
+      const saved = localStorage.getItem('mind_cave_bucket_list');
+      if (saved) state.bucketList = JSON.parse(saved);
+    } catch (e) {}
 
-
-  if (!state.bucketList || state.bucketList.length === 0) return;
-
-
-
-  const total = state.bucketList.length;
-
-  const fulfilled = state.bucketList.filter(b => b.achieved || b.status === 'fulfilled').length;
-
-  const inAction = state.bucketList.filter(b => b.status === 'in_action' || b.status === 'final_stretch').length;
-
-  const fulfilledPct = Math.round((fulfilled / total) * 100);
-
-
-
-  if (countBadge) countBadge.textContent = `${inAction} In Flight`;
-
-  if (fulfillmentBadge) fulfillmentBadge.textContent = `${fulfilled}/${total} Fulfilled (${fulfilledPct}%)`;
-
-
-
-  if (stepContainer) {
-
-    const activeDreams = state.bucketList.filter(b => !b.achieved && b.status !== 'fulfilled');
-
-    if (activeDreams.length > 0) {
-
-      const topDream = activeDreams[0];
-
-      const countdown = formatTargetDateCountdown(topDream.targetDate || topDream.year);
-
-      const steps = (topDream.plan || '').split('\n').map(s => s.trim()).filter(Boolean);
-
-      const nextStep = steps[topDream.completedStepIndices ? topDream.completedStepIndices.length : 0] || steps[0] || 'Execute phase 1';
-
-
-
-      stepContainer.innerHTML = `
-
-        <span class="font-bold text-slate-800 dark:text-slate-100">${escapeHtml(topDream.title)}</span>
-
-        <span class="text-slate-400">•</span>
-
-        <span class="${countdown.badgeClass} font-mono font-bold">${countdown.text}</span>
-
-        <span class="text-slate-400">•</span>
-
-        <span class="text-[var(--mc-accent)] font-medium italic">Next Step: ${escapeHtml(nextStep.replace(/^[0-9•\-\.]+\s*/, ''))}</span>
-
-      `;
-
-    } else {
-
-      stepContainer.textContent = 'All milestone dreams fulfilled! Add a new quest.';
-
+    if (!state.bucketList || state.bucketList.length === 0) {
+      state.bucketList = [
+        {
+          id: 'quest_1',
+          title: 'Master Generative Architecture & Multi-Agent Systems',
+          category: 'career',
+          status: 'in_action',
+          progress: 65,
+          targetDate: '2027-06-30',
+          plan: '• Phase 1: Benchmark sub-second agent routing\n• Phase 2: Deploy local zero-knowledge privacy engine\n• Phase 3: Release open-source cognitive framework',
+          completedStepIndices: [0]
+        },
+        {
+          id: 'quest_2',
+          title: 'Trek the Annapurna High Alpine Circuit',
+          category: 'adventure',
+          status: 'planning',
+          progress: 40,
+          targetDate: '2028-04-15',
+          plan: '• Phase 1: Altitude stamina endurance training\n• Phase 2: Equipment prep & permits\n• Phase 3: 14-day Himalayan trek',
+          completedStepIndices: []
+        },
+        {
+          id: 'quest_3',
+          title: 'Attain 96% Consistent Emotional Equilibrium',
+          category: 'wellness',
+          status: 'in_action',
+          progress: 80,
+          targetDate: '2026-12-31',
+          plan: '• Phase 1: Daily 30m mindfulness window\n• Phase 2: Socratic distortion reframing\n• Phase 3: Diurnal circadian alignment',
+          completedStepIndices: [0, 1]
+        }
+      ];
+      try {
+        localStorage.setItem('mind_cave_bucket_list', JSON.stringify(state.bucketList));
+      } catch (e) {}
     }
-
   }
 
+  const total = state.bucketList.length;
+  const fulfilled = state.bucketList.filter(b => b.achieved || b.status === 'fulfilled').length;
+  const inAction = state.bucketList.filter(b => b.status === 'in_action' || b.status === 'final_stretch').length;
+  const fulfilledPct = Math.round((fulfilled / (total || 1)) * 100);
+
+  if (countBadge) countBadge.textContent = `${inAction || total} In Flight`;
+  if (fulfillmentBadge) fulfillmentBadge.textContent = `${fulfilled}/${total} Fulfilled (${fulfilledPct}%)`;
+
+  // Render Sanctuary Pulse Radar List
+  if (sanctuaryContainer) {
+    sanctuaryContainer.innerHTML = state.bucketList.map(q => {
+      const isDone = q.status === 'fulfilled' || q.progress === 100;
+      const cat = (state.bucketCategories || []).find(c => c.id === q.category) || { name: 'Life Vision', color: 'cyan' };
+      const dateStr = q.targetDate || '2027-12-31';
+      
+      const diffYears = ((new Date(dateStr) - new Date()) / (365.25 * 86400000)).toFixed(1);
+      const timeLabel = isDone ? 'Fulfilled ✓' : diffYears > 0 ? `~${diffYears} yrs` : 'Target Passed';
+
+      return `
+        <div class="p-3 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] space-y-2 hover:border-[var(--mc-accent-30)] transition-all cursor-pointer group" onclick="openBucketListModal('${q.id}')">
+          <div class="flex items-start justify-between gap-2">
+            <div class="space-y-0.5 min-w-0 flex-1">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="text-[9px] font-mono px-2 py-0.5 rounded-full bg-[var(--mc-accent-10)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] font-bold">${escapeHtml(cat.name)}</span>
+                <span class="text-[9px] font-mono text-[var(--mc-text-muted)]">${timeLabel}</span>
+              </div>
+              <h5 class="text-xs font-bold text-[var(--mc-text-primary)] leading-snug truncate ${isDone ? 'line-through text-[var(--mc-text-muted)]' : ''}">${escapeHtml(q.title)}</h5>
+            </div>
+            <span class="text-xs font-mono font-bold ${isDone ? 'text-emerald-400' : 'text-[#9BB7A5]'} shrink-0">${q.progress || 0}%</span>
+          </div>
+
+          <div class="w-full h-1.5 bg-[var(--mc-bg-secondary)] rounded-full overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-[var(--mc-accent)] to-emerald-400 rounded-full transition-all duration-500" style="width: ${Math.min(100, Math.max(5, q.progress || 0))}%;"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  if (stepContainer) {
+    const activeDreams = state.bucketList.filter(b => !b.achieved && b.status !== 'fulfilled');
+    if (activeDreams.length > 0) {
+      const topDream = activeDreams[0];
+      const countdown = formatTargetDateCountdown(topDream.targetDate || topDream.year);
+      const steps = (topDream.plan || '').split('\n').map(s => s.trim()).filter(Boolean);
+      const nextStep = steps[topDream.completedStepIndices ? topDream.completedStepIndices.length : 0] || steps[0] || 'Execute phase 1';
+
+      stepContainer.innerHTML = `
+        <span class="font-bold text-[var(--mc-text-primary)]">${escapeHtml(topDream.title)}</span>
+        <span class="text-[var(--mc-text-muted)]">•</span>
+        <span class="${countdown.badgeClass} font-mono font-bold">${countdown.text}</span>
+        <span class="text-[var(--mc-text-muted)]">•</span>
+        <span class="text-[var(--mc-accent)] font-medium italic">Next Step: ${escapeHtml(nextStep.replace(/^[0-9•\-\.]+\s*/, ''))}</span>
+      `;
+    }
+  }
+
+  refreshIcons();
 }
+window.renderDashboardMilestoneRadar = renderDashboardMilestoneRadar;
 
 
 
