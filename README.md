@@ -101,3 +101,21 @@ The Google AI Studio system instructions (`security/ai_studio_system_instruction
 ## 📦 Deployment to Google Cloud Run
 
 See [`deploy/cloud_run_guide.md`](file:///c:/Users/HP/Downloads/tango-local/Gemini%20journal/deploy/cloud_run_guide.md) for complete instructions on building the Docker image and deploying to Cloud Run with Secret Manager environment injection.
+
+---
+
+## 🔌 Model Context Protocol (GitMCP)
+
+Connect AI tools and coding assistants directly to this repository's live documentation via GitMCP:
+
+- **GitMCP Server URL**: `https://gitmcp.io/MRVKY220895/Gemini-journal-`
+
+```json
+{
+  "mcpServers": {
+    "gemini-journal-docs": {
+      "serverUrl": "https://gitmcp.io/MRVKY220895/Gemini-journal-"
+    }
+  }
+}
+```
