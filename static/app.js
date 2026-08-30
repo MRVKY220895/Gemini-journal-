@@ -1,5 +1,29 @@
 
 // =============================================================================
+// ULTRA-FAST DEBOUNCED ICON & RENDER ENGINE (60FPS ZERO-JANK)
+// =============================================================================
+
+let _lucideScheduled = false;
+function refreshIcons(container = null) {
+  if (!window.lucide) return;
+  if (container) {
+    try {
+      window.lucide.createIcons({ root: container });
+      return;
+    } catch (e) {}
+  }
+  if (_lucideScheduled) return;
+  _lucideScheduled = true;
+  requestAnimationFrame(() => {
+    try {
+      if (window.lucide) window.refreshIcons();
+    } catch (e) {}
+    _lucideScheduled = false;
+  });
+}
+
+
+// =============================================================================
 // LUCIDE & CUSTOM SVG ICON ENGINE FOR HABITS & TRACKS
 // =============================================================================
 
@@ -10,7 +34,7 @@ function selectHabitIcon(iconName) {
   const badge = document.getElementById('habit-selected-emoji-badge');
   if (badge) {
     badge.innerHTML = `<i data-lucide="${iconName}" class="w-4 h-4 text-[var(--mc-accent)]"></i>`;
-    if (window.lucide) lucide.createIcons();
+    if (window.lucide) refreshIcons();
   }
   document.querySelectorAll('.habit-icon-btn').forEach(btn => {
     if (btn.getAttribute('data-icon') === iconName) {
@@ -262,23 +286,25 @@ const state = {
 
 // Initialize Application on DOM Ready
 document.addEventListener('DOMContentLoaded', () => {
+  // 1. Immediate Critical Path (Interactive in <10ms)
   initTheme();
   initLanguage();
   initMediaMode();
-  initFirebaseAuth();
-  checkGeminiKeyStatus();
   updateUserUI();
   initDiarySpace();
-  initAgendaList();
   initTodayGoal();
   initHabitTracker();
-  initGoalsTilesCollapse();
+  initAgendaList();
   initBucketList();
-  initAnalyticsCharts();
-  loadJournals();
-  loadSecurityAudit();
-  loadAIStudioConfig();
-  restoreChatHistory();
+  refreshIcons();
+
+  // 2. Idle Deferred Non-Critical Path (Zero main-thread blocking)
+  const deferTask = window.requestIdleCallback || ((cb) => setTimeout(cb, 120));
+  deferTask(() => {
+    initFirebaseAuth();
+    checkGeminiKeyStatus();
+    loadAIStudioConfig();
+  });
 });
 
 function initLanguage() {
@@ -334,7 +360,7 @@ function applyTheme(theme) {
   }
 
   localStorage.setItem('mind_cave_theme', theme);
-  lucide.createIcons();
+  refreshIcons();
 
   updateChartsTheme(theme);
 
@@ -1311,7 +1337,7 @@ function switchTab(tabId) {
   if (tabId === 'security') loadSecurityAudit();
   updateAllDashboardStats();
 
-  if (window.lucide) lucide.createIcons();
+  if (window.lucide) refreshIcons();
 }
 
 function insertPromptAndOpenStudio(promptText) {
@@ -1442,7 +1468,7 @@ function startNewSession() {
 
   `;
 
-  lucide.createIcons();
+  refreshIcons();
 
 }
 
@@ -1630,7 +1656,7 @@ function appendGeminiUnavailableCard(errorCode, retryMessage) {
     </div>`;
   chatBox.appendChild(card);
   chatBox.scrollTop = chatBox.scrollHeight;
-  if (window.lucide) lucide.createIcons();
+  if (window.lucide) refreshIcons();
 }
 
 // Retry with same message after user has updated credentials
@@ -1785,7 +1811,7 @@ function updateContextualSuggestions(userMessage, cognitiveData) {
 
   `).join('');
 
-  lucide.createIcons();
+  refreshIcons();
 
 }
 
@@ -1841,7 +1867,7 @@ function appendErrorCard(errorMessage, retryPrompt) {
 
   container.appendChild(errorDiv);
   container.scrollTop = container.scrollHeight;
-  lucide.createIcons();
+  refreshIcons();
 }
 
 function appendChatMessage(role, content, authorName, modelTag, cognitiveData = null, originalPrompt = "", isRecord = true) {
@@ -2015,7 +2041,7 @@ function appendChatMessage(role, content, authorName, modelTag, cognitiveData = 
 
   container.appendChild(msgDiv);
   container.scrollTop = container.scrollHeight;
-  lucide.createIcons();
+  refreshIcons();
 }
 
 function restoreChatHistory() {
@@ -2123,7 +2149,7 @@ function renderChatHistorySessions() {
         </button>
       </div>
     `;
-    lucide.createIcons();
+    refreshIcons();
     return;
   }
 
@@ -2148,7 +2174,7 @@ function renderChatHistorySessions() {
       </div>
     </div>
   `;
-  lucide.createIcons();
+  refreshIcons();
 }
 
 function renderSavedReflections() {
@@ -2169,7 +2195,7 @@ function renderSavedReflections() {
             <p class="text-[11px] text-slate-500 mt-1">Click "Save to Journal" on any AI message to bookmark it here.</p>
           </div>
         `;
-        lucide.createIcons();
+        refreshIcons();
         return;
       }
 
@@ -2189,7 +2215,7 @@ function renderSavedReflections() {
           </div>
         `;
       }).join('');
-      lucide.createIcons();
+      refreshIcons();
     })
     .catch(() => {
       container.innerHTML = '<div class="text-center py-6 text-xs text-slate-400">Failed to load saved reflections.</div>';
@@ -2227,7 +2253,7 @@ function stopCurrentNarration() {
     if (icon) icon.setAttribute('data-lucide', 'volume-2');
     currentNarratingButton.classList.remove('text-rose-400', 'border-rose-500/40', 'bg-rose-500/10', 'animate-pulse');
     currentNarratingButton = null;
-    lucide.createIcons();
+    refreshIcons();
   }
 }
 
@@ -2266,7 +2292,7 @@ function narrateAIMessage(text, btnElement) {
     if (span) span.textContent = 'Stop';
     if (icon) icon.setAttribute('data-lucide', 'square');
     btnElement.classList.add('text-rose-400', 'border-rose-500/40', 'bg-rose-500/10', 'animate-pulse');
-    lucide.createIcons();
+    refreshIcons();
   }
 
   utterance.onend = () => {
@@ -2861,7 +2887,7 @@ function renderDiaryWeeklyRibbon() {
 
     titleEl.innerHTML = `<i data-lucide="book-marked" class="w-4 h-4 text-cyan-400"></i> <span>${isToday ? "Today's Daily Chronicle" : selected.toLocaleDateString('en-US', options)}</span>`;
 
-    lucide.createIcons();
+    refreshIcons();
 
   }
 
@@ -2972,7 +2998,7 @@ function updateMediaModeUI() {
       icon.setAttribute('data-lucide', 'layers');
       if (btn) btn.classList.remove('border-[var(--mc-accent)]', 'text-[var(--mc-accent)]');
     }
-    if (window.lucide) lucide.createIcons();
+    if (window.lucide) refreshIcons();
   }
 }
 
@@ -3011,7 +3037,7 @@ function toggleMediaMode() {
       iconEl.setAttribute('data-lucide', 'layers');
       if (btnEl) btnEl.classList.remove('border-[var(--mc-accent)]', 'text-[var(--mc-accent)]');
     }
-    if (window.lucide) lucide.createIcons();
+    if (window.lucide) refreshIcons();
   }
 
   // Instant synchronous render with zero network delay
@@ -4035,7 +4061,7 @@ async function renderChronoTimeline(forceFetch = false) {
 
     `;
 
-    lucide.createIcons();
+    refreshIcons();
 
     renderStoryCarousel(events);
 
@@ -4459,7 +4485,7 @@ async function renderChronoTimeline(forceFetch = false) {
 
   container.innerHTML = html;
 
-  lucide.createIcons();
+  refreshIcons();
 
 
 
@@ -4519,7 +4545,7 @@ function renderStoryCarousel(events) {
 
     if (indicator) indicator.textContent = '0 Moments';
 
-    lucide.createIcons();
+    refreshIcons();
 
     return;
 
@@ -4651,7 +4677,7 @@ function renderStoryCarousel(events) {
 
   updateStorySlidePosition();
 
-  lucide.createIcons();
+  refreshIcons();
 
 }
 
@@ -4981,7 +5007,7 @@ function renderMemoryPhotos() {
 
   `).join('');
 
-  lucide.createIcons();
+  refreshIcons();
 
 }
 
@@ -5761,7 +5787,7 @@ async function loadJournals() {
         </div>
       `;
 
-      lucide.createIcons();
+      refreshIcons();
 
       return;
 
@@ -5792,7 +5818,7 @@ async function loadJournals() {
 
 
 
-    lucide.createIcons();
+    refreshIcons();
 
   } catch (error) {
 
@@ -6541,7 +6567,7 @@ function setMasterDashboardHorizon(horizon) {
     state.radarChart.update();
   }
 
-  if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+  if (typeof lucide !== 'undefined' && lucide.createIcons) refreshIcons();
 }
 
 function renderDashboardHeatmap(totalDays, intensities) {
@@ -6767,7 +6793,7 @@ async function loadAnalytics() {
         <span class="text-[var(--mc-text-primary)] leading-snug">${escapeHtml(act)}</span>
       </div>
     `).join('');
-    lucide.createIcons();
+    refreshIcons();
 
 
 
@@ -7354,7 +7380,7 @@ function renderAgendaList() {
 
 
 
-  lucide.createIcons();
+  refreshIcons();
 
 }
 
@@ -7794,7 +7820,7 @@ function toggleVoiceSummary() {
 
     if (labelEl) labelEl.textContent = 'Stop Audio';
 
-    if (iconEl) { iconEl.setAttribute('data-lucide', 'square'); lucide.createIcons(); }
+    if (iconEl) { iconEl.setAttribute('data-lucide', 'square'); refreshIcons(); }
 
 
 
@@ -7864,7 +7890,7 @@ function stopVoiceSummary() {
 
   if (labelEl) labelEl.textContent = 'Voice Summary';
 
-  if (iconEl) { iconEl.setAttribute('data-lucide', 'volume-2'); lucide.createIcons(); }
+  if (iconEl) { iconEl.setAttribute('data-lucide', 'volume-2'); refreshIcons(); }
 
 }
 
@@ -8482,7 +8508,7 @@ function renderTodayGoal() {
 
 
 
-  lucide.createIcons();
+  refreshIcons();
 
 
 
@@ -8586,7 +8612,7 @@ function updateHarmonyGoalsSummary(completedCount, totalCount, velocityPct, tota
 
     }
 
-    lucide.createIcons();
+    refreshIcons();
 
   }
 
@@ -9282,7 +9308,7 @@ function renderHabitTracker() {
 
   updateArchivedHabitsBadges();
 
-  lucide.createIcons();
+  refreshIcons();
 
 }
 
@@ -9466,7 +9492,7 @@ function toggleHabitTypeFields(type) {
 
   }
 
-  lucide.createIcons();
+  refreshIcons();
 
 }
 
@@ -9614,7 +9640,7 @@ function openArchivedHabitsModal() {
 
   document.getElementById('archived-habits-modal')?.classList.remove('hidden');
 
-  lucide.createIcons();
+  refreshIcons();
 
 }
 
@@ -9658,7 +9684,7 @@ function renderArchivedHabitsList() {
 
     `;
 
-    lucide.createIcons();
+    refreshIcons();
 
     return;
 
@@ -9760,7 +9786,7 @@ function renderArchivedHabitsList() {
 
 
 
-  lucide.createIcons();
+  refreshIcons();
 
 }
 
@@ -10092,7 +10118,7 @@ function openNewHabitModal(habitId = null) {
 
   modal.classList.remove('hidden');
 
-  lucide.createIcons();
+  refreshIcons();
 
 }
 
@@ -10364,7 +10390,7 @@ function renderShortcutsManagerList() {
 
 
 
-  lucide.createIcons();
+  refreshIcons();
 
 }
 
@@ -10550,7 +10576,7 @@ function openGoalsHabitsModal() {
 
     renderTimelineShortcuts();
 
-    lucide.createIcons();
+    refreshIcons();
 
   }
 
@@ -10754,7 +10780,7 @@ function openBucketCategoriesModal() {
 
   document.getElementById('bucket-categories-modal')?.classList.remove('hidden');
 
-  lucide.createIcons();
+  refreshIcons();
 
 }
 
@@ -10802,7 +10828,7 @@ function renderBucketCategoriesList() {
 
 
 
-  lucide.createIcons();
+  refreshIcons();
 
 }
 
@@ -11121,7 +11147,7 @@ async function generateAIBucketPlan(dreamId = null) {
 
       btn.innerHTML = `<i data-lucide="sparkles" class="w-3 h-3 text-pink-400"></i><span>✨ AI Blueprint Generator</span>`;
 
-      lucide.createIcons();
+      refreshIcons();
 
     }
 
@@ -11347,7 +11373,7 @@ function renderBucketList() {
 
     `;
 
-    lucide.createIcons();
+    refreshIcons();
 
     return;
 
@@ -11566,7 +11592,7 @@ function renderBucketList() {
 
 
 
-  lucide.createIcons();
+  refreshIcons();
 
   renderDashboardMilestoneRadar();
 
@@ -11690,7 +11716,7 @@ function openBucketListModal(editId = null) {
 
   if (modal) modal.classList.remove('hidden');
 
-  lucide.createIcons();
+  refreshIcons();
 
 }
 
@@ -12980,7 +13006,7 @@ function openFactoryResetModal() {
 
   if (modal) modal.classList.remove('hidden');
 
-  lucide.createIcons();
+  refreshIcons();
 
 }
 
@@ -13030,7 +13056,7 @@ async function executeFactoryReset() {
 
     btn.innerHTML = `<i data-lucide="loader" class="w-3.5 h-3.5 animate-spin"></i><span>Wiping all data...</span>`;
 
-    lucide.createIcons();
+    refreshIcons();
 
   }
 
