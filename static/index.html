@@ -2068,7 +2068,7 @@
                 Permanently erase all journal reflections, AI Studio chats, achievable goals, habit streaks, photos, and cognitive metrics. Reset everything and start completely fresh from scratch.
               </p>
             </div>
-            <button onclick="openFactoryResetModal()" class="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow-lg shadow-rose-600/30 transition-all flex items-center gap-2 shrink-0 self-start sm:self-center cursor-pointer">
+            <button onclick="openFactoryResetModal()" class="danger-btn-subtle px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 shrink-0 self-start sm:self-center cursor-pointer">
               <i data-lucide="trash-2" class="w-4 h-4 text-white"></i>
               <span>Factory Reset Everything</span>
             </button>
@@ -2814,7 +2814,7 @@
 
         <!-- Engine Status Bento Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-          <div class="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-1">
+          <div class="p-3 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] space-y-1">
             <div class="flex items-center justify-between text-xs font-bold text-slate-200">
               <span class="flex items-center gap-1.5"><i data-lucide="cpu" class="w-3.5 h-3.5 text-cyan-400"></i> Model Active</span>
               <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-bold">Live</span>
@@ -2823,7 +2823,7 @@
             <p class="text-[10px] text-slate-400 leading-relaxed">Multi-turn CBT reflection, cognitive reframing, and sub-second emotional analysis.</p>
           </div>
 
-          <div class="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-1">
+          <div class="p-3 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] space-y-1">
             <div class="flex items-center justify-between text-xs font-bold text-slate-200">
               <span class="flex items-center gap-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i> Privacy Vault</span>
               <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">AES-256</span>
@@ -2840,10 +2840,10 @@
             <span class="text-[10px] text-emerald-400 font-mono">Ready to Chat</span>
           </div>
           <form onsubmit="submitGeminiApiKey(event)" class="space-y-3">
-            <input type="password" id="gemini-api-key-input" placeholder="Paste optional AI Studio / Cloud Key to override" class="w-full bg-black/60 text-slate-200 text-xs p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-cyan-500 font-mono">
+            <input type="password" id="gemini-api-key-input" placeholder="Paste optional AI Studio / Cloud Key to override" class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] text-xs p-2.5 rounded-xl border border-[var(--mc-border-default)] focus:outline-none font-mono">
             <div class="flex justify-end gap-2">
               <button type="button" onclick="closeGeminiKeyModal()" class="btn-secondary text-xs">Done</button>
-              <button type="submit" class="btn-island !py-1.5 !px-3 text-xs">
+              <button type="submit" class="btn-primary !py-1.5 !px-3.5 text-xs font-semibold">
                 <span>Save Key</span>
               </button>
             </div>

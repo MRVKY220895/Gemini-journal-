@@ -13414,3 +13414,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
+
+
+function openMoodPickerModal() {
+  if (typeof openNewJournalModal === 'function') {
+    openNewJournalModal();
+  } else {
+    switchTab('journals');
+  }
+}

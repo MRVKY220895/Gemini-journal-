@@ -1535,22 +1535,11 @@ body.light .diary-day-pill .day-number {
   color: var(--mc-text-primary) !important;
 }
 
-html.light .diary-day-pill.active,
-body.light .diary-day-pill.active {
-  background: var(--mc-accent-12) !important;
-  border-color: var(--mc-accent-40) !important;
-}
 
-html.light .diary-day-pill.active .day-name,
-body.light .diary-day-pill.active .day-name {
-  color: var(--mc-accent) !important;
-  font-weight: 600;
-}
 
-html.light .diary-day-pill.active .day-number,
-body.light .diary-day-pill.active .day-number {
-  color: var(--mc-text-primary) !important;
-}
+
+
+
 
 html.light #chrono-date-picker,
 body.light #chrono-date-picker {
@@ -1692,21 +1681,11 @@ html:not(.dark) .diary-day-pill .day-number {
   color: #0f172a !important;
 }
 
-html.light .diary-day-pill.active,
-html:not(.dark) .diary-day-pill.active {
-  background: #e0f2fe !important;
-  border-color: #0284c7 !important;
-}
 
-html.light .diary-day-pill.active .day-name,
-html:not(.dark) .diary-day-pill.active .day-name {
-  color: #0284c7 !important;
-}
 
-html.light .diary-day-pill.active .day-number,
-html:not(.dark) .diary-day-pill.active .day-number {
-  color: #0369a1 !important;
-}
+
+
+
 
 /* Daily Harmony Strip Light Mode */
 html.light .synthesis-strip,
@@ -2768,4 +2747,69 @@ html:not(.dark) #goal-modal select:focus {
 
 .diary-day-pill {
   flex-shrink: 0 !important;
+}
+/* Day Ribbon Styling (Quiet Bento) */
+.diary-day-pill.active,
+html.light .diary-day-pill.active,
+body.light .diary-day-pill.active,
+html:not(.dark) .diary-day-pill.active {
+  background: var(--mc-accent-12) !important;
+  border-color: var(--mc-accent-40) !important;
+}
+
+.diary-day-pill.active .day-name,
+html.light .diary-day-pill.active .day-name,
+body.light .diary-day-pill.active .day-name,
+html:not(.dark) .diary-day-pill.active .day-name {
+  color: var(--mc-accent) !important;
+  font-weight: 600 !important;
+}
+
+.diary-day-pill.active .day-number,
+html.light .diary-day-pill.active .day-number,
+body.light .diary-day-pill.active .day-number,
+html:not(.dark) .diary-day-pill.active .day-number {
+  color: var(--mc-text-primary) !important;
+  font-weight: 700 !important;
+}
+
+/* Subtle Danger Zone Styling */
+.danger-btn-subtle {
+  background: rgba(244, 63, 94, 0.08) !important;
+  border: 1px solid rgba(244, 63, 94, 0.22) !important;
+  color: #e11d48 !important;
+  transition: all 180ms ease !important;
+}
+
+html.dark .danger-btn-subtle {
+  background: rgba(244, 63, 94, 0.12) !important;
+  border-color: rgba(244, 63, 94, 0.28) !important;
+  color: #fb7185 !important;
+}
+
+.danger-btn-subtle:hover {
+  background: rgba(244, 63, 94, 0.18) !important;
+  border-color: rgba(244, 63, 94, 0.4) !important;
+}
+
+/* Mobile Responsiveness Improvements */
+@media (max-width: 768px) {
+  .floating-nav {
+    border-radius: 1.25rem !important;
+    padding: 0.4rem 0.75rem !important;
+    margin: 0.25rem 0.5rem !important;
+    width: calc(100% - 1rem) !important;
+  }
+  .composer-wrap {
+    bottom: 0.75rem !important;
+    padding: 0 0.5rem !important;
+  }
+  .composer-outer {
+    border-radius: 1.5rem !important;
+    padding: 0.25rem !important;
+  }
+  .composer-inner {
+    border-radius: calc(1.5rem - 0.25rem) !important;
+    padding: 0.625rem 0.875rem !important;
+  }
 }
