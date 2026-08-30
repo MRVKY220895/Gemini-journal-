@@ -6663,99 +6663,52 @@ async function loadAnalytics() {
     if (Object.keys(freqs).length === 0) {
 
       distContainer.innerHTML = `
-
-        <div class="p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/30 text-xs text-emerald-300 flex items-center gap-1.5">
-
-          <i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-400 shrink-0"></i>
-
+        <div class="p-3 rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] text-xs text-[var(--mc-text-secondary)] flex items-center gap-1.5">
+          <i data-lucide="check-circle" class="w-3.5 h-3.5 text-[#9BB7A5] shrink-0"></i>
           <span>Zero persistent cognitive distortions detected. Neural cognition remains highly objective.</span>
-
         </div>
-
       `;
-
     } else {
-
       const reframingTips = {
-
         "Catastrophizing": "Decouple worst-case emotional scenarios into deterministic micro-steps.",
-
         "Black-and-White Thinking": "Recognize spectrum nuance; progress occurs in increments.",
-
         "Labeling & Self-Blame": "Separate situational friction from internal identity.",
-
         "Emotional Reasoning": "Feelings are neurological signals, not factual reality.",
-
         "Overgeneralization": "A single delay does not establish a permanent trajectory."
-
       };
 
-
-
       distContainer.innerHTML = Object.entries(freqs).map(([name, count]) => `
-
-        <div class="p-2.5 rounded-xl bg-black/40 border border-white/5 text-xs space-y-1">
-
+        <div class="p-2.5 rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] text-xs space-y-1">
           <div class="flex items-center justify-between">
-
-            <span class="font-bold text-slate-200">${escapeHtml(name)}</span>
-
-            <span class="font-mono text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded text-[10px] font-bold">${count} instances reframed</span>
-
+            <span class="font-semibold text-[var(--mc-text-primary)]">${escapeHtml(name)}</span>
+            <span class="font-mono text-[#C5AA78] bg-[#C5AA78]/10 px-2 py-0.5 rounded text-[10px] font-semibold">${count} instances reframed</span>
           </div>
-
-          <p class="text-[11px] text-slate-400">${reframingTips[name] || "Deconstructed through objective journaling reflection."}</p>
-
+          <p class="text-[11px] text-[var(--mc-text-secondary)]">${reframingTips[name] || "Deconstructed through objective journaling reflection."}</p>
         </div>
-
       `).join('');
-
     }
 
-
-
     // Update Action Items Bento (Deduplicated, Rich Behavioral Tasks)
-
     const actionsContainer = document.getElementById('action-items-container');
-
     const rawActions = analytics.recent_actions || [];
-
     
-
     // Rich fallback actionable CBT tasks
-
     const defaultTasks = [
-
       "Decouple tomorrow morning deep-work session from unscheduled chat channels.",
-
       "Execute 5-minute somatic breathing before high-stakes afternoon architecture review.",
-
       "Log 3 objective pieces of supporting evidence to counter self-critical thoughts.",
-
       "Conduct 15-minute evening debrief to catalog completed wins and anchor gratitude."
-
     ];
 
-
-
     const uniqueActions = Array.from(new Set(rawActions.filter(a => a && a.length > 5)));
-
     const finalActions = uniqueActions.length >= 2 ? uniqueActions : defaultTasks;
 
-
-
     actionsContainer.innerHTML = finalActions.slice(0, 5).map(act => `
-
-      <div class="flex items-start gap-2 bg-black/40 p-2.5 rounded-xl border border-white/5 text-xs hover:border-cyan-500/30 transition-colors">
-
-        <i data-lucide="check-circle" class="w-4 h-4 text-cyan-400 shrink-0 mt-0.5"></i>
-
-        <span class="text-slate-200 leading-snug">${escapeHtml(act)}</span>
-
+      <div class="flex items-start gap-2 bg-[var(--mc-bg-tertiary)] p-2.5 rounded-xl border border-[var(--mc-border-subtle)] text-xs transition-colors">
+        <i data-lucide="check-circle" class="w-4 h-4 text-[#9BB7A5] shrink-0 mt-0.5"></i>
+        <span class="text-[var(--mc-text-primary)] leading-snug">${escapeHtml(act)}</span>
       </div>
-
     `).join('');
-
     lucide.createIcons();
 
 
