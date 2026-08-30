@@ -10628,10 +10628,6 @@ function initBucketList() {
 
 function getCategoryColorClasses(color) {
   return 'text-[var(--mc-text-secondary)] bg-[var(--mc-bg-secondary)] border-[var(--mc-border-subtle)]';
-};
-
-  return colorMap[color] || 'text-slate-300 bg-black/40 border-white/10';
-
 }
 
 
@@ -10887,7 +10883,7 @@ function formatTargetDateCountdown(targetDateStr) {
   if (diffDays < 0) {
     return { text: `${dateFormatted} • Passed`, badgeClass: 'text-[var(--mc-text-muted)]' };
   } else if (diffDays <= 90) {
-    return { text: `${dateFormatted} • ~${diffDays}d left`, badgeClass: 'text-[var(--mc-accent)]' };
+    return { text: `${dateFormatted} • ~${diffDays}d left`, badgeClass: 'text-[var(--mc-accent)] font-semibold' };
   } else if (diffDays <= 365) {
     const months = Math.round(diffDays / 30);
     return { text: `${dateFormatted} • ~${months} mo`, badgeClass: 'text-[var(--mc-text-secondary)]' };
@@ -10895,49 +10891,7 @@ function formatTargetDateCountdown(targetDateStr) {
     const years = (diffDays / 365).toFixed(1);
     return { text: `${dateFormatted} • ~${years} yrs`, badgeClass: 'text-[var(--mc-text-secondary)]' };
   }
-};
-
-  const target = new Date(targetDateStr);
-
-  const now = new Date();
-
-  if (isNaN(target.getTime())) return { text: targetDateStr, badgeClass: 'text-amber-300' };
-
-
-
-  const diffMs = target.getTime() - now.getTime();
-
-  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-
-  const dateFormatted = target.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-
-
-
-  if (diffDays < 0) {
-
-    return { text: `${dateFormatted} • Passed`, badgeClass: 'text-rose-400' };
-
-  } else if (diffDays <= 90) {
-
-    return { text: `${dateFormatted} • ⏳ ${diffDays}d left`, badgeClass: 'text-amber-400 animate-pulse' };
-
-  } else if (diffDays <= 365) {
-
-    const months = Math.round(diffDays / 30);
-
-    return { text: `${dateFormatted} • ~${months} mo`, badgeClass: 'text-cyan-400' };
-
-  } else {
-
-    const years = (diffDays / 365).toFixed(1);
-
-    return { text: `${dateFormatted} • ~${years} yrs`, badgeClass: 'text-slate-300' };
-
-  }
-
 }
-
-
 
 function generateLocalAIBucketPlan(title, category, targetDate) {
 
