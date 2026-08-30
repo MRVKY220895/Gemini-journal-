@@ -1568,7 +1568,12 @@
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-[var(--mc-border-subtle)]">
         <div>
           <div class="flex items-center gap-2">
-            <h2 class="text-base sm:text-lg font-semibold text-[var(--mc-text-primary)] tracking-tight">Life Intelligence Master Dashboard</h2>
+            <div class="flex items-center gap-1.5">
+              <h2 class="text-base sm:text-lg font-semibold text-[var(--mc-text-primary)] tracking-tight">Life Intelligence Master Dashboard</h2>
+              <button type="button" onclick="openChartInfoModal('pillars')" class="text-[var(--mc-text-muted)] hover:text-[var(--mc-accent)] transition-colors p-0.5 cursor-pointer" title="How all 6 pillars are calculated">
+                <i data-lucide="info" class="w-4 h-4"></i>
+              </button>
+            </div>
             <span class="text-[10px] font-mono font-medium px-2 py-0.5 rounded-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-muted)] border border-[var(--mc-border-default)]">Comprehensive OS</span>
           </div>
           <p class="text-xs text-[var(--mc-text-secondary)] mt-0.5">Holistic tracking across Goals, Habit Streaks, Life Milestone Quests, Cognitive Health, and Biological Vitality.</p>
@@ -1686,7 +1691,12 @@
                 <i data-lucide="target" class="w-4 h-4 text-[#9BB7A5]"></i>
               </div>
               <div>
-                <h3 class="text-sm font-semibold text-[var(--mc-text-primary)]">Goal Execution & Focus Velocity</h3>
+                <div class="flex items-center gap-1.5">
+                  <h3 class="text-sm font-semibold text-[var(--mc-text-primary)]">Goal Execution & Focus Velocity</h3>
+                  <button type="button" onclick="openChartInfoModal('goals')" class="text-[var(--mc-text-muted)] hover:text-[var(--mc-accent)] transition-colors p-0.5 cursor-pointer" title="How this is calculated">
+                    <i data-lucide="info" class="w-3.5 h-3.5"></i>
+                  </button>
+                </div>
                 <p class="text-[10px] text-[var(--mc-text-muted)]">Time and energy invested across cognitive domains</p>
               </div>
             </div>
@@ -1761,7 +1771,12 @@
                 <i data-lucide="calendar-check-2" class="w-4 h-4 text-[#9BB7A5]"></i>
               </div>
               <div>
-                <h3 class="text-sm font-semibold text-[var(--mc-text-primary)]">Habit Consistency Heatmap</h3>
+                <div class="flex items-center gap-1.5">
+                  <h3 class="text-sm font-semibold text-[var(--mc-text-primary)]">Habit Consistency Heatmap</h3>
+                  <button type="button" onclick="openChartInfoModal('heatmap')" class="text-[var(--mc-text-muted)] hover:text-[var(--mc-accent)] transition-colors p-0.5 cursor-pointer" title="How this is calculated">
+                    <i data-lucide="info" class="w-3.5 h-3.5"></i>
+                  </button>
+                </div>
                 <p class="text-[10px] text-[var(--mc-text-muted)]">Longitudinal consistency across daily micro-disciplines</p>
               </div>
             </div>
@@ -1806,14 +1821,31 @@
                 <i data-lucide="hexagon" class="w-4 h-4 text-[#8FA9B8]"></i>
               </div>
               <div>
-                <h3 class="text-sm font-semibold text-[var(--mc-text-primary)]">Emotional Dimensions Radar</h3>
+                <div class="flex items-center gap-1.5">
+                  <h3 class="text-sm font-semibold text-[var(--mc-text-primary)]">Emotional Dimensions Radar</h3>
+                  <button type="button" onclick="openChartInfoModal('radar')" class="text-[var(--mc-text-muted)] hover:text-[var(--mc-accent)] transition-colors p-0.5 cursor-pointer" title="How this is calculated">
+                    <i data-lucide="info" class="w-3.5 h-3.5"></i>
+                  </button>
+                </div>
                 <p class="text-[10px] text-[var(--mc-text-muted)]">6-Vector psychological state equilibrium</p>
               </div>
             </div>
             <span class="text-[11px] font-mono text-[var(--mc-text-muted)]">Joy • Clarity • Resilience • Focus • Calm • Optimism</span>
           </div>
-          <div class="flex-1 flex items-center justify-center min-h-[260px]">
+          <div class="flex-1 flex items-center justify-center min-h-[260px] relative">
             <canvas id="radarMoodChart"></canvas>
+            <div id="radar-empty-state-overlay" class="absolute inset-0 bg-[var(--mc-bg-secondary)]/95 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center text-center p-4 space-y-2 hidden">
+              <div class="w-9 h-9 rounded-xl bg-[var(--mc-accent-12)] border border-[var(--mc-accent-25)] text-[var(--mc-accent)] flex items-center justify-center">
+                <i data-lucide="hexagon" class="w-4 h-4 text-[#9BB7A5]"></i>
+              </div>
+              <h5 class="text-xs font-bold text-[var(--mc-text-primary)]">Awaiting First Journal Reflection</h5>
+              <p class="text-[11px] text-[var(--mc-text-muted)] max-w-xs leading-relaxed">
+                Log 1 moment in Studio or Journal to generate your baseline 6-vector emotional radar.
+              </p>
+              <button onclick="switchTab('studio')" class="btn-primary !py-1 !px-3 text-xs font-semibold mt-1 cursor-pointer">
+                <span>+ Reflect with AI</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -1825,7 +1857,12 @@
                 <i data-lucide="trending-up" class="w-4 h-4 text-[#9BB7A5]"></i>
               </div>
               <div>
-                <h3 class="text-sm font-semibold text-[var(--mc-text-primary)]">Resilience & Clarity Trajectory</h3>
+                <div class="flex items-center gap-1.5">
+                  <h3 class="text-sm font-semibold text-[var(--mc-text-primary)]">Resilience & Clarity Trajectory</h3>
+                  <button type="button" onclick="openChartInfoModal('trajectory')" class="text-[var(--mc-text-muted)] hover:text-[var(--mc-accent)] transition-colors p-0.5 cursor-pointer" title="How this is calculated">
+                    <i data-lucide="info" class="w-3.5 h-3.5"></i>
+                  </button>
+                </div>
                 <p class="text-[10px] text-[var(--mc-text-muted)]">Longitudinal equilibrium progression</p>
               </div>
             </div>
@@ -4706,5 +4743,38 @@
       </form>
     </div>
   </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: METRIC & CHART EXPLANATION / HOW IT IS CALCULATED (INFO POPUP) -->
+  <!-- ===================================================================== -->
+  <div id="chart-info-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
+    <div class="mc-card max-w-lg w-full my-auto shadow-2xl p-5 sm:p-6 space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-[var(--mc-border-subtle)]">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-[var(--mc-accent-12)] border border-[var(--mc-accent-25)] text-[var(--mc-accent)] flex items-center justify-center text-xs">
+            <i data-lucide="info" class="w-4 h-4 text-[#9BB7A5]"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-[var(--mc-text-primary)]" id="chart-info-title">Metric & Graph Information</h3>
+            <p class="text-[11px] text-[var(--mc-text-muted)]">Live mathematical calculation methodology</p>
+          </div>
+        </div>
+        <button onclick="closeChartInfoModal()" class="w-7 h-7 rounded-xl bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-bg-elevation)] text-[var(--mc-text-muted)] hover:text-[var(--mc-text-primary)] flex items-center justify-center transition-colors cursor-pointer">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs leading-relaxed text-[var(--mc-text-secondary)]" id="chart-info-body">
+        <!-- Injected dynamically via openChartInfoModal(key) -->
+      </div>
+
+      <div class="pt-3 border-t border-[var(--mc-border-subtle)] flex justify-end">
+        <button type="button" onclick="closeChartInfoModal()" class="btn-primary text-xs !py-1.5 !px-4 font-semibold cursor-pointer">
+          Got it
+        </button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

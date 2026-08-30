@@ -1,3 +1,74 @@
+
+// ─── CHART & METRIC EXPLANATION INFO MODAL CONTROLLER ───
+const chartInfoRegistry = {
+  radar: {
+    title: "Emotional Dimensions Radar",
+    what: "A 6-vector psychological equilibrium radar mapping Joy, Clarity, Resilience, Focus, Calm, and Optimism.",
+    how: "Gemini Natural Language Processing analyzes your journal entries' semantic vocabulary and CBT cognitive reframings, scoring each dimension from 0 to 100%. The radar displays the exact mathematical average of all reflections recorded within your active time horizon.",
+    when: "Expect baseline radar values after your very first journal reflection in Studio or Living Timeline."
+  },
+  trajectory: {
+    title: "Resilience & Clarity Trajectory",
+    what: "A longitudinal progression curve showing emotional recovery velocity and cognitive clarity compounding over time.",
+    how: "Entries are grouped by timestamp; Resilience measures your ability to decouple from friction, while Clarity measures absence of cognitive fog and distortion. The curve reveals compounding psychological resilience across days, weeks, and months.",
+    when: "Activates after logging reflections across 2 or more daily check-ins."
+  },
+  goals: {
+    title: "Goal Execution & Focus Allocation",
+    what: "A domain allocation radar tracking your invested energy across Deep Work & Architecture, Physical Vitality & Somatics, Strategic Career, and Mindfulness.",
+    how: "Calculated by classifying your completed goal blocks and semantic tags in journal entries into 4 life domains, computing real percentage distributions.",
+    when: "Updates in real-time as you complete daily goals and tag journal entries."
+  },
+  heatmap: {
+    title: "Habit Consistency Heatmap",
+    what: "A 28-day diurnal density matrix inspired by architectural contribution charts.",
+    how: "Daily checkmark completion rate is combined with journal logging presence and scaled into 5 visual intensity tiers (0 = Rest, 4 = Peak Momentum).",
+    when: "Lights up tile by tile as you check off micro-habits and capture moments."
+  },
+  pillars: {
+    title: "6-Pillar Life Intelligence Strip",
+    what: "Executive dashboard summarizing your entire self-mastery OS at a glance.",
+    how: "• Goal Velocity: (Completed Goals / Total Goals) × 100%\n• Habits Discipline: Maximum unbroken habit streak\n• Dream Quests: Ratio of fulfilled lifetime bucket list milestones\n• CBT Equilibrium: % of entries free from cognitive distortions\n• Diurnal Stamina: Peak daily flow hours\n• Memory Vault: Total reflection entries and computed word count.",
+    when: "Continuously live; recalculates in 0ms with every journal turn or task completion."
+  }
+};
+
+function openChartInfoModal(chartKey) {
+  const info = chartInfoRegistry[chartKey] || chartInfoRegistry.radar;
+  const titleEl = document.getElementById('chart-info-title');
+  const bodyEl = document.getElementById('chart-info-body');
+  const modal = document.getElementById('chart-info-modal');
+
+  if (titleEl) titleEl.textContent = info.title;
+  if (bodyEl) {
+    bodyEl.innerHTML = `
+      <div class="p-3 rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] space-y-1.5">
+        <span class="font-bold text-[var(--mc-text-primary)] block text-xs">📊 What is this graph?</span>
+        <p class="text-[11px] text-[var(--mc-text-secondary)] leading-relaxed">${info.what}</p>
+      </div>
+
+      <div class="p-3 rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] space-y-1.5">
+        <span class="font-bold text-[#9BB7A5] block text-xs">⚙️ How is it mathematically calculated?</span>
+        <p class="text-[11px] text-[var(--mc-text-secondary)] leading-relaxed">${info.how.replace(/\n/g, '<br>')}</p>
+      </div>
+
+      <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 space-y-1">
+        <span class="font-bold text-amber-400 block text-xs">⏰ When to expect numbers & output:</span>
+        <p class="text-[11px] text-amber-200/90 leading-relaxed">${info.when}</p>
+      </div>
+    `;
+  }
+
+  if (modal) modal.classList.remove('hidden');
+  refreshIcons();
+}
+window.openChartInfoModal = openChartInfoModal;
+
+function closeChartInfoModal() {
+  document.getElementById('chart-info-modal')?.classList.add('hidden');
+}
+window.closeChartInfoModal = closeChartInfoModal;
+
 // =============================================================================
 // DYNAMIC LIFE INTELLIGENCE METRIC COMPUTATION ENGINE (100% CAPTURED DATA)
 // =============================================================================
@@ -7407,6 +7478,23 @@ function setMasterDashboardHorizon(horizon) {
   if (state.radarChart) {
     state.radarChart.data.datasets[0].data = data.radarData;
     state.radarChart.update();
+  }
+
+  
+  // Toggle Clean Slate Chart Overlays
+  const radarOverlay = document.getElementById('radar-empty-state-overlay');
+  const trajOverlay = document.getElementById('trajectory-empty-state-overlay');
+  const isReset = Boolean(localStorage.getItem('mind_cave_is_reset') === 'true');
+  const hasEntries = (state.journalsCache && state.journalsCache.length > 0) || (!isReset);
+
+  if (radarOverlay) {
+    if (!hasEntries) radarOverlay.classList.remove('hidden');
+    else radarOverlay.classList.add('hidden');
+  }
+
+  if (trajOverlay) {
+    if (!hasEntries) trajOverlay.classList.remove('hidden');
+    else trajOverlay.classList.add('hidden');
   }
 
   if (typeof lucide !== 'undefined' && lucide.createIcons) refreshIcons();
