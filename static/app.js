@@ -61,11 +61,6 @@ function initChatScrollWatcher() {
   }
   window.removeEventListener('scroll', checkScrollDistance);
   window.addEventListener('scroll', checkScrollDistance, { passive: true });
-} else {
-      btn.classList.add('hidden');
-      btn.classList.remove('flex');
-    }
-  }, { passive: true });
 }
 
 
