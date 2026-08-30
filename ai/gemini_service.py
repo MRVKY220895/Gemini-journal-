@@ -77,7 +77,7 @@ class GeminiService:
 
     def _init_client(self):
         k = secret_manager.get_gemini_api_key()
-        api_key = k if (k and not k.startswith("your_") and not k.startswith("mock_") and len(k) > 15) else None
+        api_key = k if (k and not k.startswith("your_") and not k.startswith("mock_") and len(k) > 8) else None
 
         # Attempt 1: Modern google-genai SDK with API Key
         if api_key:

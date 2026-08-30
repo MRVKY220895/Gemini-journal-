@@ -1,23 +1,44 @@
 {
-  "name": "Mind Cave Journal",
+  "id": "/",
+  "name": "Mind Cave — Life Intelligence System",
   "short_name": "Mind Cave",
-  "description": "Personal AI-powered Life Intelligence System",
+  "description": "Zero-Knowledge Cognitive Sanctuary, Habit Protocol & Chrono Life Intelligence",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#020617",
   "theme_color": "#020617",
+  "categories": ["lifestyle", "health", "productivity"],
+  "icons": [
+    {
+      "src": "/static/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
   "shortcuts": [
     {
-      "name": "Quick Moment",
-      "short_name": "Moment",
-      "description": "Record a quick journal moment",
-      "url": "/?action=new_moment"
+      "name": "Reflective Studio",
+      "short_name": "Studio",
+      "description": "Open AI Reflective Studio",
+      "url": "/?tab=studio",
+      "icons": [{ "src": "/static/icon.svg", "sizes": "192x192" }]
     },
     {
-      "name": "Log Habit",
-      "short_name": "Habits",
-      "description": "Jump to habits and tracking",
-      "url": "/?action=habits"
+      "name": "Log Life Moment",
+      "short_name": "Moment",
+      "description": "Record a time-aware reflection moment",
+      "url": "/?action=new_moment",
+      "icons": [{ "src": "/static/icon.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Private Vault",
+      "short_name": "Vault",
+      "description": "Open military-grade encrypted vault",
+      "url": "/?tab=security",
+      "icons": [{ "src": "/static/icon.svg", "sizes": "192x192" }]
     }
   ]
 }

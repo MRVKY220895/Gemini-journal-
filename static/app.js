@@ -19,6 +19,45 @@ function safeJSONParse(val, fallback) {
   }
 }
 
+// PWA Installation Controller
+let deferredInstallPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  const installBtn = document.getElementById('btn-pwa-install');
+  if (installBtn) {
+    installBtn.classList.remove('hidden');
+    installBtn.classList.add('inline-flex');
+  }
+});
+
+window.addEventListener('appinstalled', () => {
+  deferredInstallPrompt = null;
+  const installBtn = document.getElementById('btn-pwa-install');
+  if (installBtn) installBtn.classList.add('hidden');
+  showToast('Mind Cave successfully installed as a native app!');
+});
+
+async function triggerPWAInstall() {
+  if (!deferredInstallPrompt) {
+    // If browser doesn't support automatic prompt (like iOS Safari), provide guided tip
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    if (isIOS) {
+      alert('To install Mind Cave on iPhone/iPad:\n1. Tap the Share button (square with arrow) at the bottom.\n2. Scroll down and tap "Add to Home Screen".');
+    } else {
+      showToast('To install Mind Cave, open your browser menu (⋮) and tap "Install app" or "Add to Home screen".');
+    }
+    return;
+  }
+  deferredInstallPrompt.prompt();
+  const choice = await deferredInstallPrompt.userChoice;
+  if (choice && choice.outcome === 'accepted') {
+    showToast('Installing Mind Cave...');
+  }
+  deferredInstallPrompt = null;
+}
+
 // Application State
 const state = {
   currentUser: {
@@ -7494,88 +7533,110 @@ function toggleVoiceInput(targetInputId, indicatorId) {
 
 
   try {
-
     const recognition = new SpeechRecognition();
-
     recognition.continuous = false;
-
     recognition.interimResults = true;
 
-    recognition.lang = 'en-US';
-
-
+    // Multi-Lingual Speech Recognition Mapping
+    const langMap = {
+      'ta': 'ta-IN',
+      'hi': 'hi-IN',
+      'te': 'te-IN',
+      'es': 'es-ES',
+      'fr': 'fr-FR',
+      'de': 'de-DE',
+      'ja': 'ja-JP',
+      'zh': 'zh-CN',
+      'ar': 'ar-SA',
+      'pt': 'pt-BR',
+      'en': 'en-US',
+      'auto': navigator.language || 'en-US'
+    };
+    const activeLang = state.currentLanguage || localStorage.getItem('mind_cave_language') || 'auto';
+    recognition.lang = langMap[activeLang] || 'en-US';
 
     state.speechRecognition = recognition;
-
     state.isRecordingVoice = true;
 
-
-
     if (indicatorEl) {
-
       indicatorEl.classList.remove('hidden');
-
       indicatorEl.classList.add('flex');
-
-      if (indicatorEl.tagName === 'SPAN') indicatorEl.textContent = 'Listening...';
-
+      if (indicatorEl.tagName === 'SPAN') {
+        const langName = activeLang === 'ta' ? 'Tamil' : (activeLang === 'hi' ? 'Hindi' : (activeLang === 'te' ? 'Telugu' : ''));
+        indicatorEl.textContent = langName ? `Listening in ${langName}...` : 'Listening...';
+      }
     }
 
     if (micBtn) micBtn.classList.add('voice-active-btn');
 
-
+    let finalTranscript = '';
 
     recognition.onresult = (event) => {
-
-      let transcript = '';
-
+      let interim = '';
       for (let i = event.resultIndex; i < event.results.length; ++i) {
-
-        transcript += event.results[i][0].transcript;
-
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript;
+        } else {
+          interim += event.results[i][0].transcript;
+        }
       }
 
-      if (inputEl) {
-
+      const displayTxt = finalTranscript || interim;
+      if (inputEl && displayTxt) {
         const prevVal = inputEl.dataset.preVoiceText || '';
-
-        inputEl.value = prevVal ? `${prevVal} ${transcript}` : transcript;
-
+        inputEl.value = prevVal ? `${prevVal} ${displayTxt}` : displayTxt;
       }
-
     };
-
-
 
     recognition.onerror = (event) => {
-
       console.warn('Speech recognition error:', event.error);
-
       stopSpeechRecognition();
-
     };
 
-
-
-    recognition.onend = () => {
-
+    recognition.onend = async () => {
       stopSpeechRecognition();
 
+      const spokenText = (finalTranscript || inputEl?.value || '').trim();
+      // Auto-translate if spoken in non-English or native script
+      const hasNonLatin = /[^\u0000-\u007F]/.test(spokenText);
+      if (spokenText && (activeLang !== 'en' || hasNonLatin)) {
+        showToast('Translating spoken reflection with Gemini...');
+        try {
+          const transResp = await fetch('/api/translate', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${state.currentUser?.token || ''}`
+            },
+            body: JSON.stringify({
+              text: spokenText,
+              target_lang: 'en',
+              source_lang: activeLang === 'auto' ? null : activeLang
+            })
+          });
+
+          if (transResp.ok) {
+            const transData = await transResp.json();
+            const translated = transData.translated_text;
+            if (translated && translated.trim() && translated.trim() !== spokenText.trim()) {
+              if (inputEl) {
+                inputEl.value = `${spokenText}\n\n[Auto-Translation]: ${translated.trim()}`;
+              }
+              showToast('Spoken reflection automatically translated to English!');
+            }
+          }
+        } catch (tErr) {
+          console.debug('Spoken auto-translation notice:', tErr);
+        }
+      }
     };
-
-
 
     if (inputEl) {
-
       inputEl.dataset.preVoiceText = inputEl.value;
-
     }
 
-
-
     recognition.start();
-
-    showToast('Listening... Speak naturally.');
+    showToast(`Listening in ${activeLang === 'auto' ? 'Auto-Detect' : activeLang.toUpperCase()}... Speak naturally.`);
 
   } catch (err) {
 

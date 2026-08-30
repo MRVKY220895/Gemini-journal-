@@ -1,8 +1,10 @@
-const CACHE_NAME = "mind-cave-v2";
+const CACHE_NAME = "mind-cave-pwa-v3";
 const LOCAL_ASSETS_TO_CACHE = [
   "/",
   "/static/style.css",
-  "/static/app.js"
+  "/static/app.js",
+  "/static/icon.svg",
+  "/static/manifest.json"
 ];
 
 self.addEventListener("install", (event) => {
@@ -27,11 +29,9 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
-  // Only cache GET requests and non-API requests
   if (event.request.method !== "GET" || event.request.url.includes("/api/")) {
     return;
   }
-
   event.respondWith(
     caches.match(event.request).then((cached) => {
       return cached || fetch(event.request).catch(() => cached);
