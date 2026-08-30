@@ -15,6 +15,7 @@ Authentication hierarchy (in order):
 import os
 import re
 import json
+import time
 import logging
 from typing import List, Dict, Any, Optional
 from security.secret_manager import secret_manager
@@ -273,30 +274,42 @@ class GeminiService:
                 )
                 payload = json.dumps({
                     "contents": [{"role": "user", "parts": [{"text": final_content}]}],
-                    "generationConfig": {"temperature": 0.7, "maxOutputTokens": 4096}
+                    "generationConfig": {"temperature": 0.65, "maxOutputTokens": 2048}
                 }).encode("utf-8")
 
-                for m_name in ["gemini-3.5-flash", "gemini-3.7-flash", "gemini-flash-latest", "gemini-3.5-flash-lite", "gemini-2.5-flash"]:
+                # Optimized model fallback prioritized for sub-second response times
+                preferred_model = profile_context.get("preferred_model") if profile_context else None
+                model_order = ["gemini-3.5-flash-lite", "gemini-flash-lite-latest", "gemini-3.5-flash", "gemini-3.7-flash"]
+                if preferred_model and preferred_model in model_order:
+                    model_order.remove(preferred_model)
+                    model_order.insert(0, preferred_model)
+
+                for m_name in model_order:
                     try:
                         headers = {"Content-Type": "application/json"}
                         url = f"https://generativelanguage.googleapis.com/v1beta/models/{m_name}:generateContent?key={key}"
                             
                         req = urlreq.Request(url, data=payload, headers=headers)
-                        with urlreq.urlopen(req, timeout=15) as resp:
+                        t0_call = time.perf_counter()
+                        with urlreq.urlopen(req, timeout=8) as resp:
                             res_json = json.loads(resp.read().decode("utf-8"))
+                            call_dur_ms = round((time.perf_counter() - t0_call) * 1000)
                             text_out = res_json["candidates"][0]["content"]["parts"][0]["text"]
                             if text_out:
-                                logger.info(f"Gemini response via REST | model={m_name}")
+                                logger.info(f"Gemini response via REST | model={m_name} in {call_dur_ms}ms")
                                 return {
                                     "role": "model",
                                     "content": text_out.strip(),
                                     "model_used": m_name,
-                                    "is_live_gemini": True
+                                    "is_live_gemini": True,
+                                    "latency_ms": call_dur_ms
                                 }
                     except Exception as rest_err:
+                        logger.warning(f"REST call failed for {m_name}: {rest_err}")
                         errors.append(f"REST/{m_name}: {str(rest_err)[:60]}")
                         continue
             except Exception as outer_err:
+                logger.warning(f"REST outer failed: {outer_err}")
                 errors.append(f"REST outer: {str(outer_err)[:60]}")
 
         # ── PROTOCOL B: Google GenAI SDK (for Vertex AI / ADC on Cloud Run) ──
@@ -358,7 +371,7 @@ class GeminiService:
                 )
                 payload = json.dumps({
                     "contents": [{"role": "user", "parts": [{"text": final_content}]}],
-                    "generationConfig": {"temperature": 0.7, "maxOutputTokens": 4096}
+                    "generationConfig": {"temperature": 0.65, "maxOutputTokens": 2048}
                 }).encode("utf-8")
 
                 for m_name in ["gemini-3.5-flash", "gemini-2.5-flash"]:

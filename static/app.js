@@ -1797,9 +1797,9 @@ async function sendChatMessage(event) {
 
     removeLoadingIndicator();
 
-    // Append Calm, Editorial AI Response
-
-    appendChatMessage('ai', data.message.content, 'Reflective Partner', data.model_used, data.cognitive_data, message);
+    // Append Calm, Editorial AI Response with Latency Badge
+    const responseLatency = data.latency_ms || data.total_latency_ms;
+    appendChatMessage('ai', data.message.content, 'Reflective Partner', data.model_used, data.cognitive_data, message, responseLatency);
 
 
 

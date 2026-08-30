@@ -15,7 +15,7 @@ venv_site = os.path.join(os.path.dirname(__file__), ".venv", "Lib", "site-packag
 if os.path.exists(venv_site) and venv_site not in sys.path:
     sys.path.insert(0, venv_site)
 from typing import List, Dict, Any, Optional
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, BackgroundTasks, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
@@ -301,13 +301,15 @@ async def get_user_profile(current_user: UserContext = Depends(get_current_user)
 @app.post("/api/chat")
 async def chat_interaction(
     req: ChatRequest,
+    background_tasks: BackgroundTasks,
     current_user: UserContext = Depends(get_current_user)
 ):
     """
     Multi-turn AI chat interaction with Gemini.
-    Strictly isolated to current_user.uid.
+    Strictly isolated to current_user.uid with sub-second latency tracking and dynamic persona memory.
     Returns HTTP 503 if Gemini API is unavailable and offline_mode is not enabled.
     """
+    start_total_t = time.perf_counter()
     session_id = req.session_id or f"session_{int(time.time())}"
 
     # 1. Save user message to isolated database
@@ -335,12 +337,16 @@ async def chat_interaction(
     if not formatted_history or formatted_history[-1].get("content") != req.message:
         formatted_history.append({"role": "user", "content": req.message})
 
-    # 3. Generate AI response via Gemini (raises GeminiAPIError if all protocols fail)
+    # 3. Generate AI response via Gemini with persona context
+    profile_ctx = req.profile_context or {}
+    if "user_id" not in profile_ctx:
+        profile_ctx["user_id"] = current_user.uid
+
     try:
         ai_response = gemini_service.generate_chat_response(
             messages=formatted_history,
             persona=req.persona,
-            profile_context=req.profile_context,
+            profile_context=profile_ctx,
             offline_mode=req.offline_mode
         )
     except GeminiAPIError as api_err:
@@ -402,12 +408,31 @@ async def chat_interaction(
             "cognitive_data": cognitive_data
         }
 
+    total_latency_ms = round((time.perf_counter() - start_total_t) * 1000)
+    api_latency_ms = ai_response.get("latency_ms", total_latency_ms)
+
+    # Non-blocking async auto-update of user persona memory in background
+    def _bg_update_persona():
+        try:
+            gemini_service.synthesize_and_update_user_persona(
+                user_id=current_user.uid,
+                messages=formatted_history[-6:],
+                current_persona_tag=req.persona
+            )
+        except Exception as bg_err:
+            logger.debug(f"Persona bg update notice: {bg_err}")
+
+    background_tasks.add_task(_bg_update_persona)
+
     return {
+        "status": "success",
         "session_id": session_id,
         "message": saved_reply,
         "cognitive_data": cognitive_data,
-        "model_used": ai_response.get("model_used", "gemini-2.5-flash"),
-        "is_live_gemini": ai_response.get("is_live_gemini", True)
+        "model_used": ai_response.get("model_used", "gemini-3.5-flash-lite"),
+        "is_live_gemini": ai_response.get("is_live_gemini", True),
+        "latency_ms": api_latency_ms,
+        "total_latency_ms": total_latency_ms
     }
 
 
