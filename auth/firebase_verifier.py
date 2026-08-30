@@ -157,15 +157,13 @@ async def get_current_user(
 ) -> UserContext:
     """
     FastAPI dependency that extracts and validates the Bearer token.
-    Supports authenticated Firebase users as well as guest local vault users.
+    Enforces strict 401 on unauthenticated requests while supporting
+    live Firebase ID tokens and client sandbox tokens (e.g. demo_*, user_*).
     """
     if not credentials or not credentials.credentials:
-        return UserContext(
-            uid="guest_user",
-            email="guest@mindcave.app",
-            name="Guest User",
-            is_demo=True,
-            auth_provider="guest_mode",
-            auth_time=int(time.time())
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication token required. Please sign in or use sandbox mode.",
+            headers={"WWW-Authenticate": "Bearer"}
         )
     return auth_manager.verify_token(credentials.credentials)
