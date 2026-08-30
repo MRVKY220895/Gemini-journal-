@@ -1,4 +1,184 @@
 
+// =============================================================================
+// PROFILE STATE LOADER & DYNAMIC PROFILE SWITCHER
+// =============================================================================
+
+function loadProfileScopedState(uid = null) {
+  const activeUid = uid || profileStorage.getUid();
+  const isAlice = activeUid === 'user_alice' || activeUid === 'demo_user_alice';
+  const isReset = Boolean(profileStorage.getItem('is_reset', false, activeUid));
+
+  if (isAlice && !isReset) {
+    // Alice Demo Defaults
+    state.todayGoals = profileStorage.getItem('today_goals', null, activeUid) || [
+      {
+        id: 'g1',
+        title: 'Ship Core System Architecture & Validate Test Boundaries',
+        completed: true,
+        startTime: '09:30',
+        endTime: '12:00',
+        duration: '2h 30m',
+        category: 'north_star',
+        categoryLabel: 'North Star',
+        notes: 'Clean zero-warning build & 7/7 pytest verification'
+      },
+      {
+        id: 'g2',
+        title: '30m Mindful Nature Walk & Somatic Breathing',
+        completed: true,
+        startTime: '13:30',
+        endTime: '14:15',
+        duration: '45m',
+        category: 'wellness',
+        categoryLabel: 'Wellness',
+        notes: 'Zone 2 cardio completed'
+      },
+      {
+        id: 'g3',
+        title: 'Refactor Longitudinal Trajectory & Daily Harmony Engine',
+        completed: false,
+        startTime: '16:00',
+        endTime: '18:00',
+        duration: '2h',
+        category: 'deep_work',
+        categoryLabel: 'Deep Work',
+        notes: 'In progress'
+      }
+    ];
+
+    state.todayGoal = profileStorage.getItem('today_goal', null, activeUid) || {
+      text: "Ship Core System Architecture & complete evening 30m mindful walk",
+      completed: false
+    };
+
+    state.habitsList = profileStorage.getItem('habits_list', null, activeUid) || [
+      { id: 'h1', title: 'Hydrate (Drink Water)', emoji: '💧', type: 'counter', targetCount: 8, currentCount: 5, unit: 'glasses', streak: 12, target: '8 glasses', isTimelineShortcut: true, history: [true, true, true, true, true, true, false] },
+      { id: 'h2', title: '15m Mindfulness & CBT', emoji: '🧘', type: 'boolean', streak: 7, target: '15 mins', isTimelineShortcut: true, history: [true, true, true, false, true, true, true] },
+      { id: 'h3', title: '30m Zone-2 Cardio / Walk', emoji: '🚶', type: 'counter', targetCount: 30, currentCount: 30, unit: 'mins', streak: 5, target: '30 mins', isTimelineShortcut: true, history: [true, true, true, true, false, true, true] },
+      { id: 'h4', title: '20m Focused Reading', emoji: '📖', type: 'counter', targetCount: 20, currentCount: 15, unit: 'pages', streak: 9, target: '20 pages', isTimelineShortcut: true, history: [true, true, true, true, true, true, false] },
+      { id: 'h5', title: '8h Circadian Sleep Protocol', emoji: '🌙', type: 'boolean', streak: 6, target: '8 hours', isTimelineShortcut: false, history: [true, true, true, true, true, true, true] },
+      { id: 'h6', title: '90m Deep Work Block', emoji: '💻', type: 'counter', targetCount: 2, currentCount: 2, unit: 'blocks', streak: 14, target: '2 blocks', isTimelineShortcut: false, history: [true, true, true, true, true, true, true] }
+    ];
+
+    state.bucketList = profileStorage.getItem('bucket_list', null, activeUid) || [
+      { id: 'b1', title: 'Scuba dive the Great Barrier Reef', category: 'travel', year: '2027', achieved: false },
+      { id: 'b2', title: 'Publish Open-Source AI Architecture Benchmark', category: 'career', year: '2026', achieved: true },
+      { id: 'b3', title: 'Trek the Annapurna Circuit in Himalayas', category: 'adventure', year: '2027', achieved: false },
+      { id: 'b4', title: 'Run a sub-4-hour Marathon', category: 'wellness', year: '2026', achieved: false },
+      { id: 'b5', title: 'Solo Roadtrip across New Zealand South Island', category: 'travel', year: '2028', achieved: false },
+      { id: 'b6', title: 'Build a private off-grid mountain cabin sanctuary', category: 'wellness', year: '2029', achieved: false }
+    ];
+
+    state.agendaItems = profileStorage.getItem('agenda_items', null, activeUid) || [
+      { id: 'task_1', type: 'todo', title: 'Review System Architecture with Core Engineering', date: (new Date()).toISOString().split('T')[0], time: '14:30', priority: 'high', completed: false, gcalSynced: true },
+      { id: 'task_2', type: 'reminder', title: 'Take 15-min Circadian Stroll & Deep Breathing', date: (new Date()).toISOString().split('T')[0], time: '16:00', priority: 'normal', completed: true, gcalSynced: true },
+      { id: 'task_3', type: 'milestone', title: 'Quarterly Mind & Goal Alignment Milestone', date: (new Date()).toISOString().split('T')[0], time: '19:00', priority: 'high', completed: false, gcalSynced: true }
+    ];
+  } else {
+    // Clean Slate / Individual Profile Defaults (Decoupled & Isolated)
+    state.todayGoals = profileStorage.getItem('today_goals', [], activeUid);
+    state.todayGoal = profileStorage.getItem('today_goal', { text: '', completed: false }, activeUid);
+    state.habitsList = profileStorage.getItem('habits_list', [], activeUid);
+    state.bucketList = profileStorage.getItem('bucket_list', [], activeUid);
+    state.agendaItems = profileStorage.getItem('agenda_items', [], activeUid);
+  }
+
+  state.archivedHabits = profileStorage.getItem('archived_habits', [], activeUid);
+  state.capturesList = profileStorage.getItem('captures_list', [], activeUid);
+  state.notesList = profileStorage.getItem('notes_list', [], activeUid);
+  state.bucketCategories = profileStorage.getItem('bucket_categories', null, activeUid) || [
+    { id: 'travel', name: 'Travel & World Exploration', color: 'cyan' },
+    { id: 'career', name: 'Career & Mastery', color: 'indigo' },
+    { id: 'adventure', name: 'Adventure & Sports', color: 'amber' },
+    { id: 'wellness', name: 'Wellness & Health', color: 'emerald' },
+    { id: 'creative', name: 'Art & Creation', color: 'purple' },
+    { id: 'wealth', name: 'Financial Freedom', color: 'rose' }
+  ];
+}
+window.loadProfileScopedState = loadProfileScopedState;
+
+async function switchUserProfile(newUid, newName, newToken) {
+  state.currentUser = {
+    uid: newUid,
+    name: newName,
+    token: newToken,
+    gender: profileStorage.getRaw('user_gender', 'neutral', newUid)
+  };
+
+  localStorage.setItem('gemini_journal_uid', newUid);
+  localStorage.setItem('gemini_journal_name', newName);
+  localStorage.setItem('gemini_journal_token', newToken);
+
+  // Clear in-memory caches to guarantee 0% data bleeding
+  state.journalsCache = [];
+  state.messages = [];
+  state.currentSessionId = null;
+
+  // Load target profile's isolated collections
+  loadProfileScopedState(newUid);
+  updateUserUI();
+
+  // Re-fetch and re-render all UI components
+  await loadJournals();
+  await loadAnalytics();
+  renderTodayGoal();
+  renderHabitTracker();
+  renderBucketList();
+  renderNotesList();
+  setMasterDashboardHorizon(currentDashboardHorizon || 'weekly');
+  updateAllDashboardStats();
+  refreshIcons();
+
+  showToast(`Switched active profile to ${newName}`);
+}
+window.switchUserProfile = switchUserProfile;
+
+// =============================================================================
+// MULTI-PROFILE CLIENT TENANT ISOLATION ENGINE (DEVICE-SAFE PROFILE SCOPING)
+// =============================================================================
+
+const profileStorage = {
+  getUid: () => {
+    return (state && state.currentUser && state.currentUser.uid) 
+      ? state.currentUser.uid 
+      : (localStorage.getItem('gemini_journal_uid') || 'user_alice');
+  },
+  getKey: (key, uid = null) => {
+    const activeUid = uid || profileStorage.getUid();
+    return `mc_u_${activeUid}_${key}`;
+  },
+  getItem: (key, fallback = null, uid = null) => {
+    try {
+      const scopedKey = profileStorage.getKey(key, uid);
+      const val = localStorage.getItem(scopedKey);
+      if (val === null || val === undefined || val === 'undefined' || val === 'null') return fallback;
+      return JSON.parse(val);
+    } catch (e) {
+      return fallback;
+    }
+  },
+  getRaw: (key, fallback = null, uid = null) => {
+    const scopedKey = profileStorage.getKey(key, uid);
+    const val = localStorage.getItem(scopedKey);
+    return val !== null ? val : fallback;
+  },
+  setItem: (key, val, uid = null) => {
+    try {
+      const scopedKey = profileStorage.getKey(key, uid);
+      const strVal = typeof val === 'string' ? val : JSON.stringify(val);
+      localStorage.setItem(scopedKey, strVal);
+    } catch (e) {
+      console.warn('profileStorage setItem error:', e);
+    }
+  },
+  removeItem: (key, uid = null) => {
+    const scopedKey = profileStorage.getKey(key, uid);
+    localStorage.removeItem(scopedKey);
+  }
+};
+window.profileStorage = profileStorage;
+
+
 // ─── CHART & METRIC EXPLANATION INFO MODAL CONTROLLER ───
 const chartInfoRegistry = {
   radar: {
@@ -1211,6 +1391,7 @@ const state = {
 
 // Initialize Application on DOM Ready
 document.addEventListener('DOMContentLoaded', () => {
+  loadProfileScopedState();
   // 1. Immediate Critical Path (Interactive in <10ms)
   initTheme();
   initLanguage();
@@ -1704,41 +1885,10 @@ function setSandboxUser(userId) {
 
   };
 
-  state.currentUser = {
-
-    uid: userId,
-
-    name: names[userId] || userId,
-
-    token: `demo_${userId}`
-
-  };
-
-  localStorage.setItem('gemini_journal_uid', state.currentUser.uid);
-
-  localStorage.setItem('gemini_journal_name', state.currentUser.name);
-
-  localStorage.setItem('gemini_journal_token', state.currentUser.token);
-
-
-
-  updateUserUI();
-
+  const uName = names[userId] || userId;
+  const uToken = `demo_${userId}`;
   closeAuthModal();
-
-
-
-  // Reset chat and reload user's isolated data
-
-  startNewSession();
-
-  loadJournals();
-
-  loadAnalytics();
-
-
-
-  showToast(`Switched to ${state.currentUser.name}. Zero data shared across users.`);
+  switchUserProfile(userId, uName, uToken);
 
 }
 
@@ -1754,37 +1904,8 @@ function setCustomUser() {
 
   const cleanUid = input.replace(/[^a-zA-Z0-9_-]/g, '_').toLowerCase();
 
-  state.currentUser = {
-
-    uid: cleanUid,
-
-    name: input,
-
-    token: `user_${cleanUid}`
-
-  };
-
-  localStorage.setItem('gemini_journal_uid', state.currentUser.uid);
-
-  localStorage.setItem('gemini_journal_name', state.currentUser.name);
-
-  localStorage.setItem('gemini_journal_token', state.currentUser.token);
-
-
-
-  updateUserUI();
-
   closeAuthModal();
-
-  startNewSession();
-
-  loadJournals();
-
-  loadAnalytics();
-
-
-
-  showToast(`Authenticated as ${state.currentUser.name}`);
+  switchUserProfile(cleanUid, input, `user_${cleanUid}`);
 
 }
 
@@ -1951,11 +2072,8 @@ async function signInWithFirebaseGoogle() {
       }
     }
 
-    loadProfileDetails();
-    updateUserUI();
     closeAuthModal();
-    loadJournals();
-    loadAnalytics();
+    await switchUserProfile(state.currentUser.uid, displayName, state.currentUser.token);
     showToast(`Welcome ${displayName}! Biological profile synchronized.`);
   } catch (err) {
     if (err.code === 'auth/api-key-not-valid' || (err.message && err.message.includes('api-key-not-valid'))) {
@@ -2026,14 +2144,8 @@ async function signInWithFirebaseEmail() {
 
 
 
-    updateUserUI();
-
     closeAuthModal();
-
-    loadJournals();
-
-    loadAnalytics();
-
+    await switchUserProfile(state.currentUser.uid, state.currentUser.name, state.currentUser.token);
     showToast(`Signed in as ${state.currentUser.name}`);
 
   } catch (err) {
@@ -2098,14 +2210,8 @@ async function signUpWithFirebaseEmail() {
 
 
 
-    updateUserUI();
-
     closeAuthModal();
-
-    loadJournals();
-
-    loadAnalytics();
-
+    await switchUserProfile(state.currentUser.uid, state.currentUser.name, state.currentUser.token);
     showToast(`Firebase Account created for ${state.currentUser.name}`);
 
   } catch (err) {
@@ -2122,37 +2228,8 @@ function setCustomUserWithEmail(email) {
 
   const cleanUid = email.replace(/[^a-zA-Z0-9_-]/g, '_').toLowerCase();
 
-  state.currentUser = {
-
-    uid: cleanUid,
-
-    name: email,
-
-    token: `user_${cleanUid}`
-
-  };
-
-  localStorage.setItem('gemini_journal_uid', state.currentUser.uid);
-
-  localStorage.setItem('gemini_journal_name', state.currentUser.name);
-
-  localStorage.setItem('gemini_journal_token', state.currentUser.token);
-
-
-
-  updateUserUI();
-
   closeAuthModal();
-
-  startNewSession();
-
-  loadJournals();
-
-  loadAnalytics();
-
-
-
-  showToast(`Authenticated as ${state.currentUser.name}`);
+  switchUserProfile(cleanUid, email, `user_${cleanUid}`);
 
 }
 
@@ -2162,17 +2239,8 @@ function signOutUser() {
   if (state.firebaseAuth && state.firebaseAuth.currentUser) {
     state.firebaseAuth.signOut();
   }
-  state.currentUser = {
-    uid: 'guest_user',
-    name: 'Guest',
-    token: 'guest_token',
-    gender: localStorage.getItem('mind_cave_user_gender') || 'female'
-  };
-  localStorage.removeItem('gemini_journal_uid');
-  localStorage.removeItem('gemini_journal_name');
-  localStorage.removeItem('gemini_journal_token');
-  updateUserUI();
-  showToast('Signed out successfully.');
+  switchUserProfile('guest_user', 'Guest', 'guest_token');
+  showToast('Signed out. Active profile set to Guest Clean Slate.');
 }
 
 
@@ -9982,9 +10050,9 @@ function submitTodayGoal(event) {
 
 
 
-  localStorage.setItem('mind_cave_today_goals', JSON.stringify(state.todayGoals));
+  profileStorage.setItem('today_goals', state.todayGoals);
 
-  localStorage.setItem('mind_cave_today_goal', JSON.stringify(state.todayGoal));
+  profileStorage.setItem('today_goal', state.todayGoal);
 
 
 
@@ -10012,9 +10080,9 @@ function toggleGoalItemComplete(goalId) {
 
   goal.completed = !goal.completed;
 
-  localStorage.setItem('mind_cave_today_goals', JSON.stringify(state.todayGoals));
+  profileStorage.setItem('today_goals', state.todayGoals);
 
-  localStorage.setItem('mind_cave_today_goal', JSON.stringify(state.todayGoal));
+  profileStorage.setItem('today_goal', state.todayGoal);
 
 
 
@@ -10034,9 +10102,9 @@ function deleteGoalItem(goalId) {
 
   state.todayGoals = state.todayGoals.filter(g => g.id !== goalId);
 
-  localStorage.setItem('mind_cave_today_goals', JSON.stringify(state.todayGoals));
+  profileStorage.setItem('today_goals', state.todayGoals);
 
-  localStorage.setItem('mind_cave_today_goal', JSON.stringify(state.todayGoal));
+  profileStorage.setItem('today_goal', state.todayGoal);
 
 
 
@@ -10110,7 +10178,7 @@ function initHabitTracker() {
 
   if (!state.archivedHabits) {
 
-    state.archivedHabits = JSON.parse(localStorage.getItem('mind_cave_archived_habits') || '[]');
+    state.archivedHabits = profileStorage.getItem('archived_habits', []);
 
   }
 
@@ -10183,7 +10251,7 @@ function renderHabitTracker() {
         { id: 'h6', title: 'Circadian Sleep Wind-Down', emoji: '🌙', icon: '🌙', type: 'boolean', target: '11:00 PM', streak: 21, isTimelineShortcut: true, history: [true, true, true, true, true, true, true] }
       ];
       try {
-        localStorage.setItem('mind_cave_habits_list', JSON.stringify(state.habitsList));
+        profileStorage.setItem('habits_list', state.habitsList);
       } catch (e) {}
     }
   }
@@ -10512,7 +10580,7 @@ function refreshHabitsTracker(btnEl = null) {
 
 
 
-  localStorage.setItem('mind_cave_habits_list', JSON.stringify(state.habitsList));
+  profileStorage.setItem('habits_list', state.habitsList);
 
   renderHabitTracker();
 
@@ -10592,7 +10660,7 @@ function incrementHabitCount(habitId, delta = 1) {
 
 
 
-  localStorage.setItem('mind_cave_habits_list', JSON.stringify(state.habitsList));
+  profileStorage.setItem('habits_list', state.habitsList);
 
   renderHabitTracker();
 
@@ -10684,7 +10752,7 @@ function deleteHabit(habitId) {
 
   state.archivedHabits.unshift(archivedCopy);
 
-  localStorage.setItem('mind_cave_archived_habits', JSON.stringify(state.archivedHabits));
+  profileStorage.setItem('archived_habits', state.archivedHabits);
 
 
 
@@ -10698,7 +10766,7 @@ function deleteHabit(habitId) {
 
   state.habitsList.splice(index, 1);
 
-  localStorage.setItem('mind_cave_habits_list', JSON.stringify(state.habitsList));
+  profileStorage.setItem('habits_list', state.habitsList);
 
 
 
@@ -10742,13 +10810,13 @@ function undoDeleteHabit() {
 
     state.archivedHabits = state.archivedHabits.filter(h => h.id !== last.habit.id);
 
-    localStorage.setItem('mind_cave_archived_habits', JSON.stringify(state.archivedHabits));
+    profileStorage.setItem('archived_habits', state.archivedHabits);
 
   }
 
 
 
-  localStorage.setItem('mind_cave_habits_list', JSON.stringify(state.habitsList));
+  profileStorage.setItem('habits_list', state.habitsList);
 
   renderHabitTracker();
 
@@ -10942,13 +11010,13 @@ function restoreArchivedHabit(habitId) {
 
   state.habitsList.unshift(restored);
 
-  localStorage.setItem('mind_cave_habits_list', JSON.stringify(state.habitsList));
+  profileStorage.setItem('habits_list', state.habitsList);
 
 
 
   state.archivedHabits = state.archivedHabits.filter(h => h.id !== habitId);
 
-  localStorage.setItem('mind_cave_archived_habits', JSON.stringify(state.archivedHabits));
+  profileStorage.setItem('archived_habits', state.archivedHabits);
 
 
 
@@ -10976,7 +11044,7 @@ function purgeArchivedHabit(habitId) {
 
   state.archivedHabits = state.archivedHabits.filter(h => h.id !== habitId);
 
-  localStorage.setItem('mind_cave_archived_habits', JSON.stringify(state.archivedHabits));
+  profileStorage.setItem('archived_habits', state.archivedHabits);
 
 
 
@@ -11000,7 +11068,7 @@ function clearAllArchivedHabits() {
 
   state.archivedHabits = [];
 
-  localStorage.setItem('mind_cave_archived_habits', JSON.stringify(state.archivedHabits));
+  profileStorage.setItem('archived_habits', state.archivedHabits);
 
 
 
@@ -11108,7 +11176,7 @@ function toggleHabitDay(habitId, dayIndex) {
 
 
 
-  localStorage.setItem('mind_cave_habits_list', JSON.stringify(state.habitsList));
+  profileStorage.setItem('habits_list', state.habitsList);
 
   renderHabitTracker();
 
@@ -11414,7 +11482,7 @@ function submitNewHabit(event) {
 
 
 
-  localStorage.setItem('mind_cave_habits_list', JSON.stringify(state.habitsList));
+  profileStorage.setItem('habits_list', state.habitsList);
 
   closeNewHabitModal();
 
@@ -11434,7 +11502,7 @@ function toggleHabitTimelineShortcut(habitId) {
 
     habit.isTimelineShortcut = !habit.isTimelineShortcut;
 
-    localStorage.setItem('mind_cave_habits_list', JSON.stringify(state.habitsList));
+    profileStorage.setItem('habits_list', state.habitsList);
 
     renderTimelineShortcuts();
 
@@ -11784,7 +11852,7 @@ function initBucketList() {
 
   if (!state.bucketCategories) {
 
-    state.bucketCategories = JSON.parse(localStorage.getItem('mind_cave_bucket_categories') || 'null') || [
+    state.bucketCategories = profileStorage.getItem('bucket_categories', null) || [
 
       { id: 'travel', name: 'Travel & World Exploration', color: 'cyan' },
 
@@ -12000,7 +12068,7 @@ function submitNewBucketCategory(event) {
 
   state.bucketCategories.push({ id, name, color });
 
-  localStorage.setItem('mind_cave_bucket_categories', JSON.stringify(state.bucketCategories));
+  profileStorage.setItem('bucket_categories', state.bucketCategories);
 
 
 
@@ -12030,7 +12098,7 @@ function deleteBucketCategory(catId) {
 
   state.bucketCategories = state.bucketCategories.filter(c => c.id !== catId);
 
-  localStorage.setItem('mind_cave_bucket_categories', JSON.stringify(state.bucketCategories));
+  profileStorage.setItem('bucket_categories', state.bucketCategories);
 
   renderBucketCategoriesList();
 
@@ -12359,7 +12427,7 @@ function toggleBucketPlanStep(dreamId, stepIndex) {
 
 
 
-  localStorage.setItem('mind_cave_bucket_list', JSON.stringify(state.bucketList));
+  profileStorage.setItem('bucket_list', state.bucketList);
 
   renderBucketList();
 
@@ -12415,7 +12483,7 @@ function renderDashboardMilestoneRadar() {
         }
       ];
       try {
-        localStorage.setItem('mind_cave_bucket_list', JSON.stringify(state.bucketList));
+        profileStorage.setItem('bucket_list', state.bucketList);
       } catch (e) {}
     }
   }
@@ -13032,7 +13100,7 @@ function submitBucketItem(event) {
 
 
 
-  localStorage.setItem('mind_cave_bucket_list', JSON.stringify(state.bucketList));
+  profileStorage.setItem('bucket_list', state.bucketList);
 
   closeBucketListModal();
 
@@ -13070,7 +13138,7 @@ function advanceBucketStatus(id) {
 
 
 
-  localStorage.setItem('mind_cave_bucket_list', JSON.stringify(state.bucketList));
+  profileStorage.setItem('bucket_list', state.bucketList);
 
   renderBucketList();
 
@@ -13106,7 +13174,7 @@ function toggleBucketAchieved(id) {
 
   }
 
-  localStorage.setItem('mind_cave_bucket_list', JSON.stringify(state.bucketList));
+  profileStorage.setItem('bucket_list', state.bucketList);
 
   renderBucketList();
 
@@ -13122,7 +13190,7 @@ function deleteBucketItem(id) {
 
   state.bucketList = state.bucketList.filter(b => b.id !== id);
 
-  localStorage.setItem('mind_cave_bucket_list', JSON.stringify(state.bucketList));
+  profileStorage.setItem('bucket_list', state.bucketList);
 
   renderBucketList();
 
@@ -14304,7 +14372,7 @@ function initNotesAndAlerts() {
           updatedAt: Date.now() - 10800000
         }
       ];
-      localStorage.setItem('mind_cave_captures_list', JSON.stringify(state.capturesList));
+      profileStorage.setItem('captures_list', state.capturesList);
     }
   } catch (e) {
     state.capturesList = [];
@@ -14517,7 +14585,7 @@ function deleteCaptureItem(captureId) {
 
 function saveCaptures() {
   state.notesList = state.capturesList;
-  localStorage.setItem('mind_cave_captures_list', JSON.stringify(state.capturesList));
+  profileStorage.setItem('captures_list', state.capturesList);
   localStorage.setItem('mind_cave_notes_list', JSON.stringify(state.capturesList));
 }
 
