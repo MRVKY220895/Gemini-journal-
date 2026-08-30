@@ -1,7 +1,7 @@
 
 // ─── REFRESH MIND CAVE JOURNAL (IN-PLACE SYNCHRONIZATION) ───
 async function refreshCurrentJournalView() {
-  const icon = document.querySelector('#btn-journal-refresh i');
+  const icon = document.querySelector('#btn-journal-refresh i') || document.querySelector('#btn-journal-refresh svg');
   if (icon) icon.classList.add('animate-spin');
 
   try {
@@ -10,6 +10,8 @@ async function refreshCurrentJournalView() {
     if (typeof renderHabitTracker === 'function') renderHabitTracker();
     if (typeof renderDashboardMilestoneRadar === 'function') renderDashboardMilestoneRadar();
     if (typeof renderNotesCards === 'function') renderNotesCards();
+    if (typeof renderMemoryLane === 'function') renderMemoryLane();
+    if (typeof renderMemoryPhotos === 'function') renderMemoryPhotos();
     if (typeof updateAllDashboardStats === 'function') updateAllDashboardStats();
     showToast('🔄 Mind Cave Journal synchronized!');
   } catch (e) {

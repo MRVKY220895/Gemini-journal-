@@ -785,7 +785,7 @@
           <!-- Refresh Journal Data (Stays on same track) -->
           <button onclick="refreshCurrentJournalView()" id="btn-journal-refresh" class="btn-secondary text-xs !py-1 sm:!py-1.5 !px-2 sm:!px-2.5 flex items-center gap-1.5 cursor-pointer hover:border-[var(--mc-accent)] transition-all" title="Synchronize & Refresh Journal without leaving current view">
             <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-[#9BB7A5]"></i>
-            <span class="hidden sm:inline font-semibold">Refresh</span>
+            <span class="font-semibold">Refresh</span>
           </button>
 
           <!-- Aesthetic Scrapbook Social Card Exporter -->
@@ -3037,19 +3037,19 @@
             <div>
               <label class="text-[var(--mc-text-secondary)] font-semibold block mb-1.5">Sanctuary Aesthetic Theme</label>
               <div class="grid grid-cols-2 gap-2" id="scrapbook-theme-selector">
-                <button type="button" onclick="setScrapbookTheme('sanctuary')" class="scrapbook-theme-btn active p-2.5 rounded-xl border text-left text-xs bg-[var(--mc-accent-10)] border-[var(--mc-accent-40)] text-[var(--mc-accent)] cursor-pointer transition-all">
+                <button type="button" onclick="setScrapbookTheme('sanctuary', this)" class="scrapbook-theme-btn active p-2.5 rounded-xl border text-left text-xs bg-[var(--mc-accent-10)] border-[var(--mc-accent-40)] text-[var(--mc-accent)] cursor-pointer transition-all">
                   <span class="font-bold flex items-center gap-1.5"><i data-lucide="feather" class="w-3.5 h-3.5 text-[#9BB7A5]"></i><span>Sanctuary Sage</span></span>
                   <span class="text-[10px] opacity-75 block mt-0.5">Warm olive & gold washi</span>
                 </button>
-                <button type="button" onclick="setScrapbookTheme('vintage')" class="scrapbook-theme-btn p-2.5 rounded-xl border text-left text-xs bg-[var(--mc-bg-tertiary)] border-[var(--mc-border-subtle)] hover:border-[#C5AA78] text-[#C5AA78] cursor-pointer transition-all">
+                <button type="button" onclick="setScrapbookTheme('vintage', this)" class="scrapbook-theme-btn p-2.5 rounded-xl border text-left text-xs bg-[var(--mc-bg-tertiary)] border-[var(--mc-border-subtle)] hover:border-[#C5AA78] text-[#C5AA78] cursor-pointer transition-all">
                   <span class="font-bold flex items-center gap-1.5"><i data-lucide="scroll" class="w-3.5 h-3.5 text-[#C5AA78]"></i><span>Vintage Kraft</span></span>
                   <span class="text-[10px] opacity-75 block mt-0.5">Sepia paper & stamps</span>
                 </button>
-                <button type="button" onclick="setScrapbookTheme('notebook')" class="scrapbook-theme-btn p-2.5 rounded-xl border text-left text-xs bg-[var(--mc-bg-tertiary)] border-[var(--mc-border-subtle)] hover:border-[#8FA9B8] text-[#8FA9B8] cursor-pointer transition-all">
+                <button type="button" onclick="setScrapbookTheme('notebook', this)" class="scrapbook-theme-btn p-2.5 rounded-xl border text-left text-xs bg-[var(--mc-bg-tertiary)] border-[var(--mc-border-subtle)] hover:border-[#8FA9B8] text-[#8FA9B8] cursor-pointer transition-all">
                   <span class="font-bold flex items-center gap-1.5"><i data-lucide="book-open" class="w-3.5 h-3.5 text-[#8FA9B8]"></i><span>Minimalist Grid</span></span>
                   <span class="text-[10px] opacity-75 block mt-0.5">Clean architectural grid</span>
                 </button>
-                <button type="button" onclick="setScrapbookTheme('cyber')" class="scrapbook-theme-btn p-2.5 rounded-xl border text-left text-xs bg-[var(--mc-bg-tertiary)] border-[var(--mc-border-subtle)] hover:border-emerald-400 text-emerald-400 cursor-pointer transition-all">
+                <button type="button" onclick="setScrapbookTheme('cyber', this)" class="scrapbook-theme-btn p-2.5 rounded-xl border text-left text-xs bg-[var(--mc-bg-tertiary)] border-[var(--mc-border-subtle)] hover:border-emerald-400 text-emerald-400 cursor-pointer transition-all">
                   <span class="font-bold flex items-center gap-1.5"><i data-lucide="moon" class="w-3.5 h-3.5 text-emerald-400"></i><span>Obsidian Dark</span></span>
                   <span class="text-[10px] opacity-75 block mt-0.5">Matte dark mode</span>
                 </button>
