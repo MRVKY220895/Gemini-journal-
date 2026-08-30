@@ -3306,3 +3306,31 @@ html.light #language-dropdown-menu {
   border-color: #E2E8F0 !important;
   box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.08) !important;
 }
+
+
+/* 📱 Mobile Screen Optimizations across All Modals & Sub-Tracks */
+@media (max-width: 640px) {
+  .journal-track-nav {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    gap: 6px !important;
+    padding-bottom: 6px !important;
+  }
+
+  .track-tab-btn {
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    font-size: 11px !important;
+    padding: 5px 10px !important;
+  }
+
+  div[id$="-modal"] > div.mc-card,
+  div[id$="-modal"] > div.double-bezel {
+    max-height: 88vh !important;
+    overflow-y: auto !important;
+    margin: auto 4px !important;
+    padding: 1rem !important;
+  }
+}

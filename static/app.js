@@ -14729,3 +14729,20 @@ function setDiaryMediaMode(mode) {
 
   renderChronoTimeline(false);
 }
+
+
+// ─── GLOBAL WINDOW EXPORTS FOR EVENT HANDLERS ───
+window.openNewCaptureModal = openNewCaptureModal;
+window.closeCaptureModal = closeCaptureModal;
+window.setCaptureTypeInModal = setCaptureTypeInModal;
+window.addChecklistItemInput = addChecklistItemInput;
+window.submitCaptureForm = submitCaptureForm;
+window.toggleChecklistSubItem = toggleChecklistSubItem;
+window.toggleTaskCompleted = toggleTaskCompleted;
+window.toggleCaptureJournalSync = toggleCaptureJournalSync;
+window.deleteCaptureItem = deleteCaptureItem;
+window.setNotesFilter = setNotesFilter;
+window.filterNotesAndAlerts = filterNotesAndAlerts;
+window.setDiaryMediaMode = setDiaryMediaMode;
+window.setChronoViewMode = setChronoViewMode;
+window.setTimelineViewMode = setTimelineViewMode;
