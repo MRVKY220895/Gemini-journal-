@@ -4097,6 +4097,7 @@ function getChronologicalEvents(journals) {
       events.push({
 
         id: `journal_${j.id || idx}`,
+        journalId: j.id || `${idx}`,
 
         type: 'journal',
 
