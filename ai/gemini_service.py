@@ -119,19 +119,19 @@ class GeminiService:
             except Exception as e:
                 logger.debug(f"GenAI API key init notice: {e}")
 
-        # Attempt 2: ADC via google.auth (works on Cloud Run + local after gcloud auth adc login)
+        # Attempt 2: ADC via google.auth (works on Cloud Run + local after gcloud auth application-default login)
         try:
             import google.auth
             import google.auth.transport.requests
             creds, project = google.auth.default(
-                scopes=["https://www.googleapis.com/auth/generative-language",
-                        "https://www.googleapis.com/auth/cloud-platform"]
+                scopes=["https://www.googleapis.com/auth/cloud-platform"]
             )
             creds.refresh(google.auth.transport.requests.Request())
             self._adc_creds = creds
             from google import genai
-            self._genai_client = genai.Client(api_key=creds.token)
-            logger.info(f"Initialized Google GenAI Client with ADC (project={project}).")
+            gcp_project = project or os.getenv("GCP_PROJECT_ID", "project-eb461b9f-34ae-46e3-b00")
+            self._genai_client = genai.Client(vertexai=True, project=gcp_project, location="us-central1")
+            logger.info(f"Initialized Google GenAI Client with ADC Vertex AI (project={gcp_project}).")
             return
         except Exception as e:
             logger.debug(f"ADC init notice: {e}")
@@ -334,7 +334,7 @@ class GeminiService:
             import urllib.request as urlreq
 
             creds, _ = google.auth.default(
-                scopes=["https://www.googleapis.com/auth/generative-language"]
+                scopes=["https://www.googleapis.com/auth/cloud-platform"]
             )
             creds.refresh(google.auth.transport.requests.Request())
             bearer_token = creds.token
