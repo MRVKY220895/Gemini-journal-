@@ -173,12 +173,15 @@ async def get_current_user(
 ) -> UserContext:
     """
     FastAPI dependency that extracts and validates the Bearer token.
-    Injects the verified UserContext into API routes.
+    Supports authenticated Firebase users as well as guest local vault users.
     """
     if not credentials or not credentials.credentials:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authentication required. Please sign in via Firebase.",
-            headers={"WWW-Authenticate": "Bearer"},
+        return UserContext(
+            uid="guest_user",
+            email="guest@mindcave.app",
+            name="Guest User",
+            is_demo=True,
+            auth_provider="guest_mode",
+            auth_time=int(time.time())
         )
     return auth_manager.verify_token(credentials.credentials)

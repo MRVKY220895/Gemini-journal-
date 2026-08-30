@@ -5920,20 +5920,44 @@ function filterDiaryTimeline(query) {
 
 
 async function submitNewJournal(event) {
-  if (event) event.preventDefault();
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
 
-  const title = (document.getElementById('journal-title-input')?.value || 'Moment Reflection').trim();
-  const content = (document.getElementById('journal-content-input')?.value || '').trim();
-  const exactTime = document.getElementById('journal-exact-time-input')?.value;
-  const hour = exactTime || document.getElementById('journal-hour-input')?.value || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  const track = document.getElementById('journal-track-select')?.value || 'chrono';
-  const energy = document.getElementById('journal-energy-slider')?.value || '7';
-  const isEncrypted = document.getElementById('journal-encrypt-checkbox')?.checked ?? false;
-  const locChecked = document.getElementById('journal-location-check')?.checked ?? false;
+  const titleInput = document.getElementById('journal-title-input');
+  const contentInput = document.getElementById('journal-content-input');
+  const exactTimeInput = document.getElementById('journal-exact-time-input');
+  const hourInput = document.getElementById('journal-hour-input');
+  const trackSelect = document.getElementById('journal-track-select');
+  const energySlider = document.getElementById('journal-energy-slider');
+  const encryptCheck = document.getElementById('journal-encrypt-checkbox');
+  const locCheck = document.getElementById('journal-location-check');
+  const linkInput = document.getElementById('journal-link-input');
+
+  const title = (titleInput?.value || 'Moment Reflection').trim();
+  const content = (contentInput?.value || '').trim();
+  const exactTime = exactTimeInput?.value;
+  const hour = exactTime || hourInput?.value || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const track = trackSelect?.value || 'chrono';
+  const energy = energySlider?.value || '7';
+  const isEncrypted = encryptCheck?.checked ?? false;
+  const locChecked = locCheck?.checked ?? false;
   const locationStr = locChecked ? 'Connaught Place, New Delhi' : 'Private Sanctuary';
-  const linkUrl = document.getElementById('journal-link-input')?.value?.trim() || '';
+  const linkUrl = linkInput?.value?.trim() || '';
 
   const moodName = (typeof currentSelectedMood !== 'undefined' && currentSelectedMood?.name) ? currentSelectedMood.name : 'Calm';
+
+  // 1. Close modal IMMEDIATELY for instantaneous UI feedback
+  closeNewJournalModal();
+
+  // 2. Clear inputs immediately
+  if (titleInput) titleInput.value = '';
+  if (contentInput) contentInput.value = '';
+  if (linkInput) linkInput.value = '';
+  if (typeof removeAttachedPhoto === 'function') removeAttachedPhoto();
+  if (typeof removeAttachedSketch === 'function') removeAttachedSketch();
+  if (typeof removeAttachedFile === 'function') removeAttachedFile();
 
   // If photo attached, save to memory photos
   if (typeof attachedPhotoBase64 !== 'undefined' && attachedPhotoBase64) {
@@ -5969,15 +5993,10 @@ async function submitNewJournal(event) {
       })
     });
 
-    if (!response.ok) throw new Error('Failed to create journal entry.');
-
-    closeNewJournalModal();
-    if (document.getElementById('journal-title-input')) document.getElementById('journal-title-input').value = '';
-    if (document.getElementById('journal-content-input')) document.getElementById('journal-content-input').value = '';
-    if (typeof removeAttachedPhoto === 'function') removeAttachedPhoto();
-    if (typeof removeAttachedSketch === 'function') removeAttachedSketch();
-    if (typeof removeAttachedFile === 'function') removeAttachedFile();
-    if (document.getElementById('journal-link-input')) document.getElementById('journal-link-input').value = '';
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.detail || errData.message || 'Failed to create journal entry.');
+    }
 
     // Refresh all views
     if (typeof loadJournals === 'function') loadJournals();
