@@ -7705,7 +7705,7 @@ function updateAllDashboardStats() {
   const pillarVitality = document.getElementById('pillar-vitality-stat');
   const pillarVolume = document.getElementById('pillar-volume-stat');
 
-  const fulfilledCount = bucket.filter(b => b.achieved).length;
+  // Fulfilled count reused from upper scope
   const inActionCount = bucket.filter(b => !b.achieved).length;
   const completedGoals = goals.filter(g => g.completed).length;
   const goalVelocity = goals.length > 0 ? Math.round((completedGoals / goals.length) * 100) : 0;
