@@ -108,7 +108,7 @@
   <div class="fixed bottom-12 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse-slow"></div>
 
   <!-- Top Floating Glass Navigation Header -->
-  <header class="floating-nav flex items-center justify-between gap-1 sm:gap-2 mb-2 sm:mb-4 px-2 sm:px-4 py-1.5 sm:py-2 md:relative fixed top-0 left-0 right-0 w-full md:max-w-6xl md:mx-auto z-50 md:rounded-full md:mt-2 shadow-sm pt-[max(0.4rem,env(safe-area-inset-top,0.4rem))] md:pt-2">
+  <header class="floating-nav flex items-center justify-between gap-1 sm:gap-2 mb-2 sm:mb-4 px-2 sm:px-4 py-1.5 sm:py-2 sticky top-2 left-0 right-0 w-full max-w-6xl mx-auto z-50 rounded-full shadow-sm">
     <!-- Left Area: Master Menu Button + Brand / Logo -->
     <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
       <!-- Master Hierarchical Menu Button (Far Left Corner) -->
@@ -754,7 +754,7 @@
         <!-- SIDEBAR COLUMN (Desktop Right, 5/12 Cols): Focus Hub & Life Quests -->
         <div class="lg:col-span-5 xl:col-span-4 space-y-3 order-1 lg:order-2 min-w-0">
           <!-- DYNAMIC FOCUS & HABITS HUB -->
-          <div class="today-goal-card p-3 sm:p-4 rounded-2xl mc-card flex flex-col gap-3" id="today-focus-habits-hub">
+          <div class="mc-card p-3 sm:p-4 flex flex-col gap-3" id="today-focus-habits-hub">
             <!-- Hub Master Header Bar -->
             <div class="flex items-center justify-between gap-2 pb-2 border-b border-[var(--mc-border-subtle)]">
               <div class="flex items-center gap-2 min-w-0">
@@ -1094,46 +1094,46 @@
       <!-- =================================================================== -->
       <div id="journal-track-memory_lane" class="hidden space-y-4">
         <!-- Longitudinal Reflection Loop Banner (Warm Sunset Amber & Terracotta Palette) -->
-        <div class="p-5 rounded-2xl bg-gradient-to-r from-rose-950/40 via-black/50 to-amber-950/40 border border-amber-500/35 shadow-lg flex flex-col gap-3">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-white/5 pb-2.5">
+        <div class="mc-card p-5 sm:p-6 flex flex-col gap-3.5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-[var(--mc-border-subtle)] pb-2.5">
             <div class="flex items-center gap-2.5">
-              <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center justify-center shadow-md shadow-amber-500/15">
-                <i data-lucide="history" class="w-5 h-5"></i>
+              <div class="w-9 h-9 rounded-xl bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] flex items-center justify-center">
+                <i data-lucide="history" class="w-4 h-4"></i>
               </div>
               <div>
-                <span class="text-[10px] text-amber-300 font-mono font-bold uppercase tracking-wider block">Longitudinal Reflection Loop • 30 Days Ago</span>
-                <h4 class="text-sm sm:text-base font-bold text-white">Revisit Past Thoughts & Measure Growth</h4>
+                <span class="text-[10px] text-[var(--mc-text-muted)] font-mono font-semibold uppercase tracking-wider block">Longitudinal Reflection Loop • 30 Days Ago</span>
+                <h4 class="text-sm sm:text-base font-semibold text-[var(--mc-text-primary)]">Revisit Past Thoughts & Measure Growth</h4>
               </div>
             </div>
-            <button onclick="openJourneyEvolutionModal()" class="text-xs text-amber-300 hover:text-amber-200 bg-amber-950/50 border border-amber-500/40 px-3 py-1.5 rounded-full flex items-center gap-1.5 font-semibold self-start sm:self-auto transition-colors">
-              <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i>
+            <button onclick="openJourneyEvolutionModal()" class="btn-secondary text-xs !py-1 !px-3 rounded-full flex items-center gap-1.5 font-medium self-start sm:self-auto cursor-pointer">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5 text-[var(--mc-accent)]"></i>
               <span>Day 1 → Now Journey</span>
             </button>
           </div>
 
-          <div id="memory-lane-quote-container" class="p-4 rounded-xl bg-black/50 border border-amber-500/20 space-y-2">
+          <div id="memory-lane-quote-container" class="p-4 rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] space-y-2">
             <div class="flex items-center gap-2">
-              <span class="text-xs text-amber-300 font-mono font-bold flex items-center gap-1">
-                <i data-lucide="calendar" class="w-3.5 h-3.5 text-amber-400"></i>
+              <span class="text-xs text-[var(--mc-accent)] font-mono font-semibold flex items-center gap-1">
+                <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
                 <span id="memory-lane-date">July 30, 2026 (30 Days Ago)</span>
               </span>
-              <span id="memory-lane-tag" class="text-[10px] px-2 py-0.5 rounded-full bg-rose-950/60 text-rose-300 border border-rose-500/30 font-medium">Overwhelmed & Hesitant</span>
+              <span id="memory-lane-tag" class="text-[10px] px-2 py-0.5 rounded-full bg-[var(--mc-bg-secondary)] text-[var(--mc-text-secondary)] border border-[var(--mc-border-default)] font-medium">Overwhelmed & Hesitant</span>
             </div>
-            <p id="memory-lane-quote" class="text-xs sm:text-sm text-amber-100/90 italic leading-relaxed">
+            <p id="memory-lane-quote" class="text-xs sm:text-sm text-[var(--mc-text-primary)] italic leading-relaxed">
               "I'm not sure whether I should change directions or stay. I'm afraid I'll regret staying if I don't speak up during sprint planning..."
             </p>
           </div>
 
           <div class="flex items-center gap-2 flex-wrap pt-1">
-            <button onclick="openMemoryReaderModal()" class="btn-secondary !py-2 !px-3.5 text-xs flex items-center gap-1.5 text-amber-200 hover:border-amber-400">
-              <i data-lucide="book-open" class="w-3.5 h-3.5 text-amber-400"></i>
+            <button onclick="openMemoryReaderModal()" class="btn-secondary !py-2 !px-3.5 text-xs flex items-center gap-1.5 cursor-pointer">
+              <i data-lucide="book-open" class="w-3.5 h-3.5 text-[var(--mc-accent)]"></i>
               <span>Re-Read Past Entry</span>
             </button>
-            <button onclick="compareMemoryWithToday()" class="btn-secondary !py-2 !px-3.5 text-xs flex items-center gap-1.5 text-rose-300 hover:border-rose-400">
-              <i data-lucide="columns" class="w-3.5 h-3.5 text-rose-400"></i>
+            <button onclick="compareMemoryWithToday()" class="btn-secondary !py-2 !px-3.5 text-xs flex items-center gap-1.5 cursor-pointer">
+              <i data-lucide="columns" class="w-3.5 h-3.5 text-[#8FA9B8]"></i>
               <span>Compare with Today</span>
             </button>
-            <button onclick="askWhatChangedAI()" class="btn-island !py-2 !px-3.5 text-xs flex items-center gap-1.5">
+            <button onclick="askWhatChangedAI()" class="btn-primary !py-2 !px-3.5 text-xs flex items-center gap-1.5 cursor-pointer">
               <i data-lucide="sparkles" class="w-3.5 h-3.5 text-white"></i>
               <span>What Changed? (AI Reflection)</span>
             </button>

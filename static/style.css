@@ -1671,17 +1671,9 @@ html:not(.dark) .chrono-block-card .text-white {
 }
 
 /* Today's North Star Goal Card Light Mode */
-html.light .today-goal-card,
-html:not(.dark) .today-goal-card {
-  background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%) !important;
-  border: 1px solid #fde68a !important;
-  box-shadow: 0 4px 20px -2px rgba(245, 158, 11, 0.12) !important;
-}
 
-html.light .today-goal-card h4,
-html:not(.dark) .today-goal-card h4 {
-  color: #0f172a !important;
-}
+
+
 
 /* Weekly Ribbon Days Light Mode */
 html.light .diary-day-pill,
@@ -2422,11 +2414,7 @@ html:not(.dark) .agenda-item-card:hover {
   box-shadow: 0 8px 24px -6px rgba(245, 158, 11, 0.2);
 }
 
-html.light .today-goal-card,
-html:not(.dark) .today-goal-card {
-  background: linear-gradient(135deg, rgba(254, 243, 199, 0.7), rgba(255, 255, 255, 0.9)) !important;
-  border-color: rgba(245, 158, 11, 0.3) !important;
-}
+
 
 html.light #today-goal-text,
 html:not(.dark) #today-goal-text {

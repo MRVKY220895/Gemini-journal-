@@ -10862,7 +10862,7 @@ function filterBucketListByStatus(status, btnEl) {
 
   pills.forEach(p => {
 
-    p.classList.remove('active', 'bg-pink-500/20', 'text-pink-400', 'border-pink-500/30');
+    p.classList.remove('active', 'bg-[#5E856F]/20', 'text-pink-400', 'border-pink-500/30');
 
     p.classList.add('bg-slate-100', 'dark:bg-black/40', 'text-slate-600', 'dark:text-slate-400', 'border-slate-200', 'dark:border-white/5');
 
@@ -10870,7 +10870,7 @@ function filterBucketListByStatus(status, btnEl) {
 
   if (btnEl) {
 
-    btnEl.classList.add('active', 'bg-pink-500/20', 'text-pink-400', 'border-pink-500/30');
+    btnEl.classList.add('active', 'bg-[#5E856F]/20', 'text-pink-400', 'border-pink-500/30');
 
     btnEl.classList.remove('bg-slate-100', 'dark:bg-black/40', 'text-slate-600', 'dark:text-slate-400', 'border-slate-200', 'dark:border-white/5');
 
@@ -11260,7 +11260,7 @@ function renderDashboardMilestoneRadar() {
 
         <span class="text-slate-400">•</span>
 
-        <span class="text-pink-600 dark:text-pink-300 font-medium italic">Next Step: ${escapeHtml(nextStep.replace(/^[0-9•\-\.]+\s*/, ''))}</span>
+        <span class="text-[var(--mc-accent)] font-medium italic">Next Step: ${escapeHtml(nextStep.replace(/^[0-9•\-\.]+\s*/, ''))}</span>
 
       `;
 
@@ -11340,7 +11340,7 @@ function renderBucketList() {
 
         <p>No milestone dreams found in this filter.</p>
 
-        <button type="button" onclick="openBucketListModal()" class="text-pink-500 hover:underline font-semibold font-mono text-xs">+ Pin a New Milestone Dream</button>
+        <button type="button" onclick="openBucketListModal()" class="text-[var(--mc-accent)] hover:underline font-semibold font-mono text-xs">+ Pin a New Milestone Dream</button>
 
       </div>
 
@@ -11381,8 +11381,7 @@ function renderBucketList() {
 
 
     return `
-
-      <div class="p-3.5 rounded-2xl border transition-all duration-300 flex flex-col justify-between gap-3 ${isDone ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-500/30' : 'bg-white dark:bg-slate-900/90 border-slate-200 dark:border-white/10 hover:border-pink-500/40 shadow-sm'}" id="bucket_${b.id}">
+      <div class="mc-card p-3.5 sm:p-4 rounded-2xl flex flex-col justify-between gap-3 transition-all ${isDone ? 'bg-[var(--mc-accent-10)] border-[var(--mc-accent-25)]' : ''}" id="bucket_${b.id}">
 
         <div class="space-y-2.5">
 
@@ -11412,7 +11411,7 @@ function renderBucketList() {
 
           <div>
 
-            <h4 class="text-sm font-bold text-slate-900 dark:text-white leading-snug cursor-pointer hover:text-pink-500 transition-colors ${isDone ? 'line-through opacity-70' : ''}" onclick="openBucketListModal('${b.id}')" title="Click to edit dream">
+            <h4 class="text-sm font-bold text-slate-900 dark:text-white leading-snug cursor-pointer hover:text-[var(--mc-accent)] transition-colors ${isDone ? 'line-through opacity-70' : ''}" onclick="openBucketListModal('${b.id}')" title="Click to edit dream">
 
               ${escapeHtml(b.title)}
 
@@ -11430,7 +11429,7 @@ function renderBucketList() {
 
             <span class="text-slate-500 dark:text-slate-400 flex items-center gap-1">
 
-              <i data-lucide="calendar" class="w-3.5 h-3.5 text-pink-500"></i>
+              <i data-lucide="calendar" class="w-3.5 h-3.5 text-[var(--mc-accent)]"></i>
 
               <span>Target:</span>
 
@@ -11454,7 +11453,7 @@ function renderBucketList() {
 
               <span class="text-slate-500 dark:text-slate-400">Execution Velocity</span>
 
-              <span class="font-bold ${isDone ? 'text-emerald-500' : 'text-pink-500'}">${progressVal}%</span>
+              <span class="font-bold ${isDone ? 'text-emerald-500' : 'text-[var(--mc-accent)]'}">${progressVal}%</span>
 
             </div>
 
@@ -11478,7 +11477,7 @@ function renderBucketList() {
 
                 <span>AI Milestone Tracker:</span>
 
-                <span class="text-pink-500 font-bold">${completedSteps.length}/${planSteps.length} Steps</span>
+                <span class="text-[var(--mc-accent)] font-bold">${completedSteps.length}/${planSteps.length} Steps</span>
 
               </div>
 
@@ -11492,7 +11491,7 @@ function renderBucketList() {
 
                     <label class="p-1.5 rounded-xl border flex items-start gap-2 cursor-pointer transition-all ${isStepDone ? 'bg-emerald-500/10 border-emerald-500/30 text-slate-400 line-through' : 'bg-black/30 border-white/5 hover:border-pink-500/30 text-slate-200'}">
 
-                      <input type="checkbox" ${isStepDone ? 'checked' : ''} onchange="toggleBucketPlanStep('${b.id}', ${idx})" class="mt-0.5 w-3.5 h-3.5 rounded text-pink-500 bg-slate-900 border-slate-700 cursor-pointer">
+                      <input type="checkbox" ${isStepDone ? 'checked' : ''} onchange="toggleBucketPlanStep('${b.id}', ${idx})" class="mt-0.5 w-3.5 h-3.5 rounded text-[var(--mc-accent)] bg-slate-900 border-slate-700 cursor-pointer">
 
                       <span class="text-[11px] leading-tight flex-1">${escapeHtml(step.replace(/^[0-9•\-\.]+\s*/, ''))}</span>
 
@@ -11520,7 +11519,7 @@ function renderBucketList() {
 
             <button type="button" onclick="toggleBucketAchieved('${b.id}')" class="px-2 py-1 rounded-lg text-[11px] font-bold border transition-colors flex items-center gap-1 ${isDone ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/30' : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-white/10 hover:border-pink-400'}">
 
-              <i data-lucide="${isDone ? 'check-circle' : 'circle'}" class="w-3 h-3 text-pink-500"></i>
+              <i data-lucide="${isDone ? 'check-circle' : 'circle'}" class="w-3 h-3 text-[var(--mc-accent)]"></i>
 
               <span>${isDone ? 'Fulfilled' : 'Mark Done'}</span>
 
@@ -11528,7 +11527,7 @@ function renderBucketList() {
 
             ${!isDone ? `
 
-              <button type="button" onclick="advanceBucketStatus('${b.id}')" class="px-2 py-1 rounded-lg text-[10px] font-semibold bg-pink-50 dark:bg-pink-950/40 text-pink-600 dark:text-pink-300 border border-pink-200 dark:border-pink-500/20 hover:border-pink-500/40 transition-colors" title="Advance status to next milestone stage">
+              <button type="button" onclick="advanceBucketStatus('${b.id}')" class="px-2 py-1 rounded-lg text-[10px] font-semibold bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] hover:border-pink-500/40 transition-colors" title="Advance status to next milestone stage">
 
                 <span>Advance Stage →</span>
 
@@ -11542,7 +11541,7 @@ function renderBucketList() {
 
           <div class="flex items-center gap-1 shrink-0">
 
-            <button type="button" onclick="openBucketListModal('${b.id}')" class="p-1 text-slate-400 hover:text-pink-500 transition-colors" title="Edit Milestone & AI Plan">
+            <button type="button" onclick="openBucketListModal('${b.id}')" class="p-1 text-slate-400 hover:text-[var(--mc-accent)] transition-colors" title="Edit Milestone & AI Plan">
 
               <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
 
