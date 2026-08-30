@@ -14639,3 +14639,29 @@ function filterNotesAndAlerts(query) {
     `).join('');
   }
 }
+
+
+// ─── LIVING TIMELINE MEDIA FILTER (ALL | PHOTOS | TEXT ONLY) ───
+function setDiaryMediaMode(mode) {
+  state.diaryMediaMode = mode || 'all';
+  
+  const allBtn = document.getElementById('media-mode-all-btn');
+  const photosBtn = document.getElementById('media-mode-photos-btn');
+  const textBtn = document.getElementById('media-mode-text-btn');
+
+  [allBtn, photosBtn, textBtn].forEach(b => {
+    if (b) {
+      b.className = 'px-2 sm:px-2.5 py-1 rounded-lg font-semibold text-[var(--mc-text-muted)] hover:text-[var(--mc-text-primary)] text-[11px] sm:text-xs flex items-center gap-1 cursor-pointer';
+    }
+  });
+
+  if (mode === 'all' && allBtn) {
+    allBtn.className = 'px-2 sm:px-2.5 py-1 rounded-lg font-semibold bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] text-[11px] sm:text-xs flex items-center gap-1 cursor-pointer';
+  } else if (mode === 'photos' && photosBtn) {
+    photosBtn.className = 'px-2 sm:px-2.5 py-1 rounded-lg font-semibold bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] text-[11px] sm:text-xs flex items-center gap-1 cursor-pointer';
+  } else if (mode === 'text' && textBtn) {
+    textBtn.className = 'px-2 sm:px-2.5 py-1 rounded-lg font-semibold bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] text-[11px] sm:text-xs flex items-center gap-1 cursor-pointer';
+  }
+
+  renderChronoTimeline(false);
+}
