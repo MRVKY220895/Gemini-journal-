@@ -916,6 +916,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initHabitTracker();
   initAgendaList();
   initBucketList();
+  initAnalyticsCharts();
   refreshIcons();
 
   // 2. Idle Deferred Non-Critical Path (Zero main-thread blocking)
@@ -7110,12 +7111,12 @@ function setMasterDashboardHorizon(horizon) {
     }
   });
 
-  const isReset = Boolean(localStorage.getItem('mind_cave_is_reset'));
+  const isReset = Boolean(localStorage.getItem('mind_cave_is_reset') === 'true');
+  const isClean = isReset;
   const journals = state.journalsCache || state.journals || [];
   const habits = state.habitsList || [];
   const goals = state.todayGoals || [];
   const bucket = state.bucketList || [];
-  const isClean = isReset || journals.length === 0;
 
   const rawData = masterDashboardDataStore[horizon];
   const data = JSON.parse(JSON.stringify(rawData));
@@ -7137,7 +7138,7 @@ function setMasterDashboardHorizon(horizon) {
       vitalityStat: '0 hrs',
       vitalitySub: 'Rest State',
       vitalityDesc: 'No activity recorded',
-      volumeStat: '0 Moments',
+      volumeStat: '4 Moments',
       volumeSub: '0 Words',
       volumeDesc: '0 Photos • 0 Audio'
     };
