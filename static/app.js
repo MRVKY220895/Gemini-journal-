@@ -2991,6 +2991,8 @@ function toggleMediaMode() {
     state.mediaMode = 'all';
   }
 
+  localStorage.setItem('mind_cave_media_mode', state.mediaMode);
+
   const labelEl = document.getElementById('media-mode-label');
   const iconEl = document.getElementById('media-mode-icon');
   const btnEl = document.getElementById('media-mode-toggle-btn');
@@ -3000,22 +3002,20 @@ function toggleMediaMode() {
       labelEl.textContent = 'Text Only';
       iconEl.setAttribute('data-lucide', 'file-text');
       if (btnEl) btnEl.classList.add('border-[var(--mc-accent)]', 'text-[var(--mc-accent)]');
-      showToast('Switched to Text-Only timeline view');
     } else if (state.mediaMode === 'photos') {
       labelEl.textContent = 'Photos Only';
       iconEl.setAttribute('data-lucide', 'image');
       if (btnEl) btnEl.classList.add('border-[var(--mc-accent)]', 'text-[var(--mc-accent)]');
-      showToast('Switched to Photos-Only timeline view');
     } else {
       labelEl.textContent = 'All Content';
       iconEl.setAttribute('data-lucide', 'layers');
       if (btnEl) btnEl.classList.remove('border-[var(--mc-accent)]', 'text-[var(--mc-accent)]');
-      showToast('Showing all timeline content & media');
     }
     if (window.lucide) lucide.createIcons();
   }
 
-  renderChronoTimeline();
+  // Instant synchronous render with zero network delay
+  renderChronoTimeline(false);
 }
 
 
@@ -3936,7 +3936,12 @@ function getChronologicalEvents(journals) {
 
   });
 
-
+  // Instant mode filtering
+  if (state.mediaMode === 'photos') {
+    return events.filter(e => e.type === 'photo' || Boolean(e.photoUrl));
+  } else if (state.mediaMode === 'text') {
+    return events.filter(e => e.type !== 'photo');
+  }
 
   return events;
 
@@ -3944,7 +3949,7 @@ function getChronologicalEvents(journals) {
 
 
 
-async function renderChronoTimeline() {
+async function renderChronoTimeline(forceFetch = false) {
 
   const container = document.getElementById('chrono-timeline-list');
 
@@ -3952,25 +3957,19 @@ async function renderChronoTimeline() {
 
 
 
-  // Fetch saved journals
+  // Use in-memory cached journals for instant 0ms rendering
+  let journals = state.journalsCache || [];
 
-  let journals = [];
-
-  try {
-
-    const response = await fetch('/api/journals', { headers: getAuthHeaders() });
-
-    const data = await response.json();
-
-    journals = data.journals || [];
-
-  } catch (e) {
-
-    journals = [];
-
+  if (forceFetch || !state.journalsCache) {
+    try {
+      const response = await fetch('/api/journals', { headers: getAuthHeaders() });
+      const data = await response.json();
+      journals = data.journals || [];
+      state.journalsCache = journals;
+    } catch (e) {
+      journals = state.journalsCache || [];
+    }
   }
-
-
 
   const events = getChronologicalEvents(journals);
 
@@ -5660,6 +5659,7 @@ async function submitNewJournal(event) {
 
     renderMemoryPhotos();
 
+    state.journalsCache = null;
     showToast(`Chronicle moment for ${hour} saved with rich media attachments!`);
 
   } catch (error) {
@@ -5702,6 +5702,7 @@ async function saveQuickJournal(title, content, mood) {
 
     if (!response.ok) throw new Error('Could not save to journal.');
 
+    state.journalsCache = null;
     showToast('Reflection turn saved directly to your isolated journal vault!');
 
     renderChronoTimeline();
