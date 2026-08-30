@@ -7810,10 +7810,43 @@ function saveDecoyPassphrase() {
   showToast('🕵️ Emergency Duress / Decoy PIN updated.');
 }
 
+function toggleVaultLockState() {
+  if (state.isVaultUnlocked) {
+    lockVaultImmediately();
+  } else {
+    promptVaultUnlock();
+  }
+}
+
+function updateVaultLockButtonUI() {
+  const btn = document.getElementById('btn-vault-lock-toggle');
+  const icon = document.getElementById('btn-vault-lock-icon');
+  const text = document.getElementById('btn-vault-lock-text');
+  if (!btn || !text) return;
+
+  if (state.isVaultUnlocked) {
+    btn.className = 'btn-secondary text-xs flex items-center gap-1.5 cursor-pointer';
+    text.textContent = 'Lock Vault';
+    if (icon) {
+      icon.className = 'w-3.5 h-3.5 text-[#C5AA78]';
+      icon.setAttribute('data-lucide', 'lock');
+    }
+  } else {
+    btn.className = 'btn-primary text-xs flex items-center gap-1.5 cursor-pointer';
+    text.textContent = 'Unlock Vault';
+    if (icon) {
+      icon.className = 'w-3.5 h-3.5 text-white';
+      icon.setAttribute('data-lucide', 'unlock');
+    }
+  }
+  refreshIcons();
+}
+
 function promptVaultUnlock() {
   const isBiometric = localStorage.getItem('mind_cave_biometrics_registered') === 'true';
   if (isBiometric) {
     testBiometricAuthentication();
+    updateVaultLockButtonUI();
     return;
   }
 
@@ -7825,6 +7858,7 @@ function promptVaultUnlock() {
     state.isVaultUnlocked = true;
     state.isDuressMode = true;
     showToast('🔓 Vault Unlocked.');
+    updateVaultLockButtonUI();
     renderJournalList();
     return;
   }
@@ -7832,6 +7866,7 @@ function promptVaultUnlock() {
   state.isVaultUnlocked = true;
   state.isDuressMode = false;
   showToast('🔓 Vault Unlocked with AES-256 Master Key.');
+  updateVaultLockButtonUI();
   renderJournalList();
 }
 
@@ -7839,6 +7874,7 @@ function lockVaultImmediately() {
   state.isVaultUnlocked = false;
   state.isDuressMode = false;
   showToast('🔒 Private Vault Locked.');
+  updateVaultLockButtonUI();
   renderJournalList();
 }
 

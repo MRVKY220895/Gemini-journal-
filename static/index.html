@@ -2025,13 +2025,9 @@
           <p class="text-xs text-slate-500 dark:text-slate-400">Military-grade AES-256-GCM client encryption, biometric authentication, and strict per-user cloud isolation.</p>
         </div>
         <div class="flex items-center gap-2">
-          <button type="button" onclick="lockVaultImmediately()" class="btn-secondary text-xs flex items-center gap-1.5 cursor-pointer">
-            <i data-lucide="lock" class="w-3.5 h-3.5 text-[#C5AA78]"></i>
-            <span>Lock Vault</span>
-          </button>
-          <button type="button" onclick="promptVaultUnlock()" class="btn-primary text-xs flex items-center gap-1.5 cursor-pointer">
-            <i data-lucide="unlock" class="w-3.5 h-3.5 text-white"></i>
-            <span>Unlock Vault</span>
+          <button type="button" onclick="toggleVaultLockState()" id="btn-vault-lock-toggle" class="btn-secondary text-xs flex items-center gap-1.5 cursor-pointer shadow-sm">
+            <i data-lucide="lock" class="w-3.5 h-3.5 text-[#C5AA78]" id="btn-vault-lock-icon"></i>
+            <span id="btn-vault-lock-text">Lock Vault</span>
           </button>
         </div>
       </div>
