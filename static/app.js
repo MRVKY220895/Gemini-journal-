@@ -3892,26 +3892,93 @@ function triggerPhotoUpload() {
 
 
 
-function openNewJournalModal(targetHour = null) {
+function openNewJournalModal(targetTime = null, journalId = null) {
+  const modal = document.getElementById('journal-modal');
+  const editIdInput = document.getElementById('journal-edit-id');
+  const modalTitle = document.getElementById('journal-modal-title');
+  const modalSubtitle = document.getElementById('journal-modal-subtitle');
+  const submitBtnText = document.getElementById('journal-submit-btn-text');
 
-  if (targetHour) {
+  const cleanId = (journalId || '').toString().replace(/^journal_/, '').trim();
 
-    const hourSelect = document.getElementById('journal-hour-input');
+  if (cleanId) {
+    // EDIT MODE: Look in journalsCache, localStorage, or storyEventsCache
+    let entry = (state.journalsCache || []).find(j => (j.id && j.id.toString() === cleanId) || (j.id && j.id.toString() === journalId));
 
-    if (hourSelect) hourSelect.value = targetHour;
+    if (!entry) {
+      try {
+        const cachedStr = localStorage.getItem('mind_cave_cached_journals');
+        if (cachedStr) {
+          const list = JSON.parse(cachedStr);
+          entry = list.find(j => (j.id && j.id.toString() === cleanId) || (j.id && j.id.toString() === journalId));
+        }
+      } catch (e) {}
+    }
 
-    const timeInput = document.getElementById('journal-exact-time-input');
+    if (!entry && typeof storyEventsCache !== 'undefined' && Array.isArray(storyEventsCache)) {
+      const ev = storyEventsCache.find(e => (e.journalId && e.journalId === cleanId) || e.id === journalId || e.id === `journal_${cleanId}`);
+      if (ev) {
+        entry = {
+          id: cleanId,
+          title: ev.title,
+          content: ev.content,
+          mood: ev.mood
+        };
+      }
+    }
 
-    if (timeInput) timeInput.value = targetHour;
+    if (entry) {
+      if (editIdInput) editIdInput.value = cleanId;
+      if (modalTitle) modalTitle.textContent = 'Edit Reflection';
+      if (modalSubtitle) modalSubtitle.textContent = 'Update your notes, thoughts, and reflections';
+      if (submitBtnText) submitBtnText.textContent = 'Update Reflection';
 
+      let rawTitle = (entry.title || '').replace(/^\[\d{1,2}:\d{2}\s*(?:AM|PM)?\]\s*/i, '').trim();
+      if (document.getElementById('journal-title-input')) {
+        document.getElementById('journal-title-input').value = rawTitle;
+      }
+
+      let cleanContent = entry.content || '';
+      if (document.getElementById('journal-content-input')) {
+        document.getElementById('journal-content-input').value = cleanContent;
+      }
+
+      if (document.getElementById('journal-exact-time-input')) {
+        document.getElementById('journal-exact-time-input').value = targetTime || '';
+      }
+      if (document.getElementById('journal-hour-input') && targetTime) {
+        document.getElementById('journal-hour-input').value = targetTime;
+      }
+
+      if (entry.mood && typeof selectJournalMoodByName === 'function') {
+        selectJournalMoodByName(entry.mood);
+      }
+    } else {
+      if (editIdInput) editIdInput.value = '';
+      if (modalTitle) modalTitle.textContent = 'Log Reflection';
+      if (modalSubtitle) modalSubtitle.textContent = 'Capture your thoughts, mood, and state with clarity';
+      if (submitBtnText) submitBtnText.textContent = 'Save Reflection';
+    }
   } else {
+    // NEW LOG MODE
+    if (editIdInput) editIdInput.value = '';
+    if (modalTitle) modalTitle.textContent = 'Log Reflection';
+    if (modalSubtitle) modalSubtitle.textContent = 'Capture your thoughts, mood, and state with clarity';
+    if (submitBtnText) submitBtnText.textContent = 'Save Reflection';
 
-    setMomentTimeToNow();
-
+    if (document.getElementById('journal-title-input')) document.getElementById('journal-title-input').value = '';
+    if (document.getElementById('journal-content-input')) document.getElementById('journal-content-input').value = '';
+    
+    if (targetTime) {
+      if (document.getElementById('journal-hour-input')) document.getElementById('journal-hour-input').value = targetTime;
+      if (document.getElementById('journal-exact-time-input')) document.getElementById('journal-exact-time-input').value = targetTime;
+    } else {
+      if (typeof setMomentTimeToNow === 'function') setMomentTimeToNow();
+    }
   }
 
-  document.getElementById('journal-modal').classList.remove('hidden');
-
+  if (modal) modal.classList.remove('hidden');
+  if (typeof refreshIcons === 'function') refreshIcons();
 }
 
 
