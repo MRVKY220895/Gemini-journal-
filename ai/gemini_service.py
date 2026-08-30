@@ -262,17 +262,13 @@ class GeminiService:
                     "generationConfig": {"temperature": 0.7, "maxOutputTokens": 4096}
                 }).encode("utf-8")
 
-                for m_name in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-3.5-flash", "gemini-flash-latest"]:
+                for m_name in ["gemini-3.5-flash", "gemini-3.7-flash", "gemini-flash-latest", "gemini-3.5-flash-lite", "gemini-2.5-flash"]:
                     try:
                         headers = {"Content-Type": "application/json"}
-                        if key.startswith("AQ."):
-                            headers["Authorization"] = f"Bearer {key}"
-                            url = f"https://generativelanguage.googleapis.com/v1beta/models/{m_name}:generateContent"
-                        else:
-                            url = f"https://generativelanguage.googleapis.com/v1beta/models/{m_name}:generateContent?key={key}"
+                        url = f"https://generativelanguage.googleapis.com/v1beta/models/{m_name}:generateContent?key={key}"
                             
                         req = urlreq.Request(url, data=payload, headers=headers)
-                        with urlreq.urlopen(req, timeout=12) as resp:
+                        with urlreq.urlopen(req, timeout=15) as resp:
                             res_json = json.loads(resp.read().decode("utf-8"))
                             text_out = res_json["candidates"][0]["content"]["parts"][0]["text"]
                             if text_out:
