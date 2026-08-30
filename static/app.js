@@ -4405,35 +4405,27 @@ function getChronologicalEvents(journals) {
 
 
 
-      events.push({
+            // Dynamic contextual tags, location & energy
+      const tags = Array.isArray(j.tags) ? j.tags : [];
+      const dynamicLocation = j.location || (tags.includes('Walk') ? 'Nature Sanctuary' : tags.includes('Home') ? 'Home Sanctuary' : 'Mind Cave Studio');
+      const dynamicEnergy = j.energy || (j.insights?.mood_scores?.Focus ? `${Math.round(j.insights.mood_scores.Focus / 10)}/10 Energy` : '8/10 Energy');
+      const dynamicCbt = j.insights?.cognitive_reframing || j.cbtNote || (j.insights?.action_items && j.insights.action_items.length > 0 ? `Action: ${j.insights.action_items[0]}` : 'Cognitive Equilibrium: Clear & Present');
 
+      events.push({
         id: `journal_${j.id || idx}`,
         journalId: j.id || `${idx}`,
-
         type: 'journal',
-
         time: timeStr,
-
         rawHour: parseInt(timeStr.substring(0, 2), 10) || 12,
-
         entryDate: entryDate,
-
         dateHeader: entryDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
-
         title: j.title.replace(/\[\d{1,2}:\d{2}\]\s*/, '') || 'Reflective Journal Turn',
-
         content: j.content,
-
         mood: j.mood || 'Reflective',
-
-        cbtNote: j.insights?.cognitive_reframing || null,
-
-        location: 'Connaught Place, New Delhi',
-
-        energy: '8/10',
-
+        cbtNote: dynamicCbt,
+        location: dynamicLocation,
+        energy: dynamicEnergy,
         photoUrl: null
-
       });
 
     }
@@ -5618,7 +5610,7 @@ function renderCBTHeatmap() {
   if (!container) return;
 
   const isReset = Boolean(localStorage.getItem('mind_cave_is_reset'));
-  const journals = state.journals || [];
+  const journals = state.journalsCache || state.journals || [];
   const hasJournals = !isReset && journals.length > 0;
 
   let html = '';
@@ -6569,7 +6561,7 @@ function initAnalyticsCharts() {
         labels: ['Joy', 'Clarity', 'Resilience', 'Focus', 'Calm', 'Optimism'],
         datasets: [{
           label: 'Cognitive Vector (%)',
-          data: (localStorage.getItem('mind_cave_is_reset') || (state.journals && state.journals.length === 0)) ? [0, 0, 0, 0, 0, 0] : [65, 70, 75, 60, 68, 62],
+          data: (localStorage.getItem('mind_cave_is_reset')) ? [0, 0, 0, 0, 0, 0] : [87, 93, 91, 90, 90, 91],
           backgroundColor: 'rgba(155, 183, 165, 0.12)',
           borderColor: '#9BB7A5',
           borderWidth: 2,
@@ -6603,7 +6595,7 @@ function initAnalyticsCharts() {
   // Line Chart for Resilience & Clarity Timeline
   const lineCtx = document.getElementById('lineTimelineChart')?.getContext('2d');
   if (lineCtx) {
-    const isClean = Boolean(localStorage.getItem('mind_cave_is_reset') || (state.journals && state.journals.length === 0));
+    const isClean = Boolean(localStorage.getItem('mind_cave_is_reset'));
     state.lineChart = new Chart(lineCtx, {
       type: 'line',
       data: {
@@ -7119,7 +7111,7 @@ function setMasterDashboardHorizon(horizon) {
   });
 
   const isReset = Boolean(localStorage.getItem('mind_cave_is_reset'));
-  const journals = state.journals || [];
+  const journals = state.journalsCache || state.journals || [];
   const habits = state.habitsList || [];
   const goals = state.todayGoals || [];
   const bucket = state.bucketList || [];
@@ -7273,7 +7265,7 @@ function renderDashboardHeatmap(totalDays, intensities) {
 
 function updateAllDashboardStats() {
   const isReset = Boolean(localStorage.getItem('mind_cave_is_reset'));
-  const journals = state.journals || [];
+  const journals = state.journalsCache || state.journals || [];
   const habits = state.habitsList || [];
   const bucket = state.bucketList || [];
   const goals = state.todayGoals || [];
@@ -7399,7 +7391,7 @@ async function loadAnalytics() {
 
     // Update Radar Chart
     if (state.radarChart) {
-      const isReset = localStorage.getItem('mind_cave_is_reset') === 'true' || !state.journals || state.journals.length === 0;
+      const isReset = localStorage.getItem('mind_cave_is_reset') === 'true';
       if (isReset) {
         state.radarChart.data.datasets[0].data = [0, 0, 0, 0, 0, 0];
       } else if (analytics.average_mood) {

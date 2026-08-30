@@ -26,6 +26,7 @@ class IsolatedUserStorage:
         self.db_path = db_path
         os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
         self._init_db()
+        self._seed_alice_if_empty()
 
     def _get_connection(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self.db_path)
@@ -492,6 +493,86 @@ class IsolatedUserStorage:
             "user_id": user_id,
             "message": "All user journals, chats, sessions, and analytics permanently erased."
         }
+
+
+# Global isolated storage instance
+    def _seed_alice_if_empty(self):
+        """Seeds Alice (Demo Sandbox) with realistic, contextually rich journals and cognitive analytics."""
+        user_id = "user_alice"
+        now = time.time()
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT COUNT(*) as count FROM journals WHERE user_id = ?", (user_id,))
+            if cursor.fetchone()["count"] < 4:
+                # Wipe any sparse partial demo records for user_alice
+                cursor.execute("DELETE FROM journals WHERE user_id = ?", (user_id,))
+                cursor.execute("DELETE FROM analytics WHERE user_id = ?", (user_id,))
+                alice_journals = [
+                    (
+                        "alice_j1", user_id, "[08:15] Morning Focus: System Architecture & Deterministic State",
+                        "Setting my deep work intention for today: implementing the zero-knowledge client encryption vault and clean sub-track navigation. Feeling focused and centered.",
+                        "cbt_reflector", json.dumps(["Architecture", "Focus", "Engineering"]), "Focused",
+                        json.dumps({
+                            "mood_scores": {"Joy": 85, "Clarity": 95, "Resilience": 90, "Focus": 95, "Calm": 88, "Optimism": 90},
+                            "detected_distortions": [],
+                            "cognitive_reframing": "Deconstruct complex architectural challenges into deterministic milestones.",
+                            "action_items": ["Implement clean state isolation", "Validate 0ms in-place edit performance"]
+                        }),
+                        0, now - 3600 * 12, now - 3600 * 12
+                    ),
+                    (
+                        "alice_j2", user_id, "[11:30] Midday Sprint: Mindful Engineering & Code Review",
+                        "Reviewed sprint tasks and resolved edge cases in the mobile modal view. When a minor state collision popped up, I stayed calm and systematically debugged the scope.",
+                        "cbt_reflector", json.dumps(["Sprint", "Clarity", "Review"]), "Clarity",
+                        json.dumps({
+                            "mood_scores": {"Joy": 80, "Clarity": 92, "Resilience": 88, "Focus": 90, "Calm": 85, "Optimism": 88},
+                            "detected_distortions": ["Catastrophizing"],
+                            "cognitive_reframing": "Embrace peer code reviews as collaborative craftsmanship rather than personal friction.",
+                            "action_items": ["Unify global variable scopes", "Maintain 100% test coverage"]
+                        }),
+                        0, now - 3600 * 8, now - 3600 * 8
+                    ),
+                    (
+                        "alice_j3", user_id, "[14:45] Afternoon Nature Walk & Neural Reset",
+                        "Took a 20-minute mindful walk outdoors. Stepping away from the screen refreshed my mental equilibrium and provided clarity for the remaining milestones.",
+                        "cbt_reflector", json.dumps(["Wellness", "Mindfulness", "Walk"]), "Calm",
+                        json.dumps({
+                            "mood_scores": {"Joy": 90, "Clarity": 90, "Resilience": 92, "Focus": 85, "Calm": 95, "Optimism": 92},
+                            "detected_distortions": [],
+                            "cognitive_reframing": "Physical movement and fresh air directly compound creative problem-solving by over 40%.",
+                            "action_items": ["Maintain 20m daily walk streak", "Stay hydrated throughout deep work"]
+                        }),
+                        0, now - 3600 * 5, now - 3600 * 5
+                    ),
+                    (
+                        "alice_j4", user_id, "[17:30] Evening Retrospective & High-Agency Grounding",
+                        "Shipped all planned deliverables for today. Reflected on how focusing strictly on what is within direct control eliminates unnecessary anxiety.",
+                        "cbt_reflector", json.dumps(["Stoic", "Retrospective", "Agency"]), "Fulfilled",
+                        json.dumps({
+                            "mood_scores": {"Joy": 92, "Clarity": 94, "Resilience": 95, "Focus": 90, "Calm": 92, "Optimism": 94},
+                            "detected_distortions": [],
+                            "cognitive_reframing": "Focus on the process, daily habits, and steady execution. Agency compounds effortlessly over time.",
+                            "action_items": ["Celebrate shipped milestones", "Prepare restful evening wind-down"]
+                        }),
+                        0, now - 3600 * 2, now - 3600 * 2
+                    )
+                ]
+
+                cursor.executemany("""
+                    INSERT INTO journals (id, user_id, title, content, persona, tags, mood, insights_json, is_encrypted, created_at, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, alice_journals)
+
+                # Seed analytics
+                for j in alice_journals:
+                    insights = json.loads(j[7])
+                    cursor.execute("""
+                        INSERT INTO analytics (id, user_id, session_id, mood_scores, distortions, action_items, created_at)
+                        VALUES (?, ?, ?, ?, ?, ?, ?)
+                    """, (str(uuid.uuid4()), user_id, "session_seed", json.dumps(insights["mood_scores"]), json.dumps(insights["detected_distortions"]), json.dumps(insights["action_items"]), j[9]))
+
+                conn.commit()
+                logger.info("Successfully auto-seeded rich realistic demo journals for user_alice")
 
 
 # Global isolated storage instance
