@@ -1,4 +1,45 @@
 
+// ─── UNIFIED REALTIME JOURNAL STORAGE ENGINE ───
+
+function getUnifiedJournalsList() {
+  let journals = (state.journalsCache && state.journalsCache.length > 0) ? state.journalsCache : (state.journals || []);
+  if (!journals || journals.length === 0) {
+    try {
+      const cached = localStorage.getItem('mind_cave_cached_journals');
+      if (cached) {
+        journals = JSON.parse(cached);
+        state.journalsCache = journals;
+        state.journals = journals;
+      } else {
+        const activeUid = (typeof profileStorage !== 'undefined') ? profileStorage.getUid() : (state.currentUser?.uid || 'guest');
+        const userSaved = localStorage.getItem('mind_cave_journals_' + activeUid);
+        if (userSaved) {
+          journals = JSON.parse(userSaved);
+          state.journalsCache = journals;
+          state.journals = journals;
+        }
+      }
+    } catch (e) {}
+  }
+  return Array.isArray(journals) ? journals : [];
+}
+window.getUnifiedJournalsList = getUnifiedJournalsList;
+
+function viewJournalEntryById(journalId) {
+  switchTab('journals');
+  switchJournalTrack('chrono');
+  setTimeout(() => {
+    const el = document.querySelector(`[data-journal-id="${journalId}"]`) || document.getElementById(`journal-card-${journalId}`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.classList.add('ring-2', 'ring-emerald-500', 'animate-pulse');
+      setTimeout(() => el.classList.remove('ring-2', 'ring-emerald-500', 'animate-pulse'), 3000);
+    }
+  }, 200);
+}
+window.viewJournalEntryById = viewJournalEntryById;
+
+
 function appendGuestLimitReachedCard() {
   const container = document.getElementById('chat-messages');
   if (!container) return;
@@ -367,42 +408,30 @@ function renderHomeRecentEntries() {
   const container = document.getElementById('home-recent-reflections-list');
   if (!container) return;
 
-  const journals = state.journals || [];
+  const journals = getUnifiedJournalsList();
   if (journals.length === 0) {
-    // Show sample elegant rows
     container.innerHTML = `
-      <div class="p-3 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] flex items-center justify-between gap-3 hover:border-emerald-500/40 transition-all cursor-pointer" onclick="switchTab('journals')">
-        <div class="min-w-0">
-          <div class="text-[10px] text-[var(--mc-text-muted)] font-mono">Today • 11:15 AM</div>
-          <div class="font-bold text-[var(--mc-text-primary)] truncate mt-0.5">Thinking about today</div>
-        </div>
-        <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shrink-0">Calm</span>
-      </div>
-      <div class="p-3 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] flex items-center justify-between gap-3 hover:border-amber-500/40 transition-all cursor-pointer" onclick="switchTab('journals')">
-        <div class="min-w-0">
-          <div class="text-[10px] text-[var(--mc-text-muted)] font-mono">Yesterday • 8:20 PM</div>
-          <div class="font-bold text-[var(--mc-text-primary)] truncate mt-0.5">A busy day</div>
-        </div>
-        <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 shrink-0">Grateful</span>
-      </div>
-      <div class="p-3 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] flex items-center justify-between gap-3 hover:border-cyan-500/40 transition-all cursor-pointer" onclick="switchTab('journals')">
-        <div class="min-w-0">
-          <div class="text-[10px] text-[var(--mc-text-muted)] font-mono">Aug 29 • 9:15 AM</div>
-          <div class="font-bold text-[var(--mc-text-primary)] truncate mt-0.5">Morning thoughts</div>
-        </div>
-        <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20 shrink-0">Inspired</span>
+      <div class="text-center py-6 px-3 rounded-2xl border border-dashed border-[var(--mc-border-subtle)] bg-[var(--mc-bg-tertiary)]/50 space-y-2">
+        <div class="text-xs font-bold text-[var(--mc-text-primary)]">No reflections recorded yet</div>
+        <p class="text-[11px] text-[var(--mc-text-secondary)]">Write a thought above to start your living timeline.</p>
+        <button type="button" onclick="document.getElementById('home-quick-write-textarea').focus()" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all inline-flex items-center gap-1.5 cursor-pointer">
+          <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+          <span>Write a Thought</span>
+        </button>
       </div>
     `;
+    if (window.lucide) refreshIcons();
     return;
   }
 
-  let html = '';
+  let html = '<div class="space-y-2">';
   const recent = journals.slice(0, 4);
-  recent.forEach(j => {
+  recent.forEach((j, idx) => {
     const d = new Date(j.createdAt || j.created_at || Date.now());
     const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     const timeStr = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
     const mood = (j.mood || 'Calm').charAt(0).toUpperCase() + (j.mood || 'Calm').slice(1);
+    const jId = j.id || `entry_${idx}`;
     
     let moodBadge = 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20';
     if (['grateful', 'joy', 'happy'].includes(mood.toLowerCase())) moodBadge = 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20';
@@ -410,16 +439,18 @@ function renderHomeRecentEntries() {
     else if (['challenged', 'stressed', 'heavy'].includes(mood.toLowerCase())) moodBadge = 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20';
 
     html += `
-      <div class="p-3 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] flex items-center justify-between gap-3 hover:border-emerald-500/40 transition-all cursor-pointer" onclick="switchTab('journals')">
-        <div class="min-w-0">
+      <div class="p-2.5 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] flex items-center justify-between gap-3 hover:border-emerald-500/40 hover:bg-[var(--mc-bg-secondary)] transition-all cursor-pointer" onclick="viewJournalEntryById('${jId}')">
+        <div class="min-w-0 flex-1">
           <div class="text-[10px] text-[var(--mc-text-muted)] font-mono">${dateStr} • ${timeStr}</div>
-          <div class="font-bold text-[var(--mc-text-primary)] truncate mt-0.5">${escapeHtml(j.title || 'Journal Reflection')}</div>
+          <div class="font-bold text-[var(--mc-text-primary)] truncate mt-0.5 text-xs">${escapeHtml(j.title || 'Journal Reflection')}</div>
         </div>
-        <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${moodBadge} border shrink-0">${escapeHtml(mood)}</span>
+        <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full ${moodBadge} border shrink-0">${escapeHtml(mood)} &gt;</span>
       </div>
     `;
   });
+  html += '</div>';
   container.innerHTML = html;
+  if (window.lucide) refreshIcons();
 }
 window.renderHomeRecentEntries = renderHomeRecentEntries;
 
@@ -6752,12 +6783,15 @@ async function loadJournals() {
   const container = document.getElementById('journals-grid');
   if (!container) return;
 
-  // 1. Instant 0ms render from memory or localStorage cache
-  if (!state.journalsCache) {
-    try {
-      const cached = localStorage.getItem('mind_cave_cached_journals');
-      if (cached) state.journalsCache = JSON.parse(cached);
-    } catch (e) {}
+  // 1. Instant 0ms render from unified storage
+  const journals = getUnifiedJournalsList();
+  state.journalsCache = journals;
+  state.journals = journals;
+
+  if (journals.length > 0) {
+    renderJournalCards(journals);
+  } else if (!container.hasChildNodes() || container.innerHTML.trim() === '') {
+    container.innerHTML = '<div class="col-span-full text-center text-slate-400 py-6 text-xs animate-pulse">Accessing private vault reflections...</div>';
   }
 
   if (state.journalsCache && state.journalsCache.length > 0) {
