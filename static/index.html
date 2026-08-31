@@ -199,8 +199,8 @@
       <div class="flex items-center justify-between text-[11px] text-[var(--mc-text-muted)] px-1">
         <span>© 2026 Mind Cave</span>
         <button onclick="toggleThemeMode()" class="hover:text-[var(--mc-text-primary)] transition-colors cursor-pointer flex items-center gap-1">
-          <i data-lucide="sun" class="w-3.5 h-3.5 hidden dark:inline text-amber-400"></i>
-          <i data-lucide="moon" class="w-3.5 h-3.5 inline dark:hidden text-slate-500"></i>
+          <i data-lucide="sun" data-theme-sun class="w-3.5 h-3.5 text-amber-400"></i>
+          <i data-lucide="moon" data-theme-moon class="w-3.5 h-3.5 hidden text-slate-500"></i>
           <span>Theme</span>
         </button>
       </div>
@@ -312,8 +312,8 @@
 
         <!-- Theme Mode Switcher -->
         <button type="button" onclick="toggleThemeMode()" class="nav-action-btn font-semibold shrink-0 cursor-pointer flex items-center justify-center p-2 rounded-xl hover:bg-[var(--mc-bg-tertiary)] transition-all" title="Toggle Light/Dark Theme">
-          <i data-lucide="sun" class="w-4 h-4 hidden dark:block text-amber-400"></i>
-          <i data-lucide="moon" class="w-4 h-4 block dark:hidden text-slate-600"></i>
+          <i data-lucide="sun" data-theme-sun class="w-4 h-4 text-amber-400"></i>
+          <i data-lucide="moon" data-theme-moon class="w-4 h-4 hidden text-slate-600"></i>
         </button>
 
         <!-- User Profile Pill -->
@@ -4430,7 +4430,7 @@
   </div>
 
   <!-- Client Application Script -->
-  <script src="/static/app.js?v=1788207000"></script>
+  <script src="/static/app.js?v=1788208000"></script>
   <script>
     // Initialize Lucide Icons
     lucide.createIcons();
@@ -4840,6 +4840,6 @@
   </div>
 
   <!-- Core Application Script -->
-  <script src="/static/app.js?v=1788207000" defer></script>
+  <script src="/static/app.js?v=1788208000" defer></script>
 </body>
 </html>

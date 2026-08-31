@@ -1,4 +1,43 @@
 
+// ─── NEW USER CLEAN STATE ENGINE ───
+// Called whenever a new Google account signs in to prevent data leakage between users.
+
+function clearStateForNewUser(newUid) {
+  // Only clear if this is genuinely a different user from before
+  const previousUid = localStorage.getItem('gemini_journal_uid');
+  if (previousUid && previousUid !== newUid && !newUid.startsWith('guest')) {
+    console.log('New user detected — clearing previous user state for uid:', newUid);
+
+    // Clear all user-scoped localStorage keys (preserving theme & language preferences)
+    const preserveKeys = ['mind_cave_theme', 'mind_cave_language'];
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && !preserveKeys.includes(key)) {
+        keysToRemove.push(key);
+      }
+    }
+    keysToRemove.forEach(k => localStorage.removeItem(k));
+
+    // Reset in-memory state
+    state.journals = [];
+    state.journalsCache = [];
+    state.capturesList = [];
+    state.notesList = [];
+    state.habitsList = [];
+    state.agendaItems = [];
+    state.todayGoals = [];
+    state.checklistItems = [];
+    state.smartTasks = [];
+    state.chatHistory = [];
+    state.bucketItems = [];
+
+    showToast('New account detected — fresh workspace loaded!');
+  }
+}
+window.clearStateForNewUser = clearStateForNewUser;
+
+
 // ─── UNIFIED USER PROFILE & AUTHENTICATION SWITCHER ───
 
 async function switchUserProfile(uid, displayName, token = null) {
@@ -24,6 +63,7 @@ async function switchUserProfile(uid, displayName, token = null) {
   }
 
   updateUserUI();
+  clearStateForNewUser(cleanUid);
   loadProfileScopedState();
   dispatchGlobalInstantRefresh('profile_switch');
 
@@ -1697,18 +1737,24 @@ window.safeJSONParse = safeJSONParse;
 // ─── MASTER SYSTEM & UTILITY EVENT HANDLERS ───
 
 function toggleThemeMode() {
-  const isDark = document.documentElement.classList.contains('dark') || !document.documentElement.classList.contains('light');
+  const isDark = document.documentElement.classList.contains('dark');
+  const html = document.documentElement;
   if (isDark) {
-    document.documentElement.classList.remove('dark');
-    document.documentElement.classList.add('light');
+    html.classList.remove('dark');
     localStorage.setItem('mind_cave_theme', 'light');
     showToast('Switched to Light Theme');
   } else {
-    document.documentElement.classList.remove('light');
-    document.documentElement.classList.add('dark');
+    html.classList.add('dark');
     localStorage.setItem('mind_cave_theme', 'dark');
     showToast('Switched to Dark Theme');
   }
+  // Imperatively sync both theme toggle icons in header and sidebar
+  document.querySelectorAll('[data-theme-sun]').forEach(el => {
+    el.classList.toggle('hidden', !document.documentElement.classList.contains('dark'));
+  });
+  document.querySelectorAll('[data-theme-moon]').forEach(el => {
+    el.classList.toggle('hidden', document.documentElement.classList.contains('dark'));
+  });
   if (window.lucide) refreshIcons();
 }
 window.toggleThemeMode = toggleThemeMode;
