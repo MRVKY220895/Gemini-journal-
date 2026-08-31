@@ -1,4 +1,104 @@
 
+// ─── CORE LIFECYCLE & JOURNAL RENDER ENGINE ───
+
+function loadProfileScopedState() {
+  try {
+    const activeUid = (typeof profileStorage !== 'undefined') ? profileStorage.getUid() : (state.currentUser?.uid || 'guest');
+    if (typeof profileStorage !== 'undefined') {
+      state.habitsList = profileStorage.getItem('habits_list', state.habitsList || []);
+      state.todayGoals = profileStorage.getItem('today_goals', state.todayGoals || []);
+      state.capturesList = profileStorage.getItem('captures_list', state.capturesList || []);
+    }
+    state.journals = getUnifiedJournalsList();
+    state.journalsCache = state.journals;
+  } catch (e) {
+    console.debug('loadProfileScopedState notice:', e);
+  }
+}
+window.loadProfileScopedState = loadProfileScopedState;
+
+function renderJournalCards(journals) {
+  const container = document.getElementById('journals-grid');
+  if (!container) return;
+  const list = Array.isArray(journals) ? journals : (state.journalsCache || getUnifiedJournalsList());
+  if (!list || list.length === 0) {
+    container.innerHTML = `
+      <div class="col-span-full py-12 text-center text-slate-400 space-y-3 bg-[var(--mc-bg-tertiary)]/50 rounded-3xl border border-dashed border-[var(--mc-border-subtle)]">
+        <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto border border-emerald-500/20">
+          <i data-lucide="book-open" class="w-6 h-6"></i>
+        </div>
+        <div class="text-sm font-bold text-[var(--mc-text-primary)]">Your Journal Vault is Empty</div>
+        <p class="text-xs text-[var(--mc-text-secondary)]">Create your first reflective entry to begin your memory collection.</p>
+        <button onclick="openNewJournalModal()" class="btn-primary !py-2 !px-4 text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          <span>New Reflection</span>
+        </button>
+      </div>
+    `;
+    if (window.lucide) refreshIcons();
+    return;
+  }
+
+  container.innerHTML = list.map((j, idx) => {
+    const d = new Date(typeof j.created_at === 'number' ? (j.created_at > 1e11 ? j.created_at : j.created_at * 1000) : (j.created_at || j.createdAt || Date.now()));
+    const dateFormatted = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const timeFormatted = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    const moodName = (j.mood || 'Calm').charAt(0).toUpperCase() + (j.mood || 'Calm').slice(1);
+    const titleClean = (j.title || 'Untitled Reflection').replace(/\[\d{1,2}:\d{2}\]\s*/, '');
+    const jId = j.id || `journal_${idx}`;
+
+    return `
+      <div id="journal-card-${jId}" data-journal-id="${jId}" class="journal-card p-5 rounded-2xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] hover:border-emerald-500/40 transition-all flex flex-col justify-between space-y-3 shadow-sm group">
+        <div class="space-y-2">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-[10px] font-mono text-[var(--mc-text-muted)]">${dateFormatted} • ${timeFormatted}</span>
+            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">${escapeHtml(moodName)}</span>
+          </div>
+          <h4 class="text-sm font-bold text-[var(--mc-text-primary)] group-hover:text-emerald-400 transition-colors line-clamp-1">${escapeHtml(titleClean)}</h4>
+          <p class="text-xs text-[var(--mc-text-secondary)] line-clamp-3 leading-relaxed">${escapeHtml(j.content || '')}</p>
+        </div>
+        <div class="pt-2 border-t border-[var(--mc-border-subtle)] flex items-center justify-between text-xs">
+          <span class="text-[10px] font-mono text-[var(--mc-text-muted)]">${(j.content || '').split(' ').length} words</span>
+          <div class="flex items-center gap-1.5">
+            <button type="button" onclick="editJournalEntry('${jId}')" class="p-1 rounded-lg hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-secondary)] hover:text-cyan-400 transition-colors cursor-pointer" title="Edit">
+              <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+            </button>
+            <button type="button" onclick="deleteJournalEntry('${jId}', event)" class="p-1 rounded-lg hover:bg-rose-500/10 text-[var(--mc-text-secondary)] hover:text-rose-400 transition-colors cursor-pointer" title="Delete">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  if (window.lucide) refreshIcons();
+}
+window.renderJournalCards = renderJournalCards;
+
+function setChronoViewMode(mode) {
+  state.chronoViewMode = mode || 'timeline';
+  const streamBtn = document.getElementById('chrono-view-stream-btn');
+  const cardsBtn = document.getElementById('chrono-view-cards-btn');
+  const streamView = document.getElementById('chrono-stream-view');
+  const cardsView = document.getElementById('journals-grid-view') || document.getElementById('journals-grid');
+
+  if (mode === 'cards') {
+    if (streamBtn) streamBtn.classList.remove('active', 'bg-emerald-600', 'text-white');
+    if (cardsBtn) cardsBtn.classList.add('active', 'bg-emerald-600', 'text-white');
+    if (streamView) streamView.classList.add('hidden');
+    if (cardsView) cardsView.classList.remove('hidden');
+    renderJournalCards(state.journalsCache);
+  } else {
+    if (streamBtn) streamBtn.classList.add('active', 'bg-emerald-600', 'text-white');
+    if (cardsBtn) cardsBtn.classList.remove('active', 'bg-emerald-600', 'text-white');
+    if (streamView) streamView.classList.remove('hidden');
+    renderChronoTimeline(false);
+  }
+}
+window.setChronoViewMode = setChronoViewMode;
+
+
 // ─── INITIAL STORAGE DEDUPLICATION ON STARTUP ───
 (function cleanInitialJournalDuplicates() {
   try {
@@ -1159,7 +1259,7 @@ function refreshIcons(container = null) {
 // LUCIDE & CUSTOM SVG ICON ENGINE FOR HABITS & TRACKS
 // =============================================================================
 
-let currentSelectedHabitIcon = 'droplet';
+var currentSelectedHabitIcon = 'droplet';
 
 function selectHabitIcon(iconName) {
   currentSelectedHabitIcon = iconName;
@@ -1257,7 +1357,7 @@ function safeJSONParse(val, fallback) {
 }
 
 // PWA Installation Controller
-let deferredInstallPrompt = null;
+var deferredInstallPrompt = null;
 
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
@@ -3243,7 +3343,7 @@ function clearAllChatHistory() {
   }
 }
 
-let currentNarratingButton = null;
+var currentNarratingButton = null;
 
 function stopCurrentNarration() {
   if ('speechSynthesis' in window) {
@@ -3418,9 +3518,9 @@ function copyToClipboard(text, btnElement) {
 // MULTI-LANGUAGE SUPPORT & REAL-TIME TRANSLATION
 // =============================================================================
 
-let currentAppLanguage = localStorage.getItem('mind_cave_language') || 'auto';
+var currentAppLanguage = localStorage.getItem('mind_cave_language') || 'auto';
 
-const langMetadata = {
+var langMetadata = {
   'auto': { flag: '🌐', code: 'Auto', name: 'Auto-Detect' },
   'en': { flag: '🇬🇧', code: 'EN', name: 'English' },
   'ta': { flag: '🇮🇳', code: 'தமிழ்', name: 'Tamil (தமிழ்)' },
@@ -3655,7 +3755,7 @@ function updateLiveCognitiveBar(cogData) {
 
 
 // Mock Google Calendar Planned Events
-const mockGCalSchedule = localStorage.getItem('mind_cave_is_reset') ? {} : {
+var mockGCalSchedule = localStorage.getItem('mind_cave_is_reset') ? {} : {
   '08:00': { title: 'Team Architecture Standup', duration: '30m', category: 'Team Sync' },
   '09:00': { title: 'Deep Work: Core AI Engine', duration: '2h', category: 'Focus Block' },
   '12:00': { title: 'Team Lunch & Mindful Walk', duration: '1h', category: 'Wellness' },
@@ -3664,7 +3764,7 @@ const mockGCalSchedule = localStorage.getItem('mind_cave_is_reset') ? {} : {
 };
 
 // Mock Memory Photos
-let memoryPhotosList = JSON.parse(localStorage.getItem('mind_cave_memory_photos') || 'null') || (localStorage.getItem('mind_cave_is_reset') ? [] : [
+var memoryPhotosList = JSON.parse(localStorage.getItem('mind_cave_memory_photos') || 'null') || (localStorage.getItem('mind_cave_is_reset') ? [] : [
   {
     id: 'photo_1',
     hour: '08:15',
@@ -3696,15 +3796,15 @@ let memoryPhotosList = JSON.parse(localStorage.getItem('mind_cave_memory_photos'
 
 
 
-let attachedPhotoBase64 = null;
+var attachedPhotoBase64 = null;
 
-let currentSelectedMood = { name: 'Calm', emoji: '' };
+var currentSelectedMood = { name: 'Calm', emoji: '' };
 
-let isGCalSynced = false;
+var isGCalSynced = false;
 
-let isCycleOptedIn = true;
+var isCycleOptedIn = true;
 
-let liveDiaryClockInterval = null;
+var liveDiaryClockInterval = null;
 
 
 
@@ -4606,7 +4706,7 @@ function closeNewJournalModal() {
 
 
 
-let timelineViewMode = 'stream';
+var timelineViewMode = 'stream';
 
 var storyCurrentIndex = typeof storyCurrentIndex !== 'undefined' ? storyCurrentIndex : 0;
 
@@ -5817,11 +5917,11 @@ function goToStorySlide(index) {
 
 // Swipe & Drag Gesture Recognizer
 
-let isDraggingStory = false;
+var isDraggingStory = false;
 
-let startX = 0;
+var startX = 0;
 
-let currentTranslate = 0;
+var currentTranslate = 0;
 
 
 
@@ -6139,9 +6239,9 @@ function testPushNotification() {
 
 // =============================================================================
 
-let attachedSketchBase64 = null;
+var attachedSketchBase64 = null;
 
-let attachedFileName = null;
+var attachedFileName = null;
 
 
 
@@ -6239,13 +6339,13 @@ function removeAttachedFile() {
 
 // =============================================================================
 
-let sketchCanvas, sketchCtx;
+var sketchCanvas, sketchCtx;
 
-let isDrawing = false;
+var isDrawing = false;
 
-let sketchColor = '#38bdf8';
+var sketchColor = '#38bdf8';
 
-let sketchLineWidth = 3;
+var sketchLineWidth = 3;
 
 
 
@@ -7096,7 +7196,7 @@ function initAnalyticsCharts() {
 
 // Timeframe Trajectory Data Store (Week / Month / Year)
 
-const trajectoryDataStore = {
+var trajectoryDataStore = {
 
   week: {
 
@@ -7273,7 +7373,7 @@ function updateTrajectoryChart() {
 // MASTER LIFE INTELLIGENCE DASHBOARD (DAILY / WEEKLY / MONTHLY / YEARLY)
 // =============================================================================
 
-const masterDashboardDataStore = {
+var masterDashboardDataStore = {
   daily: {
     pillars: {
       goalsStat: '67% Done',
@@ -7456,7 +7556,7 @@ const masterDashboardDataStore = {
   }
 };
 
-let currentDashboardHorizon = 'weekly';
+var currentDashboardHorizon = 'weekly';
 
 function setDashboardHorizon(horizon, btnEl) {
   setMasterDashboardHorizon(horizon);
@@ -9994,7 +10094,7 @@ function toggleTodayGoalComplete() {
 
 
 
-let selectedHabitEmojiVal = '💧';
+var selectedHabitEmojiVal = '💧';
 
 
 
@@ -10515,7 +10615,7 @@ function toggleHabitTypeFields(type) {
 
 
 
-let showWeeklyHabitMatrix = false;
+var showWeeklyHabitMatrix = false;
 
 
 
@@ -10539,7 +10639,7 @@ function toggleHabitToday(habitId) {
 
 
 
-let recentlyDeletedHabits = [];
+var recentlyDeletedHabits = [];
 
 
 
@@ -11661,9 +11761,9 @@ function setTaskBlockerReason(reasonKey) {
 
 
 
-let bucketStatusFilter = 'all';
+var bucketStatusFilter = 'all';
 
-let bucketCategoryFilter = 'all';
+var bucketCategoryFilter = 'all';
 
 
 
@@ -13708,11 +13808,11 @@ async function executeFactoryReset() {
 
 // --- GESTURES ENGINE ---
 
-let touchStartX = 0;
+var touchStartX = 0;
 
-let touchStartY = 0;
+var touchStartY = 0;
 
-let currentHabitId = null;
+var currentHabitId = null;
 
 
 
@@ -13820,11 +13920,11 @@ window.habitTouchEnd = function(e, id) {
 
 // --- PULL-TO-REFRESH ENGINE ---
 
-let ptrStartY = 0;
+var ptrStartY = 0;
 
-let ptrCurrentY = 0;
+var ptrCurrentY = 0;
 
-let ptrRefreshing = false;
+var ptrRefreshing = false;
 
 
 
@@ -14029,7 +14129,7 @@ function openMoodPickerModal() {
 
 
 // ─── LIVE SANCTUARY PULSE CLOCK ───
-let liveSanctuaryClockInterval = null;
+var liveSanctuaryClockInterval = null;
 function startLiveSanctuaryClock() {
   function updateClock() {
     const now = new Date();
@@ -14335,7 +14435,7 @@ function saveCaptures() {
 }
 
 // ─── UNIFIED CAPTURE MODAL LOGIC ───
-let currentModalType = 'checklist';
+var currentModalType = 'checklist';
 
 function openNewCaptureModal(type = 'checklist', editId = null) {
   currentModalType = type;
