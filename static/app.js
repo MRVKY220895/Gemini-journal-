@@ -8310,8 +8310,29 @@ function updateAllDashboardStats() {
   const isClean = isReset || (journals.length === 0 && habits.length === 0 && goals.length === 0);
   const fulfilledCount = bucket.filter(b => b.achieved || b.status === 'fulfilled').length;
 
+  const boosterStreak = document.getElementById('booster-streak-days');
+  const boosterStreakSub = document.getElementById('booster-streak-sub');
+  const boosterStreakBar = document.getElementById('booster-streak-bar');
+
+  const boosterClarity = document.getElementById('booster-clarity-score');
+  const boosterClaritySub = document.getElementById('booster-clarity-sub');
+  const boosterClarityBar = document.getElementById('booster-clarity-bar');
+
+  const boosterGoals = document.getElementById('booster-goals-completed');
+  const boosterGoalsSub = document.getElementById('booster-goals-sub');
+  const boosterGoalsBar = document.getElementById('booster-goals-bar');
+
+  const boosterMilestones = document.getElementById('booster-milestones-count');
+  const boosterMilestonesSub = document.getElementById('booster-milestones-sub');
+  const boosterMilestonesBar = document.getElementById('booster-milestones-bar');
+
+  const homeStreakBadge = document.getElementById('home-streak-badge');
+  const masteryLevelBadge = document.getElementById('user-mastery-level-badge');
+
   // Realtime Homepage Stats Computations
-  updateHomepageRealtimeData();
+  if (typeof updateHomepageRealtimeData === 'function') {
+    updateHomepageRealtimeData();
+  }
 
   if (isClean) {
     if (boosterStreak) boosterStreak.textContent = '0 Days';
