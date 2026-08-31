@@ -1,4 +1,38 @@
 
+// ─── UNIFIED USER PROFILE & AUTHENTICATION SWITCHER ───
+
+async function switchUserProfile(uid, displayName, token = null) {
+  if (!uid) return;
+
+  const cleanUid = uid.trim();
+  const cleanName = displayName || (cleanUid.startsWith('user_') ? cleanUid.slice(5) : cleanUid);
+  const cleanToken = token || (cleanUid === 'guest_user' ? 'guest_token' : `token_${cleanUid}`);
+
+  state.currentUser = {
+    uid: cleanUid,
+    name: cleanName,
+    token: cleanToken
+  };
+
+  localStorage.setItem('gemini_journal_uid', cleanUid);
+  localStorage.setItem('gemini_journal_name', cleanName);
+  localStorage.setItem('gemini_journal_token', cleanToken);
+  localStorage.setItem('mind_cave_profile_name', cleanName);
+
+  if (typeof profileStorage !== 'undefined') {
+    profileStorage.setUid(cleanUid);
+  }
+
+  updateUserUI();
+  loadProfileScopedState();
+  dispatchGlobalInstantRefresh('profile_switch');
+
+  if (typeof loadJournals === 'function') loadJournals();
+  if (window.lucide) refreshIcons();
+}
+window.switchUserProfile = switchUserProfile;
+
+
 // ─── SEAMLESSM4T MULTIMODAL & MULTILINGUAL TRANSCRIBER ───
 
 var isSeamlessM4TActive = true;
