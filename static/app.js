@@ -212,15 +212,20 @@ async function saveHomeQuickReflection() {
   try {
     if (!state.journals) state.journals = [];
     state.journals.unshift(entry);
-    localStorage.setItem('mind_cave_journals_' + (state.currentUser?.uid || 'guest'), JSON.stringify(state.journals));
+    if (!state.journalsCache) state.journalsCache = [];
+    state.journalsCache.unshift(entry);
 
-    // Also trigger Cloud Firestore background sync if authenticated
+    const uid = state.currentUser?.uid || 'guest';
+    localStorage.setItem('mind_cave_journals_' + uid, JSON.stringify(state.journals));
+    localStorage.setItem('mind_cave_cached_journals', JSON.stringify(state.journalsCache));
+    if (typeof profileStorage !== 'undefined' && profileStorage.setItem) {
+      profileStorage.setItem('cached_journals', state.journalsCache);
+    }
+
+    // Background server sync
     fetch('/api/journals', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + (state.currentUser?.token || 'demo_user')
-      },
+      headers: (typeof getAuthHeaders === 'function') ? getAuthHeaders() : { 'Content-Type': 'application/json' },
       body: JSON.stringify(entry)
     }).catch(e => console.debug('Firestore sync notice:', e));
 
@@ -228,6 +233,8 @@ async function saveHomeQuickReflection() {
     showToast('Reflection saved to Living Timeline.');
     checkGuestSoftAuthTrigger('reflection');
     renderHomeRecentEntries();
+    if (typeof renderChronoTimeline === 'function') renderChronoTimeline(true);
+    if (typeof renderJournalCards === 'function') renderJournalCards(state.journalsCache);
     updateAllDashboardStats();
   } catch (err) {
     showToast('Reflection saved locally.');
@@ -299,14 +306,25 @@ function renderHomeHabitsMini() {
   const container = document.getElementById('home-habits-mini-container');
   if (!container) return;
 
+  if (!state.habitsList || state.habitsList.length === 0) {
+    try {
+      if (typeof profileStorage !== 'undefined' && profileStorage.getItem) {
+        state.habitsList = profileStorage.getItem('habits_list', []);
+      }
+      if (!state.habitsList || state.habitsList.length === 0) {
+        const saved = localStorage.getItem('mind_cave_habits_list');
+        if (saved) state.habitsList = JSON.parse(saved);
+      }
+    } catch (e) {}
+  }
+
   const habits = state.habitsList || [];
   if (habits.length === 0) {
     container.innerHTML = `
-      <div class="text-center py-6 px-4 rounded-2xl border border-dashed border-[var(--mc-border-subtle)] bg-[var(--mc-bg-tertiary)]/50 space-y-2">
-        <p class="text-xs text-[var(--mc-text-secondary)] leading-relaxed">
-          You don't have any habits yet.<br>Create a habit to build your rhythm.
-        </p>
-        <button type="button" onclick="openNewHabitModal()" class="px-3.5 py-1.5 rounded-xl bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-border-subtle)] text-[var(--mc-text-primary)] text-xs font-bold border border-[var(--mc-border-subtle)] transition-colors cursor-pointer inline-flex items-center gap-1.5">
+      <div class="text-center py-5 px-3 rounded-2xl border border-dashed border-[var(--mc-border-subtle)] bg-[var(--mc-bg-tertiary)]/50 space-y-2">
+        <div class="font-bold text-xs text-[var(--mc-text-primary)]">Pick one small habit</div>
+        <p class="text-[11px] text-[var(--mc-text-secondary)]">Small steps. Big changes.</p>
+        <button type="button" onclick="openNewHabitModal()" class="px-3.5 py-1.5 rounded-xl bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-border-subtle)] text-[var(--mc-text-primary)] text-xs font-bold border border-[var(--mc-border-subtle)] transition-colors cursor-pointer inline-flex items-center gap-1.5 mt-1">
           <i data-lucide="plus" class="w-3.5 h-3.5 text-emerald-500"></i>
           <span>+ Add a habit</span>
         </button>
@@ -315,23 +333,31 @@ function renderHomeHabitsMini() {
     return;
   }
 
+  const todayDayIdx = (new Date().getDay() + 6) % 7; // Monday = 0
+
   let html = '<div class="space-y-2">';
-  habits.slice(0, 3).forEach(h => {
-    const isDone = Boolean(h.completedToday || (h.history && h.history[(new Date().getDay() + 6) % 7]));
+  habits.slice(0, 4).forEach(h => {
+    const isCounter = h.type === 'counter' || Boolean(h.targetCount);
+    const targetCount = Number(h.targetCount) || 1;
+    const currentCount = Number(h.currentCount) || 0;
+    const isDone = isCounter ? (currentCount >= targetCount) : Boolean(h.history && h.history[todayDayIdx]);
+    const habitTitle = h.title || h.name || 'Daily Ritual';
+
     html += `
-      <div class="p-3 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] flex items-center justify-between gap-3 hover:border-[var(--mc-border-strong)] transition-all">
+      <div class="p-2.5 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] flex items-center justify-between gap-3 hover:border-[var(--mc-border-strong)] transition-all">
         <div class="flex items-center gap-2.5 min-w-0">
-          <button type="button" onclick="toggleHabitComplete('${h.id}'); renderHomeHabitsMini();" class="w-6 h-6 rounded-lg ${isDone ? 'bg-emerald-600 text-white' : 'bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-default)] text-transparent'} flex items-center justify-center transition-all cursor-pointer">
-            <i data-lucide="check" class="w-3.5 h-3.5"></i>
+          <button type="button" onclick="toggleHabitComplete('${h.id}')" class="w-6 h-6 rounded-lg ${isDone ? 'bg-emerald-600 text-white' : 'bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-default)] text-transparent'} flex items-center justify-center transition-all cursor-pointer shrink-0">
+            <i data-lucide="check" class="w-3.5 h-3.5 ${isDone ? 'text-white' : ''}"></i>
           </button>
           <div class="min-w-0">
-            <div class="text-xs font-bold text-[var(--mc-text-primary)] truncate ${isDone ? 'line-through opacity-70' : ''}">${escapeHtml(h.name)}</div>
+            <div class="text-xs font-bold text-[var(--mc-text-primary)] truncate ${isDone ? 'line-through opacity-70' : ''}">${escapeHtml(habitTitle)}</div>
             <div class="text-[10px] text-amber-500 font-mono flex items-center gap-1 mt-0.5">
               <span>🔥 ${h.streak || 0}d streak</span>
+              ${isCounter ? `<span class="text-[var(--mc-text-muted)]">(${currentCount}/${targetCount})</span>` : ''}
             </div>
           </div>
         </div>
-        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--mc-bg-secondary)] text-[var(--mc-text-muted)] border border-[var(--mc-border-subtle)]">${h.category || 'Ritual'}</span>
+        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--mc-bg-secondary)] text-[var(--mc-text-muted)] border border-[var(--mc-border-subtle)] shrink-0">${escapeHtml(h.category || 'Ritual')}</span>
       </div>
     `;
   });
@@ -340,6 +366,16 @@ function renderHomeHabitsMini() {
   if (window.lucide) refreshIcons();
 }
 window.renderHomeHabitsMini = renderHomeHabitsMini;
+
+function toggleHabitComplete(habitId) {
+  const todayDayIdx = (new Date().getDay() + 6) % 7;
+  if (typeof toggleHabitDay === 'function') {
+    toggleHabitDay(habitId, todayDayIdx);
+  }
+  renderHomeHabitsMini();
+  updateAllDashboardStats();
+}
+window.toggleHabitComplete = toggleHabitComplete;
 
 function filterDiaryByTag(tagName) {
   switchTab('journals');
@@ -11730,6 +11766,8 @@ function toggleHabitDay(habitId, dayIndex) {
   renderHabitTracker();
 
   renderTimelineShortcuts();
+  if (typeof renderHomeHabitsMini === 'function') renderHomeHabitsMini();
+  if (typeof updateAllDashboardStats === 'function') updateAllDashboardStats();
 
   showToast(`${habit.title}: ${habit.history[dayIndex] ? 'Completed!' : 'Marked incomplete'}`);
 
