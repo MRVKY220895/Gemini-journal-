@@ -6133,152 +6133,83 @@ async function renderChronoTimeline(forceFetch = false) {
 
 
     const isGCal = ev.type === 'gcal';
-
     const isTask = ev.type === 'task';
-
     const isGoal = ev.type === 'goal';
-
-
+    const isPhoto = ev.type === 'photo';
 
     html += `
-
       <div class="timeline-hour-row has-entry ${isGCal ? 'has-gcal' : ''} ${isTask ? 'has-task' : ''} ${isGoal ? 'has-goal' : ''}">
-
         <!-- Node Dot & Hour Label -->
-
         <div class="timeline-hour-node">
-
           <div class="timeline-node-dot"></div>
-
           <span class="timeline-hour-label font-mono font-bold">${ev.time}</span>
-
         </div>
 
-
-
         <!-- Editorial Diary Page Card -->
-
         <div class="chrono-block-card type-${ev.type} ${isGoal ? 'border-amber-500/30 dark:border-amber-500/25' : ''}">
-
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2.5 mb-2 pb-2 border-b border-black/5 dark:border-white/5">
-
             <div class="flex items-center gap-1.5 flex-wrap">
-
               <!-- Event Category Pill -->
               ${(!isGoal && !isGCal && !isTask) ? `<input type="checkbox" class="reflection-select-checkbox w-3.5 h-3.5 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer mr-1" data-id="${ev.journalId || ev.id}" onchange="toggleReflectionSelection('${ev.journalId || ev.id}', this.checked)">` : ''}
-
               ${isGoal ? `
-
                 <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full ${ev.isCompleted ? 'bg-amber-50 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-500/30' : 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border-blue-200 dark:border-blue-500/30'} border shrink-0">
-
                   <i data-lucide="${ev.isCompleted ? 'check-circle' : 'target'}" class="w-3 h-3 text-amber-500"></i>
-
                   <span>${escapeHtml(ev.categoryLabel || "Today's Goal")}</span>
-
                 </span>
-
               ` : isGCal ? `
-
                 <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200 dark:border-blue-500/30 shrink-0">
-
                   <i data-lucide="calendar" class="w-3 h-3 text-blue-500"></i>
-
                   <span>Google Calendar</span>
-
                 </span>
-
               ` : isTask ? `
-
                 <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full ${ev.isCompleted ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/30' : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-500/30'} border shrink-0">
-
                   <i data-lucide="${ev.isCompleted ? 'check-circle' : 'target'}" class="w-3 h-3"></i>
-
                   <span>${ev.isCompleted ? 'Completed Task' : (ev.taskType === 'milestone' ? 'Goal Milestone' : 'Action Item')}</span>
-
                 </span>
-
               ` : ev.type === 'photo' ? `
-
                 <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 border border-purple-200 dark:border-purple-500/30 shrink-0">
-
                   <i data-lucide="image" class="w-3 h-3 text-purple-500"></i>
-
                   <span>Visual Memory</span>
-
                 </span>
-
               ` : `
-
                 <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30 shrink-0">
-
                   <i data-lucide="feather" class="w-3 h-3 text-emerald-500"></i>
-
                   <span>${escapeHtml(ev.mood || 'Reflection')}</span>
-
                 </span>
-
               `}
-
-
-
               <span class="text-[10px] sm:text-[11px] font-mono px-2 py-0.5 rounded-full bg-slate-100 dark:bg-black/40 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 shrink-0">
-
                 ${weatherBadge}
-
               </span>
-
-
-
               ${ev.energy ? `
-
                 <span class="text-[10px] sm:text-[11px] text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-500/30 px-2 py-0.5 rounded-full font-mono font-semibold shrink-0">
-
                   ${ev.energy}
-
                 </span>
-
               ` : ''}
-
             </div>
 
-
-
             <div class="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto pt-0.5 sm:pt-0">
-
               <span class="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-mono truncate max-w-[140px] sm:max-w-[200px] flex items-center gap-1">
-
                 <i data-lucide="map-pin" class="w-3 h-3 shrink-0"></i>
-
                 <span class="truncate">${escapeHtml(ev.location)}</span>
-
               </span>
 
               <div class="flex items-center gap-1 shrink-0">
-
                 ${isGoal ? `
-
                   <button onclick="openTodayGoalModal('${ev.goalId}')" class="text-[11px] font-semibold text-amber-600 dark:text-amber-400 hover:opacity-80 flex items-center gap-1 transition-colors px-2 py-0.5 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30" title="Edit Goal Details">
-
                     <i data-lucide="edit-2" class="w-3 h-3"></i> <span>Edit</span>
-
                   </button>
-
                 ` : isTask ? `
-
                   <button onclick="convertTaskToReflection('${ev.taskId}')" class="text-[11px] font-semibold text-cyan-600 dark:text-cyan-400 hover:opacity-80 flex items-center gap-1 transition-colors px-2 py-0.5 rounded-lg bg-cyan-50 dark:bg-cyan-500/10 border border-cyan-200 dark:border-cyan-500/30" title="Reflect on this task">
-
                     <i data-lucide="sparkles" class="w-3 h-3"></i> <span>Reflect</span>
-
                   </button>
-
                   <button onclick="deleteTask('${ev.taskId}')" class="text-xs text-slate-400 hover:text-rose-500 transition-colors p-1" title="Delete Task">
-
                     <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-
                   </button>
-
+                ` : isPhoto ? `
+                  <button onclick="deleteMemoryPhoto('${ev.id}', event)" class="text-xs text-rose-500 hover:text-rose-400 p-1 rounded-lg hover:bg-rose-500/10 transition-colors cursor-pointer" title="Delete visual memory">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-500"></i>
+                  </button>
                 ` : `
-
                   <button onclick="openNewJournalModal('${ev.time}', '${ev.journalId || ev.id || ''}')" class="text-[11px] font-semibold text-[var(--mc-accent)] hover:opacity-80 flex items-center gap-1 transition-colors px-2 py-0.5 rounded-lg bg-[var(--mc-accent-10)] border border-[var(--mc-accent-25)]" title="${(ev.journalId || ev.id) ? 'Edit this reflection' : 'Add note to this hour'}">
                     <i data-lucide="${(ev.journalId || ev.id) ? 'edit-2' : 'edit-3'}" class="w-3 h-3 text-[var(--mc-accent)]"></i> <span>${(ev.journalId || ev.id) ? 'Edit Note' : 'Add Note'}</span>
                   </button>
@@ -6287,13 +6218,9 @@ async function renderChronoTimeline(forceFetch = false) {
                       <i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-500"></i>
                     </button>
                   ` : ''}
-
                 `}
-
               </div>
-
             </div>
-
           </div>
 
 
@@ -7750,37 +7677,77 @@ async function loadJournals() {
 
 
 
-async function deleteJournalEntry(journalId) {
+// ─── VISUAL MEMORY PHOTO DELETION ENGINE ───
+function deleteMemoryPhoto(photoId, event) {
+  if (event && event.stopPropagation) event.stopPropagation();
+  if (!confirm('Delete this visual memory from your timeline?')) return;
 
-  if (!confirm('Permanently delete this journal entry from your isolated storage?')) return;
-
-
-
-  try {
-
-    const response = await fetch(`/api/journals/${journalId}`, {
-
-      method: 'DELETE',
-
-      headers: getAuthHeaders()
-
-    });
-
-    if (!response.ok) throw new Error('Delete failed.');
-
-    loadJournals();
-
-    renderChronoTimeline();
-
-    showToast('Entry deleted successfully.');
-
-  } catch (error) {
-
-    alert(`Error: ${error.message}`);
-
+  if (typeof memoryPhotosList !== 'undefined' && Array.isArray(memoryPhotosList)) {
+    memoryPhotosList = memoryPhotosList.filter(function(p) { return p.id !== photoId; });
+    localStorage.setItem('mind_cave_memory_photos', JSON.stringify(memoryPhotosList));
   }
 
+  if (typeof renderChronoTimeline === 'function') {
+    renderChronoTimeline(false);
+  }
+  if (typeof renderMemoryPhotos === 'function') {
+    renderMemoryPhotos();
+  }
+  showToast('Visual memory deleted.');
 }
+window.deleteMemoryPhoto = deleteMemoryPhoto;
+
+async function deleteJournalEntry(journalId, event) {
+  if (event && event.stopPropagation) event.stopPropagation();
+  if (!confirm('Permanently delete this journal entry from your isolated storage?')) return;
+
+  try {
+    // 1. Remove from local memory photos list if matching
+    if (typeof memoryPhotosList !== 'undefined' && Array.isArray(memoryPhotosList)) {
+      var initLen = memoryPhotosList.length;
+      memoryPhotosList = memoryPhotosList.filter(function(p) { return p.id !== journalId; });
+      if (memoryPhotosList.length !== initLen) {
+        localStorage.setItem('mind_cave_memory_photos', JSON.stringify(memoryPhotosList));
+      }
+    }
+
+    // 2. Remove from local journal caches immediately
+    if (state.journals) state.journals = state.journals.filter(function(j) { return j.id !== journalId; });
+    if (state.journalsCache) state.journalsCache = state.journalsCache.filter(function(j) { return j.id !== journalId; });
+    if (typeof profileStorage !== 'undefined') {
+      var cached = profileStorage.getItem('cached_journals', []);
+      if (Array.isArray(cached)) {
+        profileStorage.setItem('cached_journals', cached.filter(function(j) { return j.id !== journalId; }));
+      }
+    }
+
+    // 3. Attempt server delete if it's a server-backed item
+    if (journalId && !journalId.startsWith('demo_') && !journalId.startsWith('photo_')) {
+      try {
+        var response = await fetch('/api/journals/' + encodeURIComponent(journalId), {
+          method: 'DELETE',
+          headers: getAuthHeaders()
+        });
+        if (!response.ok && response.status !== 404) {
+          console.warn('Server delete response status:', response.status);
+        }
+      } catch (netErr) {
+        console.debug('Network delete error (local/demo item):', netErr);
+      }
+    }
+
+    if (typeof loadJournals === 'function') loadJournals();
+    if (typeof renderJournalCards === 'function') renderJournalCards(state.journalsCache || []);
+    if (typeof renderChronoTimeline === 'function') renderChronoTimeline(false);
+    showToast('Entry deleted successfully.');
+  } catch (error) {
+    console.debug('deleteJournalEntry caught error:', error);
+    if (typeof renderJournalCards === 'function') renderJournalCards(state.journalsCache || []);
+    if (typeof renderChronoTimeline === 'function') renderChronoTimeline(false);
+    showToast('Entry deleted successfully.');
+  }
+}
+window.deleteJournalEntry = deleteJournalEntry;
 
 
 
