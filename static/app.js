@@ -1,4 +1,33 @@
 
+function appendGuestLimitReachedCard() {
+  const container = document.getElementById('chat-messages');
+  if (!container) return;
+  const card = document.createElement('div');
+  card.className = 'w-full my-3';
+  card.innerHTML = `
+    <div class="chat-msg-ai-card border-amber-500/30 bg-amber-950/20 p-4 rounded-2xl space-y-2.5">
+      <div class="flex items-center gap-2 font-bold text-amber-300 text-sm">
+        <i data-lucide="sparkles" class="w-4 h-4 text-amber-400"></i>
+        <span>Guest Trial Limit Reached (2/2 Free Prompts Used)</span>
+      </div>
+      <p class="text-xs text-slate-300 leading-relaxed">
+        You have experienced the 2 free introductory prompts as a Guest. To unlock unlimited conversations with Gemini, sign in with your Google or email account.
+      </p>
+      <div class="pt-1 flex items-center gap-2">
+        <button onclick="openAuthModal()" class="px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm cursor-pointer">
+          <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
+          <span>Sign In to Continue</span>
+        </button>
+      </div>
+    </div>
+  `;
+  container.appendChild(card);
+  scrollChatToBottom(true);
+  if (window.lucide) refreshIcons();
+}
+window.appendGuestLimitReachedCard = appendGuestLimitReachedCard;
+
+
 // ─── INSTANT REACTIVE REFRESH ENGINE (0ms LIVE PROPAGATION) ───
 
 function dispatchGlobalInstantRefresh(source = 'general') {
@@ -560,15 +589,31 @@ function openUserProfileModal() {
     const avatarLbl = document.getElementById('profile-modal-avatar');
     const uidLbl = document.getElementById('profile-modal-uid');
     const genderSelect = document.getElementById('user-gender-select');
+    const authActionBtn = document.getElementById('profile-modal-auth-action-btn');
 
     const u = state.currentUser || {};
     const isGuest = !u.uid || u.uid.startsWith('guest') || u.uid === 'user_alice';
     
-    if (nameInput) nameInput.value = u.name || 'Guest Explorer';
-    if (nameLbl) nameLbl.textContent = u.name || 'Guest Explorer';
-    if (avatarLbl) avatarLbl.textContent = (u.name || 'G')[0].toUpperCase();
-    if (uidLbl) uidLbl.textContent = isGuest ? 'Local Offline Mode (Guest)' : `UID: ${u.uid.slice(0, 16)}...`;
+    if (nameInput) nameInput.value = isGuest ? 'Guest Explorer' : (u.name || 'Explorer');
+    if (nameLbl) nameLbl.textContent = isGuest ? 'Guest Explorer' : (u.name || 'Explorer');
+    if (avatarLbl) avatarLbl.textContent = isGuest ? 'G' : (u.name || 'U')[0].toUpperCase();
+    if (uidLbl) uidLbl.textContent = isGuest ? 'Local Offline Sandbox (Guest Mode)' : `UID: ${u.uid.slice(0, 16)}...`;
     if (genderSelect) genderSelect.value = u.gender || localStorage.getItem('mind_cave_user_gender') || 'unspecified';
+
+    if (authActionBtn) {
+      if (isGuest) {
+        authActionBtn.innerHTML = '<i data-lucide="log-in" class="w-3.5 h-3.5"></i><span>Sign In / Sync</span>';
+        authActionBtn.className = 'shrink-0 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm cursor-pointer';
+        authActionBtn.onclick = () => {
+          closeUserProfileModal();
+          openAuthModal();
+        };
+      } else {
+        authActionBtn.innerHTML = '<i data-lucide="log-out" class="w-3.5 h-3.5"></i><span>Sign Out</span>';
+        authActionBtn.className = 'shrink-0 px-3 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-semibold hover:bg-rose-500/20 transition-colors flex items-center gap-1 cursor-pointer';
+        authActionBtn.onclick = () => signOutUser();
+      }
+    }
 
     modal.classList.remove('hidden');
   }
@@ -840,1033 +885,42 @@ function handleHeaderAuthAction() {
 window.handleHeaderAuthAction = handleHeaderAuthAction;
 
 function openUserProfileModal() {
-  const modal = document.getElementById('user-profile-modal') || document.getElementById('auth-modal');
-  if (modal) modal.classList.remove('hidden');
-  else showToast('Profile Settings Active');
-}
-window.openUserProfileModal = openUserProfileModal;
+  const modal = document.getElementById('user-profile-modal');
+  if (modal) {
+    const nameInput = document.getElementById('user-display-name-input');
+    const nameLbl = document.getElementById('profile-modal-name');
+    const avatarLbl = document.getElementById('profile-modal-avatar');
+    const uidLbl = document.getElementById('profile-modal-uid');
+    const genderSelect = document.getElementById('user-gender-select');
+    const authActionBtn = document.getElementById('profile-modal-auth-action-btn');
 
-function handleGlobalSearch(event) {
-  const query = (event.target?.value || '').trim();
-  if (event.key === 'Enter' || query.length > 2) {
-    switchTab('journals');
-    const input = document.getElementById('chrono-search-input');
-    if (input) {
-      input.value = query;
-      if (typeof renderChronoTimeline === 'function') renderChronoTimeline();
+    const u = state.currentUser || {};
+    const isGuest = !u.uid || u.uid.startsWith('guest') || u.uid === 'user_alice';
+    
+    if (nameInput) nameInput.value = isGuest ? 'Guest Explorer' : (u.name || 'Explorer');
+    if (nameLbl) nameLbl.textContent = isGuest ? 'Guest Explorer' : (u.name || 'Explorer');
+    if (avatarLbl) avatarLbl.textContent = isGuest ? 'G' : (u.name || 'U')[0].toUpperCase();
+    if (uidLbl) uidLbl.textContent = isGuest ? 'Local Offline Sandbox (Guest Mode)' : `UID: ${u.uid.slice(0, 16)}...`;
+    if (genderSelect) genderSelect.value = u.gender || localStorage.getItem('mind_cave_user_gender') || 'unspecified';
+
+    if (authActionBtn) {
+      if (isGuest) {
+        authActionBtn.innerHTML = '<i data-lucide="log-in" class="w-3.5 h-3.5"></i><span>Sign In / Sync</span>';
+        authActionBtn.className = 'shrink-0 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm cursor-pointer';
+        authActionBtn.onclick = () => {
+          closeUserProfileModal();
+          openAuthModal();
+        };
+      } else {
+        authActionBtn.innerHTML = '<i data-lucide="log-out" class="w-3.5 h-3.5"></i><span>Sign Out</span>';
+        authActionBtn.className = 'shrink-0 px-3 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-semibold hover:bg-rose-500/20 transition-colors flex items-center gap-1 cursor-pointer';
+        authActionBtn.onclick = () => signOutUser();
+      }
     }
-  }
-}
-window.handleGlobalSearch = handleGlobalSearch;
 
-function onDiarySearchChange(query) {
-  if (typeof renderChronoTimeline === 'function') renderChronoTimeline();
-}
-window.onDiarySearchChange = onDiarySearchChange;
-
-function jumpDiaryToToday() {
-  switchTab('journals');
-  const fromInput = document.getElementById('journal-filter-from-date');
-  const toInput = document.getElementById('journal-filter-to-date');
-  const todayStr = new Date().toISOString().split('T')[0];
-  if (fromInput) fromInput.value = todayStr;
-  if (toInput) toInput.value = todayStr;
-  if (typeof renderChronoTimeline === 'function') renderChronoTimeline();
-  showToast('Filtered for Today');
-}
-window.jumpDiaryToToday = jumpDiaryToToday;
-
-function handleJournalPhotoUpload(event) {
-  const file = event.target?.files?.[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const preview = document.getElementById('journal-photo-preview');
-    const img = document.getElementById('journal-photo-preview-img');
-    if (preview && img) {
-      img.src = e.target.result;
-      preview.classList.remove('hidden');
-    }
-    showToast('Photo attached.');
-  };
-  reader.readAsDataURL(file);
-}
-window.handleJournalPhotoUpload = handleJournalPhotoUpload;
-
-function removeJournalPhoto() {
-  const preview = document.getElementById('journal-photo-preview');
-  if (preview) preview.classList.add('hidden');
-  const input = document.getElementById('journal-photo-input');
-  if (input) input.value = '';
-  showToast('Photo removed.');
-}
-window.removeJournalPhoto = removeJournalPhoto;
-
-function clearLocalJournalCache() {
-  showToast('Local journal cache cleared.');
-}
-window.clearLocalJournalCache = clearLocalJournalCache;
-
-function testBiometrics() {
-  showToast('WebAuthn biometric test successful.');
-}
-window.testBiometrics = testBiometrics;
-
-function triggerRestoreUpload() {
-  showToast('Ready for backup upload.');
-}
-window.triggerRestoreUpload = triggerRestoreUpload;
-
-
-// ─── MASTER SETTINGS & VAULT SUBTAB CONTROLLER ───
-function switchSettingsTab(subtab, btnEl) {
-  const subtabs = ['security', 'ai', 'data'];
-  subtabs.forEach(s => {
-    const el = document.getElementById(`settings-subtab-${s}`);
-    if (el) {
-      if (s === subtab) el.classList.remove('hidden');
-      else el.classList.add('hidden');
-    }
-  });
-
-  document.querySelectorAll('.settings-subtab-btn').forEach(b => {
-    b.className = 'settings-subtab-btn px-3.5 py-1.5 rounded-lg font-semibold text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] cursor-pointer';
-  });
-  if (btnEl) {
-    btnEl.className = 'settings-subtab-btn active px-3.5 py-1.5 rounded-lg font-semibold bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] border border-[var(--mc-border-subtle)] cursor-pointer';
+    modal.classList.remove('hidden');
   }
   if (window.lucide) refreshIcons();
-}
-window.switchSettingsTab = switchSettingsTab;
-
-
-// =============================================================================
-// PROFILE STATE LOADER & DYNAMIC PROFILE SWITCHER
-// =============================================================================
-
-function loadProfileScopedState(uid = null) {
-  const activeUid = uid || profileStorage.getUid();
-  const isAlice = activeUid === 'user_alice' || activeUid === 'demo_user_alice';
-  const isReset = Boolean(profileStorage.getItem('is_reset', false, activeUid));
-
-  if (isAlice && !isReset) {
-    // Alice Demo Defaults
-    state.todayGoals = profileStorage.getItem('today_goals', null, activeUid) || [
-      {
-        id: 'g1',
-        title: 'Ship Core System Architecture & Validate Test Boundaries',
-        completed: true,
-        startTime: '09:30',
-        endTime: '12:00',
-        duration: '2h 30m',
-        category: 'north_star',
-        categoryLabel: 'North Star',
-        notes: 'Clean zero-warning build & 7/7 pytest verification'
-      },
-      {
-        id: 'g2',
-        title: '30m Mindful Nature Walk & Somatic Breathing',
-        completed: true,
-        startTime: '13:30',
-        endTime: '14:15',
-        duration: '45m',
-        category: 'wellness',
-        categoryLabel: 'Wellness',
-        notes: 'Zone 2 cardio completed'
-      },
-      {
-        id: 'g3',
-        title: 'Refactor Longitudinal Trajectory & Daily Harmony Engine',
-        completed: false,
-        startTime: '16:00',
-        endTime: '18:00',
-        duration: '2h',
-        category: 'deep_work',
-        categoryLabel: 'Deep Work',
-        notes: 'In progress'
-      }
-    ];
-
-    state.todayGoal = profileStorage.getItem('today_goal', null, activeUid) || {
-      text: "Ship Core System Architecture & complete evening 30m mindful walk",
-      completed: false
-    };
-
-    state.habitsList = profileStorage.getItem('habits_list', null, activeUid) || [
-      { id: 'h1', title: 'Hydrate (Drink Water)', emoji: '💧', type: 'counter', targetCount: 8, currentCount: 5, unit: 'glasses', streak: 12, target: '8 glasses', isTimelineShortcut: true, history: [true, true, true, true, true, true, false] },
-      { id: 'h2', title: '15m Mindfulness & CBT', emoji: '🧘', type: 'boolean', streak: 7, target: '15 mins', isTimelineShortcut: true, history: [true, true, true, false, true, true, true] },
-      { id: 'h3', title: '30m Zone-2 Cardio / Walk', emoji: '🚶', type: 'counter', targetCount: 30, currentCount: 30, unit: 'mins', streak: 5, target: '30 mins', isTimelineShortcut: true, history: [true, true, true, true, false, true, true] },
-      { id: 'h4', title: '20m Focused Reading', emoji: '📖', type: 'counter', targetCount: 20, currentCount: 15, unit: 'pages', streak: 9, target: '20 pages', isTimelineShortcut: true, history: [true, true, true, true, true, true, false] },
-      { id: 'h5', title: '8h Circadian Sleep Protocol', emoji: '🌙', type: 'boolean', streak: 6, target: '8 hours', isTimelineShortcut: false, history: [true, true, true, true, true, true, true] },
-      { id: 'h6', title: '90m Deep Work Block', emoji: '💻', type: 'counter', targetCount: 2, currentCount: 2, unit: 'blocks', streak: 14, target: '2 blocks', isTimelineShortcut: false, history: [true, true, true, true, true, true, true] }
-    ];
-
-    state.bucketList = profileStorage.getItem('bucket_list', null, activeUid) || [
-      { id: 'b1', title: 'Scuba dive the Great Barrier Reef', category: 'travel', year: '2027', achieved: false },
-      { id: 'b2', title: 'Publish Open-Source AI Architecture Benchmark', category: 'career', year: '2026', achieved: true },
-      { id: 'b3', title: 'Trek the Annapurna Circuit in Himalayas', category: 'adventure', year: '2027', achieved: false },
-      { id: 'b4', title: 'Run a sub-4-hour Marathon', category: 'wellness', year: '2026', achieved: false },
-      { id: 'b5', title: 'Solo Roadtrip across New Zealand South Island', category: 'travel', year: '2028', achieved: false },
-      { id: 'b6', title: 'Build a private off-grid mountain cabin sanctuary', category: 'wellness', year: '2029', achieved: false }
-    ];
-
-    state.agendaItems = profileStorage.getItem('agenda_items', null, activeUid) || [
-      { id: 'task_1', type: 'todo', title: 'Review System Architecture with Core Engineering', date: (new Date()).toISOString().split('T')[0], time: '14:30', priority: 'high', completed: false, gcalSynced: true },
-      { id: 'task_2', type: 'reminder', title: 'Take 15-min Circadian Stroll & Deep Breathing', date: (new Date()).toISOString().split('T')[0], time: '16:00', priority: 'normal', completed: true, gcalSynced: true },
-      { id: 'task_3', type: 'milestone', title: 'Quarterly Mind & Goal Alignment Milestone', date: (new Date()).toISOString().split('T')[0], time: '19:00', priority: 'high', completed: false, gcalSynced: true }
-    ];
-  } else {
-    // Clean Slate / Individual Profile Defaults (Decoupled & Isolated)
-    state.todayGoals = profileStorage.getItem('today_goals', [], activeUid);
-    state.todayGoal = profileStorage.getItem('today_goal', { text: '', completed: false }, activeUid);
-    state.habitsList = profileStorage.getItem('habits_list', [], activeUid);
-    state.bucketList = profileStorage.getItem('bucket_list', [], activeUid);
-    state.agendaItems = profileStorage.getItem('agenda_items', [], activeUid);
-  }
-
-  state.archivedHabits = profileStorage.getItem('archived_habits', [], activeUid);
-  state.capturesList = profileStorage.getItem('captures_list', [], activeUid);
-  state.notesList = profileStorage.getItem('notes_list', [], activeUid);
-  state.bucketCategories = profileStorage.getItem('bucket_categories', null, activeUid) || [
-    { id: 'travel', name: 'Travel & World Exploration', color: 'cyan' },
-    { id: 'career', name: 'Career & Mastery', color: 'indigo' },
-    { id: 'adventure', name: 'Adventure & Sports', color: 'amber' },
-    { id: 'wellness', name: 'Wellness & Health', color: 'emerald' },
-    { id: 'creative', name: 'Art & Creation', color: 'purple' },
-    { id: 'wealth', name: 'Financial Freedom', color: 'rose' }
-  ];
-}
-window.loadProfileScopedState = loadProfileScopedState;
-
-async function switchUserProfile(newUid, newName, newToken) {
-  state.currentUser = {
-    uid: newUid,
-    name: newName,
-    token: newToken,
-    gender: profileStorage.getRaw('user_gender', 'neutral', newUid)
-  };
-
-  localStorage.setItem('gemini_journal_uid', newUid);
-  localStorage.setItem('gemini_journal_name', newName);
-  localStorage.setItem('gemini_journal_token', newToken);
-
-  // Clear in-memory caches to guarantee 0% data bleeding
-  state.journalsCache = [];
-  state.messages = [];
-  state.currentSessionId = null;
-
-  // Load target profile's isolated collections
-  loadProfileScopedState(newUid);
-  updateUserUI();
-
-  // Re-fetch and re-render all UI components
-  await loadJournals();
-  await loadAnalytics();
-  renderTodayGoal();
-  renderHabitTracker();
-  renderBucketList();
-  if (typeof renderNotesCards === 'function') renderNotesCards();
-  setMasterDashboardHorizon(currentDashboardHorizon || 'weekly');
-  updateAllDashboardStats();
-  refreshIcons();
-
-  showToast(`Switched active profile to ${newName}`);
-}
-window.switchUserProfile = switchUserProfile;
-
-// =============================================================================
-// MULTI-PROFILE CLIENT TENANT ISOLATION ENGINE (DEVICE-SAFE PROFILE SCOPING)
-// =============================================================================
-
-// profileStorage hoisted to top of app.js
-
-
-// ─── CHART & METRIC EXPLANATION INFO MODAL CONTROLLER ───
-var chartInfoRegistry = window.chartInfoRegistry || {
-  radar: {
-    title: "Emotional Dimensions Radar",
-    what: "A 6-vector psychological equilibrium radar mapping Joy, Clarity, Resilience, Focus, Calm, and Optimism.",
-    how: "Gemini Natural Language Processing analyzes your journal entries' semantic vocabulary and CBT cognitive reframings, scoring each dimension from 0 to 100%. The radar displays the exact mathematical average of all reflections recorded within your active time horizon.",
-    when: "Expect baseline radar values after your very first journal reflection in Studio or Living Timeline."
-  },
-  trajectory: {
-    title: "Resilience & Clarity Trajectory",
-    what: "A longitudinal progression curve showing emotional recovery velocity and cognitive clarity compounding over time.",
-    how: "Entries are grouped by timestamp; Resilience measures your ability to decouple from friction, while Clarity measures absence of cognitive fog and distortion. The curve reveals compounding psychological resilience across days, weeks, and months.",
-    when: "Activates after logging reflections across 2 or more daily check-ins."
-  },
-  goals: {
-    title: "Goal Execution & Focus Allocation",
-    what: "A domain allocation radar tracking your invested energy across Deep Work & Architecture, Physical Vitality & Somatics, Strategic Career, and Mindfulness.",
-    how: "Calculated by classifying your completed goal blocks and semantic tags in journal entries into 4 life domains, computing real percentage distributions.",
-    when: "Updates in real-time as you complete daily goals and tag journal entries."
-  },
-  heatmap: {
-    title: "Habit Consistency Heatmap",
-    what: "A 28-day diurnal density matrix inspired by architectural contribution charts.",
-    how: "Daily checkmark completion rate is combined with journal logging presence and scaled into 5 visual intensity tiers (0 = Rest, 4 = Peak Momentum).",
-    when: "Lights up tile by tile as you check off micro-habits and capture moments."
-  },
-  pillars: {
-    title: "6-Pillar Life Intelligence Strip",
-    what: "Executive dashboard summarizing your entire self-mastery OS at a glance.",
-    how: "• Goal Velocity: (Completed Goals / Total Goals) × 100%\n• Habits Discipline: Maximum unbroken habit streak\n• Dream Quests: Ratio of fulfilled lifetime bucket list milestones\n• CBT Equilibrium: % of entries free from cognitive distortions\n• Diurnal Stamina: Peak daily flow hours\n• Memory Vault: Total reflection entries and computed word count.",
-    when: "Continuously live; recalculates in 0ms with every journal turn or task completion."
-  }
-};
-window.chartInfoRegistry = chartInfoRegistry;
-
-function openChartInfoModal(chartKey) {
-  const info = chartInfoRegistry[chartKey] || chartInfoRegistry.radar;
-  const titleEl = document.getElementById('chart-info-title');
-  const bodyEl = document.getElementById('chart-info-body');
-  const modal = document.getElementById('chart-info-modal');
-
-  if (titleEl) titleEl.textContent = info.title;
-  if (bodyEl) {
-    bodyEl.innerHTML = `
-      <div class="p-3 sm:p-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800/60 border border-slate-300 dark:border-slate-700 space-y-1.5 shadow-sm">
-        <div class="flex items-center gap-1.5 text-xs font-bold text-slate-900 dark:text-slate-100">
-          <span class="text-base">📊</span>
-          <span>What is this graph?</span>
-        </div>
-        <p class="text-xs text-slate-700 dark:text-slate-300 leading-relaxed font-normal">${info.what}</p>
-      </div>
-
-      <div class="p-3 sm:p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800/60 space-y-1.5 shadow-sm">
-        <div class="flex items-center gap-1.5 text-xs font-bold text-emerald-900 dark:text-emerald-300">
-          <span class="text-base">⚙️</span>
-          <span>How is it mathematically calculated?</span>
-        </div>
-        <p class="text-xs text-emerald-950 dark:text-emerald-200 leading-relaxed font-normal">${info.how.replace(/\n/g, '<br class="my-1">')}</p>
-      </div>
-
-      <div class="p-3 sm:p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800/60 space-y-1.5 shadow-sm">
-        <div class="flex items-center gap-1.5 text-xs font-bold text-amber-900 dark:text-amber-300">
-          <span class="text-base">⏰</span>
-          <span>When to expect numbers & output:</span>
-        </div>
-        <p class="text-xs text-amber-950 dark:text-amber-100 leading-relaxed font-medium">${info.when}</p>
-      </div>
-    `;
-  }
-
-  if (modal) modal.classList.remove('hidden');
-  refreshIcons();
-}
-window.openChartInfoModal = openChartInfoModal;
-
-function closeChartInfoModal() {
-  document.getElementById('chart-info-modal')?.classList.add('hidden');
-}
-window.closeChartInfoModal = closeChartInfoModal;
-
-// =============================================================================
-// DYNAMIC LIFE INTELLIGENCE METRIC COMPUTATION ENGINE (100% CAPTURED DATA)
-// =============================================================================
-
-function computeDynamicDashboardMetrics(horizon = 'weekly') {
-  const journals = state.journalsCache || state.journals || [];
-  const habits = state.habitsList || [];
-  const goals = state.todayGoals || [];
-  const bucket = state.bucketList || [];
-  const captures = state.capturesList || [];
-  const isReset = Boolean(localStorage.getItem('mind_cave_is_reset') === 'true');
-
-  if (isReset || (journals.length === 0 && habits.length === 0 && goals.length === 0)) {
-    return {
-      pillars: {
-        goalsStat: '0% Done',
-        goalsSub: 'No active goals',
-        goalsDesc: '0h Focus Logged',
-        habitsStat: '0d Streak',
-        habitsSub: '0% Continuity',
-        habitsDesc: '0 Checkmarks Today',
-        milestonesStat: '0 Fulfilled',
-        milestonesSub: '0 In Action',
-        milestonesDesc: 'No dreams recorded',
-        cbtStat: 'Clean',
-        cbtSub: '0 Biases Reframed',
-        cbtDesc: 'Zero Rumination',
-        vitalityStat: '0 hrs',
-        vitalitySub: 'Rest State',
-        vitalityDesc: 'No activity recorded',
-        volumeStat: '0 Moments',
-        volumeSub: '0 Words',
-        volumeDesc: '0 Photos • 0 Audio'
-      },
-      goalsScope: `${horizon.charAt(0).toUpperCase() + horizon.slice(1)} Scope`,
-      goalsSummary: 'Start logging goals and journal moments to populate your live cognitive dashboard.',
-      deepwork: '0 hrs (0%)',
-      health: '0 hrs (0%)',
-      career: '0 hrs (0%)',
-      mindset: '0 hrs (0%)',
-      deepworkPct: 0,
-      healthPct: 0,
-      careerPct: 0,
-      mindsetPct: 0,
-      habitRate: '0% Rate',
-      topStreak: 'No active habits',
-      heatmapRange: 'Activity Density',
-      heatmapDays: 28,
-      heatmapIntensity: [0],
-      growthBadge: '+0% Baseline',
-      resilienceStat: '0%',
-      resilienceSub: 'Awaiting logs',
-      clarityStat: '0%',
-      claritySub: 'Awaiting logs',
-      velocityStat: 'Baseline Zero',
-      velocitySub: 'Ready for entry',
-      chartLabels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-      resilienceData: [0, 0, 0, 0, 0, 0, 0],
-      clarityData: [0, 0, 0, 0, 0, 0, 0],
-      radarData: [0, 0, 0, 0, 0, 0],
-      insight: '<strong>Awaiting Entries:</strong> Capture daily reflections to unlock live cognitive trajectory and AI synthesis.'
-    };
-  }
-
-  // 1. Goal Velocity Computation
-  const completedGoals = goals.filter(g => g.completed).length;
-  const totalGoals = goals.length;
-  const goalPct = totalGoals > 0 ? Math.round((completedGoals / totalGoals) * 100) : 85;
-
-  // 2. Habits Streak & Completion Computation
-  const todayDayIdx = (new Date().getDay() + 6) % 7;
-  const doneHabitsToday = habits.filter(h => {
-    if (h.type === 'counter' || h.targetCount) {
-      return (Number(h.currentCount) || 0) >= (Number(h.targetCount) || 1);
-    }
-    return Boolean(h.history && h.history[todayDayIdx]);
-  }).length;
-  const maxHabitStreak = habits.length > 0 ? Math.max(...habits.map(h => h.streak || 0), 0) : 14;
-  const habitRatePct = habits.length > 0 ? Math.round((doneHabitsToday / habits.length) * 100) : 92;
-
-  // 3. Milestone Dreams Fulfilled
-  const fulfilledQuests = bucket.filter(b => b.achieved || b.status === 'fulfilled').length;
-  const inActionQuests = bucket.filter(b => !b.achieved && b.status !== 'fulfilled').length;
-
-  // 4. CBT Distortions & Equilibrium
-  let totalDistortionsCount = 0;
-  journals.forEach(j => {
-    if (j.insights && Array.isArray(j.insights.detected_distortions)) {
-      totalDistortionsCount += j.insights.detected_distortions.length;
-    }
-  });
-
-  // 5. Volume & Word Count
-  let totalWordCount = 0;
-  journals.forEach(j => {
-    if (j.content) totalWordCount += j.content.trim().split(/\s+/).length;
-  });
-  const photoCount = journals.filter(j => j.photoUrl || (j.tags && j.tags.includes('photo'))).length;
-
-  // 6. Domain Category Distribution Analysis
-  let deepCount = 0, healthCount = 0, careerCount = 0, mindCount = 0;
-  goals.forEach(g => {
-    const cat = (g.category || '').toLowerCase();
-    if (cat.includes('deep') || cat.includes('north_star') || cat.includes('arch')) deepCount += 3;
-    else if (cat.includes('well') || cat.includes('health') || cat.includes('walk')) healthCount += 2;
-    else if (cat.includes('career') || cat.includes('quest')) careerCount += 2;
-    else mindCount += 1;
-  });
-
-  journals.forEach(j => {
-    const text = ((j.title || '') + ' ' + (j.content || '') + ' ' + (Array.isArray(j.tags) ? j.tags.join(' ') : '')).toLowerCase();
-    if (text.includes('architect') || text.includes('code') || text.includes('deep') || text.includes('engineer') || text.includes('sprint') || text.includes('build')) deepCount += 2;
-    if (text.includes('walk') || text.includes('health') || text.includes('cardio') || text.includes('sleep') || text.includes('hydrate') || text.includes('wellness')) healthCount += 2;
-    if (text.includes('career') || text.includes('quest') || text.includes('review') || text.includes('milestone') || text.includes('finance')) careerCount += 2;
-    if (text.includes('stoic') || text.includes('mindful') || text.includes('cbt') || text.includes('reframe') || text.includes('clarity') || text.includes('calm')) mindCount += 2;
-  });
-
-  const totalCatPoints = (deepCount + healthCount + careerCount + mindCount) || 10;
-  const deepworkPct = Math.max(10, Math.round((deepCount / totalCatPoints) * 100) || 45);
-  const healthPct = Math.max(10, Math.round((healthCount / totalCatPoints) * 100) || 25);
-  const careerPct = Math.max(10, Math.round((careerCount / totalCatPoints) * 100) || 20);
-  const mindsetPct = Math.max(5, 100 - (deepworkPct + healthPct + careerPct));
-
-  const totalFocusHours = completedGoals > 0 ? (completedGoals * 1.75).toFixed(1) : '3.5';
-
-  // 7. Dynamic Radar Mood Vector Computation
-  const moodSum = { Joy: 0, Clarity: 0, Resilience: 0, Focus: 0, Calm: 0, Optimism: 0 };
-  let moodEntriesCount = 0;
-  journals.forEach(j => {
-    if (j.insights && j.insights.mood_scores) {
-      const ms = j.insights.mood_scores;
-      Object.keys(moodSum).forEach(k => {
-        if (ms[k] !== undefined) {
-          moodSum[k] += Number(ms[k]) || 70;
-        }
-      });
-      moodEntriesCount++;
-    }
-  });
-
-  const avgMood = {
-    Joy: moodEntriesCount > 0 ? Math.round(moodSum.Joy / moodEntriesCount) : 85,
-    Clarity: moodEntriesCount > 0 ? Math.round(moodSum.Clarity / moodEntriesCount) : 93,
-    Resilience: moodEntriesCount > 0 ? Math.round(moodSum.Resilience / moodEntriesCount) : 91,
-    Focus: moodEntriesCount > 0 ? Math.round(moodSum.Focus / moodEntriesCount) : 90,
-    Calm: moodEntriesCount > 0 ? Math.round(moodSum.Calm / moodEntriesCount) : 90,
-    Optimism: moodEntriesCount > 0 ? Math.round(moodSum.Optimism / moodEntriesCount) : 91
-  };
-
-  const radarData = [avgMood.Joy, avgMood.Clarity, avgMood.Resilience, avgMood.Focus, avgMood.Calm, avgMood.Optimism];
-
-  // 8. Line Trajectory Datasets
-  let lineLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Today'];
-  let resilienceCurve = [64, 70, 76, 82, 85, 88, avgMood.Resilience];
-  let clarityCurve = [58, 66, 72, 78, 82, 86, avgMood.Clarity];
-
-  if (horizon === 'daily') {
-    lineLabels = ['08:00', '11:00', '14:00', '17:00', '20:00'];
-    resilienceCurve = [85, 88, 92, 90, avgMood.Resilience];
-    clarityCurve = [90, 92, 90, 94, avgMood.Clarity];
-  } else if (horizon === 'monthly') {
-    lineLabels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
-    resilienceCurve = [72, 79, 86, avgMood.Resilience];
-    clarityCurve = [68, 76, 84, avgMood.Clarity];
-  }
-
-  // 9. Habit Heatmap Intensity Array
-  const heatmapIntensity = [];
-  const daysCount = horizon === 'daily' ? 24 : horizon === 'monthly' ? 30 : 28;
-  for (let i = 0; i < daysCount; i++) {
-    // Generate authentic density derived from streak and journal presence
-    const val = (i % 4 === 0 ? 3 : i % 3 === 0 ? 4 : i % 5 === 0 ? 2 : 4);
-    heatmapIntensity.push(val);
-  }
-
-  return {
-    pillars: {
-      goalsStat: `${goalPct}% Done`,
-      goalsSub: `${completedGoals} of ${totalGoals || 3} Completed`,
-      goalsDesc: `${totalFocusHours}h Deep Focus`,
-      habitsStat: `${maxHabitStreak}d Streak`,
-      habitsSub: `${habitRatePct}% Consistency`,
-      habitsDesc: `${doneHabitsToday}/${habits.length || 6} Done Today`,
-      milestonesStat: `${fulfilledQuests}/${bucket.length || 3} Fulfilled`,
-      milestonesSub: `${inActionQuests} In Action`,
-      milestonesDesc: 'Target: Dec 2027',
-      cbtStat: `${Math.max(90, 100 - totalDistortionsCount * 4)}% Clean`,
-      cbtSub: `${Math.max(1, totalDistortionsCount || 1)} Biases Neutralized`,
-      cbtDesc: 'Zero Persistent Worry',
-      vitalityStat: '6.5 hrs',
-      vitalitySub: 'Circadian Peak Flow',
-      vitalityDesc: 'Peak: 10am – 2pm',
-      volumeStat: `${journals.length} Moments`,
-      volumeSub: `${totalWordCount || 4850} Words`,
-      volumeDesc: `${photoCount} Photos • Audio`
-    },
-    goalsScope: `${horizon.charAt(0).toUpperCase() + horizon.slice(1)} Scope`,
-    goalsSummary: `${completedGoals} of ${totalGoals || 3} ${horizon} objectives fulfilled with high velocity.`,
-    deepwork: `${((deepworkPct / 100) * 6).toFixed(1)} hrs (${deepworkPct}%)`,
-    health: `${((healthPct / 100) * 6).toFixed(1)} hrs (${healthPct}%)`,
-    career: `${((careerPct / 100) * 6).toFixed(1)} hrs (${careerPct}%)`,
-    mindset: `${((mindsetPct / 100) * 6).toFixed(1)} hrs (${mindsetPct}%)`,
-    deepworkPct: deepworkPct,
-    healthPct: healthPct,
-    careerPct: careerPct,
-    mindsetPct: mindsetPct,
-    habitRate: `${habitRatePct}% Rate`,
-    topStreak: habits.length > 0 ? `${habits[0].title} (${habits[0].streak || 14}d)` : 'Morning Focus (14d)',
-    heatmapRange: `Last ${daysCount} Days Activity Density`,
-    heatmapDays: daysCount,
-    heatmapIntensity: heatmapIntensity,
-    growthBadge: `+${Math.round(avgMood.Resilience - 70)}% Growth`,
-    resilienceStat: `${avgMood.Resilience}%`,
-    resilienceSub: '+14% vs baseline',
-    clarityStat: `${avgMood.Clarity}%`,
-    claritySub: '+18% vs baseline',
-    velocityStat: 'Ascending Flow',
-    velocitySub: 'Compounding',
-    chartLabels: lineLabels,
-    resilienceData: resilienceCurve,
-    clarityData: clarityCurve,
-    radarData: radarData,
-    insight: `<strong>${horizon.charAt(0).toUpperCase() + horizon.slice(1)} Synthesis:</strong> Cognitive resilience averaged <strong>${avgMood.Resilience}%</strong> and clarity reached <strong>${avgMood.Clarity}%</strong> across your recorded journal reflections.`
-  };
-}
-window.computeDynamicDashboardMetrics = computeDynamicDashboardMetrics;
-
-
-// ─── MEMORY LANE RENDER CONTROLLER ───
-function renderMemoryLane() {
-  const container = document.getElementById('journal-track-memory_lane');
-  if (!container) return;
-  refreshIcons();
-}
-window.renderMemoryLane = renderMemoryLane;
-
-
-// ─── REFRESH MIND CAVE JOURNAL (IN-PLACE SYNCHRONIZATION) ───
-async function refreshCurrentJournalView() {
-  const icon = document.querySelector('#btn-journal-refresh i') || document.querySelector('#btn-journal-refresh svg');
-  if (icon) icon.classList.add('animate-spin');
-
-  try {
-    if (typeof loadJournals === 'function') await loadJournals();
-    if (typeof renderChronoTimeline === 'function') await renderChronoTimeline(true);
-    if (typeof renderHabitTracker === 'function') renderHabitTracker();
-    if (typeof renderDashboardMilestoneRadar === 'function') renderDashboardMilestoneRadar();
-    if (typeof renderNotesCards === 'function') renderNotesCards();
-    if (typeof renderMemoryLane === 'function') renderMemoryLane();
-    if (typeof renderMemoryPhotos === 'function') renderMemoryPhotos();
-    if (typeof updateAllDashboardStats === 'function') updateAllDashboardStats();
-    showToast('🔄 Mind Cave Journal synchronized!');
-  } catch (e) {
-    showToast('Journal refreshed.');
-  } finally {
-    setTimeout(() => {
-      if (icon) icon.classList.remove('animate-spin');
-    }, 600);
-  }
-}
-window.refreshCurrentJournalView = refreshCurrentJournalView;
-
-function setChronoViewMode(mode) {
-  if (typeof setTimelineViewMode === 'function') {
-    setTimelineViewMode(mode);
-  }
-}
-window.setChronoViewMode = setChronoViewMode;
-
-
-// =============================================================================
-// INTERACTIVE "GUIDE ME THROUGH" ONBOARDING WALKTHROUGH CONTROLLER
-// =============================================================================
-
-let currentGuideStep = 1;
-const TOTAL_GUIDE_STEPS = 6;
-
-function openOnboardingGuide(startStep = 1) {
-  currentGuideStep = startStep;
-  goToOnboardingStep(currentGuideStep);
-  const modal = document.getElementById('onboarding-guide-modal');
-  if (modal) modal.classList.remove('hidden');
-  refreshIcons();
-}
-
-function closeOnboardingGuide(markCompleted = true) {
-  const modal = document.getElementById('onboarding-guide-modal');
-  if (modal) modal.classList.add('hidden');
-  if (markCompleted) {
-    try {
-      localStorage.setItem('mind_cave_guided_tour_completed', 'true');
-    } catch (e) {}
-  }
-}
-
-function goToOnboardingStep(stepNumber) {
-  if (stepNumber < 1) stepNumber = 1;
-  if (stepNumber > TOTAL_GUIDE_STEPS) stepNumber = TOTAL_GUIDE_STEPS;
-  currentGuideStep = stepNumber;
-
-  // Hide all slides, show target slide
-  for (let i = 1; i <= TOTAL_GUIDE_STEPS; i++) {
-    const slide = document.getElementById(`guide-slide-${i}`);
-    if (slide) {
-      if (i === currentGuideStep) {
-        slide.classList.remove('hidden');
-      } else {
-        slide.classList.add('hidden');
-      }
-    }
-  }
-
-  // Update step indicator
-  const indicator = document.getElementById('guide-step-indicator');
-  if (indicator) indicator.textContent = `Step ${currentGuideStep} of ${TOTAL_GUIDE_STEPS}`;
-
-  // Update step dots
-  const dots = document.querySelectorAll('.guide-dot');
-  dots.forEach((dot, idx) => {
-    if (idx + 1 === currentGuideStep) {
-      dot.className = 'guide-dot w-4 h-2 rounded-full bg-[var(--mc-accent)] transition-all cursor-pointer';
-    } else if (idx + 1 < currentGuideStep) {
-      dot.className = 'guide-dot w-2 h-2 rounded-full bg-emerald-400 transition-all cursor-pointer';
-    } else {
-      dot.className = 'guide-dot w-2 h-2 rounded-full bg-[var(--mc-border-default)] transition-all cursor-pointer';
-    }
-  });
-
-  // Update Prev / Next buttons
-  const prevBtn = document.getElementById('guide-prev-btn');
-  const nextBtnText = document.getElementById('guide-next-btn-text');
-
-  if (prevBtn) {
-    if (currentGuideStep === 1) prevBtn.classList.add('hidden');
-    else prevBtn.classList.remove('hidden');
-  }
-
-  if (nextBtnText) {
-    if (currentGuideStep === TOTAL_GUIDE_STEPS) {
-      nextBtnText.textContent = 'Get Started →';
-    } else {
-      nextBtnText.textContent = 'Next Step';
-    }
-  }
-
-  refreshIcons();
-}
-
-function nextOnboardingStep() {
-  if (currentGuideStep >= TOTAL_GUIDE_STEPS) {
-    closeOnboardingGuide(true);
-    showToast('Welcome to Mind Cave! Explore Studio or log your first moment.');
-  } else {
-    goToOnboardingStep(currentGuideStep + 1);
-  }
-}
-
-function prevOnboardingStep() {
-  if (currentGuideStep > 1) {
-    goToOnboardingStep(currentGuideStep - 1);
-  }
-}
-
-function checkFirstTimeOnboarding() {
-  try {
-    const completed = localStorage.getItem('mind_cave_guided_tour_completed');
-    if (!completed) {
-      setTimeout(() => {
-        openOnboardingGuide(1);
-      }, 700);
-    }
-  } catch (e) {}
-}
-
-
-// =============================================================================
-// NAVIGATION DIRECTORY COLLAPSIBLE ACCORDION SYSTEM
-// =============================================================================
-
-function toggleDirectorySection(sectionId) {
-  const sectionEl = document.getElementById(sectionId);
-  const chevronEl = document.getElementById(`${sectionId}-chevron`);
-  if (!sectionEl) return;
-  const isHidden = sectionEl.classList.contains('hidden') || sectionEl.style.display === 'none';
-  if (isHidden) {
-    sectionEl.classList.remove('hidden');
-    sectionEl.style.display = 'block';
-    if (chevronEl) chevronEl.style.transform = 'rotate(180deg)';
-  } else {
-    sectionEl.classList.add('hidden');
-    sectionEl.style.display = 'none';
-    if (chevronEl) chevronEl.style.transform = 'rotate(0deg)';
-  }
-}
-
-function toggleAllDirectorySections(expand = true) {
-  const sections = document.querySelectorAll('.dir-accordion-content');
-  sections.forEach(s => {
-    const chevron = document.getElementById(`${s.id}-chevron`);
-    if (expand) {
-      s.classList.remove('hidden');
-      s.style.display = 'block';
-      if (chevron) chevron.style.transform = 'rotate(180deg)';
-    } else {
-      s.classList.add('hidden');
-      s.style.display = 'none';
-      if (chevron) chevron.style.transform = 'rotate(0deg)';
-    }
-  });
-}
-
-async function deleteJournalEntry(journalId, event) {
-  if (event) {
-    event.preventDefault();
-    event.stopPropagation();
-  }
-
-  if (!confirm('Permanently delete this reflection from your timeline?')) return;
-
-  const cleanId = (journalId || '').toString().replace(/^journal_/, '').trim();
-
-  // 1. Optimistic removal from cache for instant 0ms DOM update
-  if (!state.journalsCache || !Array.isArray(state.journalsCache)) {
-    try {
-      const cached = localStorage.getItem('mind_cave_cached_journals');
-      state.journalsCache = cached ? JSON.parse(cached) : [];
-    } catch (e) {
-      state.journalsCache = [];
-    }
-  }
-
-  state.journalsCache = state.journalsCache.filter(j => {
-    const jId = (j.id || '').toString();
-    return jId !== cleanId && jId !== journalId && `journal_${jId}` !== journalId;
-  });
-
-  try {
-    localStorage.setItem('mind_cave_cached_journals', JSON.stringify(state.journalsCache));
-  } catch (e) {}
-
-  // 2. Re-render Timeline and Cards immediately
-  renderChronoTimeline(false);
-  const gridContainer = document.getElementById('journals-grid');
-  if (gridContainer && typeof renderJournalCards === 'function') {
-    renderJournalCards(state.journalsCache);
-  }
-
-  showToast('Reflection deleted successfully.');
-
-  // 3. Send DELETE request to server
-  try {
-    const response = await fetch(`/api/journals/${cleanId}`, {
-      method: 'DELETE',
-      headers: getAuthHeaders()
-    });
-
-    if (!response.ok) {
-      console.warn('Server delete returned non-200, syncing...');
-    }
-  } catch (err) {
-    console.debug('Background delete sync notice:', err);
-  }
-}
-
-
-
-function renderJournalCards(journals) {
-  const container = document.getElementById('journals-grid');
-  if (!container) return;
-
-  if (!journals || journals.length === 0) {
-    container.innerHTML = `
-      <div class="col-span-full mc-card text-center py-10 px-4 space-y-3">
-        <div class="w-10 h-10 rounded-xl bg-[var(--mc-accent-12)] border border-[var(--mc-accent-25)] text-[var(--mc-accent)] flex items-center justify-center mx-auto">
-          <i data-lucide="book-open" class="w-5 h-5"></i>
-        </div>
-        <div>
-          <h4 class="text-sm font-semibold text-[var(--mc-text-primary)]">No Journal Entries Found</h4>
-          <p class="text-xs text-[var(--mc-text-secondary)] mt-1 max-w-sm mx-auto">All reflections are encrypted and isolated to your private vault. Create your first reflection to get started.</p>
-        </div>
-        <button onclick="openNewJournalModal()" class="btn-primary text-xs font-semibold px-4 py-2 inline-flex items-center gap-1.5 mx-auto cursor-pointer">
-          <i data-lucide="plus" class="w-4 h-4"></i>
-          <span>Write Reflection</span>
-        </button>
-      </div>
-    `;
-    refreshIcons();
-    return;
-  }
-
-  container.innerHTML = journals.map(j => `
-    <div class="mc-card p-4 sm:p-5 flex flex-col justify-between h-full space-y-3">
-      <div>
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] font-semibold">${escapeHtml(j.mood || 'Reflective')}</span>
-          <span class="text-[10px] text-[var(--mc-text-muted)] font-mono">${new Date(j.created_at * 1000).toLocaleDateString()}</span>
-        </div>
-        <h4 class="text-sm font-semibold text-[var(--mc-text-primary)] mb-1.5 line-clamp-1">${escapeHtml(j.title)}</h4>
-        <p class="text-xs text-[var(--mc-text-secondary)] line-clamp-3 leading-relaxed">${escapeHtml(j.content)}</p>
-      </div>
-      <div class="flex items-center justify-between pt-2.5 border-t border-[var(--mc-border-subtle)] text-[10px]">
-        <span class="text-[var(--mc-text-muted)] font-mono">UID: ${escapeHtml((j.user_id || '').substring(0, 10))}...</span>
-        <button onclick="deleteJournalEntry('${j.id}', event)" class="text-rose-600 dark:text-rose-400 hover:underline flex items-center gap-1 cursor-pointer font-medium">
-          <i data-lucide="trash-2" class="w-3 h-3"></i> <span>Delete</span>
-        </button>
-      </div>
-    </div>
-  `).join('');
-  refreshIcons();
-}
-
-
-// =============================================================================
-// INTELLIGENT AUTOMATIC NATIVE LANGUAGE DETECTOR
-// =============================================================================
-
-function detectScriptLanguage(text) {
-  if (!text || text.trim().length < 2) return null;
-
-  // Indian Regional Languages (Unicode Ranges)
-  if (/[\u0B80-\u0BFF]/.test(text)) return { code: 'ta', name: 'தமிழ் (Tamil)', flag: '🇮🇳' };
-  if (/[\u0900-\u097F]/.test(text)) return { code: 'hi', name: 'हिंदी (Hindi)', flag: '🇮🇳' };
-  if (/[\u0C00-\u0C7F]/.test(text)) return { code: 'te', name: 'తెలుగు (Telugu)', flag: '🇮🇳' };
-  if (/[\u0D00-\u0D7F]/.test(text)) return { code: 'ml', name: 'മലയാളം (Malayalam)', flag: '🇮🇳' };
-  if (/[\u0C80-\u0CFF]/.test(text)) return { code: 'kn', name: 'ಕನ್ನಡ (Kannada)', flag: '🇮🇳' };
-  if (/[\u0980-\u09FF]/.test(text)) return { code: 'bn', name: 'বাংলা (Bengali)', flag: '🇮🇳' };
-  if (/[\u0600-\u06FF]/.test(text)) return { code: 'ar', name: 'العربية (Arabic)', flag: '🇸🇦' };
-  if (/[\u3040-\u30FF]/.test(text)) return { code: 'ja', name: '日本語 (Japanese)', flag: '🇯🇵' };
-  if (/[\u4E00-\u9FFF]/.test(text)) return { code: 'zh', name: '中文 (Chinese)', flag: '🇨🇳' };
-  if (/[\u0400-\u04FF]/.test(text)) return { code: 'ru', name: 'Русский (Russian)', flag: '🇷🇺' };
-
-  return null;
-}
-
-function handleChatInputLanguageDetect() {
-  const input = document.getElementById('chat-input');
-  const badge = document.getElementById('composer-lang-badge');
-  const badgeText = document.getElementById('composer-lang-text');
-  if (!input || !badge || !badgeText) return;
-
-  const detected = detectScriptLanguage(input.value);
-  if (detected) {
-    badge.classList.remove('hidden');
-    badge.classList.add('flex');
-    badgeText.textContent = `Auto-Detected: ${detected.name}`;
-    localStorage.setItem('mind_cave_detected_lang', detected.code);
-  } else {
-    badge.classList.add('hidden');
-    badge.classList.remove('flex');
-  }
-}
-
-
-// =============================================================================
-// GUEST ONBOARDING & AUTHENTICATION CONTROLLER
-// =============================================================================
-
-function continueAsGuest() {
-  state.currentUser = {
-    uid: 'guest_' + Math.random().toString(36).substring(2, 9),
-    email: null,
-    displayName: 'Mindful Guest',
-    isAnonymous: true
-  };
-  localStorage.setItem('mind_cave_user', JSON.stringify(state.currentUser));
-  updateUserProfileDisplay();
-  closeAuthModal();
-  showToast('Welcome to Mind Cave! Continuing in Private Local Vault mode.');
-}
-
-
-// =============================================================================
-// QUICK MOVE / SCROLL TO END OF CONVERSATION CONTROLLER
-// =============================================================================
-
-function scrollChatToBottom(smooth = true) {
-  const container = document.getElementById('chat-messages');
-  if (container) {
-    container.scrollTo({
-      top: container.scrollHeight + 10000,
-      behavior: smooth ? 'smooth' : 'auto'
-    });
-  }
-  window.scrollTo({
-    top: document.documentElement.scrollHeight || document.body.scrollHeight,
-    behavior: smooth ? 'smooth' : 'auto'
-  });
-
-  const btn = document.getElementById('btn-scroll-bottom');
-  if (btn) {
-    btn.classList.remove('is-visible');
-  }
-}
-
-function checkScrollDistance() {
-  const studioView = document.getElementById('view-studio');
-  const btn = document.getElementById('btn-scroll-bottom');
-  if (!studioView || studioView.classList.contains('hidden') || !btn) {
-    if (btn) btn.classList.remove('is-visible');
-    return;
-  }
-
-  const container = document.getElementById('chat-messages');
-  let isScrolledUp = false;
-
-  if (container && container.scrollHeight > container.clientHeight) {
-    const dist = container.scrollHeight - container.scrollTop - container.clientHeight;
-    if (dist > 60) isScrolledUp = true;
-  } else {
-    const docDist = (document.documentElement.scrollHeight || document.body.scrollHeight) - window.scrollY - window.innerHeight;
-    if (docDist > 60) isScrolledUp = true;
-  }
-
-  if (isScrolledUp) {
-    btn.classList.add('is-visible');
-    if (window.lucide) refreshIcons();
-  } else {
-    btn.classList.remove('is-visible');
-  }
-}
-
-function initChatScrollWatcher() {
-  document.addEventListener('scroll', checkScrollDistance, { capture: true, passive: true });
-  window.addEventListener('scroll', checkScrollDistance, { passive: true });
-  document.addEventListener('wheel', () => requestAnimationFrame(checkScrollDistance), { capture: true, passive: true });
-  document.addEventListener('touchmove', () => requestAnimationFrame(checkScrollDistance), { capture: true, passive: true });
-}
-
-
-function updateComposerModelStatus(isLive, modelName = 'gemini-3.5-flash-lite') {
-  const dot = document.getElementById('gemini-key-dot');
-  const label = document.getElementById('gemini-key-label');
-  const pill = document.getElementById('composer-model-pill');
-  if (!dot || !label) return;
-
-  if (isLive) {
-    dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0';
-    label.textContent = `${modelName.replace('gemini-', 'Gemini ')} (Live)`;
-    if (pill) pill.title = `${modelName} Live Cloud Connected. Click to inspect AI settings.`;
-  } else {
-    dot.className = 'w-2 h-2 rounded-full bg-amber-400 shrink-0';
-    label.textContent = 'Local Sanctuary (Offline)';
-    if (pill) pill.title = 'Running on offline Local Sanctuary. Click to enter a live Gemini API key.';
-  }
-}
-
-
-// =============================================================================
-// DYNAMIC USER PERSONA & COGNITIVE IDENTITY CONTROLLER
-// =============================================================================
-
-async function loadUserPersona() {
-  try {
-    const response = await fetch('/api/user-persona', { headers: getAuthHeaders() });
-    if (!response.ok) return;
-    const data = await response.json();
-    const persona = data.persona || {};
-    state.userPersona = persona;
-
-    // Update UI Deck
-    const archetypeEl = document.getElementById('persona-archetype-lbl');
-    const valuesEl = document.getElementById('persona-values-chips');
-    const styleEl = document.getElementById('persona-style-lbl');
-    const themesEl = document.getElementById('persona-themes-lbl');
-    const milestonesEl = document.getElementById('persona-milestones-lbl');
-    const badgeEl = document.getElementById('persona-synthesis-badge');
-
-    if (archetypeEl) archetypeEl.textContent = persona.archetype || 'Reflective Builder';
-    if (styleEl) styleEl.textContent = persona.reflection_style || 'Analytical & Supportive';
-    if (themesEl) themesEl.textContent = (persona.recurring_themes || []).join(', ') || 'General Wellbeing';
-    if (milestonesEl) milestonesEl.textContent = (persona.current_milestones || []).join(', ') || 'Mindful Presence';
-    if (badgeEl && persona.synthesis_count) {
-      badgeEl.textContent = `Auto-Synced (${persona.synthesis_count} turns)`;
-    }
-
-    if (valuesEl) {
-      const values = persona.core_values || ['Craftsmanship', 'Agency', 'Clarity'];
-      valuesEl.innerHTML = values.map(v => `
-        <span class="px-2 py-0.5 rounded-full bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] text-[var(--mc-text-primary)] text-[10px] font-medium">
-          ${escapeHtml(v)}
-        </span>
-      `).join('');
-    }
-  } catch (e) {
-    console.debug('User persona load notice:', e);
-  }
-}
-
-function openPersonaEditModal() {
-  const p = state.userPersona || {};
-  const archInput = document.getElementById('edit-persona-archetype');
-  const valInput = document.getElementById('edit-persona-values');
-  const styleInput = document.getElementById('edit-persona-style');
-  const themesInput = document.getElementById('edit-persona-themes');
-  const triggersInput = document.getElementById('edit-persona-triggers');
-  const milesInput = document.getElementById('edit-persona-milestones');
-
-  if (archInput) archInput.value = p.archetype || '';
-  if (valInput) valInput.value = (p.core_values || []).join(', ');
-  if (styleInput) styleInput.value = p.reflection_style || '';
-  if (themesInput) themesInput.value = (p.recurring_themes || []).join(', ');
-  if (triggersInput) triggersInput.value = (p.triggers_and_stressors || []).join(', ');
-  if (milesInput) milesInput.value = (p.current_milestones || []).join(', ');
-
-  const modal = document.getElementById('persona-edit-modal');
-  if (modal) modal.classList.remove('hidden');
 }
 
 function closePersonaEditModal() {
@@ -3056,9 +2110,28 @@ function setCustomUserWithEmail(email) {
 
 function signOutUser() {
   if (state.firebaseAuth && state.firebaseAuth.currentUser) {
-    state.firebaseAuth.signOut();
+    try { state.firebaseAuth.signOut(); } catch (e) {}
   }
-  switchUserProfile('guest_user', 'Guest', 'guest_token');
+  localStorage.removeItem('gemini_journal_token');
+  localStorage.removeItem('gemini_journal_uid');
+  localStorage.removeItem('gemini_journal_name');
+  localStorage.removeItem('mind_cave_profile_name');
+  localStorage.removeItem('mind_cave_guest_ai_prompts');
+
+  state.currentUser = {
+    uid: 'guest_user',
+    name: 'Guest Explorer',
+    token: 'guest_token'
+  };
+  localStorage.setItem('gemini_journal_uid', 'guest_user');
+  localStorage.setItem('gemini_journal_name', 'Guest Explorer');
+  localStorage.setItem('gemini_journal_token', 'guest_token');
+
+  closeUserProfileModal();
+  if (typeof switchUserProfile === 'function') {
+    switchUserProfile('guest_user', 'Guest Explorer', 'guest_token');
+  }
+  dispatchGlobalInstantRefresh('signout');
   showToast('Signed out. Active profile set to Guest Clean Slate.');
 }
 
@@ -3433,6 +2506,7 @@ async function sendChatMessage(event) {
     // Append Calm, Editorial AI Response with Latency Badge
     const responseLatency = data.latency_ms || data.total_latency_ms;
     appendChatMessage('ai', data.message.content, 'Reflective Partner', data.model_used, data.cognitive_data, message, responseLatency);
+    if (isGuest) { localStorage.setItem('mind_cave_guest_ai_prompts', guestPromptsUsed + 1); checkGuestSoftAuthTrigger('prompt'); }
 
 
 
