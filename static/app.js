@@ -2762,11 +2762,11 @@ function switchTab(tabId) {
   const views = ['overview', 'journals', 'notes', 'studio', 'analytics', 'security'];
   const titles = {
     overview: 'Home Sanctuary',
-    journals: 'Journal & Life Tracks',
+    journals: 'Journal & Tracks',
     notes: 'Notes & Capture',
     studio: 'AI Reflective Studio',
     analytics: 'MindPulse Insights',
-    security: 'Private Vault & Security'
+    security: 'Settings & Vault'
   };
 
   const topbarTitle = document.getElementById('topbar-current-view');
