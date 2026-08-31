@@ -968,9 +968,17 @@ window.dispatchGlobalInstantRefresh = dispatchGlobalInstantRefresh;
 
 var profileStorage = window.profileStorage || {
   getUid: () => {
-    return (window.state && window.state.currentUser && window.state.currentUser.uid) 
-      ? window.state.currentUser.uid 
-      : (localStorage.getItem('gemini_journal_uid') || 'user_alice');
+    return (window.state && window.state.currentUser && window.state.currentUser.uid)
+      ? window.state.currentUser.uid
+      : (localStorage.getItem('gemini_journal_uid') || 'guest_user');
+  },
+  // ─── setUid: update active scoped UID for all subsequent storage calls ───
+  setUid: (uid) => {
+    if (!uid) return;
+    localStorage.setItem('gemini_journal_uid', uid);
+    if (window.state && window.state.currentUser) {
+      window.state.currentUser.uid = uid;
+    }
   },
   getKey: (key, uid = null) => {
     const activeUid = uid || profileStorage.getUid();
@@ -4487,10 +4495,12 @@ var mockGCalSchedule = localStorage.getItem('mind_cave_is_reset') ? {} : {
   '17:00': { title: 'Daily Engineering Review', duration: '30m', category: 'Wrap-up' }
 };
 
-// Mock Memory Photos
-var memoryPhotosList = JSON.parse(localStorage.getItem('mind_cave_memory_photos') || 'null') || (localStorage.getItem('mind_cave_is_reset') ? [] : [
+// Memory Photos — only pre-populate for guest sessions; authenticated users start with empty
+var _isGuestSession = !localStorage.getItem('gemini_journal_uid') || localStorage.getItem('gemini_journal_uid').startsWith('guest');
+var _hasReset = !!localStorage.getItem('mind_cave_is_reset');
+var memoryPhotosList = JSON.parse(localStorage.getItem('mind_cave_memory_photos') || 'null') || ((_isGuestSession && !_hasReset) ? [
   {
-    id: 'photo_1',
+    id: 'demo_photo_morning',
     hour: '08:15',
     url: 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=600&q=80',
     caption: 'Morning coffee & quiet planning before the sprint',
@@ -4499,7 +4509,7 @@ var memoryPhotosList = JSON.parse(localStorage.getItem('mind_cave_memory_photos'
     energy: '8/10'
   },
   {
-    id: 'photo_2',
+    id: 'demo_photo_noon',
     hour: '12:30',
     url: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=600&q=80',
     caption: 'Whiteboarding session on multi-track cognitive sync',
@@ -4508,7 +4518,7 @@ var memoryPhotosList = JSON.parse(localStorage.getItem('mind_cave_memory_photos'
     energy: '9/10'
   },
   {
-    id: 'photo_3',
+    id: 'demo_photo_evening',
     hour: '18:45',
     url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80',
     caption: 'Sunset run to clear mental cache and anchor gratitude',
@@ -4516,7 +4526,7 @@ var memoryPhotosList = JSON.parse(localStorage.getItem('mind_cave_memory_photos'
     mood: 'Joyful',
     energy: '8/10'
   }
-]);
+] : []);
 
 
 
