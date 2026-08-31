@@ -2770,11 +2770,50 @@ async function signInWithFirebaseGoogle() {
     await switchUserProfile(state.currentUser.uid, displayName, state.currentUser.token);
     showToast(`Welcome ${displayName}! Biological profile synchronized.`);
   } catch (err) {
-    if (err.code === 'auth/api-key-not-valid' || (err.message && err.message.includes('api-key-not-valid'))) {
-      const reset = confirm("Firebase Error: The Web API key configured for Firebase Authentication is invalid.\n\nNote: Do NOT enter your Gemini AI Studio API Key here. Enter your Firebase Web App API Key (from Firebase Console → Project Settings → Web App).\n\nWould you like to clear the custom configuration now?");
+    if (err.code === 'auth/unauthorized-domain' || (err.message && err.message.includes('unauthorized-domain'))) {
+      const currentHost = window.location.hostname || '127.0.0.1';
+      const useLocal = confirm(
+        `Firebase Google Sign-In Error: Domain "${currentHost}" is not authorized for OAuth in your Firebase Project.
+
+` +
+        `🛠️ HOW TO FIX IN FIREBASE CONSOLE:
+` +
+        `1. Open Firebase Console → Authentication → Settings tab
+` +
+        `2. Scroll to "Authorized domains" and click "Add domain"
+` +
+        `3. Add "${currentHost}" (and "localhost" if needed)
+
+` +
+        `Would you like to continue with a Local Development Profile (Vicky) right now?`
+      );
+      if (useLocal) {
+        state.currentUser = {
+          uid: 'user_vicky',
+          name: 'Vicky',
+          email: 'vicky@gemini-journal.local',
+          token: 'demo_user_vicky'
+        };
+        localStorage.setItem('gemini_journal_uid', state.currentUser.uid);
+        localStorage.setItem('gemini_journal_name', state.currentUser.name);
+        localStorage.setItem('gemini_journal_token', state.currentUser.token);
+        localStorage.setItem('mind_cave_profile_name', 'Vicky');
+        closeAuthModal();
+        if (typeof renderProfileStateUI === 'function') renderProfileStateUI();
+        if (typeof updateAllDashboardStats === 'function') updateAllDashboardStats();
+        showToast('Logged in as Vicky (Local Authorized Profile)');
+      }
+    } else if (err.code === 'auth/api-key-not-valid' || (err.message && err.message.includes('api-key-not-valid'))) {
+      const reset = confirm("Firebase Error: The Web API key configured for Firebase Authentication is invalid.
+
+Note: Do NOT enter your Gemini AI Studio API Key here. Enter your Firebase Web App API Key (from Firebase Console → Project Settings → Web App).
+
+Would you like to clear the custom configuration now?");
       if (reset) {
         clearCustomFirebaseConfig();
       }
+    } else if (err.code === 'auth/popup-closed-by-user') {
+      showToast('Sign-in cancelled.');
     } else {
       alert(`Google Sign-In Error: ${err.message}`);
     }
