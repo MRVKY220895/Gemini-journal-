@@ -255,9 +255,15 @@
                 <div class="flex items-center gap-2"><span>🌐</span><span class="font-semibold">Auto-Detect</span></div>
               </button>
             </div>
-            <div class="py-1 space-y-0.5">
+                        <div class="py-1 space-y-0.5">
               <button onclick="selectLanguageOption('en')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] font-medium cursor-pointer">
                 <div class="flex items-center gap-2"><span>🇬🇧</span><span>English</span></div>
+              </button>
+              <button onclick="selectLanguageOption('tanglish')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] font-medium cursor-pointer">
+                <div class="flex items-center gap-2"><span>🇮🇳</span><span class="font-semibold text-emerald-600 dark:text-emerald-400">Tanglish (Tamil + EN)</span></div>
+              </button>
+              <button onclick="selectLanguageOption('hinglish')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] font-medium cursor-pointer">
+                <div class="flex items-center gap-2"><span>🇮🇳</span><span class="font-semibold text-cyan-600 dark:text-cyan-400">Hinglish (Hindi + EN)</span></div>
               </button>
               <button onclick="selectLanguageOption('ta')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] font-medium cursor-pointer">
                 <div class="flex items-center gap-2"><span>🇮🇳</span><span>தமிழ் (Tamil)</span></div>
@@ -291,9 +297,9 @@
         </button>
 
         <!-- Theme Mode Switcher -->
-        <button onclick="toggleThemeMode()" class="nav-action-btn font-semibold shrink-0 cursor-pointer" title="Toggle Light/Dark Theme">
-          <i data-lucide="sun" class="w-3.5 h-3.5 hidden dark:inline text-amber-400"></i>
-          <i data-lucide="moon" class="w-3.5 h-3.5 inline dark:hidden text-slate-500"></i>
+        <button type="button" onclick="toggleThemeMode()" class="nav-action-btn font-semibold shrink-0 cursor-pointer flex items-center justify-center p-2 rounded-xl hover:bg-[var(--mc-bg-tertiary)] transition-all" title="Toggle Light/Dark Theme">
+          <i data-lucide="sun" class="w-4 h-4 hidden dark:block text-amber-400"></i>
+          <i data-lucide="moon" class="w-4 h-4 block dark:hidden text-slate-600"></i>
         </button>
 
         <!-- User Profile Pill -->
@@ -889,7 +895,7 @@
       <!-- ─── Master Journal Page Header & Actions ─── -->
       <div class="journal-page-header flex flex-row flex-wrap items-center justify-between gap-2 mb-1">
         <div class="journal-header-title min-w-0">
-          <span class="text-[10px] font-mono tracking-widest text-[var(--mc-text-muted)] uppercase">Life Intelligence System</span>
+          <span class="text-[10px] font-mono tracking-widest text-[var(--mc-text-muted)] uppercase">Mind Cave Sanctuary</span>
           <h2 class="text-base sm:text-lg font-semibold tracking-tight text-[var(--mc-text-primary)] mt-0.5 truncate">Mind Cave Journal</h2>
         </div>
 
@@ -1701,7 +1707,7 @@
         <div>
           <div class="flex items-center gap-2">
             <div class="flex items-center gap-1.5">
-              <h2 class="text-base sm:text-lg font-semibold text-[var(--mc-text-primary)] tracking-tight">Life Intelligence Master Dashboard</h2>
+              <h2 class="text-base sm:text-lg font-semibold text-[var(--mc-text-primary)] tracking-tight">Daily Sanctuary Overview</h2>
               <button type="button" onclick="openChartInfoModal('pillars')" class="text-[var(--mc-text-muted)] hover:text-[var(--mc-accent)] transition-colors p-0.5 cursor-pointer" title="How all 6 pillars are calculated">
                 <i data-lucide="info" class="w-4 h-4"></i>
               </button>
@@ -3979,14 +3985,14 @@
             </div>
           </div>
 
-          <!-- Accordion 2: Journal (Life Intelligence System) -->
+          <!-- Accordion 2: Journal (Mind Cave Sanctuary) -->
           <div class="rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)] overflow-hidden transition-all">
             <button type="button" onclick="toggleDirectorySection('dir-section-2')" class="w-full p-2.5 sm:p-3 flex items-center justify-between hover:bg-[var(--mc-bg-elevation)] transition-colors text-left cursor-pointer">
               <div class="flex items-center gap-2">
                 <div class="w-6 h-6 rounded-lg bg-[#9BB7A5]/15 text-[#9BB7A5] flex items-center justify-center shrink-0">
                   <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
                 </div>
-                <span class="font-semibold text-[var(--mc-text-primary)] text-xs">2. Journal — Life Intelligence System</span>
+                <span class="font-semibold text-[var(--mc-text-primary)] text-xs">2. Journal — Mind Cave Sanctuary</span>
               </div>
               <div class="flex items-center gap-2">
                 <span class="text-[10px] text-[#9BB7A5] font-mono px-1.5 py-0.5 rounded bg-[#9BB7A5]/10 border border-[#9BB7A5]/25">5 Tracks</span>
@@ -4410,7 +4416,7 @@
   </div>
 
   <!-- Client Application Script -->
-  <script src="/static/app.js?v=1788200000"></script>
+  <script src="/static/app.js?v=1788201000"></script>
   <script>
     // Initialize Lucide Icons
     lucide.createIcons();
@@ -4820,6 +4826,6 @@
   </div>
 
   <!-- Core Application Script -->
-  <script src="/static/app.js?v=1788200000" defer></script>
+  <script src="/static/app.js?v=1788201000" defer></script>
 </body>
 </html>

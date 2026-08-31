@@ -1,4 +1,44 @@
 
+// ─── TANGILSH, HINGLISH & MULTILINGUAL RECOGNITION ───
+
+const APP_LANGUAGES_EXTENDED = {
+  'auto': { flag: '🌐', code: 'Auto', name: 'Auto-Detect' },
+  'en': { flag: '🇬🇧', code: 'EN', name: 'English' },
+  'tanglish': { flag: '🇮🇳', code: 'TA-EN', name: 'Tanglish (Tamil + English)' },
+  'hinglish': { flag: '🇮🇳', code: 'HI-EN', name: 'Hinglish (Hindi + English)' },
+  'ta': { flag: '🇮🇳', code: 'TA', name: 'தமிழ் (Tamil)' },
+  'hi': { flag: '🇮🇳', code: 'HI', name: 'हिन्दी (Hindi)' },
+  'es': { flag: '🇪🇸', code: 'ES', name: 'Español' },
+  'fr': { flag: '🇫🇷', code: 'FR', name: 'Français' },
+  'de': { flag: '🇩🇪', code: 'DE', name: 'Deutsch' },
+  'ja': { flag: '🇯🇵', code: 'JA', name: '日本語' },
+  'zh': { flag: '🇨🇳', code: 'ZH', name: '中文' },
+  'pt': { flag: '🇧🇷', code: 'PT', name: 'Português' }
+};
+
+function initSpeechRecognitionLanguage(recognition) {
+  if (!recognition) return;
+  const currentLang = localStorage.getItem('mind_cave_language') || 'auto';
+  if (currentLang === 'ta' || currentLang === 'tanglish') {
+    recognition.lang = 'ta-IN';
+  } else if (currentLang === 'hi' || currentLang === 'hinglish') {
+    recognition.lang = 'hi-IN';
+  } else if (currentLang === 'es') {
+    recognition.lang = 'es-ES';
+  } else if (currentLang === 'fr') {
+    recognition.lang = 'fr-FR';
+  } else if (currentLang === 'de') {
+    recognition.lang = 'de-DE';
+  } else if (currentLang === 'ja') {
+    recognition.lang = 'ja-JP';
+  } else if (currentLang === 'zh') {
+    recognition.lang = 'zh-CN';
+  } else {
+    recognition.lang = 'en-IN'; // Indian English / Global English default
+  }
+}
+
+
 // ─── REFLECTIONS VAULT BULK SELECT & DELETE ENGINE ───
 
 var isBulkSelectJournalMode = false;
@@ -1198,7 +1238,7 @@ function renderHomeHabitsMini() {
               <i data-lucide="check" class="w-3.5 h-3.5 ${isDone ? 'text-white' : ''}"></i>
             </button>
             <div class="min-w-0">
-              <div class="text-xs font-bold text-[var(--mc-text-primary)] truncate ${isDone ? 'line-through opacity-70' : ''}">${escapeHtml(habitTitle)}</div>
+              <div class="text-xs font-bold text-[var(--mc-text-primary)] truncate ${isDone ? 'line-through decoration-emerald-500/60 decoration-[1.5px] text-[var(--mc-text-muted)] opacity-85' : 'text-[var(--mc-text-primary)]'}">${escapeHtml(habitTitle)}</div>
               <div class="text-[10px] text-amber-500 font-mono flex items-center gap-1.5 mt-0.5">
                 <span>🔥 ${h.streak || 0}d streak</span>
                 ${isCounter ? `<span class="text-[var(--mc-text-muted)] font-sans">• ${currentCount}/${targetCount} ${escapeHtml(h.unit || 'units')}</span>` : ''}
@@ -3619,34 +3659,34 @@ function appendChatMessage(role, content, authorName, modelTag, cognitiveData = 
         </div>
 
         <!-- Collapsible MindPulse Cognitive Analytics -->
-        <div class="mt-3 pt-2.5 border-t border-white/5">
-          <details class="text-[11px] text-slate-400 group/details">
-            <summary class="cursor-pointer hover:text-cyan-400 transition-colors flex items-center gap-1.5 font-medium list-none">
-              <i data-lucide="activity" class="w-3.5 h-3.5 text-cyan-400"></i>
+        <div class="mt-3 pt-2.5 border-t border-[var(--mc-border-subtle)]">
+          <details class="text-[11px] text-[var(--mc-text-secondary)] group/details">
+            <summary class="cursor-pointer hover:text-emerald-500 transition-colors flex items-center gap-1.5 font-medium list-none">
+              <i data-lucide="activity" class="w-3.5 h-3.5 text-emerald-500"></i>
               <span>MindPulse Insight & Architecture Details</span>
               <i data-lucide="chevron-down" class="w-3 h-3 ml-auto group-open/details:rotate-180 transition-transform"></i>
             </summary>
 
-            <div class="mt-2.5 p-3 rounded-xl bg-black/40 border border-white/5 space-y-2.5">
-              <div class="flex items-center justify-between text-[10px] text-slate-400 border-b border-white/5 pb-2">
-                <span>Model Engine: <strong class="text-cyan-300 font-mono">${escapeHtml(modelTag || 'gemini-3.5-flash')}</strong></span>
-                <span>Privacy: <strong class="text-emerald-400 font-mono">Isolated Cloud Firestore</strong></span>
+            <div class="mt-2.5 p-3.5 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] space-y-3">
+              <div class="flex items-center justify-between text-[10px] text-[var(--mc-text-secondary)] border-b border-[var(--mc-border-subtle)] pb-2">
+                <span>Model Engine: <strong class="text-emerald-600 dark:text-emerald-400 font-mono">${escapeHtml(modelTag || 'gemini-3.5-flash')}</strong></span>
+                <span>Privacy: <strong class="text-emerald-600 dark:text-emerald-400 font-mono">Isolated Vault</strong></span>
               </div>
 
               ${cognitiveData?.mood_scores ? `
-                <div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5 text-center pt-1">
+                <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 text-center pt-0.5">
                   ${Object.entries(cognitiveData.mood_scores).map(([k, v]) => `
-                    <div class="bg-slate-900/80 p-1.5 rounded-lg border border-white/5">
-                      <div class="text-[9px] text-slate-400 uppercase font-mono">${k}</div>
-                      <div class="text-xs font-bold text-cyan-400 font-mono">${v}%</div>
+                    <div class="bg-[var(--mc-bg-secondary)] p-2 rounded-xl border border-[var(--mc-border-subtle)] shadow-xs">
+                      <div class="text-[9px] text-[var(--mc-text-muted)] uppercase font-mono font-bold">${k}</div>
+                      <div class="text-xs font-bold text-emerald-600 dark:text-emerald-400 font-mono mt-0.5">${v}%</div>
                     </div>
                   `).join('')}
                 </div>
               ` : ''}
 
               ${cognitiveData?.cognitive_reframing ? `
-                <div class="text-xs text-slate-300 bg-blue-950/20 p-2 rounded-lg border border-blue-500/15 leading-relaxed flex items-start gap-1.5">
-                  <strong class="text-blue-300 shrink-0 flex items-center gap-1"><i data-lucide="repeat" class="w-3.5 h-3.5 text-blue-400"></i><span>Reframing:</span></strong> <span>${escapeHtml(cognitiveData.cognitive_reframing)}</span>
+                <div class="text-xs text-[var(--mc-text-primary)] bg-emerald-500/10 p-3 rounded-xl border border-emerald-500/20 leading-relaxed flex items-start gap-2">
+                  <strong class="text-emerald-600 dark:text-emerald-400 shrink-0 flex items-center gap-1"><i data-lucide="repeat" class="w-3.5 h-3.5"></i><span>Reframing:</span></strong> <span>${escapeHtml(cognitiveData.cognitive_reframing)}</span>
                 </div>
               ` : ''}
             </div>
@@ -12976,7 +13016,7 @@ function renderBucketList() {
 
           <div>
 
-            <h4 class="text-sm font-bold text-slate-900 dark:text-white leading-snug cursor-pointer hover:text-[var(--mc-accent)] transition-colors ${isDone ? 'line-through opacity-70' : ''}" onclick="openBucketListModal('${b.id}')" title="Click to edit dream">
+            <h4 class="text-sm font-bold text-slate-900 dark:text-white leading-snug cursor-pointer hover:text-[var(--mc-accent)] transition-colors ${isDone ? 'line-through decoration-emerald-500/60 decoration-[1.5px] text-[var(--mc-text-muted)] opacity-85' : 'text-[var(--mc-text-primary)]'}" onclick="openBucketListModal('${b.id}')" title="Click to edit dream">
 
               ${escapeHtml(b.title)}
 
