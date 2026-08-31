@@ -9822,60 +9822,51 @@ function syncGooglePhotosForDate() {
 
 
 async function syncGoogleFitData() {
-
   const stepsEl = document.getElementById('fit-steps-val');
-
   const sleepEl = document.getElementById('fit-sleep-val');
+  const hrEl = document.getElementById('fit-hr-val');
+  const activeEl = document.getElementById('fit-active-val');
+  const stateLbl = document.getElementById('fit-connection-state-lbl');
+  const descEl = document.getElementById('fit-status-desc');
 
-  
-
-  if (stepsEl) stepsEl.textContent = 'Syncing...';
-
-  if (sleepEl) sleepEl.textContent = 'Syncing...';
-
-  
+  if (stepsEl) stepsEl.textContent = 'Checking...';
 
   try {
-
     const res = await fetch('/api/health/telemetry', { headers: getAuthHeaders() });
-
     if (!res.ok) throw new Error('API Sync Failed');
-
     const data = await res.json();
 
-    
-
-    if (stepsEl) stepsEl.textContent = `${data.steps.current.toLocaleString()} / ${data.steps.goal.toLocaleString()}`;
-
-    if (sleepEl) sleepEl.textContent = `${data.sleep.hours}h (${data.sleep.score}%)`;
-
-    
-
-    // Hardcode other placeholders for now as API expands
-
-    const hrEl = document.getElementById('fit-hr-val');
-
-    const activeEl = document.getElementById('fit-active-val');
-
-    if (hrEl) hrEl.textContent = '60 bpm';
-
-    if (activeEl) activeEl.textContent = '64 mins';
-
-    
-
-    showToast('Google Fit REST API Telemetry synced.');
-
+    if (data.connected && data.steps.current > 0) {
+      if (stepsEl) stepsEl.textContent = `${data.steps.current.toLocaleString()} / ${data.steps.goal.toLocaleString()}`;
+      if (sleepEl) sleepEl.textContent = `${data.sleep.hours}h (${data.sleep.score}%)`;
+      if (hrEl) hrEl.textContent = `${data.heart_rate || 62} bpm`;
+      if (activeEl) activeEl.textContent = `${data.active_minutes || 0} mins`;
+      if (stateLbl) {
+        stateLbl.textContent = '● Live Synced';
+        stateLbl.className = 'text-emerald-500 font-semibold font-mono';
+      }
+      showToast('Google Fit telemetry synced.');
+    } else {
+      if (stepsEl) stepsEl.textContent = '0 / 10k';
+      if (sleepEl) sleepEl.textContent = '-- hrs';
+      if (hrEl) hrEl.textContent = '-- bpm';
+      if (activeEl) activeEl.textContent = '-- mins';
+      if (stateLbl) {
+        stateLbl.textContent = 'Not Connected';
+        stateLbl.className = 'text-amber-500 font-semibold font-mono';
+      }
+      if (descEl) descEl.textContent = 'Sign in with Google OAuth to enable live Health Connect telemetry.';
+      showToast('Google Fit: No device linked yet. Sign in with Google to connect.');
+    }
   } catch (err) {
-
-    console.error(err);
-
-    showToast('Failed to sync Google Fit telemetry.');
-
-    if (stepsEl) stepsEl.textContent = 'Auth Req';
-
-    if (sleepEl) sleepEl.textContent = 'Auth Req';
-
+    if (stepsEl) stepsEl.textContent = '-- / 10k';
+    if (stateLbl) {
+      stateLbl.textContent = 'Offline / Local';
+      stateLbl.className = 'text-[var(--mc-text-muted)] font-semibold font-mono';
+    }
+    showToast('Google Fit telemetry offline.');
   }
+}
 
 }
 

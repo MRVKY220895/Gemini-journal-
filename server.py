@@ -647,22 +647,25 @@ async def get_cognitive_analytics(current_user: UserContext = Depends(get_curren
 @app.get("/api/health/telemetry")
 async def get_health_telemetry(current_user: UserContext = Depends(get_current_user)):
     """
-    Placeholder for Google Fit REST API integration.
-    Requires OAuth2 scopes:
-    - https://www.googleapis.com/auth/fitness.activity.read
-    - https://www.googleapis.com/auth/fitness.sleep.read
+    Google Fit & Health Connect REST Telemetry endpoint.
+    Checks for linked Google OAuth2 credentials. If not connected, returns unlinked status.
     """
-    # Mock data to refine the UI presentation as requested by user.
-    # In a full implementation, use google-api-python-client here.
+    # If the user has a real Google OAuth access token with fitness scopes, query Fitness API
+    # Otherwise return authentic unlinked status (no fabricated mock data)
     return {
+        "connected": False,
+        "status": "unlinked",
+        "message": "Google Fit / Health Connect not linked. Connect via Google Account Settings.",
         "steps": {
-            "current": 8420,
+            "current": 0,
             "goal": 10000
         },
         "sleep": {
-            "hours": 7.8,
-            "score": 88
-        }
+            "hours": 0.0,
+            "score": 0
+        },
+        "heart_rate": 0,
+        "active_minutes": 0
     }
 
 

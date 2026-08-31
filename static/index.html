@@ -1430,33 +1430,33 @@
                   <h3 class="text-xs font-semibold text-[var(--mc-text-primary)] flex items-center gap-1.5">
                     <i data-lucide="activity" class="w-4 h-4 text-emerald-400"></i> Google Fit & Health Connect
                   </h3>
-                  <button onclick="syncGoogleFitData()" class="text-[10px] text-emerald-400 hover:underline font-mono">Sync</button>
+                  <button onclick="syncGoogleFitData()" id="fit-sync-btn" class="text-[10px] text-emerald-400 hover:underline font-mono cursor-pointer">Connect / Sync</button>
                 </div>
-                <p class="text-[11px] text-slate-400 mb-3">Live physiological vitality and recovery telemetry.</p>
+                <p class="text-[11px] text-[var(--mc-text-secondary)] mb-3" id="fit-status-desc">Live physiological telemetry from your Android / WearOS device.</p>
 
                 <div class="grid grid-cols-2 gap-2 pt-0.5">
-                  <div class="p-2 rounded-xl bg-white/5 border border-white/5 text-center">
-                    <span class="text-[10px] text-slate-400 font-mono block">Daily Steps</span>
-                    <span class="text-xs font-bold text-emerald-400 font-mono" id="fit-steps-val">8,420 / 10k</span>
+                  <div class="p-2 rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] text-center">
+                    <span class="text-[10px] text-[var(--mc-text-muted)] font-mono block">Daily Steps</span>
+                    <span class="text-xs font-bold text-[var(--mc-text-primary)] font-mono" id="fit-steps-val">-- / 10k</span>
                   </div>
-                  <div class="p-2 rounded-xl bg-white/5 border border-white/5 text-center">
-                    <span class="text-[10px] text-slate-400 font-mono block">Sleep Score</span>
-                    <span class="text-xs font-bold text-purple-400 font-mono" id="fit-sleep-val">7.8h (88%)</span>
+                  <div class="p-2 rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] text-center">
+                    <span class="text-[10px] text-[var(--mc-text-muted)] font-mono block">Sleep Duration</span>
+                    <span class="text-xs font-bold text-[var(--mc-text-primary)] font-mono" id="fit-sleep-val">-- hrs</span>
                   </div>
-                  <div class="p-2 rounded-xl bg-white/5 border border-white/5 text-center">
-                    <span class="text-[10px] text-slate-400 font-mono block">Resting HR</span>
-                    <span class="text-xs font-bold text-rose-400 font-mono" id="fit-hr-val">62 bpm</span>
+                  <div class="p-2 rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] text-center">
+                    <span class="text-[10px] text-[var(--mc-text-muted)] font-mono block">Resting HR</span>
+                    <span class="text-xs font-bold text-[var(--mc-text-primary)] font-mono" id="fit-hr-val">-- bpm</span>
                   </div>
-                  <div class="p-2 rounded-xl bg-white/5 border border-white/5 text-center">
-                    <span class="text-[10px] text-slate-400 font-mono block">Focus Cardio</span>
-                    <span class="text-xs font-bold text-[var(--mc-accent)] font-mono font-medium" id="fit-active-val">52 mins</span>
+                  <div class="p-2 rounded-xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] text-center">
+                    <span class="text-[10px] text-[var(--mc-text-muted)] font-mono block">Active Cardio</span>
+                    <span class="text-xs font-bold text-[var(--mc-text-primary)] font-mono" id="fit-active-val">-- mins</span>
                   </div>
                 </div>
               </div>
 
-              <div class="pt-2 border-t border-white/5 text-[10px] text-slate-400 flex justify-between">
-                <span>Recovery State</span>
-                <span class="text-emerald-400 font-semibold">Optimal (94%)</span>
+              <div class="pt-2 border-t border-[var(--mc-border-subtle)] text-[10px] text-[var(--mc-text-secondary)] flex justify-between items-center mt-2">
+                <span>Integration State</span>
+                <span class="text-amber-500 font-semibold font-mono" id="fit-connection-state-lbl">Not Linked</span>
               </div>
             </div>
           </div>
@@ -4795,6 +4795,6 @@
   </div>
 
   <!-- Core Application Script -->
-  <script src="/static/app.js?v=1788183500" defer></script>
+  <script src="/static/app.js?v=1788184000" defer></script>
 </body>
 </html>
