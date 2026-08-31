@@ -78,7 +78,7 @@ window.state = state;
 
 // ─── HOME SANCTUARY BENTO CONTROLLERS (INSPIRED BY REFERENCE) ───
 
-let currentHomeSelectedMood = { name: 'Calm', emoji: '😊', class: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' };
+var currentHomeSelectedMood = { name: 'Calm', emoji: '😊', class: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' };
 
 function updateHomeGreetingAndDate() {
   const greetingEl = document.getElementById('home-greeting-salutation');
@@ -139,8 +139,8 @@ document.addEventListener('click', (e) => {
   }
 });
 
-let homeSpeechRec = null;
-let isHomeVoiceRecording = false;
+var homeSpeechRec = null;
+var isHomeVoiceRecording = false;
 
 function toggleHomeVoiceRecording() {
   const btn = document.getElementById('btn-home-voice');
@@ -493,7 +493,7 @@ window.saveUserProfileDetails = saveUserProfileDetails;
 
 // ─── BULK DELETE & SELECTION CONTROLLERS ───
 
-let selectedReflectionIds = new Set();
+var selectedReflectionIds = new Set();
 
 function toggleReflectionSelection(journalId, isChecked) {
   if (isChecked) {
