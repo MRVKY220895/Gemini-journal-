@@ -1,4 +1,33 @@
 
+// ─── MEMORY LANE & LONGITUDINAL REFLECTION LOOP ENGINE ───
+
+function renderMemoryLane() {
+  const journals = getUnifiedJournalsList();
+  const dateEl = document.getElementById('memory-lane-date');
+  const tagEl = document.getElementById('memory-lane-tag');
+  const quoteEl = document.getElementById('memory-lane-quote');
+
+  if (!journals || journals.length === 0) {
+    if (dateEl) dateEl.textContent = '30 Days Reflection Loop';
+    if (tagEl) tagEl.textContent = 'Awaiting Entries';
+    if (quoteEl) quoteEl.textContent = 'Write entries over time to unlock automated 30-day longitudinal memory comparisons and cognitive shift analysis.';
+    return;
+  }
+
+  const pastEntry = journals.length > 1 ? journals[journals.length - 1] : journals[0];
+  const d = new Date(pastEntry.created_at ? (typeof pastEntry.created_at === 'number' ? (pastEntry.created_at > 1e11 ? pastEntry.created_at : pastEntry.created_at * 1000) : pastEntry.created_at) : (pastEntry.createdAt || Date.now()));
+  const dateFormatted = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  const moodName = (pastEntry.mood || 'Reflective').charAt(0).toUpperCase() + (pastEntry.mood || 'Reflective').slice(1);
+
+  if (dateEl) dateEl.textContent = `${dateFormatted} (${pastEntry.title || 'Past Reflection'})`;
+  if (tagEl) tagEl.textContent = moodName;
+  if (quoteEl) quoteEl.textContent = `"${(pastEntry.content || pastEntry.title || '').slice(0, 240)}..."`;
+
+  if (window.lucide) refreshIcons();
+}
+window.renderMemoryLane = renderMemoryLane;
+
+
 function checkFirstTimeOnboarding() {
   try {
     const hasSeen = localStorage.getItem('mind_cave_onboarding_completed');
@@ -11898,7 +11927,7 @@ function renderTimelineShortcuts() {
 
         <span class="text-xs">${h.emoji || '💧'}</span>
 
-        <span class="text-xs font-semibold whitespace-nowrap">${escapeHtml(h.title.split(' ')[0] || h.title)}</span>
+        <span class="text-xs font-semibold whitespace-nowrap">${escapeHtml(((h.title || h.name || 'Habit') + '').split(' ')[0])}</span>
 
         ${isCounter ? `<span class="text-[10px] font-mono font-bold ${isDone ? 'text-emerald-500' : 'text-cyan-400'}">${currentCount}/${targetCount}</span>` : ''}
 
