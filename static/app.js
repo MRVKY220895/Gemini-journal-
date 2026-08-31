@@ -1,3 +1,44 @@
+var profileStorage = window.profileStorage || {
+  getUid: () => {
+    return (window.state && window.state.currentUser && window.state.currentUser.uid) 
+      ? window.state.currentUser.uid 
+      : (localStorage.getItem('gemini_journal_uid') || 'user_alice');
+  },
+  getKey: (key, uid = null) => {
+    const activeUid = uid || profileStorage.getUid();
+    return `mc_u_${activeUid}_${key}`;
+  },
+  getItem: (key, fallback = null, uid = null) => {
+    try {
+      const scopedKey = profileStorage.getKey(key, uid);
+      const val = localStorage.getItem(scopedKey);
+      if (val === null || val === undefined || val === 'undefined' || val === 'null') return fallback;
+      return JSON.parse(val);
+    } catch (e) {
+      return fallback;
+    }
+  },
+  getRaw: (key, fallback = null, uid = null) => {
+    const scopedKey = profileStorage.getKey(key, uid);
+    const val = localStorage.getItem(scopedKey);
+    return val !== null ? val : fallback;
+  },
+  setItem: (key, val, uid = null) => {
+    try {
+      const scopedKey = profileStorage.getKey(key, uid);
+      const strVal = typeof val === 'string' ? val : JSON.stringify(val);
+      localStorage.setItem(scopedKey, strVal);
+    } catch (e) {
+      console.warn('profileStorage setItem error:', e);
+    }
+  },
+  removeItem: (key, uid = null) => {
+    const scopedKey = profileStorage.getKey(key, uid);
+    localStorage.removeItem(scopedKey);
+  }
+};
+window.profileStorage = profileStorage;
+
 
 // ─── REALTIME HOMEPAGE COMPUTATION (INSPIRED BY REFERENCE) ───
 
@@ -685,8 +726,8 @@ function escapeHtml(str) {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+    .replace(new RegExp('"', 'g'), '&quot;')
+    .replace(new RegExp("'", 'g'), '&#039;');
 }
 window.escapeHtml = escapeHtml;
 
@@ -987,46 +1028,7 @@ window.switchUserProfile = switchUserProfile;
 // MULTI-PROFILE CLIENT TENANT ISOLATION ENGINE (DEVICE-SAFE PROFILE SCOPING)
 // =============================================================================
 
-const profileStorage = {
-  getUid: () => {
-    return (state && state.currentUser && state.currentUser.uid) 
-      ? state.currentUser.uid 
-      : (localStorage.getItem('gemini_journal_uid') || 'user_alice');
-  },
-  getKey: (key, uid = null) => {
-    const activeUid = uid || profileStorage.getUid();
-    return `mc_u_${activeUid}_${key}`;
-  },
-  getItem: (key, fallback = null, uid = null) => {
-    try {
-      const scopedKey = profileStorage.getKey(key, uid);
-      const val = localStorage.getItem(scopedKey);
-      if (val === null || val === undefined || val === 'undefined' || val === 'null') return fallback;
-      return JSON.parse(val);
-    } catch (e) {
-      return fallback;
-    }
-  },
-  getRaw: (key, fallback = null, uid = null) => {
-    const scopedKey = profileStorage.getKey(key, uid);
-    const val = localStorage.getItem(scopedKey);
-    return val !== null ? val : fallback;
-  },
-  setItem: (key, val, uid = null) => {
-    try {
-      const scopedKey = profileStorage.getKey(key, uid);
-      const strVal = typeof val === 'string' ? val : JSON.stringify(val);
-      localStorage.setItem(scopedKey, strVal);
-    } catch (e) {
-      console.warn('profileStorage setItem error:', e);
-    }
-  },
-  removeItem: (key, uid = null) => {
-    const scopedKey = profileStorage.getKey(key, uid);
-    localStorage.removeItem(scopedKey);
-  }
-};
-window.profileStorage = profileStorage;
+// profileStorage hoisted to top of app.js
 
 
 // ─── CHART & METRIC EXPLANATION INFO MODAL CONTROLLER ───
@@ -3601,7 +3603,7 @@ function updateContextualSuggestions(userMessage, cognitiveData) {
 
   container.innerHTML = suggestions.map(s => `
 
-    <button onclick="insertPrompt('${escapeHtml(s.text).replace(/'/g, "\\'")}')" class="text-xs text-[var(--mc-text-primary)] hover:bg-[var(--mc-bg-elevation)] bg-[var(--mc-bg-secondary)] px-3.5 py-1.5 rounded-full border border-[var(--mc-border-default)] transition-all shrink-0 flex items-center gap-1.5 shadow-sm cursor-pointer">
+    <button onclick="insertPrompt('${escapeHtml(s.text).replace(new RegExp("'", 'g'), "\\'")}')" class="text-xs text-[var(--mc-text-primary)] hover:bg-[var(--mc-bg-elevation)] bg-[var(--mc-bg-secondary)] px-3.5 py-1.5 rounded-full border border-[var(--mc-border-default)] transition-all shrink-0 flex items-center gap-1.5 shadow-sm cursor-pointer">
 
       <i data-lucide="${s.icon}" class="w-3.5 h-3.5 text-[var(--mc-accent)] shrink-0"></i> <span>${escapeHtml(s.text)}</span>
 
@@ -4023,7 +4025,7 @@ function renderSavedReflections() {
             <p class="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">${escapeHtml(j.content || '')}</p>
             <div class="text-[10px] text-slate-500 font-mono pt-1 border-t border-white/5 flex items-center justify-between">
               <span>${dateStr}</span>
-              <button onclick="insertPrompt('${escapeHtml(j.title || '').replace(/'/g, "\\'")}') ; closeChatHistoryModal()" class="text-cyan-400 hover:underline">Discuss in AI Studio →</button>
+              <button onclick="insertPrompt('${escapeHtml(j.title || '').replace(new RegExp("'", 'g'), "\\'")}') ; closeChatHistoryModal()" class="text-cyan-400 hover:underline">Discuss in AI Studio →</button>
             </div>
           </div>
         `;
@@ -4086,7 +4088,7 @@ function narrateAIMessage(text, btnElement) {
   // Cancel any prior speech
   stopCurrentNarration();
 
-  const cleanText = text.replace(/[*#_\`~\[\]]/g, '').trim();
+  const cleanText = text.replace(new RegExp('[#*_~\\\\[\\\\]]', 'g'), '').replace(new RegExp('`', 'g'), '').trim();
   if (!cleanText) return;
 
   const utterance = new SpeechSynthesisUtterance(cleanText);
@@ -8440,6 +8442,7 @@ function updateAllDashboardStats() {
 
   const homeStreakBadge = document.getElementById('home-streak-badge');
   const masteryLevelBadge = document.getElementById('user-mastery-level-badge');
+  const badgesGrid = document.getElementById('home-badges-grid');
 
   // Realtime Homepage Stats Computations
   if (typeof updateHomepageRealtimeData === 'function') {
@@ -9179,31 +9182,7 @@ function importEncryptedBackup(inputElement) {
 
 
 
-function escapeHtml(str) {
-
-  if (!str) return '';
-
-  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-
-}
-
-
-
-function showToast(msg) {
-  const toast = document.createElement('div');
-  toast.className = 'fixed bottom-5 right-5 z-50 bg-[#161A1E] text-[#F2F4F5] text-xs px-4 py-2.5 rounded-full border border-[#30373E] shadow-2xl transition-all font-medium';
-  toast.textContent = msg;
-  document.body.appendChild(toast);
-
-  setTimeout(() => {
-
-    toast.style.opacity = '0';
-
-    setTimeout(() => toast.remove(), 300);
-
-  }, 3000);
-
-}
+// =============================================================================
 
 
 
@@ -9943,10 +9922,6 @@ async function syncGoogleFitData() {
     showToast('Google Fit telemetry offline.');
   }
 }
-
-}
-
-
 
 // =============================================================================
 
@@ -13155,7 +13130,7 @@ function renderDashboardMilestoneRadar() {
         <span class="text-[var(--mc-text-muted)]">•</span>
         <span class="${countdown.badgeClass} font-mono font-bold">${countdown.text}</span>
         <span class="text-[var(--mc-text-muted)]">•</span>
-        <span class="text-[var(--mc-accent)] font-medium italic">Next Step: ${escapeHtml(nextStep.replace(/^[0-9•\-\.]+\s*/, ''))}</span>
+        <span class="text-[var(--mc-accent)] font-medium italic">Next Step: ${escapeHtml(nextStep.replace(new RegExp('^[0-9•\\-\\.]+\\s*'), ''))}</span>
       `;
     }
   }
@@ -13377,7 +13352,7 @@ function renderBucketList() {
 
                       <input type="checkbox" ${isStepDone ? 'checked' : ''} onchange="toggleBucketPlanStep('${b.id}', ${idx})" class="mt-0.5 w-3.5 h-3.5 rounded text-[#5E856F] bg-[var(--mc-bg-secondary)] border-[var(--mc-border-default)] cursor-pointer">
 
-                      <span class="text-[11px] leading-tight flex-1">${escapeHtml(step.replace(/^[0-9•\-\.]+\s*/, ''))}</span>
+                      <span class="text-[11px] leading-tight flex-1">${escapeHtml(step.replace(new RegExp('^[0-9•\\-\\.]+\\s*'), ''))}</span>
 
                     </label>
 
