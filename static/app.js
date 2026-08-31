@@ -1,3 +1,82 @@
+// =============================================================================
+// MIND CAVE GLOBAL MANIFEST & ROOT STATE DECLARATION (LINE 1)
+// =============================================================================
+
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+window.escapeHtml = escapeHtml;
+
+function showToast(msg, duration = 3000) {
+  const toast = document.getElementById('toast-notification') || document.getElementById('toast');
+  const msgEl = document.getElementById('toast-message') || document.getElementById('toast-msg');
+  if (toast) {
+    if (msgEl) msgEl.textContent = msg;
+    else toast.textContent = msg;
+    toast.classList.remove('hidden', 'translate-y-12', 'opacity-0');
+    setTimeout(() => {
+      toast.classList.add('translate-y-12', 'opacity-0');
+      setTimeout(() => toast.classList.add('hidden'), 300);
+    }, duration);
+  }
+}
+window.showToast = showToast;
+
+function safeJSONParse(str, fallback = null) {
+  try {
+    return str ? JSON.parse(str) : fallback;
+  } catch (e) {
+    return fallback;
+  }
+}
+window.safeJSONParse = safeJSONParse;
+
+// Application State
+const state = {
+  currentUser: {
+    uid: localStorage.getItem('gemini_journal_uid') || 'user_alice',
+    name: localStorage.getItem('gemini_journal_name') || 'Alice (Demo Sandbox)',
+    token: localStorage.getItem('gemini_journal_token') || 'demo_user_alice',
+    gender: localStorage.getItem('mind_cave_user_gender') || 'female'
+  },
+  currentPersona: 'cbt_reflector',
+  currentSessionId: null,
+  radarChart: null,
+  lineChart: null,
+  firebaseApp: null,
+  firebaseAuth: null,
+  timelineRange: localStorage.getItem('mind_cave_timeline_range') || 'day_standard',
+  selectedDiaryDate: new Date(),
+  mediaMode: localStorage.getItem('mind_cave_media_mode') || 'photos',
+  diaryRangeMode: 'single', // 'single' | 'week' | 'all'
+  isSpeakingSummary: false,
+  isRecordingVoice: false,
+  speechRecognition: null,
+  speechUtterance: null,
+  agendaItems: [],
+  todayGoals: [],
+  todayGoal: { text: '', completed: false },
+  habitsList: [],
+  archivedHabits: [],
+  bucketList: [],
+  bucketCategories: safeJSONParse(localStorage.getItem('mind_cave_bucket_categories'), null) || [
+    { id: 'travel', name: 'Travel & World Exploration', color: 'cyan' },
+    { id: 'career', name: 'Career & Mastery', color: 'indigo' },
+    { id: 'adventure', name: 'Adventure & Sports', color: 'amber' },
+    { id: 'wellness', name: 'Wellness & Health', color: 'emerald' },
+    { id: 'creative', name: 'Art & Creation', color: 'purple' },
+    { id: 'wealth', name: 'Financial Freedom', color: 'rose' }
+  ],
+  scrapbookTheme: 'pastel'
+};
+window.state = state;
+
 
 // ─── MASTER SYSTEM & UTILITY EVENT HANDLERS ───
 
@@ -1399,44 +1478,7 @@ async function triggerPWAInstall() {
   deferredInstallPrompt = null;
 }
 
-// Application State
-const state = {
-  currentUser: {
-    uid: localStorage.getItem('gemini_journal_uid') || 'user_alice',
-    name: localStorage.getItem('gemini_journal_name') || 'Alice (Demo Sandbox)',
-    token: localStorage.getItem('gemini_journal_token') || 'demo_user_alice',
-    gender: localStorage.getItem('mind_cave_user_gender') || 'female'
-  },
-  currentPersona: 'cbt_reflector',
-  currentSessionId: null,
-  radarChart: null,
-  lineChart: null,
-  firebaseApp: null,
-  firebaseAuth: null,
-  timelineRange: localStorage.getItem('mind_cave_timeline_range') || 'day_standard',
-  selectedDiaryDate: new Date(),
-  mediaMode: localStorage.getItem('mind_cave_media_mode') || 'photos',
-  diaryRangeMode: 'single', // 'single' | 'week' | 'all'
-  isSpeakingSummary: false,
-  isRecordingVoice: false,
-  speechRecognition: null,
-  speechUtterance: null,
-  agendaItems: [],
-  todayGoals: [],
-  todayGoal: { text: '', completed: false },
-  habitsList: [],
-  archivedHabits: [],
-  bucketList: [],
-  bucketCategories: safeJSONParse(localStorage.getItem('mind_cave_bucket_categories'), null) || [
-    { id: 'travel', name: 'Travel & World Exploration', color: 'cyan' },
-    { id: 'career', name: 'Career & Mastery', color: 'indigo' },
-    { id: 'adventure', name: 'Adventure & Sports', color: 'amber' },
-    { id: 'wellness', name: 'Wellness & Health', color: 'emerald' },
-    { id: 'creative', name: 'Art & Creation', color: 'purple' },
-    { id: 'wealth', name: 'Financial Freedom', color: 'rose' }
-  ],
-  scrapbookTheme: 'pastel'
-};
+
 
 // Initialize Application on DOM Ready
 document.addEventListener('DOMContentLoaded', () => {
