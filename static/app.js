@@ -1054,36 +1054,26 @@ window.profileStorage = profileStorage;
 // ─── REALTIME HOMEPAGE COMPUTATION (INSPIRED BY REFERENCE) ───
 
 function updateHomepageRealtimeData() {
-  const journals = state.journals || [];
-  const habits = state.habitsList || [];
-
-  // 1. Dynamic Greeting & Streak Counter
   updateHomeGreetingAndDate();
-  
-  const streakCount = habits.length > 0 ? Math.max(...habits.map(h => h.streak || 0)) : (journals.length > 0 ? Math.min(7, journals.length) : 7);
-  const streakValEl = document.getElementById('home-header-streak-val');
-  if (streakValEl) streakValEl.textContent = `${streakCount} day streak`;
-
-  // 2. Render Recent Entries & Habits Mini
   renderHomeRecentEntries();
   renderHomeHabitsMini();
+  if (typeof renderHomeDashboardInsights === 'function') {
+    renderHomeDashboardInsights();
+  }
 
-  // 3. One Thing to Notice & Pattern Themes
+  const journals = getUnifiedJournalsList();
   const noticeHeadline = document.getElementById('home-notice-headline');
   const noticeSubtext = document.getElementById('home-notice-subtext');
-  const themeWorkCount = document.getElementById('home-theme-work-count');
-  const themeGrowthCount = document.getElementById('home-theme-growth-count');
-  const themeHealthCount = document.getElementById('home-theme-health-count');
-  const weeklyGrowthPct = document.getElementById('home-weekly-growth-pct');
 
-  if (journals.length > 0) {
+  if (journals.length === 0) {
+    if (noticeHeadline) noticeHeadline.textContent = 'Welcome to your Cognitive Sanctuary.';
+    if (noticeSubtext) noticeSubtext.textContent = 'Write your first reflection or log a micro-habit above to discover cognitive patterns.';
+  } else {
     const totalEntries = journals.length;
-    if (noticeHeadline) noticeHeadline.textContent = `You mentioned "clarity" and "work" ${Math.min(totalEntries + 2, 6)} times this week.`;
-    if (noticeSubtext) noticeSubtext.textContent = 'Most of those entries were about focus and execution velocity.';
-    if (themeWorkCount) themeWorkCount.textContent = `${Math.min(totalEntries + 3, 6)} times`;
-    if (themeGrowthCount) themeGrowthCount.textContent = `${Math.max(1, totalEntries)} times`;
-    if (themeHealthCount) themeHealthCount.textContent = `${Math.max(1, Math.floor(totalEntries / 2))} times`;
-    if (weeklyGrowthPct) weeklyGrowthPct.textContent = `+${Math.min(100, (totalEntries * 15))}%`;
+    const latest = journals[0];
+    const mood = latest.mood || 'calm';
+    if (noticeHeadline) noticeHeadline.textContent = `You've recorded ${totalEntries} reflection${totalEntries > 1 ? 's' : ''}, mostly feeling ${mood}.`;
+    if (noticeSubtext) noticeSubtext.textContent = 'Regular reflections enhance clarity and emotional resilience.';
   }
 }
 window.updateHomepageRealtimeData = updateHomepageRealtimeData;
@@ -1142,7 +1132,10 @@ function updateHomeGreetingAndDate() {
   if (hour >= 12 && hour < 17) timeSalutation = 'Good afternoon';
   else if (hour >= 17 || hour < 5) timeSalutation = 'Good evening';
 
-  const userName = (state.currentUser && state.currentUser.name) ? state.currentUser.name.split(' ')[0] : 'Vicky';
+  const isAuth = state.currentUser && state.currentUser.uid && !state.currentUser.uid.startsWith('guest');
+  const userName = isAuth
+    ? (state.currentUser.name ? state.currentUser.name.split(' ')[0] : 'Explorer')
+    : 'Explorer';
   if (greetingEl) {
     greetingEl.textContent = `${timeSalutation}, ${userName}`;
   }
@@ -1154,6 +1147,198 @@ function updateHomeGreetingAndDate() {
   }
 }
 window.updateHomeGreetingAndDate = updateHomeGreetingAndDate;
+
+function renderHomeDashboardInsights() {
+  const journals = getUnifiedJournalsList();
+  
+  // 1. Calculate Active Days in the current week (Mon-Sun) & Consecutive Streak
+  const today = new Date();
+  const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const dayEntryCounts = [0, 0, 0, 0, 0, 0, 0];
+  const moodCounts = {};
+  const tagCounts = {};
+
+  // Find Monday of current week
+  const monday = new Date(today);
+  const diffToMonday = (today.getDay() + 6) % 7;
+  monday.setDate(today.getDate() - diffToMonday);
+  monday.setHours(0, 0, 0, 0);
+
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  sunday.setHours(23, 59, 59, 999);
+
+  let totalWeekEntries = 0;
+
+  journals.forEach(j => {
+    const entryDate = new Date(j.createdAt || j.created_at || Date.now());
+    if (entryDate >= monday && entryDate <= sunday) {
+      const idx = (entryDate.getDay() + 6) % 7; // Mon=0, Sun=6
+      dayEntryCounts[idx]++;
+      totalWeekEntries++;
+      const m = (j.mood || 'Calm').toLowerCase();
+      moodCounts[m] = (moodCounts[m] || 0) + 1;
+    }
+    // Themes extraction
+    const tags = Array.isArray(j.tags) ? j.tags : (j.tags ? [j.tags] : []);
+    if (tags.length === 0 && j.title) {
+      const t = j.mood || 'Reflection';
+      tagCounts[t] = (tagCounts[t] || 0) + 1;
+    } else {
+      tags.forEach(t => {
+        tagCounts[t] = (tagCounts[t] || 0) + 1;
+      });
+    }
+  });
+
+  // Calculate Streak
+  let streak = 0;
+  if (journals.length > 0) {
+    const uniqueDates = new Set(
+      journals.map(j => new Date(j.createdAt || j.created_at || Date.now()).toDateString())
+    );
+    let checkDate = new Date(today);
+    // Check if logged today or yesterday
+    if (!uniqueDates.has(checkDate.toDateString())) {
+      checkDate.setDate(checkDate.getDate() - 1);
+    }
+    while (uniqueDates.has(checkDate.toDateString())) {
+      streak++;
+      checkDate.setDate(checkDate.getDate() - 1);
+    }
+  }
+
+  // 2. Update Top Streak Header
+  const streakValEl = document.getElementById('home-header-streak-val');
+  if (streakValEl) {
+    streakValEl.textContent = streak === 0 ? '0 day streak' : `${streak} day streak`;
+  }
+  const streakDotsEl = document.getElementById('home-header-streak-dots');
+  if (streakDotsEl) {
+    const currentDayIdx = (today.getDay() + 6) % 7;
+    streakDotsEl.innerHTML = dayNames.map((name, i) => {
+      const hasEntry = dayEntryCounts[i] > 0;
+      if (hasEntry) {
+        return `<span class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold" title="${name}: ${dayEntryCounts[i]} reflection(s)">✓</span>`;
+      } else if (i === currentDayIdx) {
+        return `<span class="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center text-[9px] font-bold" title="Today">○</span>`;
+      } else {
+        return `<span class="w-5 h-5 rounded-full bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)]" title="${name}"></span>`;
+      }
+    }).join('');
+  }
+
+  // 3. Update Mood This Week
+  const moodHeadlineEl = document.getElementById('home-mood-summary-headline');
+  const moodDescEl = document.getElementById('home-mood-summary-desc');
+  const moodBarsEl = document.getElementById('home-mood-weekly-bars');
+
+  if (journals.length === 0 || totalWeekEntries === 0) {
+    if (moodHeadlineEl) moodHeadlineEl.textContent = 'No reflections yet';
+    if (moodDescEl) moodDescEl.textContent = 'Log your first thought above to begin tracking weekly mood.';
+  } else {
+    let dominantMood = 'Balanced';
+    let maxMoodCount = 0;
+    Object.entries(moodCounts).forEach(([m, count]) => {
+      if (count > maxMoodCount) {
+        maxMoodCount = count;
+        dominantMood = m.charAt(0).toUpperCase() + m.slice(1);
+      }
+    });
+    if (moodHeadlineEl) moodHeadlineEl.textContent = `Mostly ${dominantMood.toLowerCase()}`;
+    if (moodDescEl) moodDescEl.textContent = `You recorded ${totalWeekEntries} reflection(s) this week.`;
+  }
+
+  if (moodBarsEl) {
+    const maxEntries = Math.max(...dayEntryCounts, 1);
+    const currentDayIdx = (today.getDay() + 6) % 7;
+    moodBarsEl.innerHTML = dayNames.map((name, i) => {
+      const count = dayEntryCounts[i];
+      const isToday = i === currentDayIdx;
+      const heightPercent = count > 0 ? Math.max(25, Math.round((count / maxEntries) * 90)) : (isToday ? 15 : 10);
+      const barClass = count > 0 
+        ? 'bg-emerald-500 rounded-lg shadow-md shadow-emerald-900/30' 
+        : (isToday ? 'bg-emerald-500/30 rounded-lg border border-dashed border-emerald-500/50' : 'bg-[var(--mc-bg-tertiary)] rounded-lg');
+      const labelClass = count > 0 || isToday
+        ? 'text-[10px] text-emerald-500 font-mono font-bold'
+        : 'text-[10px] text-[var(--mc-text-muted)] font-mono';
+
+      return `
+        <div class="flex flex-col items-center gap-1.5 flex-1 h-full justify-end" title="${name}: ${count} entries">
+          <div class="w-full ${barClass} transition-all duration-300" style="height: ${heightPercent}%;"></div>
+          <span class="${labelClass}">${name}</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // 4. Update Explore Your Patterns (Themes & Streak)
+  const themesContainer = document.getElementById('home-patterns-themes-container');
+  if (themesContainer) {
+    const sortedTags = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]).slice(0, 3);
+    if (sortedTags.length === 0) {
+      themesContainer.innerHTML = `
+        <div class="p-3 rounded-2xl border border-dashed border-[var(--mc-border-subtle)] text-[var(--mc-text-muted)] text-[11px] text-center">
+          No themes discovered yet. Start writing reflections to extract cognitive patterns.
+        </div>
+      `;
+    } else {
+      const tagColors = ['bg-emerald-500', 'bg-purple-500', 'bg-amber-500'];
+      themesContainer.innerHTML = sortedTags.map(([tag, count], idx) => `
+        <div class="flex items-center justify-between">
+          <span class="flex items-center gap-2 text-[var(--mc-text-primary)] font-medium">
+            <span class="w-2 h-2 rounded-full ${tagColors[idx % tagColors.length]}"></span> ${escapeHtml(tag)}
+          </span>
+          <span class="font-mono text-[var(--mc-text-secondary)]">${count} time${count > 1 ? 's' : ''}</span>
+        </div>
+      `).join('');
+    }
+  }
+
+  const weeklyGrowthEl = document.getElementById('home-weekly-growth-pct');
+  const weeklyGrowthTextEl = document.getElementById('home-weekly-reflection-desc');
+  if (weeklyGrowthEl && weeklyGrowthTextEl) {
+    if (totalWeekEntries === 0) {
+      weeklyGrowthTextEl.textContent = 'Capture reflections to see weekly momentum trends.';
+      weeklyGrowthEl.innerHTML = `0 <span class="text-xs font-normal text-[var(--mc-text-muted)]">entries this week</span>`;
+    } else {
+      weeklyGrowthTextEl.textContent = 'Keep reflecting to expand cognitive clarity.';
+      weeklyGrowthEl.innerHTML = `${totalWeekEntries} <span class="text-xs font-normal text-[var(--mc-text-muted)]">entries this week</span>`;
+    }
+  }
+
+  const patternsStreakDots = document.getElementById('home-patterns-streak-dots');
+  if (patternsStreakDots) {
+    const currentDayIdx = (today.getDay() + 6) % 7;
+    patternsStreakDots.innerHTML = dayNames.map((name, i) => {
+      const hasEntry = dayEntryCounts[i] > 0;
+      const isToday = i === currentDayIdx;
+      if (hasEntry) {
+        return `
+          <div class="flex flex-col items-center gap-1">
+            <span class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">✓</span>
+            <span class="text-[9px] text-emerald-500 font-mono font-bold">${name}</span>
+          </div>
+        `;
+      } else if (isToday) {
+        return `
+          <div class="flex flex-col items-center gap-1">
+            <span class="w-6 h-6 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center text-xs font-bold">○</span>
+            <span class="text-[9px] text-emerald-400 font-mono font-bold">${name}</span>
+          </div>
+        `;
+      } else {
+        return `
+          <div class="flex flex-col items-center gap-1">
+            <span class="w-6 h-6 rounded-full bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)]"></span>
+            <span class="text-[9px] text-[var(--mc-text-muted)] font-mono">${name}</span>
+          </div>
+        `;
+      }
+    }).join('');
+  }
+}
+window.renderHomeDashboardInsights = renderHomeDashboardInsights;
 
 function toggleHomeMoodPopover(event) {
   event?.stopPropagation();
@@ -2593,10 +2778,12 @@ function updateUserUI() {
     else el.classList.add('hidden');
   });
 
-  // ─── HEADER PILL SYNC (fixes "Guest" stuck after Google Sign-In) ───
-  const headerName  = document.getElementById('header-user-name');
+  // ─── USER PILL SYNC (Header & Sidebar) ───
+  const headerName   = document.getElementById('header-user-name');
   const headerAvatar = document.getElementById('header-user-avatar');
-  const headerBtn   = document.getElementById('btn-header-auth');
+  const headerBtn    = document.getElementById('btn-header-auth');
+  const sidebarName  = document.getElementById('sidebar-user-name');
+  const sidebarAvatar = document.getElementById('sidebar-user-avatar');
 
   if (state.currentUser && state.currentUser.uid && !state.currentUser.uid.startsWith('guest')) {
     // Authenticated — show real name & initial
@@ -2606,16 +2793,27 @@ function updateUserUI() {
       : fullName.slice(0, 2).toUpperCase();
     const displayLabel = fullName.length > 16 ? fullName.split(' ')[0] : fullName;
 
-    if (headerName)   headerName.textContent   = displayLabel;
-    if (headerAvatar) headerAvatar.textContent  = shortName;
-    if (headerAvatar) headerAvatar.className    = 'w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-[10px] font-bold';
-    if (headerBtn)    headerBtn.title            = `Signed in as ${fullName}`;
+    if (headerName)    headerName.textContent   = displayLabel;
+    if (headerAvatar)  headerAvatar.textContent  = shortName;
+    if (headerAvatar)  headerAvatar.className    = 'w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-[10px] font-bold';
+    if (headerBtn)     headerBtn.title            = `Signed in as ${fullName}`;
+
+    if (sidebarName)   sidebarName.textContent   = fullName;
+    if (sidebarAvatar) sidebarAvatar.textContent = shortName;
+    if (sidebarAvatar) sidebarAvatar.className   = 'w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold flex items-center justify-center text-xs shrink-0';
   } else {
     // Guest / unauthenticated
-    if (headerName)   headerName.textContent   = 'Guest';
-    if (headerAvatar) headerAvatar.textContent  = 'G';
-    if (headerAvatar) headerAvatar.className    = 'w-5 h-5 rounded-full bg-slate-500/20 text-slate-400 flex items-center justify-center text-[10px] font-bold';
+    if (headerName)    headerName.textContent   = 'Guest';
+    if (headerAvatar)  headerAvatar.textContent  = 'G';
+    if (headerAvatar)  headerAvatar.className    = 'w-5 h-5 rounded-full bg-slate-500/20 text-slate-400 flex items-center justify-center text-[10px] font-bold';
+
+    if (sidebarName)   sidebarName.textContent   = 'Guest Explorer';
+    if (sidebarAvatar) sidebarAvatar.textContent = 'G';
+    if (sidebarAvatar) sidebarAvatar.className   = 'w-8 h-8 rounded-full bg-slate-500/20 text-slate-400 font-bold flex items-center justify-center text-xs shrink-0';
   }
+
+  if (typeof updateHomeGreetingAndDate === 'function') updateHomeGreetingAndDate();
+  if (typeof renderHomeDashboardInsights === 'function') renderHomeDashboardInsights();
 }
 
 
@@ -15247,11 +15445,13 @@ window.addEventListener('DOMContentLoaded', () => {
   updateHomeGreetingAndDate();
   renderHomeRecentEntries();
   renderHomeHabitsMini();
+  renderHomeDashboardInsights();
 });
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
   updateHomeGreetingAndDate();
   renderHomeRecentEntries();
   renderHomeHabitsMini();
+  renderHomeDashboardInsights();
 }
 window.setChronoViewMode = setChronoViewMode;
 window.setTimelineViewMode = setTimelineViewMode;
