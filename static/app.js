@@ -1,27 +1,61 @@
 
+// ─── INITIAL STORAGE DEDUPLICATION ON STARTUP ───
+(function cleanInitialJournalDuplicates() {
+  try {
+    const raw = localStorage.getItem('mind_cave_cached_journals');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        const seen = new Set();
+        const unique = [];
+        parsed.forEach(j => {
+          if (!j) return;
+          const key = j.id || `${j.title}_${j.created_at || j.createdAt}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            unique.push(j);
+          }
+        });
+        localStorage.setItem('mind_cave_cached_journals', JSON.stringify(unique));
+      }
+    }
+  } catch (e) {}
+})();
+
+
 // ─── UNIFIED REALTIME JOURNAL STORAGE ENGINE ───
 
 function getUnifiedJournalsList() {
-  let journals = (state.journalsCache && state.journalsCache.length > 0) ? state.journalsCache : (state.journals || []);
-  if (!journals || journals.length === 0) {
+  let raw = (state.journalsCache && state.journalsCache.length > 0) ? state.journalsCache : (state.journals || []);
+  if (!raw || raw.length === 0) {
     try {
       const cached = localStorage.getItem('mind_cave_cached_journals');
-      if (cached) {
-        journals = JSON.parse(cached);
-        state.journalsCache = journals;
-        state.journals = journals;
-      } else {
-        const activeUid = (typeof profileStorage !== 'undefined') ? profileStorage.getUid() : (state.currentUser?.uid || 'guest');
-        const userSaved = localStorage.getItem('mind_cave_journals_' + activeUid);
-        if (userSaved) {
-          journals = JSON.parse(userSaved);
-          state.journalsCache = journals;
-          state.journals = journals;
-        }
-      }
+      if (cached) raw = JSON.parse(cached);
     } catch (e) {}
   }
-  return Array.isArray(journals) ? journals : [];
+  if (!raw || raw.length === 0) {
+    try {
+      const activeUid = (typeof profileStorage !== 'undefined') ? profileStorage.getUid() : (state.currentUser?.uid || 'guest');
+      const userSaved = localStorage.getItem('mind_cave_journals_' + activeUid);
+      if (userSaved) raw = JSON.parse(userSaved);
+    } catch (e) {}
+  }
+
+  // Strict deduplication by unique ID or title+timestamp
+  const seen = new Set();
+  const unique = [];
+  (raw || []).forEach(j => {
+    if (!j) return;
+    const key = j.id || `${j.title || ''}_${j.created_at || j.createdAt || ''}_${j.content || ''}`;
+    if (!seen.has(key)) {
+      seen.add(key);
+      unique.push(j);
+    }
+  });
+
+  state.journals = unique;
+  state.journalsCache = unique;
+  return unique;
 }
 window.getUnifiedJournalsList = getUnifiedJournalsList;
 
@@ -362,30 +396,39 @@ async function saveHomeQuickReflection() {
     return;
   }
 
-  const title = text.length > 40 ? text.slice(0, 40) + '...' : text;
+  const now = new Date();
+  const hourStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  const rawTitle = text.length > 40 ? text.slice(0, 40) + '...' : text;
   const entry = {
-    id: `journal_${Date.now()}`,
-    title,
+    id: `journal_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+    title: `[${hourStr}] ${rawTitle}`,
     content: text,
     mood: currentHomeSelectedMood.name.toLowerCase(),
-    tags: [currentHomeSelectedMood.name, 'QuickReflection'],
-    createdAt: new Date().toISOString(),
-    created_at: new Date().toISOString(),
+    tags: [currentHomeSelectedMood.name, 'QuickReflection', hourStr],
+    createdAt: now.toISOString(),
+    created_at: Math.floor(now.getTime() / 1000),
     is_encrypted: false
   };
 
   try {
-    if (!state.journals) state.journals = [];
-    state.journals.unshift(entry);
-    if (!state.journalsCache) state.journalsCache = [];
-    state.journalsCache.unshift(entry);
+    const list = getUnifiedJournalsList();
+    list.unshift(entry);
+    state.journals = list;
+    state.journalsCache = list;
 
-    const uid = state.currentUser?.uid || 'guest';
-    localStorage.setItem('mind_cave_journals_' + uid, JSON.stringify(state.journals));
-    localStorage.setItem('mind_cave_cached_journals', JSON.stringify(state.journalsCache));
+    const uid = (typeof profileStorage !== 'undefined') ? profileStorage.getUid() : (state.currentUser?.uid || 'guest');
+    localStorage.setItem('mind_cave_journals_' + uid, JSON.stringify(list));
+    localStorage.setItem('mind_cave_cached_journals', JSON.stringify(list));
     if (typeof profileStorage !== 'undefined' && profileStorage.setItem) {
-      profileStorage.setItem('cached_journals', state.journalsCache);
+      profileStorage.setItem('cached_journals', list);
     }
+
+    textarea.value = '';
+    showToast('Reflection saved to Living Timeline.');
+    checkGuestSoftAuthTrigger('reflection');
+
+    // Instantly propagate across all tabs in 0ms with zero delay
+    dispatchGlobalInstantRefresh('home_reflection');
 
     // Background server sync
     fetch('/api/journals', {
@@ -394,10 +437,6 @@ async function saveHomeQuickReflection() {
       body: JSON.stringify(entry)
     }).catch(e => console.debug('Firestore sync notice:', e));
 
-    textarea.value = '';
-    showToast('Reflection saved to Living Timeline.');
-    checkGuestSoftAuthTrigger('reflection');
-    dispatchGlobalInstantRefresh('home_reflection');
   } catch (err) {
     showToast('Reflection saved locally.');
   }
