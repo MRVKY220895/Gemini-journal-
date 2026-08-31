@@ -17,8 +17,11 @@
 - [🌟 Key Innovations & Deliverables](#-key-innovations--deliverables)
 - [🏛️ System Architecture](#️-system-architecture)
 - [🎨 Five Primary Destination Views](#-five-primary-destination-views)
+- [🗄️ Daily Habit Tracker & Archive Vault](#️-daily-habit-tracker--archive-vault)
+- [📊 100% Authentic Dynamic Analytics Engine](#-100-authentic-dynamic-analytics-engine)
 - [🌐 SeamlessM4T Multilingual & Colloquial Engine](#-seamlessm4t-multilingual--colloquial-engine)
 - [🛡️ Zero-Knowledge Security & Privacy Architecture](#️-zero-knowledge-security--privacy-architecture)
+- [⚡ Zero-Flash Pre-Paint Bootstrapper](#-zero-flash-pre-paint-bootstrapper)
 - [📱 Progressive Web App (PWA & Desktop App)](#-progressive-web-app-pwa--desktop-app)
 - [🚀 Quickstart & Local Setup](#-quickstart--local-setup)
 - [🧪 Testing & Regression Verification](#-testing--regression-verification)
@@ -29,16 +32,18 @@
 
 ## 🌟 Key Innovations & Deliverables
 
-| Deliverable / Feature | Implementation & Security Solution |
+| Deliverable / Feature | Implementation & Solution |
 |:---|:---|
 | **1. User Authentication** | **Firebase Auth** integration with cryptographic ID Token (JWT) verification on every API request. Zero trusting of client-supplied user IDs. |
 | **2. Multi-turn AI Guidance** | **Google Gemini 2.5 Flash** with context retention, dynamic emotional vectoring, and multi-persona prompts (*CBT Reflector, Socratic Brainstormer, Executive Strategist, Shadow Work*). |
-| **3. Isolated Data Storage** | **Cloud Firestore** collection hierarchy scoped strictly to `/users/{userId}/*` backed by `firestore.rules` (Default Deny & `request.auth.uid == userId`) with zero cross-tenant leakage. |
+| **3. Isolated Data Storage** | **Cloud Firestore** collection hierarchy scoped strictly to `/users/{userId}/*` backed by `firestore.rules` (Default Deny & `request.auth.uid == userId`) with client-scoped `mc_u_<UID>_*` storage keys. |
 | **4. Secure Key Management** | **Google Cloud Secret Manager** dynamic resolution (`projects/{id}/secrets/{secret_name}/versions/latest`). Zero API keys in frontend bundles, git history, or logs. |
 | **5. SeamlessM4T Voice & Language** | Multilingual speech-to-text with auto-detection for **Tanglish**, **Hinglish**, **Tamil**, **Hindi**, **Spanish**, **Mandarin**, **French**, **German**, **Japanese**, and **English**. |
-| **6. MindPulse Cognitive Analytics** | 6-vector emotional radar (*Joy, Clarity, Resilience, Focus, Calm, Optimism*), CBT cognitive distortion detection (*Catastrophizing, All-or-Nothing, Should statements*), and Chart.js analytics. |
-| **7. Living Timeline & Story Flow** | 0ms fast-path in-place journaling with dual presentation: **Vertical Stream** and full-width swipeable **Story Flow Carousel**. |
-| **8. Zero-Knowledge Client Vault** | Client-side **AES-256-GCM** Web Crypto encryption ensuring plain-text thoughts never touch cloud servers unless encrypted with device-derived keys. |
+| **6. MindPulse Dynamic Analytics** | 100% authentic metric calculation across 6 Executive Pillars, Category Focus Allocations, Multi-Horizon Consistency Heatmaps, and 6-Vector Emotional Radars. Zero fake mock data. |
+| **7. Habit Tracker & Archive Vault** | Active routine tracking with streak calculation, 7-day completion grids, Archive Vault preservation with historical streaks intact, and permanent deletion controls. |
+| **8. Living Timeline & Story Flow** | Fast-path in-place journaling with dual presentation: **Vertical Stream** and full-width swipeable **Story Flow Carousel**. |
+| **9. Zero-Knowledge Client Vault** | Client-side **AES-256-GCM** Web Crypto encryption ensuring plain-text thoughts never touch cloud servers unless encrypted with device-derived keys. |
+| **10. Zero-Flash Bootstrapper** | Pre-paint DOM mutation observers in `<head>` eliminating visual layout shifts and "Guest" flashes on page reload. |
 
 ---
 
@@ -74,13 +79,15 @@
 ## 🎨 Five Primary Destination Views
 
 ### 1. 🏡 Daily Sanctuary Overview
-- **Habit Streaks & Progress**: Dynamic streak counters and daily habit tracking.
+- **Habit Streaks & Progress**: Real-time habit checkmarks, active day dots, and streak counts.
 - **Fast-Path In-Place Capture**: Record thoughts in under 10ms with zero loading delay.
-- **Cognitive Reflections Stream**: Live preview of recent entries with instant emotion badges.
+- **Cognitive Reflections Stream**: Live preview of recent entries with mood vector badges.
+- **Dynamic Weekly Insights**: Genuine weekly reflection distributions and top pattern themes.
 
 ### 2. 📖 Journal & Tracks (Living Timeline)
 - **Vertical Stream View**: Chronological hour-by-hour view integrating reflections, Google Calendar events, deadline tasks, and visual memories.
 - **Story Flow Carousel View**: Interactive full-width slide-deck to revisit moments via swipe gestures, drag controls, or arrow keys.
+- **Daily Habit Tracker & Streaks**: 7-day completion dots, custom streak counters, and direct Archive Vault integration.
 - **Notes, Checklists & Smart Tasks**: Interactive checklists with strikethrough completion, deadline task tracking, and personal notes.
 - **Visual Memory Lane**: Photo journal integration with authentic date syncing and localized storage.
 
@@ -94,8 +101,9 @@
 - **Chat History & Vault**: Multi-session switching and saved reflection bookmarks.
 
 ### 4. 📊 MindPulse Insights & Cognitive Analytics
+- **6 Executive Pillars**: Goal Velocity, Habits Discipline, Dream Quests, CBT Equilibrium, Diurnal Stamina, and Memory Vault.
+- **Category Focus Allocation**: Deep Work, Somatics & Health, Strategic Career, and Mindfulness proportions.
 - **6-Vector Cognitive Vectoring**: Radar metrics for Joy, Clarity, Resilience, Focus, Calm, and Optimism.
-- **Cognitive Distortion Detector**: Real-time identification of all-or-nothing thinking, catastrophizing, and emotional reasoning.
 - **Resilience Trajectory**: Time-series charts comparing daily, weekly, monthly, and yearly emotional velocity.
 
 ### 5. ⚙️ Settings & Vault
@@ -103,6 +111,37 @@
 - **Biometric Sensor**: WebAuthn biometric passkey integration for locking/unlocking the vault.
 - **Tenant Isolation**: Strict UID separation ensuring data privacy.
 - **Data & Reset**: Purge local caches, manage archived habits, or initiate factory resets.
+
+---
+
+## 🗄️ Daily Habit Tracker & Archive Vault
+
+Mind Cave features a complete, non-destructive habit management lifecycle:
+
+```
+[ Active Habit Tracker ] ──(Delete)──► [ Archive Vault (Preserved Streaks & 7-Day Tracks) ]
+           ▲                                          │                   │
+           │                                          │ (Restore)         │ (Delete Permanently)
+           └──────────────────────────────────────────┘                   ▼
+                                                                  [ Permanently Purged ]
+```
+
+1. **Active Tracking**: Track Boolean checkmarks or quantitative numeric targets with streak counters.
+2. **Move to Archive**: Removing a habit moves it into the **Archive Vault**, preserving all historical checkmarks, streaks, and timestamps intact across page reloads.
+3. **Restore Habit**: 1-tap restoration brings the habit and its exact historical record back into the active tracker, Home Sanctuary, and Analytics.
+4. **Delete Permanently**: Permanently removes individual habits or all archived habits from client storage.
+
+---
+
+## 📊 100% Authentic Dynamic Analytics Engine
+
+Mind Cave eliminates all hardcoded mock figures. All metrics are computed dynamically from actual user database logs across four time horizons:
+
+- **Daily Horizon**: 24-hour diurnal activity curve, hourly reflection check-ins, and same-day focus metrics.
+- **Weekly Horizon**: Mon–Sun reflection density, 28-day habit continuity grid, and weekly emotional vectoring.
+- **Monthly Horizon**: 30-day activity matrix, 4-week cognitive clarity trajectory, and distortion reframing counts.
+- **Yearly Horizon**: 52-week annual consistency matrix, 12-month resilience progression, and annual goal velocity.
+- **Pristine Zero-States**: Brand new user accounts display clean zero-states (`0% Done`, `0d Streak`, `0 Moments`) without artificial pre-fill.
 
 ---
 
@@ -123,6 +162,14 @@ Mind Cave integrates **SeamlessM4T-inspired** multilingual speech translation an
 3. **PII Sanitization**: Sensitive identifiers (SSNs, credit cards, credentials) are redacted prior to AI processing.
 4. **Browser Extension Noise Shield v4**: High-priority capture-phase exception shield prevents Chrome extension message-channel teardown noise from affecting application state.
 5. **No Cross-Tenant Data Leaks**: Default-deny Firestore security rules ensure users only read and write documents where `request.auth.uid == resource.data.userId`.
+
+---
+
+## ⚡ Zero-Flash Pre-Paint Bootstrapper
+
+To prevent visual layout shifts (CLS) and fraction-of-a-second "Guest" flashes on reload:
+- **Synchronous Auth Bootstrapper in `<head>`**: Reads cached authentication credentials prior to DOM paint.
+- **Pre-Paint Mutation Observer**: Binds user avatars and display names the moment elements are parsed, delivering a flicker-free user experience on hard refreshes.
 
 ---
 
