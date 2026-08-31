@@ -440,7 +440,7 @@ window.triggerRestoreUpload = triggerRestoreUpload;
 
 // ─── MASTER SETTINGS & VAULT SUBTAB CONTROLLER ───
 function switchSettingsTab(subtab, btnEl) {
-  const subtabs = ['directory', 'security', 'ai', 'data'];
+  const subtabs = ['security', 'ai', 'data'];
   subtabs.forEach(s => {
     const el = document.getElementById(`settings-subtab-${s}`);
     if (el) {
@@ -450,10 +450,10 @@ function switchSettingsTab(subtab, btnEl) {
   });
 
   document.querySelectorAll('.settings-subtab-btn').forEach(b => {
-    b.className = 'settings-subtab-btn px-3.5 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white cursor-pointer';
+    b.className = 'settings-subtab-btn px-3.5 py-1.5 rounded-lg font-semibold text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] cursor-pointer';
   });
   if (btnEl) {
-    btnEl.className = 'settings-subtab-btn active px-3.5 py-1.5 rounded-lg font-semibold bg-white/10 text-white cursor-pointer';
+    btnEl.className = 'settings-subtab-btn active px-3.5 py-1.5 rounded-lg font-semibold bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] border border-[var(--mc-border-subtle)] cursor-pointer';
   }
   if (window.lucide) refreshIcons();
 }
