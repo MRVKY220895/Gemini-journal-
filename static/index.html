@@ -5,22 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mind Cave — Cognitive Sanctuary & Reflective Studio</title>
 
-  <!-- ── ZERO-FLASH THEME BOOTSTRAPPER ── runs before any CSS paints ── -->
+  <!-- ── CAPTURE-PHASE EXTENSION NOISE SHIELD (v4) ── runs first ── -->
   <script>
-    (function() {
-      var saved = localStorage.getItem('mind_cave_theme') || 'dark';
-      var html = document.documentElement;
-      // Always remove both, then apply exactly one
-      html.classList.remove('dark', 'light');
-      html.classList.add(saved === 'light' ? 'light' : 'dark');
-    })();
-  </script>
-
-  <!-- Tailwind CSS & Global Exception Shield (Capture-Phase v3) -->
-  <script>
-    // ─── CAPTURE-PHASE EXTENSION NOISE SHIELD ───
-    // Intercepts BEFORE any other listener sees the rejection.
-    // Covers all known Chrome / Firefox extension message-channel teardown variants.
     (function() {
       var _EXT_PATTERNS = [
         'message channel closed',
@@ -30,7 +16,8 @@
         'chrome-extension',
         'moz-extension',
         'resizeobserver loop',
-        'could not establish connection'
+        'could not establish connection',
+        'message channel closed before a response'
       ];
       function _isExtNoise(str) {
         if (!str) return false;
@@ -40,19 +27,19 @@
         }
         return false;
       }
-      // Unhandled Promise Rejections (capture phase = true)
+      // Intercept unhandled promise rejections
       window.addEventListener('unhandledrejection', function(event) {
         if (!event) return;
         var reason = event.reason;
         var msg = reason
-          ? (typeof reason === 'string' ? reason : (reason.message || reason.toString() || ''))
+          ? (typeof reason === 'string' ? reason : (reason.message || reason.stack || reason.toString() || ''))
           : '';
         if (_isExtNoise(msg)) {
           event.preventDefault();
           event.stopImmediatePropagation();
         }
       }, true);
-      // Synchronous Script Errors (capture phase = true)
+      // Intercept global uncaught errors
       window.addEventListener('error', function(event) {
         if (!event) return;
         var msg = (event.message || '') + ' ' + (event.filename || '');
@@ -61,12 +48,34 @@
           event.stopImmediatePropagation();
         }
       }, true);
+      // Intercept console.error calls from injected extension scripts
+      var _origError = console.error;
+      console.error = function() {
+        if (arguments.length > 0) {
+          for (var i = 0; i < arguments.length; i++) {
+            var arg = arguments[i];
+            var str = (typeof arg === 'string') ? arg : (arg && (arg.message || arg.stack || String(arg))) || '';
+            if (_isExtNoise(str)) return;
+          }
+        }
+        _origError.apply(console, arguments);
+      };
       // Silence Tailwind CDN dev warning
       var _origWarn = console.warn;
       console.warn = function() {
         if (arguments[0] && typeof arguments[0] === 'string' && arguments[0].indexOf('cdn.tailwindcss.com') !== -1) return;
         _origWarn.apply(console, arguments);
       };
+    })();
+  </script>
+
+  <!-- ── ZERO-FLASH THEME BOOTSTRAPPER ── runs before any CSS paints ── -->
+  <script>
+    (function() {
+      var saved = localStorage.getItem('mind_cave_theme') || 'dark';
+      var html = document.documentElement;
+      html.classList.remove('dark', 'light');
+      html.classList.add(saved === 'light' ? 'light' : 'dark');
     })();
   </script>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -124,7 +133,7 @@
   </script>
 
   <!-- Custom Styling -->
-  <link rel="stylesheet" href="/static/style.css?v=1788216000">
+  <link rel="stylesheet" href="/static/style.css?v=1788217000">
 </head>
 <body class="bg-[#0B0D0F] text-[#F2F4F5] min-h-screen flex antialiased font-sans selection:bg-emerald-500/30 overflow-x-hidden">
 
@@ -4432,7 +4441,7 @@
   </div>
 
   <!-- Client Application Script -->
-  <script src="/static/app.js?v=1788216000"></script>
+  <script src="/static/app.js?v=1788217000"></script>
   <script>
     // Initialize Lucide Icons
     lucide.createIcons();
@@ -4842,6 +4851,6 @@
   </div>
 
   <!-- Core Application Script -->
-  <script src="/static/app.js?v=1788216000" defer></script>
+  <script src="/static/app.js?v=1788217000" defer></script>
 </body>
 </html>
