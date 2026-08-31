@@ -1,3 +1,57 @@
+
+// ─── INSTANT REACTIVE REFRESH ENGINE (0ms LIVE PROPAGATION) ───
+
+function dispatchGlobalInstantRefresh(source = 'general') {
+  try {
+    // 1. Synchronize state with persistent storage
+    if (!state.journalsCache || state.journalsCache.length === 0) {
+      try {
+        const cached = localStorage.getItem('mind_cave_cached_journals');
+        if (cached) state.journalsCache = JSON.parse(cached);
+      } catch (e) {}
+    }
+    if (!state.journals || state.journals.length === 0) {
+      state.journals = state.journalsCache || [];
+    }
+
+    if (!state.habitsList || state.habitsList.length === 0) {
+      try {
+        if (typeof profileStorage !== 'undefined' && profileStorage.getItem) {
+          state.habitsList = profileStorage.getItem('habits_list', []);
+        }
+      } catch (e) {}
+    }
+
+    // 2. Refresh Homepage Realtime Components
+    if (typeof updateHomepageRealtimeData === 'function') updateHomepageRealtimeData();
+    if (typeof renderHomeRecentEntries === 'function') renderHomeRecentEntries();
+    if (typeof renderHomeHabitsMini === 'function') renderHomeHabitsMini();
+
+    // 3. Refresh Living Timeline & Journal Vault
+    if (typeof renderChronoTimeline === 'function') renderChronoTimeline(false);
+    const grid = document.getElementById('journals-grid');
+    if (grid && typeof renderJournalCards === 'function' && state.journalsCache) {
+      renderJournalCards(state.journalsCache);
+    }
+
+    // 4. Refresh Habit & Goal Trackers
+    if (typeof renderHabitTracker === 'function') renderHabitTracker();
+    if (typeof renderTimelineShortcuts === 'function') renderTimelineShortcuts();
+    if (typeof renderGoalsFocusDeck === 'function') renderGoalsFocusDeck();
+
+    // 5. Refresh Analytics Charts & All Dashboard Stats
+    if (typeof updateAllDashboardStats === 'function') updateAllDashboardStats();
+    if (typeof renderRadarChart === 'function' && state.journalsCache) renderRadarChart(state.journalsCache);
+    if (typeof renderTrajectoryChart === 'function' && state.journalsCache) renderTrajectoryChart(state.journalsCache);
+
+    // 6. Refresh Icons
+    if (typeof refreshIcons === 'function') refreshIcons();
+  } catch (err) {
+    console.debug('Instant refresh notice:', err);
+  }
+}
+window.dispatchGlobalInstantRefresh = dispatchGlobalInstantRefresh;
+
 var profileStorage = window.profileStorage || {
   getUid: () => {
     return (window.state && window.state.currentUser && window.state.currentUser.uid) 
@@ -273,10 +327,7 @@ async function saveHomeQuickReflection() {
     textarea.value = '';
     showToast('Reflection saved to Living Timeline.');
     checkGuestSoftAuthTrigger('reflection');
-    renderHomeRecentEntries();
-    if (typeof renderChronoTimeline === 'function') renderChronoTimeline(true);
-    if (typeof renderJournalCards === 'function') renderJournalCards(state.journalsCache);
-    updateAllDashboardStats();
+    dispatchGlobalInstantRefresh('home_reflection');
   } catch (err) {
     showToast('Reflection saved locally.');
   }
@@ -450,8 +501,7 @@ function toggleHabitComplete(habitId) {
   if (typeof toggleHabitDay === 'function') {
     toggleHabitDay(habitId, todayDayIdx);
   }
-  renderHomeHabitsMini();
-  updateAllDashboardStats();
+  dispatchGlobalInstantRefresh('habit_toggle');
 }
 window.toggleHabitComplete = toggleHabitComplete;
 
@@ -1032,7 +1082,7 @@ window.switchUserProfile = switchUserProfile;
 
 
 // ─── CHART & METRIC EXPLANATION INFO MODAL CONTROLLER ───
-const chartInfoRegistry = {
+var chartInfoRegistry = window.chartInfoRegistry || {
   radar: {
     title: "Emotional Dimensions Radar",
     what: "A 6-vector psychological equilibrium radar mapping Joy, Clarity, Resilience, Focus, Calm, and Optimism.",
@@ -1064,6 +1114,7 @@ const chartInfoRegistry = {
     when: "Continuously live; recalculates in 0ms with every journal turn or task completion."
   }
 };
+window.chartInfoRegistry = chartInfoRegistry;
 
 function openChartInfoModal(chartKey) {
   const info = chartInfoRegistry[chartKey] || chartInfoRegistry.radar;
@@ -3116,17 +3167,14 @@ function switchTab(tabId) {
 
   if (tabId === 'overview') {
     updateHomeGreetingAndDate();
-    renderHomeRecentEntries();
-    renderHomeHabitsMini();
   }
   if (tabId === 'journals') {
     loadJournals();
-    renderChronoTimeline();
   }
   if (tabId === 'studio') restoreChatHistory();
   if (tabId === 'analytics') loadAnalytics();
   if (tabId === 'security') loadSecurityAudit();
-  updateAllDashboardStats();
+  dispatchGlobalInstantRefresh(`tab_${tabId}`);
 
   if (window.lucide) refreshIcons();
 }
@@ -7523,13 +7571,12 @@ Includes Canvas Sketch`;
     localStorage.setItem('mind_cave_cached_journals', JSON.stringify(state.journalsCache));
   } catch (e) {}
 
-  // Instantly re-render Timeline and Cards DOM in 0ms
-  renderChronoTimeline(false);
-  const gridContainer = document.getElementById('journals-grid');
-  if (gridContainer && typeof renderJournalCards === 'function') {
-    renderJournalCards(state.journalsCache);
-  }
+  // Instantly re-render Timeline, Cards, Homepage & Analytics DOM in 0ms
+  state.journals = state.journalsCache;
+  const activeUid = (typeof profileStorage !== 'undefined') ? profileStorage.getUid() : (state.currentUser?.uid || 'guest');
+  localStorage.setItem('mind_cave_journals_' + activeUid, JSON.stringify(state.journals));
   if (typeof renderMemoryPhotos === 'function') renderMemoryPhotos();
+  dispatchGlobalInstantRefresh('journal_submit');
 
   showToast(isEditMode ? 'Reflection updated!' : `Reflection moment for ${hour} saved!`);
 
