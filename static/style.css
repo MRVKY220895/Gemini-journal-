@@ -3382,3 +3382,37 @@ header.sticky {
   background: var(--mc-border-subtle);
   border-radius: 4px;
 }
+
+/* ==========================================================================
+   THEME MODE ICON VISIBILITY (Strict CSS Engine)
+   Dark Mode: Show Sun icon (indicates click to switch to Light)
+   Light Mode: Show Moon icon (indicates click to switch to Dark)
+   ========================================================================== */
+html.dark [data-theme-sun],
+html.dark svg[data-theme-sun],
+html.dark i[data-theme-sun] {
+  display: inline-block !important;
+}
+html.dark [data-theme-moon],
+html.dark svg[data-theme-moon],
+html.dark i[data-theme-moon] {
+  display: none !important;
+}
+
+html.light [data-theme-sun],
+html.light svg[data-theme-sun],
+html.light i[data-theme-sun],
+html:not(.dark) [data-theme-sun],
+html:not(.dark) svg[data-theme-sun],
+html:not(.dark) i[data-theme-sun] {
+  display: none !important;
+}
+html.light [data-theme-moon],
+html.light svg[data-theme-moon],
+html.light i[data-theme-moon],
+html:not(.dark) [data-theme-moon],
+html:not(.dark) svg[data-theme-moon],
+html:not(.dark) i[data-theme-moon] {
+  display: inline-block !important;
+}
+

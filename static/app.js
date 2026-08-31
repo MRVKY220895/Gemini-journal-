@@ -1785,21 +1785,38 @@ window.safeJSONParse = safeJSONParse;
 
 function applyTheme(mode) {
   var html = document.documentElement;
-  if (mode === 'light') {
+  var theme = mode === 'light' ? 'light' : 'dark';
+  if (theme === 'light') {
     html.classList.remove('dark');
     html.classList.add('light');
   } else {
     html.classList.remove('light');
     html.classList.add('dark');
   }
+
+  localStorage.setItem('mind_cave_theme', theme);
+
   // Sync icon visibility imperatively
-  var isDarkNow = html.classList.contains('dark');
+  var isDarkNow = (theme === 'dark');
   document.querySelectorAll('[data-theme-sun]').forEach(function(el) {
     el.classList.toggle('hidden', !isDarkNow);
+    el.style.display = isDarkNow ? 'inline-block' : 'none';
   });
   document.querySelectorAll('[data-theme-moon]').forEach(function(el) {
     el.classList.toggle('hidden', isDarkNow);
+    el.style.display = isDarkNow ? 'none' : 'inline-block';
   });
+
+  // Master menu labels
+  var menuIcon = document.getElementById('menu-theme-icon');
+  var menuSublabel = document.getElementById('menu-theme-sublabel');
+  if (menuIcon) menuIcon.setAttribute('data-lucide', isDarkNow ? 'sun' : 'moon');
+  if (menuSublabel) menuSublabel.textContent = isDarkNow ? 'Currently: Dark (Click for Light)' : 'Currently: Light (Click for Dark)';
+
+  if (typeof updateChartsTheme === 'function') {
+    updateChartsTheme(theme);
+  }
+
   if (window.lucide) refreshIcons();
 }
 window.applyTheme = applyTheme;
@@ -1808,10 +1825,10 @@ function toggleThemeMode() {
   var isDark = document.documentElement.classList.contains('dark');
   var nextMode = isDark ? 'light' : 'dark';
   applyTheme(nextMode);
-  localStorage.setItem('mind_cave_theme', nextMode);
   showToast(nextMode === 'light' ? 'Switched to Light Theme' : 'Switched to Dark Theme');
 }
 window.toggleThemeMode = toggleThemeMode;
+window.toggleTheme = toggleThemeMode;
 
 function handleHeaderAuthAction() {
   if (state.currentUser && state.currentUser.uid && !state.currentUser.uid.startsWith('guest')) {
@@ -2206,65 +2223,6 @@ function initLanguage() {
 function initTheme() {
   const savedTheme = localStorage.getItem('mind_cave_theme') || 'dark';
   applyTheme(savedTheme);
-}
-
-function applyTheme(theme) {
-  const html = document.documentElement;
-  const icon = document.getElementById('theme-toggle-icon');
-  const label = document.getElementById('theme-toggle-label');
-  const menuIcon = document.getElementById('menu-theme-icon');
-  const menuSublabel = document.getElementById('menu-theme-sublabel');
-  const globalIcon = document.getElementById('global-theme-icon');
-
-  if (theme === 'light') {
-    html.classList.remove('dark');
-    html.classList.add('light');
-    if (icon) {
-      icon.setAttribute('data-lucide', 'moon');
-      icon.className = 'w-3.5 h-3.5';
-    }
-    if (label) label.textContent = 'Dark';
-    if (menuIcon) menuIcon.setAttribute('data-lucide', 'moon');
-    if (menuSublabel) menuSublabel.textContent = 'Currently: Light (Click for Dark)';
-    if (globalIcon) {
-      globalIcon.setAttribute('data-lucide', 'moon');
-      globalIcon.className = 'w-4 h-4 text-indigo-400';
-    }
-  } else {
-    html.classList.remove('light');
-    html.classList.add('dark');
-    if (icon) {
-      icon.setAttribute('data-lucide', 'sun');
-      icon.className = 'w-3.5 h-3.5';
-    }
-    if (label) label.textContent = 'Light';
-    if (menuIcon) menuIcon.setAttribute('data-lucide', 'sun');
-    if (menuSublabel) menuSublabel.textContent = 'Currently: Dark (Click for Light)';
-    if (globalIcon) {
-      globalIcon.setAttribute('data-lucide', 'sun');
-      globalIcon.className = 'w-4 h-4 text-amber-400';
-    }
-  }
-
-  localStorage.setItem('mind_cave_theme', theme);
-  refreshIcons();
-
-  updateChartsTheme(theme);
-
-}
-
-
-
-function toggleTheme() {
-
-  const current = document.documentElement.classList.contains('light') ? 'light' : 'dark';
-
-  const next = current === 'dark' ? 'light' : 'dark';
-
-  applyTheme(next);
-
-  showToast(`Switched to ${next === 'light' ? 'Light' : 'Dark'} Mode`);
-
 }
 
 
