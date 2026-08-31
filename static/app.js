@@ -615,63 +615,93 @@ window.jumpToToday = jumpDiaryToToday;
 // ─── UNIFIED PERSISTENT CAPTURES & NOTES ENGINE ───
 
 function getUnifiedCapturesList() {
-  let list = (state.capturesList && Array.isArray(state.capturesList) && state.capturesList.length > 0) ? state.capturesList : [];
+  var list = (state.capturesList && Array.isArray(state.capturesList) && state.capturesList.length > 0)
+    ? state.capturesList : [];
+
   if (list.length === 0) {
     try {
-      const activeUid = (typeof profileStorage !== 'undefined') ? profileStorage.getUid() : (state.currentUser?.uid || 'guest');
-      let saved = (typeof profileStorage !== 'undefined') ? profileStorage.getItem('captures_list', null, activeUid) : null;
-      if (!saved || !Array.isArray(saved) || saved.length === 0) {
-        const localSaved = localStorage.getItem('mind_cave_notes_list') || localStorage.getItem('mind_cave_captures_list');
-        if (localSaved) saved = JSON.parse(localSaved);
+      var activeUid = (typeof profileStorage !== 'undefined')
+        ? profileStorage.getUid()
+        : (state.currentUser && state.currentUser.uid ? state.currentUser.uid : 'guest');
+
+      // ─── Load from user-scoped profileStorage first ───
+      var saved = (typeof profileStorage !== 'undefined')
+        ? profileStorage.getItem('captures_list', null, activeUid)
+        : null;
+
+      // ─── Fallback: legacy non-scoped localStorage keys ───
+      if (!saved || !Array.isArray(saved)) {
+        var localSaved = localStorage.getItem('mind_cave_notes_list') || localStorage.getItem('mind_cave_captures_list');
+        if (localSaved) {
+          try { saved = JSON.parse(localSaved); } catch(e) {}
+        }
       }
-      if (saved && Array.isArray(saved) && saved.length > 0) {
+
+      if (saved && Array.isArray(saved)) {
+        // Respect an empty array — user deliberately cleared all items
         list = saved;
       }
     } catch (e) {}
   }
 
+  // ─── DEMO SEED ── only for genuine guest sessions, never for authenticated users ───
+  // A user who has explicitly cleared their list gets an empty workspace (cleared_captures flag).
   if (list.length === 0) {
-    list = [
-      {
-        id: 'cap_1',
-        type: 'checklist',
-        title: 'System Release & Milestone Verification',
-        items: [
-          { id: 'c1', text: 'Fast-path local token verification', completed: true },
-          { id: 'c2', text: 'Living Timeline multi-track integration', completed: true },
-          { id: 'c3', text: 'Interactive Checklist with strikethrough', completed: true },
-          { id: 'c4', text: 'Zero-knowledge client encryption audit', completed: false }
-        ],
-        tag: 'Work',
-        priority: 'high',
-        syncToJournal: true,
-        completed: false,
-        updatedAt: Date.now() - 3600000
-      },
-      {
-        id: 'cap_2',
-        type: 'task',
-        title: 'AWS Cloud Hosting & Database Renewal',
-        content: 'Verify auto-debit invoice and audit bandwidth limits for private cloud instances.',
-        dueDate: new Date(Date.now() + 86400000 * 3).toISOString().split('T')[0],
-        dueTime: '10:00',
-        priority: 'high',
-        tag: 'Finance',
-        syncToJournal: true,
-        completed: false,
-        updatedAt: Date.now() - 7200000
-      },
-      {
-        id: 'cap_3',
-        type: 'note',
-        title: 'Weekly Stoic & Mindfulness Anchors',
-        content: 'Practice 30-min morning deep focus window without notifications. Celebrate small wins daily and maintain 92% cognitive equilibrium.',
-        tag: 'Personal',
-        syncToJournal: false,
-        completed: false,
-        updatedAt: Date.now() - 10800000
-      }
-    ];
+    var activeUid2 = (typeof profileStorage !== 'undefined')
+      ? profileStorage.getUid()
+      : (state.currentUser && state.currentUser.uid ? state.currentUser.uid : 'guest');
+
+    var isAuthUser = activeUid2 && !activeUid2.startsWith('guest') && activeUid2 !== 'user_alice' && activeUid2 !== 'guest_user';
+
+    // Check if user has ever cleared their captures (don't re-seed after delete)
+    var clearedKey = 'mc_u_' + activeUid2 + '_captures_cleared';
+    var wasCleared = localStorage.getItem(clearedKey) === 'true';
+
+    if (!isAuthUser && !wasCleared) {
+      // Guest: show demo seed so the UI isn't totally empty on first visit
+      list = [
+        {
+          id: 'cap_demo_1',
+          type: 'checklist',
+          title: 'System Release & Milestone Verification',
+          items: [
+            { id: 'c1', text: 'Fast-path local token verification', completed: true },
+            { id: 'c2', text: 'Living Timeline multi-track integration', completed: true },
+            { id: 'c3', text: 'Interactive Checklist with strikethrough', completed: true },
+            { id: 'c4', text: 'Zero-knowledge client encryption audit', completed: false }
+          ],
+          tag: 'Work',
+          priority: 'high',
+          syncToJournal: true,
+          completed: false,
+          updatedAt: Date.now() - 3600000
+        },
+        {
+          id: 'cap_demo_2',
+          type: 'task',
+          title: 'AWS Cloud Hosting & Database Renewal',
+          content: 'Verify auto-debit invoice and audit bandwidth limits for private cloud instances.',
+          dueDate: new Date(Date.now() + 86400000 * 3).toISOString().split('T')[0],
+          dueTime: '10:00',
+          priority: 'high',
+          tag: 'Finance',
+          syncToJournal: true,
+          completed: false,
+          updatedAt: Date.now() - 7200000
+        },
+        {
+          id: 'cap_demo_3',
+          type: 'note',
+          title: 'Weekly Stoic & Mindfulness Anchors',
+          content: 'Practice 30-min morning deep focus window without notifications. Celebrate small wins daily and maintain 92% cognitive equilibrium.',
+          tag: 'Personal',
+          syncToJournal: false,
+          completed: false,
+          updatedAt: Date.now() - 10800000
+        }
+      ];
+    }
+    // Authenticated users or cleared-flag users → empty list (no demo seed)
   }
 
   state.capturesList = list;
@@ -14983,7 +15013,7 @@ function toggleCaptureJournalSync(captureId) {
 
 function deleteCaptureItem(captureId) {
   if (!confirm('Delete this item?')) return;
-  state.capturesList = state.capturesList.filter(c => c.id !== captureId);
+  state.capturesList = state.capturesList.filter(function(c) { return c.id !== captureId; });
   saveCaptures();
   renderNotesCards();
   renderChronoTimeline(false);
@@ -14992,11 +15022,26 @@ function deleteCaptureItem(captureId) {
 
 function saveCaptures() {
   state.notesList = state.capturesList;
+
+  var activeUid = (typeof profileStorage !== 'undefined')
+    ? profileStorage.getUid()
+    : (state.currentUser && state.currentUser.uid ? state.currentUser.uid : 'guest');
+
+  // ─── Persist captured list (including empty array) ───
   if (typeof profileStorage !== 'undefined') {
     profileStorage.setItem('captures_list', state.capturesList);
   }
   localStorage.setItem('mind_cave_notes_list', JSON.stringify(state.capturesList));
   localStorage.setItem('mind_cave_captures_list', JSON.stringify(state.capturesList));
+
+  // ─── If list is now empty, set the cleared flag so demo seed never re-injects ───
+  var clearedKey = 'mc_u_' + activeUid + '_captures_cleared';
+  if (state.capturesList.length === 0) {
+    localStorage.setItem(clearedKey, 'true');
+  } else {
+    localStorage.removeItem(clearedKey);
+  }
+
   if (typeof renderChronoTimeline === 'function') renderChronoTimeline(false);
 }
 
