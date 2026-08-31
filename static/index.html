@@ -4,7 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mind Cave — Cognitive Sanctuary & Reflective Studio</title>
-  
+
+  <!-- ── ZERO-FLASH THEME BOOTSTRAPPER ── runs before any CSS paints ── -->
+  <script>
+    (function() {
+      var saved = localStorage.getItem('mind_cave_theme') || 'dark';
+      var html = document.documentElement;
+      // Always remove both, then apply exactly one
+      html.classList.remove('dark', 'light');
+      html.classList.add(saved === 'light' ? 'light' : 'dark');
+    })();
+  </script>
+
   <!-- Tailwind CSS & Global Exception Shield (Capture-Phase v3) -->
   <script>
     // ─── CAPTURE-PHASE EXTENSION NOISE SHIELD ───
@@ -4430,7 +4441,7 @@
   </div>
 
   <!-- Client Application Script -->
-  <script src="/static/app.js?v=1788209000"></script>
+  <script src="/static/app.js?v=1788210000"></script>
   <script>
     // Initialize Lucide Icons
     lucide.createIcons();
@@ -4840,6 +4851,6 @@
   </div>
 
   <!-- Core Application Script -->
-  <script src="/static/app.js?v=1788209000" defer></script>
+  <script src="/static/app.js?v=1788210000" defer></script>
 </body>
 </html>

@@ -1744,26 +1744,42 @@ window.safeJSONParse = safeJSONParse;
 
 // ─── MASTER SYSTEM & UTILITY EVENT HANDLERS ───
 
-function toggleThemeMode() {
-  const isDark = document.documentElement.classList.contains('dark');
-  const html = document.documentElement;
-  if (isDark) {
+// ─── THEME ENGINE ─────────────────────────────────────────────────────────
+// applyTheme(mode) is the single source of truth for theme state.
+// It must always set exactly one of 'dark' or 'light' on <html>.
+// The CSS in style.css defines:
+//   :root          → dark token defaults
+//   html.light     → light token overrides
+// Tailwind darkMode:'class' checks for html.dark
+// So we need BOTH toggled atomically.
+
+function applyTheme(mode) {
+  var html = document.documentElement;
+  if (mode === 'light') {
     html.classList.remove('dark');
-    localStorage.setItem('mind_cave_theme', 'light');
-    showToast('Switched to Light Theme');
+    html.classList.add('light');
   } else {
+    html.classList.remove('light');
     html.classList.add('dark');
-    localStorage.setItem('mind_cave_theme', 'dark');
-    showToast('Switched to Dark Theme');
   }
-  // Imperatively sync both theme toggle icons in header and sidebar
-  document.querySelectorAll('[data-theme-sun]').forEach(el => {
-    el.classList.toggle('hidden', !document.documentElement.classList.contains('dark'));
+  // Sync icon visibility imperatively
+  var isDarkNow = html.classList.contains('dark');
+  document.querySelectorAll('[data-theme-sun]').forEach(function(el) {
+    el.classList.toggle('hidden', !isDarkNow);
   });
-  document.querySelectorAll('[data-theme-moon]').forEach(el => {
-    el.classList.toggle('hidden', document.documentElement.classList.contains('dark'));
+  document.querySelectorAll('[data-theme-moon]').forEach(function(el) {
+    el.classList.toggle('hidden', isDarkNow);
   });
   if (window.lucide) refreshIcons();
+}
+window.applyTheme = applyTheme;
+
+function toggleThemeMode() {
+  var isDark = document.documentElement.classList.contains('dark');
+  var nextMode = isDark ? 'light' : 'dark';
+  applyTheme(nextMode);
+  localStorage.setItem('mind_cave_theme', nextMode);
+  showToast(nextMode === 'light' ? 'Switched to Light Theme' : 'Switched to Dark Theme');
 }
 window.toggleThemeMode = toggleThemeMode;
 
