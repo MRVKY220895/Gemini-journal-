@@ -5945,7 +5945,7 @@ async function renderChronoTimeline(forceFetch = false) {
             <div class="flex items-center gap-1.5 flex-wrap">
 
               <!-- Event Category Pill -->
-              ${(!isGoal && !isGCal && !isTask) ? `<input type="checkbox" class="reflection-select-checkbox w-3.5 h-3.5 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer mr-1" data-id="${ev.journalId || ev.id}" onchange="toggleReflectionSelection(\'${ev.journalId || ev.id}\', this.checked)">` : \'\'}
+              ${(!isGoal && !isGCal && !isTask) ? `<input type="checkbox" class="reflection-select-checkbox w-3.5 h-3.5 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer mr-1" data-id="${ev.journalId || ev.id}" onchange="toggleReflectionSelection('${ev.journalId || ev.id}', this.checked)">` : ''}
 
               ${isGoal ? `
 
