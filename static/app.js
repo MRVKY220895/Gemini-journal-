@@ -1,4 +1,143 @@
 
+function handleGenderChange(val) {
+  if (state.currentUser) state.currentUser.gender = val;
+  localStorage.setItem('mind_cave_user_gender', val);
+}
+window.handleGenderChange = handleGenderChange;
+
+function handleTimelineSpanChange(val) {
+  localStorage.setItem('mind_cave_timeline_range', val);
+  if (typeof renderChronoTimeline === 'function') renderChronoTimeline();
+}
+window.handleTimelineSpanChange = handleTimelineSpanChange;
+
+function openPersonaEditorModal() {
+  switchTab('security');
+  if (typeof switchSettingsTab === 'function') switchSettingsTab('ai');
+  closeUserProfileModal();
+  showToast('Switched to AI Persona Configuration');
+}
+window.openPersonaEditorModal = openPersonaEditorModal;
+
+
+// ─── AUTH & PROFILE MODAL CONTROLLERS + SOFT AUTH GATE ───
+
+function openAuthModal() {
+  const modal = document.getElementById('auth-modal');
+  if (modal) modal.classList.remove('hidden');
+  if (window.lucide) refreshIcons();
+}
+window.openAuthModal = openAuthModal;
+
+function closeAuthModal() {
+  const modal = document.getElementById('auth-modal');
+  if (modal) modal.classList.add('hidden');
+}
+window.closeAuthModal = closeAuthModal;
+
+function openUserProfileModal() {
+  const modal = document.getElementById('user-profile-modal');
+  if (modal) {
+    const nameInput = document.getElementById('user-display-name-input');
+    const nameLbl = document.getElementById('profile-modal-name');
+    const avatarLbl = document.getElementById('profile-modal-avatar');
+    const uidLbl = document.getElementById('profile-modal-uid');
+    const genderSelect = document.getElementById('user-gender-select');
+
+    const u = state.currentUser || {};
+    const isGuest = !u.uid || u.uid.startsWith('guest') || u.uid === 'user_alice';
+    
+    if (nameInput) nameInput.value = u.name || 'Guest Explorer';
+    if (nameLbl) nameLbl.textContent = u.name || 'Guest Explorer';
+    if (avatarLbl) avatarLbl.textContent = (u.name || 'G')[0].toUpperCase();
+    if (uidLbl) uidLbl.textContent = isGuest ? 'Local Offline Mode (Guest)' : `UID: ${u.uid.slice(0, 16)}...`;
+    if (genderSelect) genderSelect.value = u.gender || localStorage.getItem('mind_cave_user_gender') || 'unspecified';
+
+    modal.classList.remove('hidden');
+  }
+  if (window.lucide) refreshIcons();
+}
+window.openUserProfileModal = openUserProfileModal;
+
+function closeUserProfileModal() {
+  const modal = document.getElementById('user-profile-modal');
+  if (modal) modal.classList.add('hidden');
+}
+window.closeUserProfileModal = closeUserProfileModal;
+
+function openAuthModalFromBanner() {
+  dismissGuestAuthBanner();
+  openAuthModal();
+}
+window.openAuthModalFromBanner = openAuthModalFromBanner;
+
+function dismissGuestAuthBanner() {
+  const banner = document.getElementById('guest-soft-auth-banner');
+  if (banner) banner.classList.add('hidden');
+  localStorage.setItem('mind_cave_soft_auth_dismissed', 'true');
+}
+window.dismissGuestAuthBanner = dismissGuestAuthBanner;
+
+function checkGuestSoftAuthTrigger(actionType) {
+  try {
+    const isAuth = state.currentUser && state.currentUser.uid && !state.currentUser.uid.startsWith('guest') && state.currentUser.uid !== 'user_alice';
+    if (isAuth) return; // User already authenticated
+
+    if (localStorage.getItem('mind_cave_soft_auth_dismissed') === 'true') return;
+
+    let promptCount = parseInt(localStorage.getItem('mind_cave_guest_prompts') || '0', 10);
+    let reflectionCount = parseInt(localStorage.getItem('mind_cave_guest_reflections') || '0', 10);
+
+    if (actionType === 'prompt') {
+      promptCount += 1;
+      localStorage.setItem('mind_cave_guest_prompts', promptCount.toString());
+    } else if (actionType === 'reflection') {
+      reflectionCount += 1;
+      localStorage.setItem('mind_cave_guest_reflections', reflectionCount.toString());
+    }
+
+    // Trigger after 2 prompts AND 1 reflection (or 2 prompts OR 1 reflection)
+    if (promptCount >= 2 && reflectionCount >= 1) {
+      const banner = document.getElementById('guest-soft-auth-banner');
+      if (banner) {
+        banner.classList.remove('hidden');
+        if (window.lucide) refreshIcons();
+      }
+    }
+  } catch (e) {
+    console.debug('Soft auth check notice:', e);
+  }
+}
+window.checkGuestSoftAuthTrigger = checkGuestSoftAuthTrigger;
+
+function saveUserProfileDetails() {
+  const nameInput = document.getElementById('user-display-name-input');
+  const dobInput = document.getElementById('user-dob-input');
+  const genderSelect = document.getElementById('user-gender-select');
+  const spanSelect = document.getElementById('user-timeline-span-select');
+
+  if (nameInput && nameInput.value.trim()) {
+    state.currentUser.name = nameInput.value.trim();
+    localStorage.setItem('gemini_journal_name', state.currentUser.name);
+  }
+  if (dobInput && dobInput.value) {
+    localStorage.setItem('mind_cave_user_dob', dobInput.value);
+  }
+  if (genderSelect) {
+    state.currentUser.gender = genderSelect.value;
+    localStorage.setItem('mind_cave_user_gender', genderSelect.value);
+  }
+  if (spanSelect) {
+    localStorage.setItem('mind_cave_timeline_range', spanSelect.value);
+  }
+
+  updateUserUI();
+  closeUserProfileModal();
+  showToast('Profile settings saved successfully.');
+}
+window.saveUserProfileDetails = saveUserProfileDetails;
+
+
 // ─── BULK DELETE & SELECTION CONTROLLERS ───
 
 let selectedReflectionIds = new Set();
@@ -2724,6 +2863,7 @@ function handleTextareaKeydown(event) {
 
 
 async function sendChatMessage(event) {
+  checkGuestSoftAuthTrigger('prompt');
 
   if (event) event.preventDefault();
 

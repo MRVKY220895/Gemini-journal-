@@ -99,7 +99,7 @@
   </script>
 
   <!-- Custom Styling -->
-  <link rel="stylesheet" href="/static/style.css?v=1788179191">
+  <link rel="stylesheet" href="/static/style.css?v=1788179377">
 </head>
 <body class="bg-[#0B0D0F] text-[#F2F4F5] min-h-screen flex antialiased font-sans selection:bg-emerald-500/30 overflow-x-hidden">
 
@@ -2370,281 +2370,221 @@
   </div>
 
   <!-- ===================================================================== -->
-  <!-- MODAL: AUTHENTICATION & BIOLOGICAL PROFILE -->
+  <!-- ===================================================================== -->
+  <!-- MODAL 1: AUTHENTICATION PORTAL (FOR GUEST / SIGN IN) -->
   <!-- ===================================================================== -->
   <div id="auth-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
-    <div class="double-bezel max-w-lg w-full my-auto">
-      <div class="double-bezel-inner p-5 sm:p-6 space-y-4 max-h-[90vh] overflow-y-auto">
-        <!-- Modal Header -->
-        <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-white/10">
-          <div class="flex items-center gap-2.5">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/25">
-              <i data-lucide="shield-check" class="w-5 h-5 text-white"></i>
-            </div>
-            <div>
-              <h3 class="text-base font-bold text-slate-900 dark:text-white">Account & Biological Profile</h3>
-              <p class="text-[11px] text-slate-500 dark:text-slate-400">Isolated Cloud Firestore vault & encrypted biometric sync</p>
-            </div>
+    <div class="max-w-md w-full my-auto rounded-3xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] shadow-2xl p-5 sm:p-6 space-y-4">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-3 border-b border-[var(--mc-border-subtle)]">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-500 shadow-sm">
+            <i data-lucide="shield-check" class="w-5 h-5 text-emerald-500"></i>
           </div>
-          <button onclick="closeAuthModal()" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition-colors">
-            <i data-lucide="x" class="w-4 h-4"></i>
-          </button>
-        </div>
-
-        <!-- Active User Status Card -->
-        <div id="active-user-status-card" class="p-3.5 rounded-2xl bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 flex items-center justify-between gap-3 hidden">
-          <div class="flex items-center gap-3 min-w-0">
-            <div class="w-9 h-9 rounded-full bg-blue-600/15 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-sm shrink-0">
-              <i data-lucide="user" class="w-4 h-4 text-blue-500"></i>
-            </div>
-            <div class="min-w-0">
-              <div class="flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0 animate-pulse"></span>
-                <span class="text-xs font-bold text-slate-900 dark:text-white truncate" id="modal-current-user-lbl"></span>
-              </div>
-              <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono flex items-center gap-1 mt-0.5">
-                <i data-lucide="lock" class="w-2.5 h-2.5 text-emerald-500"></i>
-                <span id="modal-role-lbl">Client AES-256 Vault Active</span>
-              </div>
-            </div>
-          </div>
-          <button type="button" onclick="signOutUser()" class="shrink-0 px-2.5 py-1 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-500/30 text-rose-600 dark:text-rose-400 text-xs font-semibold hover:bg-rose-100 dark:hover:bg-rose-900/50 transition-colors flex items-center gap-1">
-            <i data-lucide="log-out" class="w-3 h-3"></i>
-            <span>Sign Out</span>
-          </button>
-        </div>
-
-        <div id="auth-forms-container" class="space-y-4">
-          <!-- Main Modal Tabs (Auth vs Profile) -->
-          <div class="flex gap-1 bg-slate-100 dark:bg-black/50 p-1 rounded-xl border border-slate-200 dark:border-white/10 text-xs">
-            <button type="button" onclick="switchAuthTab('firebase')" id="auth-tab-btn-firebase" class="flex-1 py-1.5 rounded-lg font-semibold transition-all bg-white dark:bg-blue-600/30 text-blue-600 dark:text-blue-300 shadow-sm dark:shadow-none border border-slate-200/80 dark:border-blue-500/40 flex items-center justify-center gap-1.5">
-              <i data-lucide="flame" class="w-3.5 h-3.5 text-amber-500"></i>
-              <span>Firebase Auth</span>
-            </button>
-            
-          </div>
-
-          <!-- Section A: Live Firebase Cloud Sync & Guest Access -->
-          <div id="auth-panel-firebase" class="space-y-3">
-            <!-- Google Sign In Button -->
-            <button type="button" onclick="signInWithFirebaseGoogle()" class="w-full flex items-center justify-center gap-2.5 bg-white text-slate-800 hover:bg-slate-50 font-semibold py-2.5 px-4 rounded-xl text-xs border border-slate-300 dark:border-white/20 shadow-sm transition-all cursor-pointer">
-              <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
-              <span>Sign In with Google</span>
-            </button>
-
-            <!-- Instant Guest Access Button -->
-            <button type="button" onclick="continueAsGuest()" class="w-full flex items-center justify-center gap-2 bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-bg-elevation)] text-[var(--mc-text-primary)] font-semibold py-2 px-4 rounded-xl text-xs border border-[var(--mc-border-default)] transition-all cursor-pointer">
-              <i data-lucide="user" class="w-3.5 h-3.5 text-[var(--mc-accent)]"></i>
-              <span>Continue as Guest (Local Vault)</span>
-            </button>
-
-          <div class="flex items-center gap-2 my-2 text-[10px] text-slate-400 uppercase tracking-widest text-center before:flex-1 before:border-t before:border-slate-200 dark:before:border-slate-800 after:flex-1 after:border-t after:border-slate-200 dark:after:border-slate-800">
-            or continue with email
-          </div>
-
-          <!-- Email / Password Inputs -->
-          <div class="space-y-2.5">
-            <div>
-              <label class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 block mb-1">Email Address</label>
-              <input type="email" id="firebase-email-input" placeholder="name@example.com" class="w-full bg-slate-50 dark:bg-slate-900/90 text-slate-900 dark:text-slate-100 text-xs p-2.5 rounded-xl border border-slate-300 dark:border-white/10 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 font-sans">
-            </div>
-
-            <div>
-              <label class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 block mb-1">Password</label>
-              <input type="password" id="firebase-password-input" placeholder="Password (min 6 chars)" class="w-full bg-slate-50 dark:bg-slate-900/90 text-slate-900 dark:text-slate-100 text-xs p-2.5 rounded-xl border border-slate-300 dark:border-white/10 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 font-sans">
-            </div>
-            
-            <div class="grid grid-cols-2 gap-2 pt-1">
-              <button type="button" onclick="signInWithFirebaseEmail()" class="btn-secondary text-xs !justify-center !py-2 font-semibold">
-                Sign In
-              </button>
-              <button type="button" onclick="signUpWithFirebaseEmail()" class="btn-island text-xs !justify-center !py-2 font-semibold !bg-gradient-to-r !from-blue-600 !to-indigo-600">
-                Create Account
-              </button>
-            </div>
-          </div>
-
-          <!-- Firebase Status & Config Box -->
-          <div id="firebase-status-banner" class="admin-only mt-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400 flex items-center justify-between">
-            <span class="flex items-center gap-1.5">
-              <span id="fb-status-dot" class="w-2 h-2 rounded-full bg-emerald-500"></span>
-              <span id="fb-status-text" class="font-medium">Firebase Client Ready</span>
-            </span>
-            <button type="button" onclick="toggleFirebaseConfigBox()" class="text-[10px] text-blue-600 dark:text-blue-400 hover:underline font-semibold flex items-center gap-1">
-              <i data-lucide="settings" class="w-3 h-3"></i>
-              <span>Config</span>
-            </button>
-          </div>
-
-          <!-- Custom Web Config Details (Collapsible) -->
-          <div id="firebase-config-box" class="hidden p-3 rounded-xl bg-slate-50 dark:bg-black/60 border border-slate-200 dark:border-slate-800 text-[11px] space-y-2 mt-2">
-            <p class="text-slate-500 dark:text-slate-400 text-[10px]">Enter Firebase Web App credentials (from Firebase Console → Project Settings → Web App):</p>
-            <input type="text" id="cfg-fb-api-key" placeholder="apiKey (AIza... from Firebase Web App)" class="w-full bg-white dark:bg-slate-950 p-2 rounded-lg text-xs border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white font-mono">
-            <input type="text" id="cfg-fb-auth-domain" placeholder="authDomain (project.firebaseapp.com)" class="w-full bg-white dark:bg-slate-950 p-2 rounded-lg text-xs border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white font-mono">
-            <input type="text" id="cfg-fb-project-id" placeholder="projectId" class="w-full bg-white dark:bg-slate-950 p-2 rounded-lg text-xs border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white font-mono">
-            <div class="grid grid-cols-2 gap-2 pt-1">
-              <button type="button" onclick="saveCustomFirebaseConfig()" class="btn-island text-[11px] !py-1.5 w-full !justify-center font-semibold !bg-blue-600">Save Config</button>
-              <button type="button" onclick="clearCustomFirebaseConfig()" class="btn-secondary text-[11px] !py-1.5 w-full !justify-center font-semibold text-rose-500 hover:text-rose-600">Clear / Reset</button>
-            </div>
+          <div>
+            <h3 class="text-base font-bold text-[var(--mc-text-primary)]">Sign In to Mind Cave</h3>
+            <p class="text-[11px] text-[var(--mc-text-secondary)]">Sync encrypted reflections to Cloud Firestore</p>
           </div>
         </div>
-
-        <!-- Section B: Instant Sandbox Multi-Tenant Switcher -->
-        </div> <!-- End of auth-forms-container -->
-
-        <!-- Section C: Profile & Physiological Personalization -->
-        <div class="pt-3 border-t border-slate-200 dark:border-white/10 space-y-3">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-              <i data-lucide="user-check" class="w-3.5 h-3.5 text-cyan-500 dark:text-cyan-400"></i> Biological Profile & Timezone
-            </span>
-            <span id="profile-age-badge" class="hidden text-[10px] font-mono font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-2 py-0.5 rounded-full"></span>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
-            <div>
-              <label class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 block mb-1">Full Name / Moniker</label>
-              <input type="text" id="profile-first-name" oninput="saveProfileDetails()" placeholder="e.g. Vignesh Ramkumar" class="w-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 text-xs p-2.5 rounded-xl border border-slate-300 dark:border-slate-800 focus:outline-none focus:border-cyan-500 placeholder-slate-400 dark:placeholder-slate-600">
-            </div>
-            <div>
-              <label class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 block mb-1">Date of Birth (DOB)</label>
-              <input type="date" id="profile-dob" oninput="saveProfileDetails()" class="w-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 text-xs p-2.5 rounded-xl border border-slate-300 dark:border-slate-800 focus:outline-none focus:border-cyan-500">
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <div>
-              <label class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 block mb-1">Gender / Wellness Track</label>
-              <select id="profile-gender-select" onchange="updateUserGender(this.value); saveProfileDetails();" class="w-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 text-xs p-2.5 rounded-xl border border-slate-300 dark:border-slate-800 focus:outline-none focus:border-cyan-500">
-                <option value="female">Female (Cycle Intelligence Track)</option>
-                <option value="male">Male (Circadian & Stamina Track)</option>
-                <option value="non_binary">Non-Binary / Custom Track</option>
-                <option value="unspecified">Unspecified / Custom Track</option>
-              </select>
-            </div>
-            <div>
-              <label class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 block mb-1">Daily Diary Span</label>
-              <select id="profile-span-select" onchange="changeTimeRange(this.value)" class="w-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 text-xs p-2.5 rounded-xl border border-slate-300 dark:border-slate-800 focus:outline-none focus:border-cyan-500">
-                <option value="day_standard">Day Span (06:00 – 23:00)</option>
-                <option value="full_24h">Full 24 Hours</option>
-                <option value="active_focus">Active Focus (08:00 – 20:00)</option>
-              </select>
-            </div>
-          </div>
-          </div>
-
-          
-        <!-- Section D: Dynamic User Persona & Cognitive Identity Deck -->
-        <div class="pt-3 border-t border-slate-200 dark:border-white/10 space-y-3" id="profile-persona-container">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <div class="w-7 h-7 rounded-xl bg-[var(--mc-accent-12)] border border-[var(--mc-accent-25)] text-[var(--mc-accent)] flex items-center justify-center">
-                <i data-lucide="brain" class="w-3.5 h-3.5"></i>
-              </div>
-              <div>
-                <h4 class="text-xs font-bold text-slate-900 dark:text-white">Evolving User Persona & Cognitive Memory</h4>
-                <p class="text-[10px] text-slate-500 dark:text-slate-400">Auto-learns from your conversations to personalize all future reflections</p>
-              </div>
-            </div>
-            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] font-semibold" id="persona-synthesis-badge">
-              Auto-Synced
-            </span>
-          </div>
-
-          <!-- Persona Card Display -->
-          <div class="p-3.5 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)] space-y-2.5 text-xs">
-            <div class="flex items-center justify-between">
-              <span class="text-[10px] font-mono uppercase tracking-wider text-[var(--mc-text-muted)]">Cognitive Archetype</span>
-              <span class="font-semibold text-[var(--mc-accent)]" id="persona-archetype-lbl">Reflective Builder</span>
-            </div>
-            
-            <div>
-              <span class="text-[10px] font-mono uppercase tracking-wider text-[var(--mc-text-muted)] block mb-1">Core Values & Philosophy</span>
-              <div class="flex items-center gap-1.5 flex-wrap" id="persona-values-chips">
-                <!-- Dynamically populated -->
-              </div>
-            </div>
-
-            <div>
-              <span class="text-[10px] font-mono uppercase tracking-wider text-[var(--mc-text-muted)] block mb-0.5">Reflection Preference</span>
-              <p class="text-[11px] text-[var(--mc-text-secondary)] leading-relaxed italic" id="persona-style-lbl">
-                Analytical, structured, constructive with bulleted action steps and gentle inquiry.
-              </p>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-[var(--mc-border-subtle)] text-[10px]">
-              <div>
-                <span class="text-[var(--mc-text-muted)] font-mono block">Recurring Life Themes:</span>
-                <span class="text-[var(--mc-text-primary)] font-medium" id="persona-themes-lbl">Product architecture, Focus, Clarity</span>
-              </div>
-              <div>
-                <span class="text-[var(--mc-text-muted)] font-mono block">Active Milestones:</span>
-                <span class="text-[var(--mc-text-primary)] font-medium" id="persona-milestones-lbl">Ship deterministic architecture</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Persona Management Actions -->
-          <div class="flex items-center justify-between gap-1.5 flex-wrap pt-1">
-            <div class="flex items-center gap-1.5">
-              <button type="button" onclick="openPersonaEditModal()" class="btn-secondary !py-1 !px-2.5 text-xs flex items-center gap-1 cursor-pointer" title="Edit Persona Details">
-                <i data-lucide="edit-3" class="w-3 h-3 text-[var(--mc-accent)]"></i>
-                <span>Edit Persona</span>
-              </button>
-              <button type="button" onclick="document.getElementById('persona-import-file-input').click()" class="btn-secondary !py-1 !px-2.5 text-xs flex items-center gap-1 cursor-pointer" title="Import Persona from JSON/Text File">
-                <i data-lucide="upload" class="w-3 h-3 text-[#8FA9B8]"></i>
-                <span>Import</span>
-              </button>
-              <input type="file" id="persona-import-file-input" accept=".json,.txt" class="hidden" onchange="importUserPersonaFile(event)">
-              <button type="button" onclick="exportUserPersonaJSON()" class="btn-secondary !py-1 !px-2.5 text-xs flex items-center gap-1 cursor-pointer" title="Export Persona as JSON File">
-                <i data-lucide="download" class="w-3 h-3 text-[#C5AA78]"></i>
-                <span>Export</span>
-              </button>
-            </div>
-            <button type="button" onclick="resynthesizeUserPersona()" class="text-[10px] text-[var(--mc-accent)] hover:underline font-medium flex items-center gap-1 cursor-pointer" title="Re-analyze all chat and journal history">
-              <i data-lucide="refresh-cw" class="w-2.5 h-2.5"></i>
-              <span>Re-Synthesize</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Custom Track Toggles -->
-          <div id="profile-custom-tracks-container" class="p-3 rounded-2xl bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-800 space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="text-[11px] font-semibold text-slate-800 dark:text-slate-200">Active Vitality Tracks:</span>
-              <span class="text-[10px] text-cyan-600 dark:text-[var(--mc-accent)] font-mono font-medium font-semibold" id="profile-tracks-status-hint">Dynamic Sync</span>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-              <label class="flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 cursor-pointer transition-colors shadow-sm dark:shadow-none">
-                <span class="flex items-center gap-2 text-xs text-slate-800 dark:text-slate-200 font-semibold">
-                  <i data-lucide="moon" class="w-4 h-4 text-rose-500"></i> <span>Cycle Intelligence</span>
-                </span>
-                <input type="checkbox" id="profile-toggle-cycle" onchange="toggleTrackPreference('cycle', this.checked)" class="accent-rose-500 rounded w-4 h-4 cursor-pointer">
-              </label>
-              <label class="flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 cursor-pointer transition-colors shadow-sm dark:shadow-none">
-                <span class="flex items-center gap-2 text-xs text-slate-800 dark:text-slate-200 font-semibold">
-                  <i data-lucide="zap" class="w-4 h-4 text-amber-500"></i> <span>Circadian & Energy</span>
-                </span>
-                <input type="checkbox" id="profile-toggle-circadian" onchange="toggleTrackPreference('circadian', this.checked)" class="accent-amber-500 rounded w-4 h-4 cursor-pointer">
-              </label>
-            </div>
-            <p class="text-[10px] text-slate-500 dark:text-slate-400">Toggle individual biological & vitality tracks on/off for your journal.</p>
-          </div>
-
-          <!-- Danger Zone: Factory Data Wipe -->
-          <div class="pt-3 border-t border-rose-500/20">
-            <button type="button" onclick="openFactoryResetModal()" class="w-full py-2.5 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 dark:text-rose-400 border border-rose-500/30 text-xs font-bold flex items-center justify-center gap-2 transition-colors">
-              <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-500"></i>
-              <span>Factory Reset Everything (Start From First)</span>
-            </button>
-          </div>
-        </div>
-
+        <button onclick="closeAuthModal()" class="w-8 h-8 rounded-xl bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-border-subtle)] text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] flex items-center justify-center transition-colors cursor-pointer">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
       </div>
+
+      <!-- Google Sign In Button -->
+      <button type="button" onclick="signInWithFirebaseGoogle()" class="w-full flex items-center justify-center gap-2.5 bg-white text-slate-800 hover:bg-slate-50 font-semibold py-2.5 px-4 rounded-xl text-xs border border-slate-200 shadow-sm transition-all cursor-pointer">
+        <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+        <span>Sign In with Google</span>
+      </button>
+
+      <div class="flex items-center gap-2 my-2 text-[10px] text-[var(--mc-text-muted)] uppercase tracking-widest text-center before:flex-1 before:border-t before:border-[var(--mc-border-subtle)] after:flex-1 after:border-t after:border-[var(--mc-border-subtle)]">
+        or with email
+      </div>
+
+      <!-- Email / Password Form -->
+      <div class="space-y-2.5">
+        <div>
+          <label class="text-[11px] font-semibold text-[var(--mc-text-secondary)] block mb-1">Email Address</label>
+          <input type="email" id="firebase-email-input" placeholder="name@example.com" class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] text-xs p-2.5 rounded-xl border border-[var(--mc-border-default)] focus:outline-none focus:border-emerald-500 font-sans">
+        </div>
+
+        <div>
+          <label class="text-[11px] font-semibold text-[var(--mc-text-secondary)] block mb-1">Password</label>
+          <input type="password" id="firebase-password-input" placeholder="Password (min 6 chars)" class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] text-xs p-2.5 rounded-xl border border-[var(--mc-border-default)] focus:outline-none focus:border-emerald-500 font-sans">
+        </div>
+        
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <button type="button" onclick="signInWithFirebaseEmail()" class="py-2.5 rounded-xl bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-border-subtle)] text-[var(--mc-text-primary)] text-xs font-semibold border border-[var(--mc-border-subtle)] cursor-pointer">
+            Sign In
+          </button>
+          <button type="button" onclick="signUpWithFirebaseEmail()" class="py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-900/30 cursor-pointer">
+            Create Account
+          </button>
+        </div>
+      </div>
+
+      <!-- Guest Access Shortcut -->
+      <div class="pt-2 border-t border-[var(--mc-border-subtle)]">
+        <button type="button" onclick="continueAsGuest()" class="w-full py-2 rounded-xl bg-transparent hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-muted)] hover:text-[var(--mc-text-primary)] text-xs font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
+          <i data-lucide="user" class="w-3.5 h-3.5"></i>
+          <span>Continue as Guest (Local Offline Vault)</span>
+        </button>
+      </div>
+
     </div>
+  </div>
 
   <!-- ===================================================================== -->
-  <!-- MODAL: LOG JOURNAL MOMENT (DISTRACTION-FREE QUIET BENTO EDITOR) -->
+  <!-- MODAL 2: SIGNED-IN ACCOUNT & BIOLOGICAL PROFILE -->
+  <!-- ===================================================================== -->
+  <div id="user-profile-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
+    <div class="max-w-lg w-full my-auto rounded-3xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] shadow-2xl p-5 sm:p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-3 border-b border-[var(--mc-border-subtle)]">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-500 shadow-sm">
+            <i data-lucide="user" class="w-5 h-5 text-emerald-500"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-[var(--mc-text-primary)]">Account & Personal Profile</h3>
+            <p class="text-[11px] text-[var(--mc-text-secondary)]">Biological tracks, cognitive identity & cloud status</p>
+          </div>
+        </div>
+        <button onclick="closeUserProfileModal()" class="w-8 h-8 rounded-xl bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-border-subtle)] text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] flex items-center justify-center transition-colors cursor-pointer">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- User Info Status Card -->
+      <div class="p-3.5 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-500 font-bold flex items-center justify-center text-sm shrink-0" id="profile-modal-avatar">
+            G
+          </div>
+          <div class="min-w-0">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0 animate-pulse"></span>
+              <span class="text-xs font-bold text-[var(--mc-text-primary)] truncate" id="profile-modal-name">Guest Explorer</span>
+            </div>
+            <div class="text-[10px] text-[var(--mc-text-muted)] font-mono flex items-center gap-1 mt-0.5">
+              <i data-lucide="shield-check" class="w-3 h-3 text-emerald-500"></i>
+              <span id="profile-modal-uid">Client AES-256 Vault Active</span>
+            </div>
+          </div>
+        </div>
+        <button type="button" onclick="signOutUser()" class="shrink-0 px-3 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-semibold hover:bg-rose-500/20 transition-colors flex items-center gap-1 cursor-pointer">
+          <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+          <span>Sign Out</span>
+        </button>
+      </div>
+
+      <!-- Biological Profile & Timezone Settings -->
+      <div class="space-y-3 pt-1">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-[var(--mc-text-primary)] flex items-center gap-1.5">
+            <i data-lucide="user-check" class="w-3.5 h-3.5 text-emerald-500"></i> Biological Profile & Timezone
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+          <div>
+            <label class="text-[11px] font-semibold text-[var(--mc-text-secondary)] block mb-1">Full Name / Moniker</label>
+            <input type="text" id="user-display-name-input" placeholder="e.g. Maya Chen" class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] p-2.5 rounded-xl border border-[var(--mc-border-default)] focus:outline-none focus:border-emerald-500">
+          </div>
+          <div>
+            <label class="text-[11px] font-semibold text-[var(--mc-text-secondary)] block mb-1">Date of Birth (DOB)</label>
+            <input type="date" id="user-dob-input" class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] p-2.5 rounded-xl border border-[var(--mc-border-default)] focus:outline-none focus:border-emerald-500">
+          </div>
+          <div>
+            <label class="text-[11px] font-semibold text-[var(--mc-text-secondary)] block mb-1">Gender / Wellness Track</label>
+            <select id="user-gender-select" onchange="handleGenderChange(this.value)" class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] p-2.5 rounded-xl border border-[var(--mc-border-default)] focus:outline-none">
+              <option value="unspecified">Unspecified / Custom Track</option>
+              <option value="female">Female (Cycle & Vitality Enabled)</option>
+              <option value="male">Male (Circadian & Peak Energy)</option>
+              <option value="non_binary">Non-Binary / Neutral Vitality</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[11px] font-semibold text-[var(--mc-text-secondary)] block mb-1">Daily Diary Span</label>
+            <select id="user-timeline-span-select" onchange="handleTimelineSpanChange(this.value)" class="w-full bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] p-2.5 rounded-xl border border-[var(--mc-border-default)] focus:outline-none">
+              <option value="day_standard">Day Span (06:00 – 23:00)</option>
+              <option value="full_24">Full 24-Hour (00:00 – 23:00)</option>
+              <option value="work_hours">Deep Focus (08:00 – 18:00)</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="button" onclick="saveUserProfileDetails()" class="w-full py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all cursor-pointer">
+          Save Profile Details
+        </button>
+      </div>
+
+      <!-- Evolving Cognitive Persona Memory -->
+      <div class="p-4 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] space-y-2.5">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i data-lucide="cpu" class="w-4 h-4 text-emerald-500"></i>
+            <span class="text-xs font-bold text-[var(--mc-text-primary)]">Evolving Persona & Memory</span>
+          </div>
+          <span class="text-[10px] font-mono text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full font-semibold">Auto-Synced</span>
+        </div>
+        <p class="text-[11px] text-[var(--mc-text-secondary)] leading-relaxed">
+          Gemini synthesizes recurring life themes, core values, and communication styles to personalize all future responses.
+        </p>
+        <div class="flex items-center gap-2 pt-1">
+          <button type="button" onclick="openPersonaEditorModal()" class="flex-1 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-[var(--mc-text-primary)] text-xs font-semibold transition-colors cursor-pointer">
+            Edit Persona
+          </button>
+          <button type="button" onclick="resynthesizeUserPersona()" class="flex-1 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-[var(--mc-text-primary)] text-xs font-semibold transition-colors cursor-pointer flex items-center justify-center gap-1">
+            <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+            <span>Re-Synthesize</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Danger Zone -->
+      <div class="pt-2 border-t border-[var(--mc-border-subtle)]">
+        <button type="button" onclick="openFactoryResetModal()" class="w-full py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/20 text-xs font-semibold transition-colors cursor-pointer flex items-center justify-center gap-1.5">
+          <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i>
+          <span>Factory Reset Everything</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- 5. SOFT AUTH PROMPT BANNER (AFTER 2 PROMPTS & 1 REFLECTION) -->
+  <!-- ===================================================================== -->
+  <div id="guest-soft-auth-banner" class="hidden fixed bottom-16 lg:bottom-6 right-4 sm:right-6 z-50 max-w-md w-[calc(100%-2rem)] bg-[var(--mc-bg-secondary)] border border-emerald-500/30 rounded-2xl shadow-2xl p-4 animate-fade-in text-xs space-y-3">
+    <div class="flex items-start justify-between gap-2">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-xl bg-emerald-500/15 text-emerald-500 flex items-center justify-center font-bold shrink-0">
+          <i data-lucide="cloud" class="w-4 h-4"></i>
+        </div>
+        <div>
+          <h4 class="font-bold text-[var(--mc-text-primary)]">Sync Reflections to Cloud</h4>
+          <p class="text-[11px] text-[var(--mc-text-secondary)] mt-0.5">You've logged 2 AI prompts & 1 reflection as a Guest. Sign in to back up and sync across all devices.</p>
+        </div>
+      </div>
+      <button onclick="dismissGuestAuthBanner()" class="text-[var(--mc-text-muted)] hover:text-[var(--mc-text-primary)] p-1 cursor-pointer">
+        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+      </button>
+    </div>
+
+    <div class="flex items-center gap-2 pt-1">
+      <button type="button" onclick="openAuthModalFromBanner()" class="flex-1 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm cursor-pointer">
+        <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
+        <span>Sign In & Sync</span>
+      </button>
+      <button type="button" onclick="dismissGuestAuthBanner()" class="py-2 px-3 rounded-xl bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-border-subtle)] text-[var(--mc-text-secondary)] font-medium text-xs cursor-pointer">
+        Later
+      </button>
+    </div>
+  </div>
+<!-- MODAL: LOG JOURNAL MOMENT (DISTRACTION-FREE QUIET BENTO EDITOR) -->
   <!-- ===================================================================== -->
     <div id="journal-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-2.5 sm:p-4 hidden overflow-y-auto">
     <div class="mc-card max-w-lg w-full my-auto shadow-2xl p-4 sm:p-5 flex flex-col max-h-[92vh] sm:max-h-[88vh]">
@@ -4460,7 +4400,7 @@
   </div>
 
   <!-- Client Application Script -->
-  <script src="/static/app.js?v=1788179191"></script>
+  <script src="/static/app.js?v=1788179377"></script>
   <script>
     // Initialize Lucide Icons
     lucide.createIcons();
