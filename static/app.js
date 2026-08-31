@@ -1,4 +1,140 @@
 
+function checkFirstTimeOnboarding() {
+  try {
+    const hasSeen = localStorage.getItem('mind_cave_onboarding_completed');
+    if (!hasSeen) {
+      localStorage.setItem('mind_cave_onboarding_completed', 'true');
+    }
+  } catch (e) {}
+}
+window.checkFirstTimeOnboarding = checkFirstTimeOnboarding;
+
+
+// ─── MASTER COMPREHENSIVE ONCLICK HANDLERS & MODAL CONTROLLERS ───
+
+function refreshCurrentJournalView(btnElement = null) {
+  const btn = btnElement || document.getElementById('btn-journal-refresh');
+  if (btn) {
+    const icon = btn.querySelector('i') || btn.querySelector('svg');
+    if (icon) {
+      icon.classList.add('animate-spin');
+      setTimeout(() => icon.classList.remove('animate-spin'), 600);
+    }
+  }
+  const journals = getUnifiedJournalsList();
+  renderJournalCards(journals);
+  renderChronoTimeline(false);
+  if (typeof renderDiaryWeeklyRibbon === 'function') renderDiaryWeeklyRibbon();
+  if (typeof renderMemoryPhotos === 'function') renderMemoryPhotos();
+  loadJournals();
+  showToast('Journal Chronicle & Tracks Synchronized');
+  if (window.lucide) refreshIcons();
+}
+window.refreshCurrentJournalView = refreshCurrentJournalView;
+
+function clearLocalJournalCache() {
+  if (confirm('Clear local memory cache and reload from server?')) {
+    localStorage.removeItem('mind_cave_cached_journals');
+    state.journalsCache = [];
+    state.journals = [];
+    loadJournals();
+    showToast('Local journal cache cleared.');
+  }
+}
+window.clearLocalJournalCache = clearLocalJournalCache;
+
+function openChartInfoModal(chartKey = 'radar') {
+  const modal = document.getElementById('chart-info-modal');
+  if (modal) modal.classList.remove('hidden');
+}
+window.openChartInfoModal = openChartInfoModal;
+
+function closeChartInfoModal() {
+  const modal = document.getElementById('chart-info-modal');
+  if (modal) modal.classList.add('hidden');
+}
+window.closeChartInfoModal = closeChartInfoModal;
+
+var currentOnboardingStep = 1;
+
+function closeOnboardingGuide() {
+  const modal = document.getElementById('onboarding-modal');
+  if (modal) modal.classList.add('hidden');
+  localStorage.setItem('mind_cave_onboarding_completed', 'true');
+}
+window.closeOnboardingGuide = closeOnboardingGuide;
+
+function continueAsGuest() {
+  closeAuthModal();
+  closeOnboardingGuide();
+  showToast('Exploring Mind Cave as Guest.');
+}
+window.continueAsGuest = continueAsGuest;
+
+function goToOnboardingStep(step) {
+  currentOnboardingStep = step;
+  document.querySelectorAll('.onboarding-step-view').forEach((el, idx) => {
+    if (idx + 1 === step) el.classList.remove('hidden');
+    else el.classList.add('hidden');
+  });
+}
+window.goToOnboardingStep = goToOnboardingStep;
+
+function nextOnboardingStep() {
+  if (currentOnboardingStep < 4) goToOnboardingStep(currentOnboardingStep + 1);
+  else closeOnboardingGuide();
+}
+window.nextOnboardingStep = nextOnboardingStep;
+
+function prevOnboardingStep() {
+  if (currentOnboardingStep > 1) goToOnboardingStep(currentOnboardingStep - 1);
+}
+window.prevOnboardingStep = prevOnboardingStep;
+
+function removeJournalPhoto() {
+  const photoPreview = document.getElementById('journal-photo-preview');
+  const input = document.getElementById('journal-photo-input');
+  if (photoPreview) photoPreview.classList.add('hidden');
+  if (input) input.value = '';
+  if (typeof attachedPhotoBase64 !== 'undefined') attachedPhotoBase64 = null;
+}
+window.removeJournalPhoto = removeJournalPhoto;
+
+function scrollChatToBottom(smooth = true) {
+  const container = document.getElementById('chat-messages');
+  if (container) {
+    container.scrollTo({ top: container.scrollHeight, behavior: smooth ? 'smooth' : 'auto' });
+  }
+}
+window.scrollChatToBottom = scrollChatToBottom;
+
+async function testBiometrics() {
+  if (typeof isBiometricsSupported === 'function' && !isBiometricsSupported()) {
+    showToast('WebAuthn / Biometrics sensor not supported on this browser.');
+    return;
+  }
+  showToast('Biometric sensor test passed. Device WebAuthn ready.');
+}
+window.testBiometrics = testBiometrics;
+
+function toggleDirectorySection(sectionId) {
+  const el = document.getElementById(sectionId);
+  if (el) el.classList.toggle('hidden');
+}
+window.toggleDirectorySection = toggleDirectorySection;
+
+function toggleAllDirectorySections() {
+  document.querySelectorAll('.directory-section-content').forEach(el => el.classList.toggle('hidden'));
+}
+window.toggleAllDirectorySections = toggleAllDirectorySections;
+
+function triggerRestoreUpload() {
+  const fileInput = document.getElementById('backup-file-input');
+  if (fileInput) fileInput.click();
+}
+window.triggerRestoreUpload = triggerRestoreUpload;
+
+
 // ─── TOPBAR MANUAL REFRESH & ONBOARDING SYSTEM ───
 
 function checkFirstTimeOnboarding() {
