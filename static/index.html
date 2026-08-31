@@ -125,10 +125,40 @@
             }
           } else {
             _syncAuthElements();
-          }
-        }
       } catch(e) {}
     })();
+  </script>
+
+  <!-- ── SAFE EARLY ONCLICK STUBS ── prevents ReferenceError if clicked during load ── -->
+  <script>
+    window.handleHeaderAuthAction = window.handleHeaderAuthAction || function() {
+      var profModal = document.getElementById('user-profile-modal');
+      var authModal = document.getElementById('auth-modal');
+      var uid = localStorage.getItem('gemini_journal_uid');
+      if (uid && !uid.startsWith('guest') && profModal) {
+        if (typeof openUserProfileModal === 'function') openUserProfileModal();
+        else profModal.classList.remove('hidden');
+      } else if (authModal) {
+        if (typeof openAuthModal === 'function') openAuthModal();
+        else authModal.classList.remove('hidden');
+      }
+    };
+    window.openUserProfileModal = window.openUserProfileModal || function() {
+      var modal = document.getElementById('user-profile-modal');
+      if (modal) modal.classList.remove('hidden');
+    };
+    window.closeUserProfileModal = window.closeUserProfileModal || function() {
+      var modal = document.getElementById('user-profile-modal');
+      if (modal) modal.classList.add('hidden');
+    };
+    window.openAuthModal = window.openAuthModal || function() {
+      var modal = document.getElementById('auth-modal');
+      if (modal) modal.classList.remove('hidden');
+    };
+    window.closeAuthModal = window.closeAuthModal || function() {
+      var modal = document.getElementById('auth-modal');
+      if (modal) modal.classList.add('hidden');
+    };
   </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -185,7 +215,7 @@
   </script>
 
   <!-- Custom Styling -->
-  <link rel="stylesheet" href="/static/style.css?v=1788219000">
+  <link rel="stylesheet" href="/static/style.css?v=1788220000">
 </head>
 <body class="bg-[#0B0D0F] text-[#F2F4F5] min-h-screen flex antialiased font-sans selection:bg-emerald-500/30 overflow-x-hidden">
 
@@ -4478,7 +4508,7 @@
   </div>
 
   <!-- Client Application Script -->
-  <script src="/static/app.js?v=1788219000"></script>
+  <script src="/static/app.js?v=1788220000"></script>
   <script>
     // Initialize Lucide Icons
     lucide.createIcons();
@@ -4888,6 +4918,6 @@
   </div>
 
   <!-- Core Application Script -->
-  <script src="/static/app.js?v=1788219000" defer></script>
+  <script src="/static/app.js?v=1788220000" defer></script>
 </body>
 </html>

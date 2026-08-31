@@ -2031,44 +2031,6 @@ function handleHeaderAuthAction() {
 }
 window.handleHeaderAuthAction = handleHeaderAuthAction;
 
-function openUserProfileModal() {
-  const modal = document.getElementById('user-profile-modal');
-  if (modal) {
-    const nameInput = document.getElementById('user-display-name-input');
-    const nameLbl = document.getElementById('profile-modal-name');
-    const avatarLbl = document.getElementById('profile-modal-avatar');
-    const uidLbl = document.getElementById('profile-modal-uid');
-    const genderSelect = document.getElementById('user-gender-select');
-    const authActionBtn = document.getElementById('profile-modal-auth-action-btn');
-
-    const u = state.currentUser || {};
-    const isGuest = !u.uid || u.uid.startsWith('guest') || u.uid === 'user_alice';
-    
-    if (nameInput) nameInput.value = isGuest ? 'Guest Explorer' : (u.name || 'Explorer');
-    if (nameLbl) nameLbl.textContent = isGuest ? 'Guest Explorer' : (u.name || 'Explorer');
-    if (avatarLbl) avatarLbl.textContent = isGuest ? 'G' : (u.name || 'U')[0].toUpperCase();
-    if (uidLbl) uidLbl.textContent = isGuest ? 'Local Offline Sandbox (Guest Mode)' : `UID: ${u.uid.slice(0, 16)}...`;
-    if (genderSelect) genderSelect.value = u.gender || localStorage.getItem('mind_cave_user_gender') || 'unspecified';
-
-    if (authActionBtn) {
-      if (isGuest) {
-        authActionBtn.innerHTML = '<i data-lucide="log-in" class="w-3.5 h-3.5"></i><span>Sign In / Sync</span>';
-        authActionBtn.className = 'shrink-0 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm cursor-pointer';
-        authActionBtn.onclick = () => {
-          closeUserProfileModal();
-          openAuthModal();
-        };
-      } else {
-        authActionBtn.innerHTML = '<i data-lucide="log-out" class="w-3.5 h-3.5"></i><span>Sign Out</span>';
-        authActionBtn.className = 'shrink-0 px-3 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-semibold hover:bg-rose-500/20 transition-colors flex items-center gap-1 cursor-pointer';
-        authActionBtn.onclick = () => signOutUser();
-      }
-    }
-
-    modal.classList.remove('hidden');
-  }
-  if (window.lucide) refreshIcons();
-}
 
 function closePersonaEditModal() {
   const modal = document.getElementById('persona-edit-modal');
