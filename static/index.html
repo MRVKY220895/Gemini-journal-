@@ -99,182 +99,217 @@
   </script>
 
   <!-- Custom Styling -->
-  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/style.css?v=1788177636">
 </head>
-<body class="p-2 sm:p-4 md:p-6 pb-24 md:pb-6 flex flex-col min-h-screen">
+<body class="bg-[#0B0D0F] text-[#F2F4F5] min-h-screen flex antialiased font-sans selection:bg-emerald-500/30 overflow-x-hidden">
 
-  <!-- Background Glow Orbs -->
-  <div class="fixed top-12 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse-slow"></div>
-  <div class="fixed bottom-12 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse-slow"></div>
+    <!-- Background Ambient Glow -->
+  <div class="fixed top-12 left-1/4 w-96 h-96 bg-emerald-600/5 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse-slow"></div>
+  <div class="fixed bottom-12 right-1/4 w-96 h-96 bg-blue-600/5 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse-slow"></div>
 
-  <!-- Top Header Sticky Shield Bar (Prevents Content Overlap & Bleed) -->
-  <div class="sticky top-0 left-0 right-0 w-full z-50 bg-[var(--mc-bg-primary)]/95 backdrop-blur-xl border-b border-[var(--mc-border-subtle)]/50 pt-2 pb-2 px-2 sm:px-4">
-    <header class="floating-nav flex items-center justify-between gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 w-full max-w-6xl mx-auto rounded-full shadow-sm !static">
-    <!-- Left Area: Master Menu Button + Brand / Logo -->
-    <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-      <!-- Master Hierarchical Menu Button (Desktop Only) -->
-      <button onclick="openMasterMenuModal()" id="btn-master-menu" class="btn-menu shrink-0 hidden lg:inline-flex" title="Open Master Directory & Settings">
-        <i data-lucide="menu" class="w-3.5 h-3.5 text-[#9BB7A5]"></i>
-        <span class="inline">Menu</span>
+  <!-- ===================================================================== -->
+  <!-- 1. FIXED LEFT SIDEBAR (DESKTOP) -->
+  <!-- ===================================================================== -->
+  <aside id="desktop-fixed-sidebar" class="hidden lg:flex flex-col fixed inset-y-0 left-0 w-64 xl:w-72 bg-[#111417] border-r border-[#20252A] z-40 justify-between select-none">
+    
+    <!-- Top Branding & Navigation -->
+    <div class="p-5 space-y-5">
+      <!-- Brand Header -->
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5 cursor-pointer" onclick="switchTab('overview')">
+          <div class="w-8 h-8 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-sm">
+            <i data-lucide="compass" class="w-4 h-4 text-emerald-400"></i>
+          </div>
+          <div>
+            <div class="text-sm font-extrabold tracking-tight text-white">Mind Cave</div>
+            <div class="text-[10px] text-slate-400 font-mono">Personal AI Sanctuary</div>
+          </div>
+        </div>
+
+        <button onclick="openMasterMenuModal()" id="btn-master-menu" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#161A1E] transition-colors" title="Master Menu & Directory">
+          <i data-lucide="more-vertical" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Quick Action: + New Reflection -->
+      <button onclick="openNewJournalModal()" class="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md shadow-emerald-900/30 transition-all cursor-pointer">
+        <i data-lucide="edit-3" class="w-4 h-4"></i>
+        <span>New Reflection</span>
       </button>
 
-      <span class="w-[1px] h-4 bg-[var(--mc-border-subtle)] hidden lg:inline-block"></span>
+      <!-- Primary Sidebar Navigation Menu -->
+      <nav class="space-y-1" id="desktop-sidebar-nav">
+        <button onclick="switchTab('overview')" id="sidebar-tab-overview" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-white bg-[#161A1E] border border-[#20252A] transition-all cursor-pointer">
+          <i data-lucide="home" class="w-4 h-4 text-emerald-400"></i>
+          <span>Home Sanctuary</span>
+        </button>
+        <button onclick="switchTab('journals')" id="sidebar-tab-journals" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-[#161A1E] transition-all cursor-pointer">
+          <i data-lucide="book-open" class="w-4 h-4 text-emerald-400"></i>
+          <span>Journal & Tracks</span>
+        </button>
+        <button onclick="switchTab('studio')" id="sidebar-tab-studio" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-[#161A1E] transition-all cursor-pointer">
+          <i data-lucide="sparkles" class="w-4 h-4 text-emerald-400"></i>
+          <span>AI Reflective Studio</span>
+        </button>
+        <button onclick="switchTab('sanctuary')" id="sidebar-tab-sanctuary" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-[#161A1E] transition-all cursor-pointer">
+          <i data-lucide="activity" class="w-4 h-4 text-cyan-400"></i>
+          <span>Bio Sanctuary & Habits</span>
+        </button>
+        <button onclick="switchTab('analytics')" id="sidebar-tab-analytics" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-[#161A1E] transition-all cursor-pointer">
+          <i data-lucide="bar-chart-2" class="w-4 h-4 text-amber-400"></i>
+          <span>MindPulse Insights</span>
+        </button>
+        <button onclick="switchTab('security')" id="sidebar-tab-security" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-[#161A1E] transition-all cursor-pointer">
+          <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+          <span>Private Vault & AES</span>
+        </button>
+      </nav>
+    </div>
 
-      <!-- Brand / Logo -->
-      <div class="flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0" onclick="switchTab('overview')">
-        <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-[#9BB7A5]/15 border border-[#9BB7A5]/30 flex items-center justify-center text-[#9BB7A5]">
-          <i data-lucide="compass" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#9BB7A5]"></i>
+    <!-- Bottom Sidebar Profile & Account Card -->
+    <div class="p-4 border-t border-[#20252A] space-y-3">
+      <div class="p-3 rounded-2xl bg-[#161A1E] border border-[#20252A] flex items-center justify-between">
+        <div class="flex items-center gap-2.5 min-w-0 cursor-pointer" onclick="openUserProfileModal()">
+          <div class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center text-xs shrink-0" id="sidebar-user-avatar">
+            G
+          </div>
+          <div class="min-w-0">
+            <div class="text-xs font-bold text-white truncate" id="sidebar-user-name">Guest Explorer</div>
+            <div class="text-[10px] text-emerald-400 flex items-center gap-1 font-mono">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>Encrypted</span>
+            </div>
+          </div>
         </div>
-        <span class="text-xs sm:text-sm font-bold tracking-tight text-[var(--mc-text-primary)] whitespace-nowrap">Mind Cave</span>
+
+        <button onclick="handleHeaderAuthAction()" class="p-1.5 rounded-xl text-slate-400 hover:text-white transition-colors cursor-pointer" title="Sign In / Profile">
+          <i data-lucide="log-in" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="flex items-center justify-between text-[11px] text-slate-500 px-1">
+        <span>© 2026 Mind Cave</span>
+        <button onclick="toggleThemeMode()" class="hover:text-white transition-colors cursor-pointer flex items-center gap-1">
+          <i data-lucide="sun" class="w-3.5 h-3.5 hidden dark:inline text-amber-400"></i>
+          <i data-lucide="moon" class="w-3.5 h-3.5 inline dark:hidden text-slate-400"></i>
+          <span>Theme</span>
+        </button>
       </div>
     </div>
 
-    <!-- Master Navigation Tabs (Desktop / Tablet Header Nav) -->
-    <nav class="hidden md:flex items-center gap-1 nav-pill-track shrink-0">
-      <button onclick="switchTab('overview')" id="tab-btn-overview" class="tab-btn active flex items-center gap-1.5 whitespace-nowrap !py-1 !px-3 text-xs" title="Home Sanctuary">
-        <i data-lucide="home" class="w-3.5 h-3.5"></i> <span>Home</span>
-      </button>
-      <button onclick="switchTab('journals')" id="tab-btn-journals" class="tab-btn flex items-center gap-1.5 whitespace-nowrap !py-1 !px-3 text-xs" title="Journal & Life Intelligence Tracks">
-        <i data-lucide="book-open" class="w-3.5 h-3.5"></i> <span>Journal</span>
-      </button>
-      <button onclick="switchTab('studio')" id="tab-btn-studio" class="tab-btn flex items-center gap-1.5 whitespace-nowrap !py-1 !px-3 text-xs" title="AI Reflective Studio">
-        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-[#9BB7A5]"></i> <span>Studio</span>
-      </button>
-      <button onclick="switchTab('analytics')" id="tab-btn-analytics" class="tab-btn flex items-center gap-1.5 whitespace-nowrap !py-1 !px-3 text-xs" title="MindPulse Life Intelligence">
-        <i data-lucide="activity" class="w-3.5 h-3.5 text-[#8FA9B8]"></i> <span>MindPulse</span>
-      </button>
-      <button onclick="switchTab('security')" id="tab-btn-security" class="tab-btn flex items-center gap-1.5 whitespace-nowrap !py-1 !px-3 text-xs" title="Private Encrypted Vault">
-        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-[#91B59D]"></i> <span>Vault</span>
-      </button>
-    </nav>
+  </aside>
 
-    <!-- Right Area: Custom Multi-Language + Theme Toggle Shortcut + Consolidated User Profile Trigger -->
-    <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-      <!-- Custom Multi-Language Selector Trigger -->
-      <div class="relative inline-block" id="language-picker-container">
-        <button type="button" onclick="toggleLanguageDropdown(event)" id="btn-language-picker" class="nav-action-btn font-semibold shrink-0" title="Change Language / Auto-Detect">
-          <span id="current-lang-flag" class="text-xs">🌐</span>
-          <span id="current-lang-code" class="text-[11px] sm:text-xs">Auto</span>
-          <i data-lucide="chevron-down" class="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[var(--mc-text-muted)]"></i>
+  <!-- ===================================================================== -->
+  <!-- 2. MAIN VIEWPORT CONTAINER WITH FIXED SIDEBAR OFFSET -->
+  <!-- ===================================================================== -->
+  <div class="lg:pl-64 xl:pl-72 flex-1 flex flex-col min-h-screen min-w-0 w-full">
+
+    <!-- Sticky Top Utility Bar -->
+    <header class="sticky top-0 z-30 h-16 bg-[#0B0D0F]/90 backdrop-blur-xl border-b border-[#20252A] flex items-center justify-between px-4 sm:px-6 lg:px-8 shrink-0">
+      
+      <!-- Left: Mobile Menu Trigger & Breadcrumbs -->
+      <div class="flex items-center gap-3">
+        <button onclick="openMasterMenuModal()" class="lg:hidden p-2 rounded-xl bg-[#111417] border border-[#20252A] text-white">
+          <i data-lucide="menu" class="w-4 h-4 text-emerald-400"></i>
         </button>
 
-        <!-- Custom Dropdown Menu (Glass Popover with Dark High-Contrast Background) -->
-        <div id="language-dropdown-menu" class="hidden absolute right-0 mt-2 w-52 sm:w-56 rounded-2xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-default)] shadow-2xl backdrop-blur-2xl p-1.5 z-50 text-xs divide-y divide-[var(--mc-border-subtle)] max-h-80 overflow-y-auto">
-          <div class="py-1">
-            <button onclick="selectLanguageOption('auto')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] transition-colors font-medium cursor-pointer">
-              <div class="flex items-center gap-2">
-                <span class="text-sm">🌐</span>
-                <span class="font-semibold">Auto-Detect</span>
-              </div>
-              <i data-lucide="check" class="w-3.5 h-3.5 text-[#9BB7A5] hidden lang-check" data-check="auto"></i>
-            </button>
+        <!-- Brand (Mobile Only) -->
+        <div class="flex items-center gap-2 lg:hidden cursor-pointer" onclick="switchTab('overview')">
+          <div class="w-6 h-6 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+            <i data-lucide="compass" class="w-3.5 h-3.5 text-emerald-400"></i>
           </div>
-          <div class="py-1 space-y-0.5">
-            <button onclick="selectLanguageOption('en')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] transition-colors font-medium cursor-pointer">
-              <div class="flex items-center gap-2">
-                <span class="text-sm">🇬🇧</span>
-                <span>English</span>
-              </div>
-              <i data-lucide="check" class="w-3.5 h-3.5 text-[#9BB7A5] hidden lang-check" data-check="en"></i>
-            </button>
-            <button onclick="selectLanguageOption('ta')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] transition-colors font-medium cursor-pointer">
-              <div class="flex items-center gap-2">
-                <span class="text-sm">🇮🇳</span>
-                <span>தமிழ் (Tamil)</span>
-              </div>
-              <i data-lucide="check" class="w-3.5 h-3.5 text-[#9BB7A5] hidden lang-check" data-check="ta"></i>
-            </button>
-            <button onclick="selectLanguageOption('hi')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] transition-colors font-medium cursor-pointer">
-              <div class="flex items-center gap-2">
-                <span class="text-sm">🇮🇳</span>
-                <span>हिंदी (Hindi)</span>
-              </div>
-              <i data-lucide="check" class="w-3.5 h-3.5 text-[#9BB7A5] hidden lang-check" data-check="hi"></i>
-            </button>
-            <button onclick="selectLanguageOption('te')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] transition-colors font-medium cursor-pointer">
-              <div class="flex items-center gap-2">
-                <span class="text-sm">🇮🇳</span>
-                <span>తెలుగు (Telugu)</span>
-              </div>
-              <i data-lucide="check" class="w-3.5 h-3.5 text-[#9BB7A5] hidden lang-check" data-check="te"></i>
-            </button>
-            <button onclick="selectLanguageOption('es')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] transition-colors font-medium cursor-pointer">
-              <div class="flex items-center gap-2">
-                <span class="text-sm">🇪🇸</span>
-                <span>Español (Spanish)</span>
-              </div>
-              <i data-lucide="check" class="w-3.5 h-3.5 text-[#9BB7A5] hidden lang-check" data-check="es"></i>
-            </button>
-            <button onclick="selectLanguageOption('fr')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] transition-colors font-medium cursor-pointer">
-              <div class="flex items-center gap-2">
-                <span class="text-sm">🇫🇷</span>
-                <span>Français (French)</span>
-              </div>
-              <i data-lucide="check" class="w-3.5 h-3.5 text-[#9BB7A5] hidden lang-check" data-check="fr"></i>
-            </button>
-            <button onclick="selectLanguageOption('de')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] transition-colors font-medium cursor-pointer">
-              <div class="flex items-center gap-2">
-                <span class="text-sm">🇩🇪</span>
-                <span>Deutsch (German)</span>
-              </div>
-              <i data-lucide="check" class="w-3.5 h-3.5 text-[#9BB7A5] hidden lang-check" data-check="de"></i>
-            </button>
-            <button onclick="selectLanguageOption('ja')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] transition-colors font-medium cursor-pointer">
-              <div class="flex items-center gap-2">
-                <span class="text-sm">🇯🇵</span>
-                <span>日本語 (Japanese)</span>
-              </div>
-              <i data-lucide="check" class="w-3.5 h-3.5 text-[#9BB7A5] hidden lang-check" data-check="ja"></i>
-            </button>
-            <button onclick="selectLanguageOption('zh')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] transition-colors font-medium cursor-pointer">
-              <div class="flex items-center gap-2">
-                <span class="text-sm">🇨🇳</span>
-                <span>中文 (Chinese)</span>
-              </div>
-              <i data-lucide="check" class="w-3.5 h-3.5 text-[#9BB7A5] hidden lang-check" data-check="zh"></i>
-            </button>
-            <button onclick="selectLanguageOption('ar')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] transition-colors font-medium cursor-pointer">
-              <div class="flex items-center gap-2">
-                <span class="text-sm">🇸🇦</span>
-                <span>العربية (Arabic)</span>
-              </div>
-              <i data-lucide="check" class="w-3.5 h-3.5 text-[#9BB7A5] hidden lang-check" data-check="ar"></i>
-            </button>
-            <button onclick="selectLanguageOption('pt')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] transition-colors font-medium cursor-pointer">
-              <div class="flex items-center gap-2">
-                <span class="text-sm">🇧🇷</span>
-                <span>Português</span>
-              </div>
-              <i data-lucide="check" class="w-3.5 h-3.5 text-[#9BB7A5] hidden lang-check" data-check="pt"></i>
-            </button>
-          </div>
+          <span class="text-xs font-bold text-white">Mind Cave</span>
+        </div>
+
+        <!-- Desktop Breadcrumb / Title -->
+        <div class="hidden lg:flex items-center gap-2 text-xs text-slate-400 font-medium">
+          <span>Sanctuary</span>
+          <i data-lucide="chevron-right" class="w-3 h-3 text-slate-600"></i>
+          <span class="font-bold text-white" id="topbar-current-view">Home Sanctuary</span>
         </div>
       </div>
 
-      <!-- 1-Tap PWA / PWD Standalone App Installation Trigger -->
-      <button onclick="triggerPWAInstall()" id="btn-pwa-install" class="hidden items-center gap-1 nav-action-btn text-[#9BB7A5] font-semibold transition-all cursor-pointer shadow-sm active:scale-95 shrink-0" title="Install Mind Cave Native App to Home Screen">
-        <i data-lucide="download" class="w-3 h-3 text-[#9BB7A5]"></i>
-        <span class="hidden sm:inline">Install App</span>
-      </button>
+      <!-- Center: Global Quick Search Bar -->
+      <div class="hidden md:flex items-center flex-1 max-w-md mx-4">
+        <div class="relative w-full">
+          <i data-lucide="search" class="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+          <input type="text" id="global-search-input" onkeyup="handleGlobalSearch(event)" placeholder="Search reflections, insights, tags (Press /)..." class="w-full pl-9 pr-4 py-1.5 rounded-xl bg-[#111417] border border-[#20252A] text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors">
+        </div>
+      </div>
 
-      <!-- 1-Tap Theme Mode Switcher in Global Bar -->
-      <button onclick="toggleTheme()" id="btn-global-theme" class="nav-action-btn !w-8 !h-8 !p-0 justify-center rounded-full shrink-0" title="Toggle Light / Dark Mode">
-        <i data-lucide="sun" id="global-theme-icon" class="w-3.5 h-3.5 text-amber-400"></i>
-      </button>
+      <!-- Right: Cognitive Equilibrium + Language + Theme + Profile -->
+      <div class="flex items-center gap-2 sm:gap-2.5 shrink-0">
+        
+        <!-- Cognitive Equilibrium Pill -->
+        <div class="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold font-mono">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="sanctuary-equilibrium-badge">96% Optimal Equilibrium</span>
+        </div>
 
-      <!-- Consolidated User Profile & Settings Trigger -->
-      <button onclick="openAuthModal()" id="user-pill" class="nav-action-btn whitespace-nowrap shrink-0 !px-2 sm:!px-2.5" title="Account & Biological Profile Settings">
-        <div id="user-avatar-indicator" class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></div>
-        <span id="user-display-name" class="font-medium truncate max-w-[80px] sm:max-w-[120px] whitespace-nowrap text-[11px] sm:text-xs hidden md:inline-block">Guest</span>
-        <i data-lucide="chevron-down" class="w-2.5 h-2.5 text-[var(--mc-text-muted)] shrink-0"></i>
-      </button>
-    </div>
-  </header>
-  </div>
+        <!-- Language Selector Dropdown -->
+        <div class="relative inline-block" id="language-picker-container">
+          <button type="button" onclick="toggleLanguageDropdown(event)" id="btn-language-picker" class="nav-action-btn font-semibold shrink-0 flex items-center gap-1" title="Change Language">
+            <span id="current-lang-flag" class="text-xs">🌐</span>
+            <span id="current-lang-code" class="text-[11px] sm:text-xs">Auto</span>
+            <i data-lucide="chevron-down" class="w-2.5 h-2.5 text-slate-500"></i>
+          </button>
 
-  <!-- Main Content Container -->
+          <div id="language-dropdown-menu" class="hidden absolute right-0 mt-2 w-52 sm:w-56 rounded-2xl bg-[#111417] border border-[#20252A] shadow-2xl backdrop-blur-2xl p-1.5 z-50 text-xs divide-y divide-[#20252A] max-h-80 overflow-y-auto">
+            <div class="py-1">
+              <button onclick="selectLanguageOption('auto')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[#161A1E] text-white font-medium cursor-pointer">
+                <div class="flex items-center gap-2"><span>🌐</span><span class="font-semibold">Auto-Detect</span></div>
+              </button>
+            </div>
+            <div class="py-1 space-y-0.5">
+              <button onclick="selectLanguageOption('en')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[#161A1E] text-white font-medium cursor-pointer">
+                <div class="flex items-center gap-2"><span>🇬🇧</span><span>English</span></div>
+              </button>
+              <button onclick="selectLanguageOption('ta')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[#161A1E] text-white font-medium cursor-pointer">
+                <div class="flex items-center gap-2"><span>🇮🇳</span><span>தமிழ் (Tamil)</span></div>
+              </button>
+              <button onclick="selectLanguageOption('hi')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[#161A1E] text-white font-medium cursor-pointer">
+                <div class="flex items-center gap-2"><span>🇮🇳</span><span>हिन्दी (Hindi)</span></div>
+              </button>
+              <button onclick="selectLanguageOption('es')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[#161A1E] text-white font-medium cursor-pointer">
+                <div class="flex items-center gap-2"><span>🇪🇸</span><span>Español (Spanish)</span></div>
+              </button>
+              <button onclick="selectLanguageOption('fr')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[#161A1E] text-white font-medium cursor-pointer">
+                <div class="flex items-center gap-2"><span>🇫🇷</span><span>Français (French)</span></div>
+              </button>
+              <button onclick="selectLanguageOption('de')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[#161A1E] text-white font-medium cursor-pointer">
+                <div class="flex items-center gap-2"><span>🇩🇪</span><span>Deutsch (German)</span></div>
+              </button>
+              <button onclick="selectLanguageOption('ja')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[#161A1E] text-white font-medium cursor-pointer">
+                <div class="flex items-center gap-2"><span>🇯🇵</span><span>日本語 (Japanese)</span></div>
+              </button>
+              <button onclick="selectLanguageOption('zh')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[#161A1E] text-white font-medium cursor-pointer">
+                <div class="flex items-center gap-2"><span>🇨🇳</span><span>中文 (Chinese)</span></div>
+              </button>
+            </div>
+          </div>
+        </div>
 
-  <main class="studio-container flex-1 flex flex-col max-w-6xl mx-auto w-full">
+        <!-- Theme Mode Switcher -->
+        <button onclick="toggleThemeMode()" class="nav-action-btn font-semibold shrink-0" title="Toggle Light/Dark Theme">
+          <i data-lucide="sun" class="w-3.5 h-3.5 hidden dark:inline text-amber-400"></i>
+          <i data-lucide="moon" class="w-3.5 h-3.5 inline dark:hidden text-slate-400"></i>
+        </button>
+
+        <!-- User Profile Pill -->
+        <button onclick="handleHeaderAuthAction()" id="btn-header-auth" class="nav-action-btn font-semibold flex items-center gap-1.5 shrink-0">
+          <div class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] font-bold" id="header-user-avatar">G</div>
+          <span class="text-xs text-slate-200" id="header-user-name">Guest</span>
+        </button>
+
+      </div>
+
+    </header>
+
+    <!-- ===================================================================== -->
+    <!-- 3. CENTERED BENTO CONTENT AREA (max-w-7xl) -->
+    <!-- ===================================================================== -->
+    <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
+
 
     <!-- ===================================================================== -->
     <!-- TAB 1: HOME (EDITORIAL LANDING & SANCTUARY COMMAND DASHBOARD) -->
@@ -2172,7 +2207,34 @@
       </div>
     </section>
 
-  </main>
+      </main>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- 4. MOBILE BOTTOM NAVIGATION (THUMB ACCESSIBLE) -->
+  <!-- ===================================================================== -->
+  <nav class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#111417]/95 backdrop-blur-xl border-t border-[#20252A] px-3 py-2 flex items-center justify-around">
+    <button onclick="switchTab('overview')" id="mobile-tab-overview" class="flex flex-col items-center gap-1 text-[10px] font-semibold text-emerald-400 py-1 px-2.5 rounded-xl transition-all cursor-pointer">
+      <i data-lucide="home" class="w-4 h-4"></i>
+      <span>Home</span>
+    </button>
+    <button onclick="switchTab('journals')" id="mobile-tab-journals" class="flex flex-col items-center gap-1 text-[10px] font-medium text-slate-400 py-1 px-2.5 rounded-xl transition-all cursor-pointer">
+      <i data-lucide="book-open" class="w-4 h-4"></i>
+      <span>Journal</span>
+    </button>
+    <button onclick="switchTab('studio')" id="mobile-tab-studio" class="flex flex-col items-center gap-1 text-[10px] font-medium text-slate-400 py-1 px-2.5 rounded-xl transition-all cursor-pointer">
+      <i data-lucide="sparkles" class="w-4 h-4"></i>
+      <span>Studio</span>
+    </button>
+    <button onclick="switchTab('analytics')" id="mobile-tab-analytics" class="flex flex-col items-center gap-1 text-[10px] font-medium text-slate-400 py-1 px-2.5 rounded-xl transition-all cursor-pointer">
+      <i data-lucide="activity" class="w-4 h-4"></i>
+      <span>Insights</span>
+    </button>
+    <button onclick="switchTab('security')" id="mobile-tab-security" class="flex flex-col items-center gap-1 text-[10px] font-medium text-slate-400 py-1 px-2.5 rounded-xl transition-all cursor-pointer">
+      <i data-lucide="shield-check" class="w-4 h-4"></i>
+      <span>Vault</span>
+    </button>
+  </nav>
 
   <!-- ===================================================================== -->
   <!-- MODAL: CHAT HISTORY & SAVED REFLECTIONS -->
@@ -4329,7 +4391,7 @@
   </div>
 
   <!-- Client Application Script -->
-  <script src="/static/app.js"></script>
+  <script src="/static/app.js?v=1788177636"></script>
   <script>
     // Initialize Lucide Icons
     lucide.createIcons();
