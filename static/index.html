@@ -314,10 +314,10 @@
         <!-- ===================================================================== -->
     <!-- TAB 1: HOME (LIFE INTELLIGENCE MASTER DASHBOARD & DAILY BOOSTER) -->
     <!-- ===================================================================== -->
-    <section id="view-overview" class="flex-1 flex flex-col gap-6 w-full pb-16 md:pb-8">
+    <section id="view-overview" class="flex-1 flex flex-col gap-5 w-full pb-16 md:pb-8">
       
-      <!-- ─── 1. GREETING & DATE HEADER (INSPIRED BY REFERENCE) ─── -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-[var(--mc-border-subtle)]">
+      <!-- ─── 1. GREETING & 7-DAY STREAK HEADER ─── -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-[var(--mc-border-subtle)]">
         <div>
           <h1 class="text-2xl sm:text-3xl font-extrabold text-[var(--mc-text-primary)] tracking-tight flex items-center gap-2" id="home-greeting-text">
             <span id="home-greeting-salutation">Good morning, Vicky</span>
@@ -326,16 +326,30 @@
           <p class="text-xs sm:text-sm text-[var(--mc-text-secondary)] mt-1">A quiet place to write, think, and remember.</p>
         </div>
 
-        <div class="flex items-center gap-2 self-start sm:self-auto">
-          <div class="px-3.5 py-1.5 rounded-2xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] text-xs font-semibold text-[var(--mc-text-primary)] flex items-center gap-2 shadow-sm font-mono" id="home-live-date-pill">
-            <i data-lucide="calendar" class="w-3.5 h-3.5 text-emerald-500"></i>
-            <span id="home-formatted-date">Mon, Aug 31</span>
+        <!-- 7-Day Streak Pill Card -->
+        <div class="p-2.5 sm:p-3 rounded-2xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] flex items-center gap-3 shadow-sm self-start sm:self-auto">
+          <div class="flex items-center gap-2">
+            <span class="text-base">🔥</span>
+            <div>
+              <div class="text-xs font-bold text-[var(--mc-text-primary)]" id="home-header-streak-val">7 day streak</div>
+              <div class="text-[10px] text-[var(--mc-text-secondary)]">Keep it going!</div>
+            </div>
+          </div>
+          <!-- 7 Day Circles Tracker -->
+          <div class="flex items-center gap-1 pl-2 border-l border-[var(--mc-border-subtle)]">
+            <span class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold">✓</span>
+            <span class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold">✓</span>
+            <span class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold">✓</span>
+            <span class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold">✓</span>
+            <span class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold">✓</span>
+            <span class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold">✓</span>
+            <span class="w-5 h-5 rounded-full bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)]"></span>
           </div>
         </div>
       </div>
 
       <!-- ─── 2. TOP BENTO ROW: WHAT'S ON YOUR MIND & ONE THING TO NOTICE ─── -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
         
         <!-- Card 1 (Col 1-7): What's on your mind? Quick Capture -->
         <div class="lg:col-span-7 mc-card p-5 sm:p-6 rounded-3xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] flex flex-col justify-between space-y-4 shadow-sm hover:border-[var(--mc-border-strong)] transition-all">
@@ -404,9 +418,9 @@
         <!-- Card 2 (Col 8-12): One thing to notice (Cognitive Highlight) -->
         <div class="lg:col-span-5 mc-card p-5 sm:p-6 rounded-3xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] flex flex-col justify-between space-y-4 shadow-sm hover:border-[var(--mc-border-strong)] transition-all">
           <div class="space-y-3">
-            <div class="flex items-center gap-2 text-amber-500 font-bold text-xs uppercase tracking-wider font-mono">
-              <i data-lucide="star" class="w-4 h-4 fill-amber-500 text-amber-500"></i>
-              <span>One thing to notice</span>
+            <div class="flex items-center gap-2 text-amber-500 font-bold text-[11px] uppercase tracking-wider font-mono">
+              <i data-lucide="star" class="w-3.5 h-3.5 fill-amber-500 text-amber-500"></i>
+              <span>ONE THING TO NOTICE</span>
             </div>
 
             <div class="space-y-1.5">
@@ -421,7 +435,7 @@
 
           <div class="pt-2 border-t border-[var(--mc-border-subtle)]">
             <button type="button" onclick="switchTab('analytics')" class="w-full sm:w-auto px-4 py-2 rounded-xl bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-border-subtle)] text-[var(--mc-text-primary)] text-xs font-semibold transition-colors cursor-pointer flex items-center justify-center gap-1.5">
-              <span>See more</span>
+              <span>See more insights</span>
               <i data-lucide="arrow-right" class="w-3 h-3"></i>
             </button>
           </div>
@@ -429,11 +443,11 @@
 
       </div>
 
-      <!-- ─── 3. BOTTOM BENTO ROW: RECENT ENTRIES & HABITS ─── -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+      <!-- ─── 3. MIDDLE BENTO ROW (3 COLUMNS): RECENT ENTRIES, MOOD THIS WEEK, TODAY'S HABIT FOCUS ─── -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         
-        <!-- Card 3 (Col 1-7): Recent Entries with Animated Single Line Items -->
-        <div class="lg:col-span-7 mc-card p-5 sm:p-6 rounded-3xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] flex flex-col justify-between space-y-4 shadow-sm hover:border-[var(--mc-border-strong)] transition-all">
+        <!-- Column 1: Recent Entries -->
+        <div class="mc-card p-5 rounded-3xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] flex flex-col justify-between space-y-3 shadow-sm">
           <div class="space-y-3">
             <div class="flex items-center justify-between pb-2 border-b border-[var(--mc-border-subtle)]">
               <div class="flex items-center gap-2">
@@ -446,57 +460,106 @@
               </button>
             </div>
 
-            <!-- Dynamic Recent Reflection Rows -->
+            <!-- Dynamic List -->
             <div id="home-recent-reflections-list" class="space-y-2 text-xs">
-              <!-- Default sample/rendered items -->
-              <div class="p-3 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] flex items-center justify-between gap-3 hover:border-emerald-500/40 transition-all cursor-pointer" onclick="switchTab('journals')">
+              <div class="p-2.5 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] flex items-center justify-between gap-2 hover:border-emerald-500/40 transition-all cursor-pointer" onclick="switchTab('journals')">
                 <div class="min-w-0">
                   <div class="text-[10px] text-[var(--mc-text-muted)] font-mono">Today • 11:15 AM</div>
                   <div class="font-bold text-[var(--mc-text-primary)] truncate mt-0.5">Thinking about today</div>
                 </div>
-                <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shrink-0">Calm</span>
+                <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shrink-0">Calm ></span>
               </div>
-
-              <div class="p-3 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] flex items-center justify-between gap-3 hover:border-amber-500/40 transition-all cursor-pointer" onclick="switchTab('journals')">
+              <div class="p-2.5 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] flex items-center justify-between gap-2 hover:border-amber-500/40 transition-all cursor-pointer" onclick="switchTab('journals')">
                 <div class="min-w-0">
                   <div class="text-[10px] text-[var(--mc-text-muted)] font-mono">Yesterday • 8:20 PM</div>
                   <div class="font-bold text-[var(--mc-text-primary)] truncate mt-0.5">A busy day</div>
                 </div>
-                <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 shrink-0">Grateful</span>
+                <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 shrink-0">Grateful ></span>
               </div>
-
-              <div class="p-3 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] flex items-center justify-between gap-3 hover:border-cyan-500/40 transition-all cursor-pointer" onclick="switchTab('journals')">
+              <div class="p-2.5 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] flex items-center justify-between gap-2 hover:border-cyan-500/40 transition-all cursor-pointer" onclick="switchTab('journals')">
                 <div class="min-w-0">
                   <div class="text-[10px] text-[var(--mc-text-muted)] font-mono">Aug 29 • 9:15 AM</div>
                   <div class="font-bold text-[var(--mc-text-primary)] truncate mt-0.5">Morning thoughts</div>
                 </div>
-                <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20 shrink-0">Inspired</span>
+                <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20 shrink-0">Inspired ></span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Card 4 (Col 8-12): Habits Mini Tracker -->
-        <div class="lg:col-span-5 mc-card p-5 sm:p-6 rounded-3xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] flex flex-col justify-between space-y-4 shadow-sm hover:border-[var(--mc-border-strong)] transition-all">
-          <div class="space-y-3">
+        <!-- Column 2: Mood This Week & Interactive Bar Chart -->
+        <div class="mc-card p-5 rounded-3xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] flex flex-col justify-between space-y-3 shadow-sm">
+          <div class="space-y-2">
             <div class="flex items-center justify-between pb-2 border-b border-[var(--mc-border-subtle)]">
               <div class="flex items-center gap-2">
-                <i data-lucide="target" class="w-4 h-4 text-emerald-500"></i>
-                <h3 class="text-sm font-bold text-[var(--mc-text-primary)]">Habits</h3>
+                <span class="text-sm">😊</span>
+                <h3 class="text-sm font-bold text-[var(--mc-text-primary)]">Mood this week</h3>
               </div>
-              <button onclick="switchTab('journals'); switchJournalTrack('sanctuary');" class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer">
-                <span>Manage</span>
+              <button onclick="switchTab('analytics')" class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer">
+                <span>View more</span>
                 <i data-lucide="arrow-right" class="w-3 h-3"></i>
               </button>
             </div>
 
-            <!-- Dynamic Habits Mini Checkoff Feed -->
+            <div class="space-y-0.5">
+              <div class="text-base font-extrabold text-emerald-600 dark:text-emerald-400">Mostly calm</div>
+              <div class="text-xs text-[var(--mc-text-secondary)]">You've been feeling balanced.</div>
+            </div>
+
+            <!-- Mini Weekly Mood Bar Chart -->
+            <div class="flex items-end justify-between gap-2 pt-4 px-2 h-28 border-b border-[var(--mc-border-subtle)] pb-2">
+              <div class="flex flex-col items-center gap-1.5 flex-1">
+                <div class="w-full bg-[var(--mc-bg-tertiary)] rounded-lg h-12"></div>
+                <span class="text-[10px] text-[var(--mc-text-muted)] font-mono">Mon</span>
+              </div>
+              <div class="flex flex-col items-center gap-1.5 flex-1">
+                <div class="w-full bg-[var(--mc-bg-tertiary)] rounded-lg h-16"></div>
+                <span class="text-[10px] text-[var(--mc-text-muted)] font-mono">Tue</span>
+              </div>
+              <div class="flex flex-col items-center gap-1.5 flex-1">
+                <div class="w-full bg-[var(--mc-bg-tertiary)] rounded-lg h-20"></div>
+                <span class="text-[10px] text-[var(--mc-text-muted)] font-mono">Wed</span>
+              </div>
+              <div class="flex flex-col items-center gap-1.5 flex-1">
+                <div class="w-full bg-[var(--mc-bg-tertiary)] rounded-lg h-16"></div>
+                <span class="text-[10px] text-[var(--mc-text-muted)] font-mono">Thu</span>
+              </div>
+              <div class="flex flex-col items-center gap-1.5 flex-1">
+                <div class="w-full bg-emerald-500 rounded-lg h-24 shadow-md shadow-emerald-900/30"></div>
+                <span class="text-[10px] text-emerald-500 font-mono font-bold">Fri</span>
+              </div>
+              <div class="flex flex-col items-center gap-1.5 flex-1">
+                <div class="w-full bg-[var(--mc-bg-tertiary)] rounded-lg h-14"></div>
+                <span class="text-[10px] text-[var(--mc-text-muted)] font-mono">Sat</span>
+              </div>
+              <div class="flex flex-col items-center gap-1.5 flex-1">
+                <div class="w-full bg-[var(--mc-bg-tertiary)] rounded-lg h-16"></div>
+                <span class="text-[10px] text-[var(--mc-text-muted)] font-mono">Sun</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 3: Today's Habit Focus -->
+        <div class="mc-card p-5 rounded-3xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] flex flex-col justify-between space-y-3 shadow-sm">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between pb-2 border-b border-[var(--mc-border-subtle)]">
+              <div class="flex items-center gap-2">
+                <i data-lucide="target" class="w-4 h-4 text-emerald-500"></i>
+                <h3 class="text-sm font-bold text-[var(--mc-text-primary)]">Today's habit focus</h3>
+              </div>
+              <button onclick="openNewHabitModal()" class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer">
+                <span>Add habit</span>
+                <i data-lucide="arrow-right" class="w-3 h-3"></i>
+              </button>
+            </div>
+
+            <!-- Habit Content / Mini Tracker -->
             <div id="home-habits-mini-container" class="space-y-2">
-              <div class="text-center py-6 px-4 rounded-2xl border border-dashed border-[var(--mc-border-subtle)] bg-[var(--mc-bg-tertiary)]/50 space-y-2">
-                <p class="text-xs text-[var(--mc-text-secondary)] leading-relaxed">
-                  You don't have any habits yet.<br>Create a habit to build your rhythm.
-                </p>
-                <button type="button" onclick="openNewHabitModal()" class="px-3.5 py-1.5 rounded-xl bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-border-subtle)] text-[var(--mc-text-primary)] text-xs font-bold border border-[var(--mc-border-subtle)] transition-colors cursor-pointer inline-flex items-center gap-1.5">
+              <div class="text-center py-5 px-3 rounded-2xl border border-dashed border-[var(--mc-border-subtle)] bg-[var(--mc-bg-tertiary)]/50 space-y-2">
+                <div class="font-bold text-xs text-[var(--mc-text-primary)]">Pick one small habit</div>
+                <p class="text-[11px] text-[var(--mc-text-secondary)]">Small steps. Big changes.</p>
+                <button type="button" onclick="openNewHabitModal()" class="px-3.5 py-1.5 rounded-xl bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-border-subtle)] text-[var(--mc-text-primary)] text-xs font-bold border border-[var(--mc-border-subtle)] transition-colors cursor-pointer inline-flex items-center gap-1.5 mt-1">
                   <i data-lucide="plus" class="w-3.5 h-3.5 text-emerald-500"></i>
                   <span>+ Add a habit</span>
                 </button>
@@ -507,16 +570,147 @@
 
       </div>
 
-      <!-- ─── 4. ANIMATED SINGLE LINE HORIZONTAL TAG STRIP (SIMPLER TAGS) ─── -->
-      <div class="w-full overflow-hidden py-2 px-1 relative">
-        <div class="flex items-center gap-2.5 overflow-x-auto no-scrollbar py-1" id="home-animated-tags-ticker">
-          <span class="px-3 py-1 rounded-full bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] text-xs text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] font-mono whitespace-nowrap transition-all cursor-pointer" onclick="filterDiaryByTag('DeepWork')">#DeepWork</span>
-          <span class="px-3 py-1 rounded-full bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] text-xs text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] font-mono whitespace-nowrap transition-all cursor-pointer" onclick="filterDiaryByTag('Clarity')">#Clarity</span>
-          <span class="px-3 py-1 rounded-full bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] text-xs text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] font-mono whitespace-nowrap transition-all cursor-pointer" onclick="filterDiaryByTag('Gratitude')">#Gratitude</span>
-          <span class="px-3 py-1 rounded-full bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] text-xs text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] font-mono whitespace-nowrap transition-all cursor-pointer" onclick="filterDiaryByTag('Equilibrium')">#Equilibrium</span>
-          <span class="px-3 py-1 rounded-full bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] text-xs text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] font-mono whitespace-nowrap transition-all cursor-pointer" onclick="filterDiaryByTag('Mindful')">#Mindful</span>
-          <span class="px-3 py-1 rounded-full bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] text-xs text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] font-mono whitespace-nowrap transition-all cursor-pointer" onclick="filterDiaryByTag('ReflectiveBuilder')">#ReflectiveBuilder</span>
-          <span class="px-3 py-1 rounded-full bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] text-xs text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] font-mono whitespace-nowrap transition-all cursor-pointer" onclick="filterDiaryByTag('Vitality')">#Vitality</span>
+      <!-- ─── 4. QUICK START ACTIONS BAR ─── -->
+      <div class="p-3.5 sm:p-4 rounded-3xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] flex items-center justify-between gap-3 overflow-x-auto no-scrollbar shadow-sm">
+        
+        <div class="flex items-center gap-2 pr-4 border-r border-[var(--mc-border-subtle)] shrink-0">
+          <i data-lucide="zap" class="w-4 h-4 text-amber-500"></i>
+          <div>
+            <div class="text-xs font-bold text-[var(--mc-text-primary)]">Quick start</div>
+            <div class="text-[10px] text-[var(--mc-text-secondary)]">Jump in quickly</div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 shrink-0">
+          <button onclick="openNewJournalModal()" class="p-2.5 rounded-2xl bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-border-subtle)] border border-[var(--mc-border-subtle)] text-left flex items-center gap-2.5 transition-all cursor-pointer">
+            <i data-lucide="edit-3" class="w-4 h-4 text-emerald-500"></i>
+            <div>
+              <div class="text-xs font-bold text-[var(--mc-text-primary)]">Write</div>
+              <div class="text-[10px] text-[var(--mc-text-secondary)]">Jot down your thoughts</div>
+            </div>
+          </button>
+
+          <button onclick="switchTab('studio')" class="p-2.5 rounded-2xl bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-border-subtle)] border border-[var(--mc-border-subtle)] text-left flex items-center gap-2.5 transition-all cursor-pointer">
+            <i data-lucide="message-square" class="w-4 h-4 text-cyan-500"></i>
+            <div>
+              <div class="text-xs font-bold text-[var(--mc-text-primary)]">Talk</div>
+              <div class="text-[10px] text-[var(--mc-text-secondary)]">Talk with Gemini</div>
+            </div>
+          </button>
+
+          <button onclick="switchTab('journals')" class="p-2.5 rounded-2xl bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-border-subtle)] border border-[var(--mc-border-subtle)] text-left flex items-center gap-2.5 transition-all cursor-pointer">
+            <i data-lucide="book-open" class="w-4 h-4 text-blue-500"></i>
+            <div>
+              <div class="text-xs font-bold text-[var(--mc-text-primary)]">Review</div>
+              <div class="text-[10px] text-[var(--mc-text-secondary)]">Look back at past entries</div>
+            </div>
+          </button>
+
+          <button onclick="openNewCaptureModal()" class="p-2.5 rounded-2xl bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-border-subtle)] border border-[var(--mc-border-subtle)] text-left flex items-center gap-2.5 transition-all cursor-pointer">
+            <i data-lucide="flag" class="w-4 h-4 text-amber-500"></i>
+            <div>
+              <div class="text-xs font-bold text-[var(--mc-text-primary)]">Set a goal</div>
+              <div class="text-[10px] text-[var(--mc-text-secondary)]">Focus on what matters</div>
+            </div>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ─── 5. EXPLORE YOUR PATTERNS SECTION (3 COLUMNS) ─── -->
+      <div class="p-5 sm:p-6 rounded-3xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] space-y-4 shadow-sm">
+        
+        <div class="flex items-center justify-between pb-3 border-b border-[var(--mc-border-subtle)]">
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="sparkles" class="w-4 h-4 text-emerald-500"></i>
+            <div>
+              <h3 class="text-sm font-bold text-[var(--mc-text-primary)]">Explore your patterns</h3>
+              <p class="text-xs text-[var(--mc-text-secondary)]">Discover trends from your writing.</p>
+            </div>
+          </div>
+          <button onclick="switchTab('analytics')" class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer">
+            <span>See all insights</span>
+            <i data-lucide="arrow-right" class="w-3 h-3"></i>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-1 text-xs">
+          
+          <!-- Column 1: Top Themes -->
+          <div class="space-y-2">
+            <div class="text-[11px] font-bold text-[var(--mc-text-muted)] uppercase tracking-wider font-mono">Top themes</div>
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="flex items-center gap-2 text-[var(--mc-text-primary)] font-medium">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Work
+                </span>
+                <span class="font-mono text-[var(--mc-text-secondary)]" id="home-theme-work-count">6 times</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="flex items-center gap-2 text-[var(--mc-text-primary)] font-medium">
+                  <span class="w-2 h-2 rounded-full bg-purple-500"></span> Self growth
+                </span>
+                <span class="font-mono text-[var(--mc-text-secondary)]" id="home-theme-growth-count">4 times</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="flex items-center gap-2 text-[var(--mc-text-primary)] font-medium">
+                  <span class="w-2 h-2 rounded-full bg-amber-500"></span> Health
+                </span>
+                <span class="font-mono text-[var(--mc-text-secondary)]" id="home-theme-health-count">3 times</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Column 2: Weekly Reflection -->
+          <div class="space-y-2">
+            <div class="text-[11px] font-bold text-[var(--mc-text-muted)] uppercase tracking-wider font-mono">Weekly reflection</div>
+            <div>
+              <p class="text-xs text-[var(--mc-text-secondary)] leading-relaxed">You wrote more this week. Keep reflecting!</p>
+              <div class="text-xl font-extrabold text-emerald-600 dark:text-emerald-400 font-mono mt-1" id="home-weekly-growth-pct">
+                +25% <span class="text-xs font-normal text-[var(--mc-text-muted)]">vs last week</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Column 3: Writing Streak -->
+          <div class="space-y-2">
+            <div class="text-[11px] font-bold text-[var(--mc-text-muted)] uppercase tracking-wider font-mono">Writing streak</div>
+            <div>
+              <p class="text-xs text-[var(--mc-text-secondary)] leading-relaxed">Keep going! Consistency builds clarity.</p>
+              <!-- 7 Day Circles Tracker -->
+              <div class="flex items-center gap-2 pt-2">
+                <div class="flex flex-col items-center gap-1">
+                  <span class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">✓</span>
+                  <span class="text-[9px] text-[var(--mc-text-muted)] font-mono">Mon</span>
+                </div>
+                <div class="flex flex-col items-center gap-1">
+                  <span class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">✓</span>
+                  <span class="text-[9px] text-[var(--mc-text-muted)] font-mono">Tue</span>
+                </div>
+                <div class="flex flex-col items-center gap-1">
+                  <span class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">✓</span>
+                  <span class="text-[9px] text-[var(--mc-text-muted)] font-mono">Wed</span>
+                </div>
+                <div class="flex flex-col items-center gap-1">
+                  <span class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">✓</span>
+                  <span class="text-[9px] text-[var(--mc-text-muted)] font-mono">Thu</span>
+                </div>
+                <div class="flex flex-col items-center gap-1">
+                  <span class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">✓</span>
+                  <span class="text-[9px] text-[var(--mc-text-muted)] font-mono">Fri</span>
+                </div>
+                <div class="flex flex-col items-center gap-1">
+                  <span class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">✓</span>
+                  <span class="text-[9px] text-[var(--mc-text-muted)] font-mono">Sat</span>
+                </div>
+                <div class="flex flex-col items-center gap-1">
+                  <span class="w-6 h-6 rounded-full bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-default)]"></span>
+                  <span class="text-[9px] text-[var(--mc-text-muted)] font-mono">Sun</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -4191,7 +4385,7 @@
   </div>
 
   <!-- Client Application Script -->
-  <script src="/static/app.js?v=1788179526"></script>
+  <script src="/static/app.js?v=1788182000"></script>
   <script>
     // Initialize Lucide Icons
     lucide.createIcons();
@@ -4601,6 +4795,6 @@
   </div>
 
   <!-- Core Application Script -->
-  <script src="/static/app.js?v=1788181200" defer></script>
+  <script src="/static/app.js?v=1788182000" defer></script>
 </body>
 </html>
