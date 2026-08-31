@@ -8145,96 +8145,53 @@ function launchGuidedCBT(type) {
 
 
 async function loadSecurityAudit() {
-
   const container = document.getElementById('security-audit-cards');
-
+  if (!container) return;
   try {
-
     const response = await fetch('/api/security/audit');
-
     const data = await response.json();
-
-
-
     container.innerHTML = `
-
       <div class="bg-black/40 p-4 rounded-xl border border-emerald-500/30">
-
         <div class="text-[10px] text-emerald-400 font-mono uppercase mb-1">Key Management</div>
-
         <div class="font-bold text-white">${data.key_management.secrets_source}</div>
-
         <div class="text-[11px] text-slate-400 mt-1 font-mono">${data.key_management.gemini_api_key_masked}</div>
-
       </div>
-
-
-
       <div class="bg-black/40 p-4 rounded-xl border border-blue-500/30">
-
         <div class="text-[10px] text-blue-400 font-mono uppercase mb-1">Auth Boundary</div>
-
         <div class="font-bold text-white">Firebase JWT Verified</div>
-
         <div class="text-[11px] text-slate-400 mt-1">Bearer Token Required</div>
-
       </div>
-
-
-
       <div class="bg-black/40 p-4 rounded-xl border border-purple-500/30">
-
         <div class="text-[10px] text-purple-400 font-mono uppercase mb-1">Firestore Isolation</div>
-
         <div class="font-bold text-white">Zero Cross-Tenant Leak</div>
-
         <div class="text-[11px] text-slate-400 mt-1">/users/{uid}/* Enforced</div>
-
       </div>
-
-
-
       <div class="bg-black/40 p-4 rounded-xl border border-cyan-500/30">
-
         <div class="text-[10px] text-cyan-400 font-mono uppercase mb-1">AI Delimiter Guard</div>
-
         <div class="font-bold text-white">Injection Shield Active</div>
-
         <div class="text-[11px] text-slate-400 mt-1">&lt;user_journal_entry&gt;</div>
-
       </div>
-
     `;
-
   } catch (error) {
-
-    container.innerHTML = `<p class="text-rose-400 col-span-full">Audit error: ${error.message}</p>`;
-
+    if (container) container.innerHTML = `<p class="text-rose-400 col-span-full">Audit error: ${error.message}</p>`;
   }
-
 }
+window.loadSecurityAudit = loadSecurityAudit;
 
 
 
 async function loadAIStudioConfig() {
-
   const codeView = document.getElementById('ai-studio-code-view');
-
+  if (!codeView) return;
   try {
-
     const response = await fetch('/api/ai-studio/config');
-
     const data = await response.json();
-
-    codeView.textContent = JSON.stringify(data.config_json, null, 2);
-
+    if (codeView) codeView.textContent = JSON.stringify(data.config_json, null, 2);
   } catch (error) {
-
-    codeView.textContent = 'Could not load AI Studio configuration.';
-
+    if (codeView) codeView.textContent = 'Could not load AI Studio configuration.';
   }
-
 }
+window.loadAIStudioConfig = loadAIStudioConfig;
 
 
 
