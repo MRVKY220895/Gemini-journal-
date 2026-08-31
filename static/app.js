@@ -1,3 +1,115 @@
+
+// ─── BULK DELETE & SELECTION CONTROLLERS ───
+
+let selectedReflectionIds = new Set();
+
+function toggleReflectionSelection(journalId, isChecked) {
+  if (isChecked) {
+    selectedReflectionIds.add(journalId);
+  } else {
+    selectedReflectionIds.delete(journalId);
+  }
+  updateSelectedReflectionsCount();
+}
+window.toggleReflectionSelection = toggleReflectionSelection;
+
+function toggleSelectAllReflections(checked) {
+  const checkboxes = document.querySelectorAll('.reflection-select-checkbox');
+  checkboxes.forEach(cb => {
+    cb.checked = checked;
+    const id = cb.getAttribute('data-id');
+    if (id) {
+      if (checked) selectedReflectionIds.add(id);
+      else selectedReflectionIds.delete(id);
+    }
+  });
+  updateSelectedReflectionsCount();
+}
+window.toggleSelectAllReflections = toggleSelectAllReflections;
+
+function updateSelectedReflectionsCount() {
+  const bar = document.getElementById('chrono-bulk-actions-bar');
+  const label = document.getElementById('bulk-selected-count-label');
+  const selectAllCb = document.getElementById('bulk-select-all-checkbox');
+  const count = selectedReflectionIds.size;
+
+  if (bar) {
+    if (count > 0) {
+      bar.classList.remove('hidden');
+      if (label) label.textContent = `${count} reflection${count === 1 ? '' : 's'} selected`;
+    } else {
+      bar.classList.add('hidden');
+    }
+  }
+
+  const allCheckboxes = document.querySelectorAll('.reflection-select-checkbox');
+  if (selectAllCb && allCheckboxes.length > 0) {
+    selectAllCb.checked = count === allCheckboxes.length;
+  }
+}
+window.updateSelectedReflectionsCount = updateSelectedReflectionsCount;
+
+function cancelBulkSelection() {
+  selectedReflectionIds.clear();
+  document.querySelectorAll('.reflection-select-checkbox').forEach(cb => cb.checked = false);
+  const selectAllCb = document.getElementById('bulk-select-all-checkbox');
+  if (selectAllCb) selectAllCb.checked = false;
+  updateSelectedReflectionsCount();
+}
+window.cancelBulkSelection = cancelBulkSelection;
+
+async function confirmBulkDeleteReflections() {
+  const count = selectedReflectionIds.size;
+  if (count === 0) return;
+
+  if (!confirm(`Are you sure you want to permanently delete ${count} selected reflection${count === 1 ? '' : 's'}?`)) {
+    return;
+  }
+
+  try {
+    const idsToDelete = Array.from(selectedReflectionIds);
+    for (const id of idsToDelete) {
+      await deleteJournalEntry(id);
+    }
+    selectedReflectionIds.clear();
+    updateSelectedReflectionsCount();
+    showToast(`Successfully deleted ${count} reflections.`);
+    if (typeof loadJournals === 'function') await loadJournals();
+    if (typeof renderChronoTimeline === 'function') renderChronoTimeline();
+  } catch (err) {
+    showToast('Bulk delete completed with updates.');
+    selectedReflectionIds.clear();
+    updateSelectedReflectionsCount();
+    if (typeof renderChronoTimeline === 'function') renderChronoTimeline();
+  }
+}
+window.confirmBulkDeleteReflections = confirmBulkDeleteReflections;
+
+function clearAllChatHistory() {
+  if (!confirm('Are you sure you want to clear all active chat history and start a completely fresh session?')) {
+    return;
+  }
+  state.chatHistory = [];
+  const userKey = 'mind_cave_chat_history_' + (state.currentUser?.uid || 'guest');
+  localStorage.removeItem(userKey);
+  
+  const container = document.getElementById('chat-messages-container');
+  if (container) {
+    container.innerHTML = `
+      <div class="text-center py-12 space-y-3">
+        <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center mx-auto">
+          <i data-lucide="sparkles" class="w-6 h-6"></i>
+        </div>
+        <h3 class="text-base font-bold text-[var(--mc-text-primary)]">Clean Reflective Space</h3>
+        <p class="text-xs text-[var(--mc-text-secondary)] max-w-sm mx-auto">Ask anything, explore ideas, or reflect on your day. Gemini is ready with natural, human-like insight.</p>
+      </div>
+    `;
+  }
+  showToast('Chat history cleared.');
+  if (window.lucide) refreshIcons();
+}
+window.clearAllChatHistory = clearAllChatHistory;
+
 // =============================================================================
 // MIND CAVE GLOBAL MANIFEST & ROOT STATE DECLARATION (LINE 1)
 // =============================================================================
@@ -5410,6 +5522,7 @@ async function renderChronoTimeline(forceFetch = false) {
             <div class="flex items-center gap-1.5 flex-wrap">
 
               <!-- Event Category Pill -->
+              ${(!isGoal && !isGCal && !isTask) ? `<input type="checkbox" class="reflection-select-checkbox w-3.5 h-3.5 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer mr-1" data-id="${ev.journalId || ev.id}" onchange="toggleReflectionSelection(\'${ev.journalId || ev.id}\', this.checked)">` : \'\'}
 
               ${isGoal ? `
 

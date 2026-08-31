@@ -99,7 +99,7 @@
   </script>
 
   <!-- Custom Styling -->
-  <link rel="stylesheet" href="/static/style.css?v=1788178658">
+  <link rel="stylesheet" href="/static/style.css?v=1788179191">
 </head>
 <body class="bg-[#0B0D0F] text-[#F2F4F5] min-h-screen flex antialiased font-sans selection:bg-emerald-500/30 overflow-x-hidden">
 
@@ -108,86 +108,87 @@
   <div class="fixed bottom-12 right-1/4 w-96 h-96 bg-blue-600/5 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse-slow"></div>
 
   <!-- ===================================================================== -->
+    <!-- ===================================================================== -->
   <!-- 1. FIXED LEFT SIDEBAR (DESKTOP) -->
   <!-- ===================================================================== -->
-  <aside id="desktop-fixed-sidebar" class="hidden lg:flex flex-col fixed inset-y-0 left-0 w-64 xl:w-72 bg-[#111417] border-r border-[#20252A] z-40 justify-between select-none">
+  <aside id="desktop-fixed-sidebar" class="hidden lg:flex flex-col fixed inset-y-0 left-0 w-64 xl:w-72 bg-[var(--mc-bg-secondary)] border-r border-[var(--mc-border-subtle)] z-40 justify-between select-none transition-colors duration-200">
     
     <!-- Top Branding & Navigation -->
     <div class="p-5 space-y-5">
       <!-- Brand Header -->
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2.5 cursor-pointer" onclick="switchTab('overview')">
-          <div class="w-8 h-8 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-sm">
-            <i data-lucide="compass" class="w-4 h-4 text-emerald-400"></i>
+          <div class="w-8 h-8 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-500 dark:text-emerald-400 shadow-sm">
+            <i data-lucide="compass" class="w-4 h-4 text-emerald-500 dark:text-emerald-400"></i>
           </div>
           <div>
-            <div class="text-sm font-extrabold tracking-tight text-white">Mind Cave</div>
-            <div class="text-[10px] text-slate-400 font-mono">Personal AI Sanctuary</div>
+            <div class="text-sm font-extrabold tracking-tight text-[var(--mc-text-primary)]">Mind Cave</div>
+            <div class="text-[10px] text-[var(--mc-text-muted)] font-mono">Personal AI Sanctuary</div>
           </div>
         </div>
 
-        <button onclick="openMasterMenuModal()" id="btn-master-menu" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#161A1E] transition-colors" title="Master Menu & Directory">
+        <button onclick="openMasterMenuModal()" id="btn-master-menu" class="p-1.5 rounded-lg text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] hover:bg-[var(--mc-bg-tertiary)] transition-colors cursor-pointer" title="Master Menu & Directory">
           <i data-lucide="more-vertical" class="w-4 h-4"></i>
         </button>
       </div>
 
       <!-- Quick Action: + New Reflection -->
-      <button onclick="openNewJournalModal()" class="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md shadow-emerald-900/30 transition-all cursor-pointer">
+      <button onclick="openNewJournalModal()" class="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md shadow-emerald-900/20 transition-all cursor-pointer">
         <i data-lucide="edit-3" class="w-4 h-4"></i>
         <span>New Reflection</span>
       </button>
 
-            <!-- Primary Sidebar Navigation Menu -->
+      <!-- Primary Sidebar Navigation Menu -->
       <nav class="space-y-1" id="desktop-sidebar-nav">
-        <button onclick="switchTab('overview')" id="sidebar-tab-overview" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-white bg-[#161A1E] border border-[#20252A] transition-all cursor-pointer">
-          <i data-lucide="home" class="w-4 h-4 text-emerald-400"></i>
+        <button onclick="switchTab('overview')" id="sidebar-tab-overview" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-[var(--mc-text-primary)] bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] transition-all cursor-pointer">
+          <i data-lucide="home" class="w-4 h-4 text-emerald-500 dark:text-emerald-400"></i>
           <span>Home Sanctuary</span>
         </button>
-        <button onclick="switchTab('journals')" id="sidebar-tab-journals" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-[#161A1E] transition-all cursor-pointer">
-          <i data-lucide="book-open" class="w-4 h-4 text-emerald-400"></i>
+        <button onclick="switchTab('journals')" id="sidebar-tab-journals" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] hover:bg-[var(--mc-bg-tertiary)] transition-all cursor-pointer">
+          <i data-lucide="book-open" class="w-4 h-4 text-emerald-500 dark:text-emerald-400"></i>
           <span>Journal & Tracks</span>
         </button>
-        <button onclick="switchTab('studio')" id="sidebar-tab-studio" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-[#161A1E] transition-all cursor-pointer">
-          <i data-lucide="sparkles" class="w-4 h-4 text-emerald-400"></i>
+        <button onclick="switchTab('studio')" id="sidebar-tab-studio" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] hover:bg-[var(--mc-bg-tertiary)] transition-all cursor-pointer">
+          <i data-lucide="sparkles" class="w-4 h-4 text-emerald-500 dark:text-emerald-400"></i>
           <span>AI Reflective Studio</span>
         </button>
-        <button onclick="switchTab('analytics')" id="sidebar-tab-analytics" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-[#161A1E] transition-all cursor-pointer">
-          <i data-lucide="bar-chart-2" class="w-4 h-4 text-amber-400"></i>
+        <button onclick="switchTab('analytics')" id="sidebar-tab-analytics" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] hover:bg-[var(--mc-bg-tertiary)] transition-all cursor-pointer">
+          <i data-lucide="bar-chart-2" class="w-4 h-4 text-amber-500 dark:text-amber-400"></i>
           <span>MindPulse Insights</span>
         </button>
-        <button onclick="switchTab('security')" id="sidebar-tab-security" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-[#161A1E] transition-all cursor-pointer">
-          <i data-lucide="settings" class="w-4 h-4 text-slate-300"></i>
+        <button onclick="switchTab('security')" id="sidebar-tab-security" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] hover:bg-[var(--mc-bg-tertiary)] transition-all cursor-pointer">
+          <i data-lucide="settings" class="w-4 h-4 text-[var(--mc-text-secondary)]"></i>
           <span>Settings & Vault</span>
         </button>
       </nav>
     </div>
 
     <!-- Bottom Sidebar Profile & Account Card -->
-    <div class="p-4 border-t border-[#20252A] space-y-3">
-      <div class="p-3 rounded-2xl bg-[#161A1E] border border-[#20252A] flex items-center justify-between">
+    <div class="p-4 border-t border-[var(--mc-border-subtle)] space-y-3">
+      <div class="p-3 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] flex items-center justify-between">
         <div class="flex items-center gap-2.5 min-w-0 cursor-pointer" onclick="openUserProfileModal()">
-          <div class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center text-xs shrink-0" id="sidebar-user-avatar">
+          <div class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold flex items-center justify-center text-xs shrink-0" id="sidebar-user-avatar">
             G
           </div>
           <div class="min-w-0">
-            <div class="text-xs font-bold text-white truncate" id="sidebar-user-name">Guest Explorer</div>
-            <div class="text-[10px] text-emerald-400 flex items-center gap-1 font-mono">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <div class="text-xs font-bold text-[var(--mc-text-primary)] truncate" id="sidebar-user-name">Guest Explorer</div>
+            <div class="text-[10px] text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-mono">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
               <span>Encrypted</span>
             </div>
           </div>
         </div>
 
-        <button onclick="handleHeaderAuthAction()" class="p-1.5 rounded-xl text-slate-400 hover:text-white transition-colors cursor-pointer" title="Sign In / Profile">
+        <button onclick="handleHeaderAuthAction()" class="p-1.5 rounded-xl text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] transition-colors cursor-pointer" title="Sign In / Profile">
           <i data-lucide="log-in" class="w-4 h-4"></i>
         </button>
       </div>
 
-      <div class="flex items-center justify-between text-[11px] text-slate-500 px-1">
+      <div class="flex items-center justify-between text-[11px] text-[var(--mc-text-muted)] px-1">
         <span>© 2026 Mind Cave</span>
-        <button onclick="toggleThemeMode()" class="hover:text-white transition-colors cursor-pointer flex items-center gap-1">
+        <button onclick="toggleThemeMode()" class="hover:text-[var(--mc-text-primary)] transition-colors cursor-pointer flex items-center gap-1">
           <i data-lucide="sun" class="w-3.5 h-3.5 hidden dark:inline text-amber-400"></i>
-          <i data-lucide="moon" class="w-3.5 h-3.5 inline dark:hidden text-slate-400"></i>
+          <i data-lucide="moon" class="w-3.5 h-3.5 inline dark:hidden text-slate-500"></i>
           <span>Theme</span>
         </button>
       </div>
@@ -200,36 +201,36 @@
   <!-- ===================================================================== -->
   <div class="lg:pl-64 xl:pl-72 flex-1 flex flex-col min-h-screen min-w-0 w-full">
 
-    <!-- Sticky Top Utility Bar -->
-    <header class="sticky top-0 z-30 h-16 bg-[#0B0D0F]/90 backdrop-blur-xl border-b border-[#20252A] flex items-center justify-between px-4 sm:px-6 lg:px-8 shrink-0">
+        <!-- Sticky Top Utility Bar -->
+    <header class="sticky top-0 z-30 h-16 bg-[var(--mc-bg-primary)]/90 backdrop-blur-xl border-b border-[var(--mc-border-subtle)] flex items-center justify-between px-4 sm:px-6 lg:px-8 shrink-0 transition-colors duration-200">
       
       <!-- Left: Mobile Menu Trigger & Breadcrumbs -->
       <div class="flex items-center gap-3">
-        <button onclick="openMasterMenuModal()" class="lg:hidden p-2 rounded-xl bg-[#111417] border border-[#20252A] text-white">
-          <i data-lucide="menu" class="w-4 h-4 text-emerald-400"></i>
+        <button onclick="openMasterMenuModal()" class="lg:hidden p-2 rounded-xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] text-[var(--mc-text-primary)]">
+          <i data-lucide="menu" class="w-4 h-4 text-emerald-500"></i>
         </button>
 
         <!-- Brand (Mobile Only) -->
         <div class="flex items-center gap-2 lg:hidden cursor-pointer" onclick="switchTab('overview')">
-          <div class="w-6 h-6 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-            <i data-lucide="compass" class="w-3.5 h-3.5 text-emerald-400"></i>
+          <div class="w-6 h-6 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-500">
+            <i data-lucide="compass" class="w-3.5 h-3.5 text-emerald-500"></i>
           </div>
-          <span class="text-xs font-bold text-white">Mind Cave</span>
+          <span class="text-xs font-bold text-[var(--mc-text-primary)]">Mind Cave</span>
         </div>
 
         <!-- Desktop Breadcrumb / Title -->
-        <div class="hidden lg:flex items-center gap-2 text-xs text-slate-400 font-medium">
+        <div class="hidden lg:flex items-center gap-2 text-xs text-[var(--mc-text-secondary)] font-medium">
           <span>Sanctuary</span>
-          <i data-lucide="chevron-right" class="w-3 h-3 text-slate-600"></i>
-          <span class="font-bold text-white" id="topbar-current-view">Home Sanctuary</span>
+          <i data-lucide="chevron-right" class="w-3 h-3 text-[var(--mc-text-muted)]"></i>
+          <span class="font-bold text-[var(--mc-text-primary)]" id="topbar-current-view">Home Sanctuary</span>
         </div>
       </div>
 
       <!-- Center: Global Quick Search Bar -->
       <div class="hidden md:flex items-center flex-1 max-w-md mx-4">
         <div class="relative w-full">
-          <i data-lucide="search" class="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-          <input type="text" id="global-search-input" onkeyup="handleGlobalSearch(event)" placeholder="Search reflections, insights, tags (Press /)..." class="w-full pl-9 pr-4 py-1.5 rounded-xl bg-[#111417] border border-[#20252A] text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors">
+          <i data-lucide="search" class="w-3.5 h-3.5 text-[var(--mc-text-muted)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+          <input type="text" id="global-search-input" onkeyup="handleGlobalSearch(event)" placeholder="Search reflections, insights, tags (Press /)..." class="w-full pl-9 pr-4 py-1.5 rounded-xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] text-xs text-[var(--mc-text-primary)] placeholder-[var(--mc-text-muted)] focus:outline-none focus:border-emerald-500 transition-colors">
         </div>
       </div>
 
@@ -237,8 +238,8 @@
       <div class="flex items-center gap-2 sm:gap-2.5 shrink-0">
         
         <!-- Cognitive Equilibrium Pill -->
-        <div class="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold font-mono">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <div class="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-semibold font-mono">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
           <span id="sanctuary-equilibrium-badge">96% Optimal Equilibrium</span>
         </div>
 
@@ -247,54 +248,54 @@
           <button type="button" onclick="toggleLanguageDropdown(event)" id="btn-language-picker" class="nav-action-btn font-semibold shrink-0 flex items-center gap-1" title="Change Language">
             <span id="current-lang-flag" class="text-xs">🌐</span>
             <span id="current-lang-code" class="text-[11px] sm:text-xs">Auto</span>
-            <i data-lucide="chevron-down" class="w-2.5 h-2.5 text-slate-500"></i>
+            <i data-lucide="chevron-down" class="w-2.5 h-2.5 text-[var(--mc-text-muted)]"></i>
           </button>
 
-          <div id="language-dropdown-menu" class="hidden absolute right-0 mt-2 w-52 sm:w-56 rounded-2xl bg-[#111417] border border-[#20252A] shadow-2xl backdrop-blur-2xl p-1.5 z-50 text-xs divide-y divide-[#20252A] max-h-80 overflow-y-auto">
+          <div id="language-dropdown-menu" class="hidden absolute right-0 mt-2 w-52 sm:w-56 rounded-2xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] shadow-2xl backdrop-blur-2xl p-1.5 z-50 text-xs divide-y divide-[var(--mc-border-subtle)] max-h-80 overflow-y-auto">
             <div class="py-1">
-              <button onclick="selectLanguageOption('auto')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[#161A1E] text-white font-medium cursor-pointer">
+              <button onclick="selectLanguageOption('auto')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] font-medium cursor-pointer">
                 <div class="flex items-center gap-2"><span>🌐</span><span class="font-semibold">Auto-Detect</span></div>
               </button>
             </div>
             <div class="py-1 space-y-0.5">
-              <button onclick="selectLanguageOption('en')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[#161A1E] text-white font-medium cursor-pointer">
+              <button onclick="selectLanguageOption('en')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] font-medium cursor-pointer">
                 <div class="flex items-center gap-2"><span>🇬🇧</span><span>English</span></div>
               </button>
-              <button onclick="selectLanguageOption('ta')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[#161A1E] text-white font-medium cursor-pointer">
+              <button onclick="selectLanguageOption('ta')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] font-medium cursor-pointer">
                 <div class="flex items-center gap-2"><span>🇮🇳</span><span>தமிழ் (Tamil)</span></div>
               </button>
-              <button onclick="selectLanguageOption('hi')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[#161A1E] text-white font-medium cursor-pointer">
+              <button onclick="selectLanguageOption('hi')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] font-medium cursor-pointer">
                 <div class="flex items-center gap-2"><span>🇮🇳</span><span>हिन्दी (Hindi)</span></div>
               </button>
-              <button onclick="selectLanguageOption('es')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[#161A1E] text-white font-medium cursor-pointer">
-                <div class="flex items-center gap-2"><span>🇪🇸</span><span>Español (Spanish)</span></div>
+              <button onclick="selectLanguageOption('es')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] font-medium cursor-pointer">
+                <div class="flex items-center gap-2"><span>🇪🇸</span><span>Español</span></div>
               </button>
-              <button onclick="selectLanguageOption('fr')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[#161A1E] text-white font-medium cursor-pointer">
-                <div class="flex items-center gap-2"><span>🇫🇷</span><span>Français (French)</span></div>
+              <button onclick="selectLanguageOption('fr')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] font-medium cursor-pointer">
+                <div class="flex items-center gap-2"><span>🇫🇷</span><span>Français</span></div>
               </button>
-              <button onclick="selectLanguageOption('de')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[#161A1E] text-white font-medium cursor-pointer">
-                <div class="flex items-center gap-2"><span>🇩🇪</span><span>Deutsch (German)</span></div>
+              <button onclick="selectLanguageOption('de')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] font-medium cursor-pointer">
+                <div class="flex items-center gap-2"><span>🇩🇪</span><span>Deutsch</span></div>
               </button>
-              <button onclick="selectLanguageOption('ja')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[#161A1E] text-white font-medium cursor-pointer">
-                <div class="flex items-center gap-2"><span>🇯🇵</span><span>日本語 (Japanese)</span></div>
+              <button onclick="selectLanguageOption('ja')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] font-medium cursor-pointer">
+                <div class="flex items-center gap-2"><span>🇯🇵</span><span>日本語</span></div>
               </button>
-              <button onclick="selectLanguageOption('zh')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[#161A1E] text-white font-medium cursor-pointer">
-                <div class="flex items-center gap-2"><span>🇨🇳</span><span>中文 (Chinese)</span></div>
+              <button onclick="selectLanguageOption('zh')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] font-medium cursor-pointer">
+                <div class="flex items-center gap-2"><span>🇨🇳</span><span>中文</span></div>
               </button>
             </div>
           </div>
         </div>
 
         <!-- Theme Mode Switcher -->
-        <button onclick="toggleThemeMode()" class="nav-action-btn font-semibold shrink-0" title="Toggle Light/Dark Theme">
+        <button onclick="toggleThemeMode()" class="nav-action-btn font-semibold shrink-0 cursor-pointer" title="Toggle Light/Dark Theme">
           <i data-lucide="sun" class="w-3.5 h-3.5 hidden dark:inline text-amber-400"></i>
-          <i data-lucide="moon" class="w-3.5 h-3.5 inline dark:hidden text-slate-400"></i>
+          <i data-lucide="moon" class="w-3.5 h-3.5 inline dark:hidden text-slate-500"></i>
         </button>
 
         <!-- User Profile Pill -->
-        <button onclick="handleHeaderAuthAction()" id="btn-header-auth" class="nav-action-btn font-semibold flex items-center gap-1.5 shrink-0">
-          <div class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] font-bold" id="header-user-avatar">G</div>
-          <span class="text-xs text-slate-200" id="header-user-name">Guest</span>
+        <button onclick="handleHeaderAuthAction()" id="btn-header-auth" class="nav-action-btn font-semibold flex items-center gap-1.5 shrink-0 cursor-pointer">
+          <div class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-[10px] font-bold" id="header-user-avatar">G</div>
+          <span class="text-xs text-[var(--mc-text-primary)]" id="header-user-name">Guest</span>
         </button>
 
       </div>
@@ -646,9 +647,13 @@
             <i data-lucide="history" class="w-3.5 h-3.5 text-[var(--mc-text-muted)]"></i>
             <span class="hidden sm:inline">Chat History</span>
           </button>
-          <button onclick="startNewSession()" class="btn-secondary text-xs !py-1 !px-2.5 flex items-center gap-1" title="Start Clean Chat Session">
+          <button onclick="startNewSession()" class="btn-secondary text-xs !py-1 !px-2.5 flex items-center gap-1 cursor-pointer" title="Start Clean Chat Session">
             <i data-lucide="plus" class="w-3.5 h-3.5 text-[#9BB7A5]"></i>
             <span class="hidden sm:inline">New Session</span>
+          </button>
+          <button onclick="clearAllChatHistory()" class="btn-secondary text-xs !py-1 !px-2.5 flex items-center gap-1 text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 cursor-pointer" title="Clear All Active Chat History">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            <span class="hidden sm:inline">Clear Chat</span>
           </button>
         </div>
       </div>
@@ -4455,7 +4460,7 @@
   </div>
 
   <!-- Client Application Script -->
-  <script src="/static/app.js?v=1788178658"></script>
+  <script src="/static/app.js?v=1788179191"></script>
   <script>
     // Initialize Lucide Icons
     lucide.createIcons();
