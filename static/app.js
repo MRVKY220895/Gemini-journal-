@@ -45,7 +45,7 @@ window.processSeamlessM4TTranscript = processSeamlessM4TTranscript;
 
 // ─── TANGILSH, HINGLISH & MULTILINGUAL RECOGNITION ───
 
-const APP_LANGUAGES_EXTENDED = {
+var APP_LANGUAGES_EXTENDED = window.APP_LANGUAGES_EXTENDED || {
   'auto': { flag: '🌐', code: 'Auto', name: 'Auto-Detect' },
   'en': { flag: '🇬🇧', code: 'EN', name: 'English' },
   'tanglish': { flag: '🇮🇳', code: 'TA-EN', name: 'Tanglish (Tamil + English)' },
