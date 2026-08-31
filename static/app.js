@@ -2143,44 +2143,57 @@ function safeJSONParse(val, fallback) {
   }
 }
 
-// PWA Installation Controller
+// ─── PWA / DESKTOP INSTALLATION CONTROLLER ───
 var deferredInstallPrompt = null;
 
-window.addEventListener('beforeinstallprompt', (e) => {
+window.addEventListener('beforeinstallprompt', function(e) {
   e.preventDefault();
   deferredInstallPrompt = e;
-  const installBtn = document.getElementById('btn-pwa-install');
-  if (installBtn) {
-    installBtn.classList.remove('hidden');
-    installBtn.classList.add('inline-flex');
-  }
+  document.querySelectorAll('[data-pwa-install-btn]').forEach(function(btn) {
+    btn.classList.remove('hidden');
+    btn.classList.add('inline-flex');
+  });
 });
 
-window.addEventListener('appinstalled', () => {
+window.addEventListener('appinstalled', function() {
   deferredInstallPrompt = null;
-  const installBtn = document.getElementById('btn-pwa-install');
-  if (installBtn) installBtn.classList.add('hidden');
+  document.querySelectorAll('[data-pwa-install-btn]').forEach(function(btn) {
+    btn.classList.add('hidden');
+  });
   showToast('Mind Cave successfully installed as a native app!');
 });
 
 async function triggerPWAInstall() {
-  if (!deferredInstallPrompt) {
-    // If browser doesn't support automatic prompt (like iOS Safari), provide guided tip
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    if (isIOS) {
-      alert('To install Mind Cave on iPhone/iPad:\n1. Tap the Share button (square with arrow) at the bottom.\n2. Scroll down and tap "Add to Home Screen".');
-    } else {
-      showToast('To install Mind Cave, open your browser menu (⋮) and tap "Install app" or "Add to Home screen".');
-    }
+  var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  if (isStandalone) {
+    showToast('Mind Cave is already running as an installed standalone app!');
     return;
   }
-  deferredInstallPrompt.prompt();
-  const choice = await deferredInstallPrompt.userChoice;
-  if (choice && choice.outcome === 'accepted') {
-    showToast('Installing Mind Cave...');
+
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    var choice = await deferredInstallPrompt.userChoice;
+    if (choice && choice.outcome === 'accepted') {
+      showToast('Installing Mind Cave...');
+    }
+    deferredInstallPrompt = null;
+    return;
   }
-  deferredInstallPrompt = null;
+
+  // If prompt not primed yet (Safari iOS, desktop Chrome without prompt trigger, etc.):
+  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  var isMac = /Macintosh|Mac OS X/.test(navigator.userAgent);
+  var isWindows = /Windows/.test(navigator.userAgent);
+
+  if (isIOS) {
+    alert('To install Mind Cave on iPhone / iPad:\n1. Tap the Share button (square with arrow ↑) in Safari.\n2. Scroll down and tap "Add to Home Screen".');
+  } else if (isWindows || isMac) {
+    showToast('To install Desktop App: Click the install icon (⊕ or 💻) in your browser address bar, or Menu (⋮) → "Install Mind Cave".');
+  } else {
+    showToast('To install app: Tap the browser menu (⋮) → "Install app" or "Add to Home screen".');
+  }
 }
+window.triggerPWAInstall = triggerPWAInstall;
 
 
 
