@@ -78,6 +78,58 @@
       html.classList.add(saved === 'light' ? 'light' : 'dark');
     })();
   </script>
+
+  <!-- ── ZERO-FLASH AUTH & USER PROFILE BOOTSTRAPPER ── renders user name instantly before paint ── -->
+  <script>
+    (function() {
+      try {
+        var uid = localStorage.getItem('gemini_journal_uid');
+        var name = localStorage.getItem('gemini_journal_name') || localStorage.getItem('mind_cave_profile_name');
+        if (uid && !uid.startsWith('guest') && name) {
+          var shortName = name.includes(' ')
+            ? name.split(' ').map(function(p){ return p[0]; }).join('').toUpperCase().slice(0, 2)
+            : name.slice(0, 2).toUpperCase();
+          var displayLabel = name.length > 16 ? name.split(' ')[0] : name;
+          var firstName = name.split(' ')[0];
+
+          function _syncAuthElements() {
+            var hName = document.getElementById('header-user-name');
+            var hAv = document.getElementById('header-user-avatar');
+            var sName = document.getElementById('sidebar-user-name');
+            var sAv = document.getElementById('sidebar-user-avatar');
+            var gSal = document.getElementById('home-greeting-salutation');
+
+            if (hName) hName.textContent = displayLabel;
+            if (hAv) hAv.textContent = shortName;
+            if (sName) sName.textContent = name;
+            if (sAv) sAv.textContent = shortName;
+            if (gSal) {
+              var hour = new Date().getHours();
+              var timeSal = 'Good morning';
+              if (hour >= 12 && hour < 17) timeSal = 'Good afternoon';
+              else if (hour >= 17 || hour < 5) timeSal = 'Good evening';
+              gSal.textContent = timeSal + ', ' + firstName;
+            }
+          }
+
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', _syncAuthElements);
+            if (window.MutationObserver) {
+              var obs = new MutationObserver(function() {
+                if (document.getElementById('sidebar-user-name') && document.getElementById('header-user-name')) {
+                  _syncAuthElements();
+                  obs.disconnect();
+                }
+              });
+              obs.observe(document.documentElement, { childList: true, subtree: true });
+            }
+          } else {
+            _syncAuthElements();
+          }
+        }
+      } catch(e) {}
+    })();
+  </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -133,7 +185,7 @@
   </script>
 
   <!-- Custom Styling -->
-  <link rel="stylesheet" href="/static/style.css?v=1788218000">
+  <link rel="stylesheet" href="/static/style.css?v=1788219000">
 </head>
 <body class="bg-[#0B0D0F] text-[#F2F4F5] min-h-screen flex antialiased font-sans selection:bg-emerald-500/30 overflow-x-hidden">
 
@@ -4426,7 +4478,7 @@
   </div>
 
   <!-- Client Application Script -->
-  <script src="/static/app.js?v=1788218000"></script>
+  <script src="/static/app.js?v=1788219000"></script>
   <script>
     // Initialize Lucide Icons
     lucide.createIcons();
@@ -4836,6 +4888,6 @@
   </div>
 
   <!-- Core Application Script -->
-  <script src="/static/app.js?v=1788218000" defer></script>
+  <script src="/static/app.js?v=1788219000" defer></script>
 </body>
 </html>
