@@ -2843,11 +2843,7 @@ async function signInWithFirebaseGoogle() {
         showToast('Logged in as Vicky (Local Authorized Profile)');
       }
     } else if (err.code === 'auth/api-key-not-valid' || (err.message && err.message.includes('api-key-not-valid'))) {
-      const reset = confirm("Firebase Error: The Web API key configured for Firebase Authentication is invalid.
-
-Note: Do NOT enter your Gemini AI Studio API Key here. Enter your Firebase Web App API Key (from Firebase Console → Project Settings → Web App).
-
-Would you like to clear the custom configuration now?");
+      const reset = confirm("Firebase Error: The Web API key configured for Firebase Authentication is invalid.\n\nNote: Do NOT enter your Gemini AI Studio API Key here. Enter your Firebase Web App API Key (from Firebase Console → Project Settings → Web App).\n\nWould you like to clear the custom configuration now?");
       if (reset) {
         clearCustomFirebaseConfig();
       }
