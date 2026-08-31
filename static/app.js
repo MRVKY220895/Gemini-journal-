@@ -1,4 +1,47 @@
 
+// ─── CHRONO DATE DISPLAY & NAVIGATION ENHANCEMENT ───
+
+function updateChronoDateDisplay() {
+  const d = state.selectedDiaryDate || new Date();
+  const label = document.getElementById('chrono-date-display-label');
+  const picker = document.getElementById('chrono-date-picker');
+  const now = new Date();
+
+  const isToday = d.toDateString() === now.toDateString();
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  const isYesterday = d.toDateString() === yesterday.toDateString();
+
+  let formatted = '';
+  if (isToday) {
+    formatted = `Today, ${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+  } else if (isYesterday) {
+    formatted = `Yesterday, ${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+  } else {
+    formatted = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  if (label) label.textContent = formatted;
+  if (picker) {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    picker.value = `${yyyy}-${mm}-${dd}`;
+  }
+}
+window.updateChronoDateDisplay = updateChronoDateDisplay;
+
+function jumpDiaryToToday() {
+  state.selectedDiaryDate = new Date();
+  updateChronoDateDisplay();
+  if (typeof renderDiaryWeeklyRibbon === 'function') renderDiaryWeeklyRibbon();
+  if (typeof renderChronoTimeline === 'function') renderChronoTimeline(false);
+  showToast('Viewing Today\'s Chronicle');
+}
+window.jumpDiaryToToday = jumpDiaryToToday;
+window.jumpToToday = jumpDiaryToToday;
+
+
 // ─── UNIFIED PERSISTENT CAPTURES & NOTES ENGINE ───
 
 function getUnifiedCapturesList() {
@@ -147,24 +190,45 @@ function renderJournalCards(journals) {
 window.renderJournalCards = renderJournalCards;
 
 function setChronoViewMode(mode) {
-  state.chronoViewMode = mode || 'timeline';
-  const streamBtn = document.getElementById('chrono-view-stream-btn');
-  const cardsBtn = document.getElementById('chrono-view-cards-btn');
-  const streamView = document.getElementById('chrono-stream-view');
+  state.chronoViewMode = mode || 'stream';
+  const streamBtn = document.getElementById('view-mode-stream-btn') || document.getElementById('chrono-view-stream-btn');
+  const storyBtn = document.getElementById('view-mode-story-btn') || document.getElementById('chrono-view-story-btn');
+  const streamView = document.getElementById('chrono-timeline-list');
+  const storyView = document.getElementById('chrono-story-carousel');
   const cardsView = document.getElementById('journals-grid-view') || document.getElementById('journals-grid');
 
-  if (mode === 'cards') {
-    if (streamBtn) streamBtn.classList.remove('active', 'bg-emerald-600', 'text-white');
-    if (cardsBtn) cardsBtn.classList.add('active', 'bg-emerald-600', 'text-white');
+  if (mode === 'story') {
+    if (streamBtn) {
+      streamBtn.className = 'px-2.5 py-1 rounded-lg font-semibold text-[var(--mc-text-muted)] hover:text-[var(--mc-text-primary)] text-xs flex items-center gap-1 cursor-pointer';
+    }
+    if (storyBtn) {
+      storyBtn.className = 'px-2.5 py-1 rounded-lg font-semibold bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] text-xs flex items-center gap-1 cursor-pointer';
+    }
     if (streamView) streamView.classList.add('hidden');
-    if (cardsView) cardsView.classList.remove('hidden');
-    renderJournalCards(state.journalsCache);
+    if (storyView) {
+      storyView.classList.remove('hidden');
+      if (typeof renderStoryCarousel === 'function') renderStoryCarousel();
+    }
+  } else if (mode === 'cards') {
+    if (streamView) streamView.classList.add('hidden');
+    if (storyView) storyView.classList.add('hidden');
+    if (cardsView) {
+      cardsView.classList.remove('hidden');
+      renderJournalCards(state.journalsCache);
+    }
   } else {
-    if (streamBtn) streamBtn.classList.add('active', 'bg-emerald-600', 'text-white');
-    if (cardsBtn) cardsBtn.classList.remove('active', 'bg-emerald-600', 'text-white');
+    // 'stream'
+    if (streamBtn) {
+      streamBtn.className = 'px-2.5 py-1 rounded-lg font-semibold bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] text-xs flex items-center gap-1 cursor-pointer';
+    }
+    if (storyBtn) {
+      storyBtn.className = 'px-2.5 py-1 rounded-lg font-semibold text-[var(--mc-text-muted)] hover:text-[var(--mc-text-primary)] text-xs flex items-center gap-1 cursor-pointer';
+    }
     if (streamView) streamView.classList.remove('hidden');
+    if (storyView) storyView.classList.add('hidden');
     renderChronoTimeline(false);
   }
+  if (window.lucide) refreshIcons();
 }
 window.setChronoViewMode = setChronoViewMode;
 
@@ -3887,8 +3951,8 @@ var liveDiaryClockInterval = null;
 
 
 function initDiarySpace() {
-
   updateLiveDiaryClock();
+  updateChronoDateDisplay();
 
   if (liveDiaryClockInterval) clearInterval(liveDiaryClockInterval);
 
@@ -4101,7 +4165,7 @@ function onDiaryDatePickerChange(dateVal) {
   if (parts.length === 3) {
 
     state.selectedDiaryDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
-
+    updateChronoDateDisplay();
     renderDiaryWeeklyRibbon();
 
     renderChronoTimeline();
@@ -4123,7 +4187,7 @@ function stepDiaryDay(offset) {
   next.setDate(current.getDate() + offset);
 
   state.selectedDiaryDate = next;
-
+  updateChronoDateDisplay();
   renderDiaryWeeklyRibbon();
 
   renderChronoTimeline();
