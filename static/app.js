@@ -1,4 +1,39 @@
 
+// ─── DYNAMIC DASHBOARD METRICS ENGINE ───
+
+function computeDynamicDashboardMetrics(horizon = 'weekly') {
+  if (typeof masterDashboardDataStore !== 'undefined' && masterDashboardDataStore && masterDashboardDataStore[horizon]) {
+    return masterDashboardDataStore[horizon];
+  }
+  return {
+    pillars: {
+      goalsStat: '100% Done', goalsSub: 'All on track', goalsDesc: 'Focus Active',
+      habitsStat: '7d Streak', habitsSub: '92% Rate', habitsDesc: 'Daily Checked',
+      milestonesStat: '4/4 Active', milestonesSub: 'On Schedule', milestonesDesc: 'Target 2026',
+      cbtStat: 'Equilibrium', cbtSub: 'Clear & Present', cbtDesc: 'Zero Bias',
+      vitalityStat: '7.2 hrs', vitalitySub: 'Optimal Rest', vitalityDesc: 'Vitality High',
+      volumeStat: 'Realtime', volumeSub: 'Live Logs', volumeDesc: 'Private Vault'
+    },
+    goalsScope: 'Weekly Scope',
+    goalsSummary: 'All active commitments on schedule.',
+    deepwork: '18 hrs', health: '10 hrs', career: '8 hrs', mindset: '4 hrs',
+    habitRate: '92%', topStreak: 'Daily Reflection Flow',
+    heatmapRange: '28 Days Continuity', heatmapDays: 28,
+    heatmapIntensity: [2, 3, 4, 3, 4, 4, 3, 2, 4, 4, 3, 4, 4, 4, 3, 4, 3, 4, 4, 4, 4, 3, 4],
+    growthBadge: '+14% Growth',
+    resilienceStat: '88%', resilienceSub: '+14% vs baseline',
+    clarityStat: '86%', claritySub: '+18% vs baseline',
+    velocityStat: 'Ascending', velocitySub: 'Compounding',
+    chartLabels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    resilienceData: [62, 68, 74, 78, 83, 85, 88],
+    clarityData: [58, 64, 71, 76, 80, 84, 86],
+    radarData: [68, 86, 88, 82, 80, 84],
+    insight: 'Cognitive resilience continues to compound as daily reflections and mindful habits maintain equilibrium.'
+  };
+}
+window.computeDynamicDashboardMetrics = computeDynamicDashboardMetrics;
+
+
 // ─── MEMORY LANE & LONGITUDINAL REFLECTION LOOP ENGINE ───
 
 function renderMemoryLane() {
@@ -7373,263 +7408,128 @@ async function deleteJournalEntry(journalId) {
 
 
 function initAnalyticsCharts() {
+  if (typeof Chart === 'undefined') return;
 
   // Radar Chart for Emotional Dimensions
-
-  const radarCtx = document.getElementById('radarMoodChart')?.getContext('2d');
-
-  if (radarCtx) {
-
-    state.radarChart = new Chart(radarCtx, {
-
-      type: 'radar',
-
-      data: {
-
-        labels: ['Joy', 'Clarity', 'Resilience', 'Focus', 'Calm', 'Optimism'],
-        datasets: [{
-          label: 'Cognitive Vector (%)',
-          data: (localStorage.getItem('mind_cave_is_reset')) ? [0, 0, 0, 0, 0, 0] : [87, 93, 91, 90, 90, 91],
-          backgroundColor: 'rgba(155, 183, 165, 0.12)',
-          borderColor: '#9BB7A5',
-          borderWidth: 2,
-          pointBackgroundColor: '#9BB7A5',
-          pointBorderColor: '#111417'
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          r: {
-            angleLines: { color: 'rgba(255, 255, 255, 0.06)' },
-            grid: { color: 'rgba(255, 255, 255, 0.06)' },
-            pointLabels: { color: '#A5ADB5', font: { size: 11, family: 'Inter' } },
-            suggestedMin: 0,
-            suggestedMax: 100,
-            ticks: { display: false }
-          }
-        },
-        plugins: {
-          legend: { display: false }
-        }
+  const radarEl = document.getElementById('radarMoodChart');
+  if (radarEl) {
+    try {
+      const existingRadar = Chart.getChart(radarEl);
+      if (existingRadar) existingRadar.destroy();
+      if (state.radarChart && typeof state.radarChart.destroy === 'function') {
+        state.radarChart.destroy();
+        state.radarChart = null;
       }
-    });
-  }
+    } catch (e) {}
 
-  // State & Data Engine for Resilience & Clarity Trajectory
-  state.trajectoryTimeframe = 'week';
-
-  // Line Chart for Resilience & Clarity Timeline
-  const lineCtx = document.getElementById('lineTimelineChart')?.getContext('2d');
-  if (lineCtx) {
-    const isClean = Boolean(localStorage.getItem('mind_cave_is_reset'));
-    state.lineChart = new Chart(lineCtx, {
-      type: 'line',
-      data: {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Today'],
-        datasets: [
-          {
-            label: 'Resilience',
-            data: isClean ? [0, 0, 0, 0, 0, 0, 0] : [64, 68, 72, 70, 78, 83, 88],
+    const radarCtx = radarEl.getContext('2d');
+    if (radarCtx) {
+      state.radarChart = new Chart(radarCtx, {
+        type: 'radar',
+        data: {
+          labels: ['Joy', 'Clarity', 'Resilience', 'Focus', 'Calm', 'Optimism'],
+          datasets: [{
+            label: 'Cognitive Vector (%)',
+            data: (localStorage.getItem('mind_cave_is_reset')) ? [0, 0, 0, 0, 0, 0] : [87, 93, 91, 90, 90, 91],
+            backgroundColor: 'rgba(155, 183, 165, 0.12)',
             borderColor: '#9BB7A5',
-            backgroundColor: 'rgba(155, 183, 165, 0.08)',
             borderWidth: 2,
             pointBackgroundColor: '#9BB7A5',
-            pointBorderColor: '#111417',
-            pointRadius: 3.5,
-            pointHoverRadius: 5,
-            tension: 0.35,
-            fill: true
-          },
-          {
-            label: 'Clarity',
-            data: isClean ? [0, 0, 0, 0, 0, 0, 0] : [58, 64, 69, 74, 76, 82, 86],
-            borderColor: '#8FA9B8',
-            backgroundColor: 'rgba(143, 169, 184, 0.08)',
-            borderWidth: 2,
-            pointBackgroundColor: '#8FA9B8',
-            pointBorderColor: '#111417',
-            pointRadius: 3.5,
-            pointHoverRadius: 5,
-            tension: 0.35,
-            fill: true
-          }
-        ]
-      },
-
-      options: {
-
-        responsive: true,
-
-        maintainAspectRatio: false,
-
-        interaction: {
-
-          mode: 'index',
-
-          intersect: false
-
+            pointBorderColor: '#111417'
+          }]
         },
-
-        scales: {
-
-          x: { 
-
-            grid: { color: 'rgba(255, 255, 255, 0.06)' }, 
-
-            ticks: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans', size: 11 } } 
-
-          },
-
-          y: { 
-
-            grid: { color: 'rgba(255, 255, 255, 0.06)' }, 
-
-            ticks: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans', size: 11 } }, 
-
-            min: 30, 
-
-            max: 100 
-
-          }
-
-        },
-
-        plugins: {
-
-          legend: { 
-
-            labels: { 
-
-              color: '#cbd5e1', 
-
-              font: { family: 'Plus Jakarta Sans', size: 11, weight: 'bold' },
-
-              usePointStyle: true,
-
-              pointStyle: 'circle'
-
-            } 
-
-          },
-
-          tooltip: {
-
-            backgroundColor: 'rgba(15, 23, 42, 0.95)',
-
-            titleColor: '#ffffff',
-
-            bodyColor: '#e2e8f0',
-
-            borderColor: 'rgba(255, 255, 255, 0.15)',
-
-            borderWidth: 1,
-
-            padding: 10,
-
-            callbacks: {
-
-              label: function(context) {
-
-                return ` ${context.dataset.label}: ${context.parsed.y}% Cognitive Equilibrium`;
-
-              }
-
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            r: {
+              angleLines: { color: 'rgba(255, 255, 255, 0.06)' },
+              grid: { color: 'rgba(255, 255, 255, 0.06)' },
+              pointLabels: { color: '#A5ADB5', font: { size: 11, family: 'Inter' } },
+              suggestedMin: 0,
+              suggestedMax: 100,
+              ticks: { display: false }
             }
-
+          },
+          plugins: {
+            legend: { display: false }
           }
-
         }
+      });
+    }
+  }
 
+  // Line Chart for Resilience & Clarity Timeline
+  state.trajectoryTimeframe = 'week';
+  const lineEl = document.getElementById('lineTimelineChart');
+  if (lineEl) {
+    try {
+      const existingLine = Chart.getChart(lineEl);
+      if (existingLine) existingLine.destroy();
+      if (state.lineChart && typeof state.lineChart.destroy === 'function') {
+        state.lineChart.destroy();
+        state.lineChart = null;
       }
+    } catch (e) {}
 
-    });
-
+    const lineCtx = lineEl.getContext('2d');
+    if (lineCtx) {
+      const isClean = Boolean(localStorage.getItem('mind_cave_is_reset'));
+      state.lineChart = new Chart(lineCtx, {
+        type: 'line',
+        data: {
+          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Today'],
+          datasets: [
+            {
+              label: 'Resilience',
+              data: isClean ? [0, 0, 0, 0, 0, 0, 0] : [64, 68, 72, 70, 78, 83, 88],
+              borderColor: '#9BB7A5',
+              backgroundColor: 'rgba(155, 183, 165, 0.08)',
+              borderWidth: 2,
+              pointBackgroundColor: '#9BB7A5',
+              pointBorderColor: '#111417',
+              pointRadius: 3.5,
+              pointHoverRadius: 5,
+              tension: 0.35,
+              fill: true
+            },
+            {
+              label: 'Clarity',
+              data: isClean ? [0, 0, 0, 0, 0, 0, 0] : [58, 64, 69, 74, 76, 82, 86],
+              borderColor: '#8FA9B8',
+              backgroundColor: 'rgba(143, 169, 184, 0.08)',
+              borderWidth: 2,
+              pointBackgroundColor: '#8FA9B8',
+              pointBorderColor: '#111417',
+              pointRadius: 3.5,
+              pointHoverRadius: 5,
+              tension: 0.35,
+              fill: true
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { color: '#A5ADB5', font: { size: 10 } }
+            },
+            y: {
+              suggestedMin: 40,
+              suggestedMax: 100,
+              grid: { color: 'rgba(255, 255, 255, 0.04)' },
+              ticks: { color: '#A5ADB5', font: { size: 10 } }
+            }
+          }
+        }
+      });
+    }
   }
-
-  // Initialize Master Dashboard with default Weekly Horizon
-  setMasterDashboardHorizon('weekly');
-}
-
-
-
-// Timeframe Trajectory Data Store (Week / Month / Year)
-
-var trajectoryDataStore = {
-
-  week: {
-
-    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Today'],
-
-    resilience: [64, 68, 72, 70, 78, 83, 88],
-
-    clarity: [58, 64, 69, 74, 76, 82, 86],
-
-    resilienceStat: '88%',
-
-    resilienceSub: '+14% vs 7d ago',
-
-    clarityStat: '86%',
-
-    claritySub: '+18% vs 7d ago',
-
-    velocityStat: 'Ascending Flow',
-
-    velocitySub: 'Compounding',
-
-    insight: '<strong>Weekly Synthesis:</strong> Cognitive resilience climbed +14% as mindful micro-habits and evening reframing decoupled somatic stress from task execution.'
-
-  },
-
-  month: {
-
-    labels: ['Aug 1-7', 'Aug 8-14', 'Aug 15-21', 'Aug 22-28', 'Aug 29+'],
-
-    resilience: [58, 65, 72, 79, 88],
-
-    clarity: [52, 60, 68, 77, 86],
-
-    resilienceStat: '82.4%',
-
-    resilienceSub: '+21% 30d gain',
-
-    clarityStat: '78.6%',
-
-    claritySub: '+24% 30d gain',
-
-    velocityStat: 'Steady Expansion',
-
-    velocitySub: '84% Less Bias',
-
-    insight: '<strong>Monthly Synthesis:</strong> 30-day cognitive analysis demonstrates an 84% reduction in Catastrophizing and All-or-Nothing cognitive distortions.'
-
-  },
-
-  year: {
-
-    labels: ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
-
-    resilience: [48, 52, 57, 62, 66, 70, 74, 78, 81, 84, 86, 91],
-
-    clarity: [42, 46, 51, 56, 62, 67, 72, 76, 80, 83, 85, 89],
-
-    resilienceStat: '91%',
-
-    resilienceSub: '+43% annual delta',
-
-    clarityStat: '89%',
-
-    claritySub: '+47% annual delta',
-
-    velocityStat: 'Sovereign Mastery',
-
-    velocitySub: 'Transformational',
-
-    insight: '<strong>Annual Synthesis:</strong> Full-year longitudinal growth reveals profound cognitive rewiring — shifting from reactive anxiety into proactive executive serenity.'
-
-  }
-
 };
 
 
