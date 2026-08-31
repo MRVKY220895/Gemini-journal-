@@ -314,297 +314,209 @@
         <!-- ===================================================================== -->
     <!-- TAB 1: HOME (LIFE INTELLIGENCE MASTER DASHBOARD & DAILY BOOSTER) -->
     <!-- ===================================================================== -->
-    <section id="view-overview" class="flex-1 flex flex-col gap-5 sm:gap-6 w-full pb-16 md:pb-8">
+    <section id="view-overview" class="flex-1 flex flex-col gap-6 w-full pb-16 md:pb-8">
       
-      <!-- ─── HERO LANDING BANNER & DAILY MOMENTUM CAPSULE ─── -->
-      <div class="mc-card p-5 sm:p-7 rounded-3xl relative overflow-hidden border border-[var(--mc-border-default)] shadow-xl bg-gradient-to-br from-[var(--mc-bg-secondary)] via-[var(--mc-bg-tertiary)] to-[var(--mc-bg-secondary)]">
-        <div class="max-w-3xl space-y-3 relative z-10">
-          <div class="flex items-center gap-2 flex-wrap">
-            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--mc-accent-12)] border border-[var(--mc-accent-25)] text-xs font-mono text-[var(--mc-accent)] font-semibold shadow-sm">
-              <i data-lucide="sparkles" class="w-3.5 h-3.5 text-[#9BB7A5]"></i>
-              <span>Life Intelligence Master Dashboard</span>
-            </div>
-            <span class="inline-flex items-center gap-1 text-[11px] font-mono font-bold text-amber-500 bg-amber-500/10 border border-amber-500/30 px-2.5 py-0.5 rounded-full" id="home-streak-badge">
-              🔥 14-Day Consistency Streak
-            </span>
-          </div>
-
-          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-[var(--mc-text-primary)] leading-tight">
-            Clarity for your thoughts.<br>
-            <span class="text-[var(--mc-accent)] font-serif italic">Mastery of your daily momentum.</span>
+      <!-- ─── 1. GREETING & DATE HEADER (INSPIRED BY REFERENCE) ─── -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-[var(--mc-border-subtle)]">
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-[var(--mc-text-primary)] tracking-tight flex items-center gap-2" id="home-greeting-text">
+            <span id="home-greeting-salutation">Good morning, Vicky</span>
+            <span class="animate-wave inline-block origin-bottom-right">👋</span>
           </h1>
-
-          <p class="text-xs sm:text-sm text-[var(--mc-text-secondary)] leading-relaxed max-w-2xl">
-            Your private cognitive sanctuary. Unpack emotions with CBT reframing, track daily streaks, celebrate life milestones, and cultivate deep self-mastery in English or your native language.
-          </p>
-
-          <!-- Primary Hero Actions -->
-          <div class="flex items-center gap-2 flex-wrap pt-1.5">
-            <button onclick="openOnboardingGuide(1)" class="btn-primary text-xs sm:text-sm !py-2 !px-4 flex items-center gap-2 cursor-pointer shadow-md hover:scale-105 active:scale-95 transition-all bg-gradient-to-r from-[var(--mc-accent)] to-emerald-600 text-white font-bold">
-              <i data-lucide="compass" class="w-4 h-4 text-white"></i>
-              <span>✨ Guide Me Through</span>
-            </button>
-            <button onclick="switchTab('studio')" class="btn-secondary text-xs sm:text-sm !py-2 !px-3.5 flex items-center gap-2 cursor-pointer transition-all">
-              <i data-lucide="sparkles" class="w-4 h-4 text-[var(--mc-accent)]"></i>
-              <span>Reflect with AI</span>
-            </button>
-            <button onclick="openNewJournalModal()" class="btn-secondary text-xs sm:text-sm !py-2 !px-4 flex items-center gap-2 cursor-pointer transition-all">
-              <i data-lucide="edit-3" class="w-4 h-4 text-[var(--mc-accent)]"></i>
-              <span>+ Log Reflection</span>
-            </button>
-            <button onclick="switchTab('journals')" class="btn-secondary text-xs sm:text-sm !py-2 !px-3.5 flex items-center gap-1.5 cursor-pointer text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)]">
-              <i data-lucide="calendar" class="w-3.5 h-3.5 text-[#9BB7A5]"></i>
-              <span>Living Timeline</span>
-            </button>
-            <button onclick="switchTab('analytics')" class="btn-secondary text-xs sm:text-sm !py-2 !px-3.5 flex items-center gap-1.5 cursor-pointer text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)]">
-              <i data-lucide="activity" class="w-3.5 h-3.5 text-[#8FA9B8]"></i>
-              <span>MindPulse Radar</span>
-            </button>
-          </div>
+          <p class="text-xs sm:text-sm text-[var(--mc-text-secondary)] mt-1">A quiet place to write, think, and remember.</p>
         </div>
 
-        <!-- Decorative Glow -->
-        <div class="absolute -right-12 -bottom-12 w-64 h-64 rounded-full bg-[var(--mc-accent-10)] blur-3xl pointer-events-none"></div>
-      </div>
-
-      <!-- ─── DAILY BOOSTER: GENUINE ACHIEVEMENTS & MOMENTUM METRICS ─── -->
-      <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <!-- Metric 1: Consistency Streak -->
-        <div class="mc-card p-4 rounded-2xl border border-[var(--mc-border-default)] flex flex-col justify-between space-y-2 hover:border-amber-500/40 transition-all">
-          <div class="flex items-center justify-between">
-            <span class="text-[10px] font-mono text-[var(--mc-text-muted)] uppercase tracking-wider">Consistency</span>
-            <div class="w-7 h-7 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-500">
-              <i data-lucide="flame" class="w-4 h-4 text-amber-500"></i>
-            </div>
-          </div>
-          <div>
-            <div class="text-xl sm:text-2xl font-extrabold text-[var(--mc-text-primary)] font-mono" id="booster-streak-days">0 Days</div>
-            <div class="text-[11px] text-amber-600 dark:text-amber-400 font-semibold flex items-center gap-1 mt-0.5 truncate" id="booster-streak-sub">
-              <span>🌱 Start your first daily habit</span>
-            </div>
-          </div>
-          <div class="w-full h-1.5 bg-[var(--mc-border-subtle)] rounded-full overflow-hidden">
-            <div class="h-full bg-amber-500 rounded-full transition-all duration-500" id="booster-streak-bar" style="width: 0%;"></div>
-          </div>
-        </div>
-
-        <!-- Metric 2: Mind Clarity & Equilibrium -->
-        <div class="mc-card p-4 rounded-2xl border border-[var(--mc-border-default)] flex flex-col justify-between space-y-2 hover:border-[#9BB7A5]/40 transition-all">
-          <div class="flex items-center justify-between">
-            <span class="text-[10px] font-mono text-[var(--mc-text-muted)] uppercase tracking-wider">Equilibrium</span>
-            <div class="w-7 h-7 rounded-xl bg-[#9BB7A5]/15 border border-[#9BB7A5]/30 flex items-center justify-center text-[#9BB7A5]">
-              <i data-lucide="shield-check" class="w-4 h-4 text-[#9BB7A5]"></i>
-            </div>
-          </div>
-          <div>
-            <div class="text-xl sm:text-2xl font-extrabold text-[var(--mc-text-primary)] font-mono" id="booster-clarity-score">0% Baseline</div>
-            <div class="text-[11px] text-[#9BB7A5] font-semibold flex items-center gap-1 mt-0.5 truncate" id="booster-clarity-sub">
-              <span>🌿 Log 1st journal reflection</span>
-            </div>
-          </div>
-          <div class="w-full h-1.5 bg-[var(--mc-border-subtle)] rounded-full overflow-hidden">
-            <div class="h-full bg-[#9BB7A5] rounded-full transition-all duration-500" id="booster-clarity-bar" style="width: 0%;"></div>
-          </div>
-        </div>
-
-        <!-- Metric 3: Goal Velocity -->
-        <div class="mc-card p-4 rounded-2xl border border-[var(--mc-border-default)] flex flex-col justify-between space-y-2 hover:border-[#8FA9B8]/40 transition-all">
-          <div class="flex items-center justify-between">
-            <span class="text-[10px] font-mono text-[var(--mc-text-muted)] uppercase tracking-wider">Goal Velocity</span>
-            <div class="w-7 h-7 rounded-xl bg-[#8FA9B8]/15 border border-[#8FA9B8]/30 flex items-center justify-center text-[#8FA9B8]">
-              <i data-lucide="target" class="w-4 h-4 text-[#8FA9B8]"></i>
-            </div>
-          </div>
-          <div>
-            <div class="text-xl sm:text-2xl font-extrabold text-[var(--mc-text-primary)] font-mono" id="booster-goals-completed">0 / 0 Executed</div>
-            <div class="text-[11px] text-[#8FA9B8] font-semibold flex items-center gap-1 mt-0.5 truncate" id="booster-goals-sub">
-              <span>🎯 Add today's first goal</span>
-            </div>
-          </div>
-          <div class="w-full h-1.5 bg-[var(--mc-border-subtle)] rounded-full overflow-hidden">
-            <div class="h-full bg-[#8FA9B8] rounded-full transition-all duration-500" id="booster-goals-bar" style="width: 0%;"></div>
-          </div>
-        </div>
-
-        <!-- Metric 4: Milestones & Insights Vault -->
-        <div class="mc-card p-4 rounded-2xl border border-[var(--mc-border-default)] flex flex-col justify-between space-y-2 hover:border-[#C5AA78]/40 transition-all">
-          <div class="flex items-center justify-between">
-            <span class="text-[10px] font-mono text-[var(--mc-text-muted)] uppercase tracking-wider">Life Vault</span>
-            <div class="w-7 h-7 rounded-xl bg-[#C5AA78]/15 border border-[#C5AA78]/30 flex items-center justify-center text-[#C5AA78]">
-              <i data-lucide="award" class="w-4 h-4 text-[#C5AA78]"></i>
-            </div>
-          </div>
-          <div>
-            <div class="text-xl sm:text-2xl font-extrabold text-[var(--mc-text-primary)] font-mono" id="booster-milestones-count">0 Milestones</div>
-            <div class="text-[11px] text-[#C5AA78] font-semibold flex items-center gap-1 mt-0.5 truncate" id="booster-milestones-sub">
-              <span>✨ Create a milestone quest</span>
-            </div>
-          </div>
-          <div class="w-full h-1.5 bg-[var(--mc-border-subtle)] rounded-full overflow-hidden">
-            <div class="h-full bg-[#C5AA78] rounded-full transition-all duration-500" id="booster-milestones-bar" style="width: 0%;"></div>
+        <div class="flex items-center gap-2 self-start sm:self-auto">
+          <div class="px-3.5 py-1.5 rounded-2xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] text-xs font-semibold text-[var(--mc-text-primary)] flex items-center gap-2 shadow-sm font-mono" id="home-live-date-pill">
+            <i data-lucide="calendar" class="w-3.5 h-3.5 text-emerald-500"></i>
+            <span id="home-formatted-date">Mon, Aug 31</span>
           </div>
         </div>
       </div>
 
-      <!-- ─── DAILY BOOSTER: STOIC WISDOM & QUICK RITUALS ─── -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        <!-- Daily Wisdom & Stoic Booster (7 Cols) -->
-        <div class="lg:col-span-7 mc-card p-5 sm:p-6 flex flex-col justify-between space-y-3 rounded-2xl border border-[var(--mc-border-default)]">
-          <div class="flex items-center justify-between gap-2 border-b border-[var(--mc-border-subtle)] pb-2.5">
-            <div class="flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-              <span class="text-xs font-bold text-[var(--mc-text-primary)] font-mono uppercase tracking-wider">Daily Stoic & Psychological Booster</span>
+      <!-- ─── 2. TOP BENTO ROW: WHAT'S ON YOUR MIND & ONE THING TO NOTICE ─── -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        
+        <!-- Card 1 (Col 1-7): What's on your mind? Quick Capture -->
+        <div class="lg:col-span-7 mc-card p-5 sm:p-6 rounded-3xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] flex flex-col justify-between space-y-4 shadow-sm hover:border-[var(--mc-border-strong)] transition-all">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <h2 class="text-base sm:text-lg font-bold text-[var(--mc-text-primary)]">What's on your mind?</h2>
+              <span id="home-mood-selected-badge" class="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 hidden">
+                😊 Calm
+              </span>
             </div>
-            <span class="text-[10px] font-mono text-[var(--mc-accent)] font-semibold px-2 py-0.5 rounded-full bg-[var(--mc-accent-10)]">Mind Alignment</span>
+            <textarea id="home-quick-write-textarea" rows="4" placeholder="Start writing..." class="w-full bg-transparent text-sm text-[var(--mc-text-primary)] placeholder-[var(--mc-text-muted)] focus:outline-none resize-none leading-relaxed font-sans"></textarea>
           </div>
 
-          <blockquote class="italic text-xs sm:text-sm text-[var(--mc-text-primary)] leading-relaxed border-l-2 border-[var(--mc-accent)] pl-3 my-1">
-            "You have power over your mind — not outside events. Realize this, and you will find unstoppable inner resilience."
-            <span class="block text-[11px] text-[var(--mc-text-muted)] font-normal not-italic mt-1">— Marcus Aurelius • Meditations</span>
-          </blockquote>
+          <!-- Bottom Action Toolbar -->
+          <div class="flex items-center justify-between gap-2 pt-3 border-t border-[var(--mc-border-subtle)] flex-wrap">
+            <div class="flex items-center gap-1.5 relative">
+              
+              <!-- Mood Selector Button -->
+              <div class="relative inline-block">
+                <button type="button" onclick="toggleHomeMoodPopover(event)" id="btn-home-mood" class="px-3 py-1.5 rounded-xl bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-border-subtle)] text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer border border-[var(--mc-border-subtle)]">
+                  <span id="home-mood-btn-icon">😊</span>
+                  <span id="home-mood-btn-label">Mood</span>
+                </button>
 
-          <!-- 1-Tap Daily Alignment Rituals -->
+                <!-- Floating Mood Dropdown Menu -->
+                <div id="home-mood-popover" class="hidden absolute left-0 bottom-10 w-44 rounded-2xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] shadow-2xl backdrop-blur-2xl p-1.5 z-50 text-xs space-y-0.5 animate-fade-in">
+                  <button type="button" onclick="selectHomeMood('Calm', '😊', 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20')" class="w-full px-2.5 py-1.5 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] flex items-center gap-2 cursor-pointer">
+                    <span>😊</span> <span>Calm</span>
+                  </button>
+                  <button type="button" onclick="selectHomeMood('Grateful', '✨', 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20')" class="w-full px-2.5 py-1.5 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] flex items-center gap-2 cursor-pointer">
+                    <span>✨</span> <span>Grateful</span>
+                  </button>
+                  <button type="button" onclick="selectHomeMood('Inspired', '💡', 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20')" class="w-full px-2.5 py-1.5 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] flex items-center gap-2 cursor-pointer">
+                    <span>💡</span> <span>Inspired</span>
+                  </button>
+                  <button type="button" onclick="selectHomeMood('Reflective', '🌿', 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20')" class="w-full px-2.5 py-1.5 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] flex items-center gap-2 cursor-pointer">
+                    <span>🌿</span> <span>Reflective</span>
+                  </button>
+                  <button type="button" onclick="selectHomeMood('Challenged', '⚡', 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20')" class="w-full px-2.5 py-1.5 rounded-xl text-left hover:bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] flex items-center gap-2 cursor-pointer">
+                    <span>⚡</span> <span>Challenged</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Voice Dictation Button -->
+              <button type="button" onclick="toggleHomeVoiceRecording()" id="btn-home-voice" class="px-3 py-1.5 rounded-xl bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-border-subtle)] text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer border border-[var(--mc-border-subtle)]" title="Voice Dictation">
+                <i data-lucide="mic" class="w-3.5 h-3.5" id="home-voice-icon"></i>
+                <span id="home-voice-label">Voice</span>
+              </button>
+
+              <!-- Add Photo / Tag Attachment Button -->
+              <button type="button" onclick="openNewJournalModal()" class="px-3 py-1.5 rounded-xl bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-border-subtle)] text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer border border-[var(--mc-border-subtle)]" title="Rich Editor & Attachments">
+                <i data-lucide="paperclip" class="w-3.5 h-3.5"></i>
+                <span>Add</span>
+              </button>
+            </div>
+
+            <!-- Save Primary CTA -->
+            <button type="button" onclick="saveHomeQuickReflection()" id="btn-home-save-reflection" class="px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-emerald-900/20 transition-all cursor-pointer">
+              <i data-lucide="check" class="w-3.5 h-3.5"></i>
+              <span>Save</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Card 2 (Col 8-12): One thing to notice (Cognitive Highlight) -->
+        <div class="lg:col-span-5 mc-card p-5 sm:p-6 rounded-3xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] flex flex-col justify-between space-y-4 shadow-sm hover:border-[var(--mc-border-strong)] transition-all">
+          <div class="space-y-3">
+            <div class="flex items-center gap-2 text-amber-500 font-bold text-xs uppercase tracking-wider font-mono">
+              <i data-lucide="star" class="w-4 h-4 fill-amber-500 text-amber-500"></i>
+              <span>One thing to notice</span>
+            </div>
+
+            <div class="space-y-1.5">
+              <h3 class="text-base sm:text-lg font-bold text-[var(--mc-text-primary)] leading-snug" id="home-notice-headline">
+                You mentioned "work" 4 times this week.
+              </h3>
+              <p class="text-xs text-[var(--mc-text-secondary)] leading-relaxed" id="home-notice-subtext">
+                Most of those entries were about uncertainty.
+              </p>
+            </div>
+          </div>
+
           <div class="pt-2 border-t border-[var(--mc-border-subtle)]">
-            <span class="text-[10px] font-mono text-[var(--mc-text-muted)] uppercase tracking-wider block mb-2">1-Tap Daily Alignments:</span>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
-              <button onclick="insertPromptAndOpenStudio('Help me set a high-agency intention for today and eliminate distraction friction.')" class="p-2.5 rounded-xl bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-bg-elevation)] border border-[var(--mc-border-subtle)] hover:border-[var(--mc-accent)]/50 text-left transition-all group cursor-pointer">
-                <span class="font-semibold text-[var(--mc-text-primary)] group-hover:text-[var(--mc-accent)] block flex items-center gap-1.5"><i data-lucide="sun" class="w-3.5 h-3.5 text-amber-400"></i><span>Morning Intention</span></span>
-                <span class="text-[10px] text-[var(--mc-text-muted)] mt-0.5 block">Focus & priorities</span>
-              </button>
-              <button onclick="insertPromptAndOpenStudio('I want to do a quick midday reset to clear cognitive overload and recenter my energy.')" class="p-2.5 rounded-xl bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-bg-elevation)] border border-[var(--mc-border-subtle)] hover:border-[#8FA9B8]/50 text-left transition-all group cursor-pointer">
-                <span class="font-semibold text-[var(--mc-text-primary)] group-hover:text-[#8FA9B8] block flex items-center gap-1.5"><i data-lucide="battery-charging" class="w-3.5 h-3.5 text-cyan-400"></i><span>Midday Reset</span></span>
-                <span class="text-[10px] text-[var(--mc-text-muted)] mt-0.5 block">Clear friction & noise</span>
-              </button>
-              <button onclick="insertPromptAndOpenStudio('I want to log my evening reflection, celebrate what went well, and anchor gratitude.')" class="p-2.5 rounded-xl bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-bg-elevation)] border border-[var(--mc-border-subtle)] hover:border-[#91B59D]/50 text-left transition-all group cursor-pointer">
-                <span class="font-semibold text-[var(--mc-text-primary)] group-hover:text-[#91B59D] block flex items-center gap-1.5"><i data-lucide="moon" class="w-3.5 h-3.5 text-rose-400"></i><span>Evening Gratitude</span></span>
-                <span class="text-[10px] text-[var(--mc-text-muted)] mt-0.5 block">Close loop & rest</span>
-              </button>
-            </div>
+            <button type="button" onclick="switchTab('analytics')" class="w-full sm:w-auto px-4 py-2 rounded-xl bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-border-subtle)] text-[var(--mc-text-primary)] text-xs font-semibold transition-colors cursor-pointer flex items-center justify-center gap-1.5">
+              <span>See more</span>
+              <i data-lucide="arrow-right" class="w-3 h-3"></i>
+            </button>
           </div>
         </div>
 
-        <!-- Achievement Badges & Growth Mastery (5 Cols) -->
-        <div class="lg:col-span-5 mc-card p-5 sm:p-6 flex flex-col justify-between space-y-3 rounded-2xl border border-[var(--mc-border-default)]">
-          <div class="flex items-center justify-between border-b border-[var(--mc-border-subtle)] pb-2.5">
-            <span class="text-xs font-bold text-[var(--mc-text-primary)] font-mono uppercase tracking-wider flex items-center gap-1.5">
-              <i data-lucide="award" class="w-3.5 h-3.5 text-amber-500"></i>
-              <span>Life Mastery Badges</span>
-            </span>
-            <span id="user-mastery-level-badge" class="text-[10px] font-mono text-amber-500 font-bold bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/30">Level 1 Initiate</span>
-          </div>
-
-          <!-- Dynamic Badges Grid -->
-          <div class="grid grid-cols-2 gap-2 text-xs py-1" id="home-badges-grid">
-            <!-- Rendered dynamically based on real user actions -->
-          </div>
-
-          <button onclick="openMoodPickerModal()" class="btn-secondary !py-2 text-xs flex items-center justify-center gap-1.5 w-full cursor-pointer">
-            <i data-lucide="smile" class="w-3.5 h-3.5 text-[#9BB7A5]"></i>
-            <span>Log Daily Mood & Check-In</span>
-          </button>
-        </div>
       </div>
 
-      <!-- ─── 5 CORE PILLARS OF MIND CAVE (BENTO GRID) ─── -->
-      <div>
-        <div class="flex items-center justify-between mb-3 px-1">
-          <div>
-            <h2 class="text-base sm:text-lg font-semibold text-[var(--mc-text-primary)]">Core Life Intelligence Capabilities</h2>
-            <p class="text-xs text-[var(--mc-text-secondary)]">Explore the 5 integrated pillars of the Mind Cave architecture</p>
+      <!-- ─── 3. BOTTOM BENTO ROW: RECENT ENTRIES & HABITS ─── -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        
+        <!-- Card 3 (Col 1-7): Recent Entries with Animated Single Line Items -->
+        <div class="lg:col-span-7 mc-card p-5 sm:p-6 rounded-3xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] flex flex-col justify-between space-y-4 shadow-sm hover:border-[var(--mc-border-strong)] transition-all">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between pb-2 border-b border-[var(--mc-border-subtle)]">
+              <div class="flex items-center gap-2">
+                <i data-lucide="book-open" class="w-4 h-4 text-emerald-500"></i>
+                <h3 class="text-sm font-bold text-[var(--mc-text-primary)]">Recent entries</h3>
+              </div>
+              <button onclick="switchTab('journals')" class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer">
+                <span>View all</span>
+                <i data-lucide="arrow-right" class="w-3 h-3"></i>
+              </button>
+            </div>
+
+            <!-- Dynamic Recent Reflection Rows -->
+            <div id="home-recent-reflections-list" class="space-y-2 text-xs">
+              <!-- Default sample/rendered items -->
+              <div class="p-3 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] flex items-center justify-between gap-3 hover:border-emerald-500/40 transition-all cursor-pointer" onclick="switchTab('journals')">
+                <div class="min-w-0">
+                  <div class="text-[10px] text-[var(--mc-text-muted)] font-mono">Today • 11:15 AM</div>
+                  <div class="font-bold text-[var(--mc-text-primary)] truncate mt-0.5">Thinking about today</div>
+                </div>
+                <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shrink-0">Calm</span>
+              </div>
+
+              <div class="p-3 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] flex items-center justify-between gap-3 hover:border-amber-500/40 transition-all cursor-pointer" onclick="switchTab('journals')">
+                <div class="min-w-0">
+                  <div class="text-[10px] text-[var(--mc-text-muted)] font-mono">Yesterday • 8:20 PM</div>
+                  <div class="font-bold text-[var(--mc-text-primary)] truncate mt-0.5">A busy day</div>
+                </div>
+                <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 shrink-0">Grateful</span>
+              </div>
+
+              <div class="p-3 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] flex items-center justify-between gap-3 hover:border-cyan-500/40 transition-all cursor-pointer" onclick="switchTab('journals')">
+                <div class="min-w-0">
+                  <div class="text-[10px] text-[var(--mc-text-muted)] font-mono">Aug 29 • 9:15 AM</div>
+                  <div class="font-bold text-[var(--mc-text-primary)] truncate mt-0.5">Morning thoughts</div>
+                </div>
+                <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20 shrink-0">Inspired</span>
+              </div>
+            </div>
           </div>
-          <span class="text-[10px] font-mono text-[var(--mc-text-muted)] uppercase tracking-wider">5 Pillars</span>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3.5">
-          <!-- Pillar 1: Conversational AI Partner -->
-          <div class="mc-card p-4 sm:p-5 flex flex-col justify-between space-y-3 cursor-pointer group hover:border-[var(--mc-accent)] transition-all" onclick="switchTab('studio')">
-            <div class="flex items-center justify-between">
-              <div class="w-8 h-8 rounded-xl bg-[var(--mc-accent-12)] border border-[var(--mc-accent-25)] text-[var(--mc-accent)] flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                <i data-lucide="sparkles" class="w-4 h-4 text-[#9BB7A5]"></i>
+        <!-- Card 4 (Col 8-12): Habits Mini Tracker -->
+        <div class="lg:col-span-5 mc-card p-5 sm:p-6 rounded-3xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] flex flex-col justify-between space-y-4 shadow-sm hover:border-[var(--mc-border-strong)] transition-all">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between pb-2 border-b border-[var(--mc-border-subtle)]">
+              <div class="flex items-center gap-2">
+                <i data-lucide="target" class="w-4 h-4 text-emerald-500"></i>
+                <h3 class="text-sm font-bold text-[var(--mc-text-primary)]">Habits</h3>
               </div>
-              <span class="text-[10px] font-mono text-[var(--mc-accent)] bg-[var(--mc-accent-10)] px-2 py-0.5 rounded-full font-semibold">Live AI</span>
+              <button onclick="switchTab('journals'); switchJournalTrack('sanctuary');" class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer">
+                <span>Manage</span>
+                <i data-lucide="arrow-right" class="w-3 h-3"></i>
+              </button>
             </div>
-            <div>
-              <h3 class="text-sm font-semibold text-[var(--mc-text-primary)] group-hover:text-[var(--mc-accent)] transition-colors">Empathetic Reflective Partner</h3>
-              <p class="text-xs text-[var(--mc-text-secondary)] mt-1 leading-relaxed">Untangle thoughts, examine assumptions, and find cognitive equilibrium in English, Tamil, Hindi, or any native tongue.</p>
-            </div>
-            <div class="text-[11px] text-[var(--mc-accent)] font-semibold flex items-center gap-1 pt-1">
-              <span>Open Studio</span>
-              <i data-lucide="arrow-right" class="w-3 h-3 group-hover:translate-x-1 transition-transform"></i>
-            </div>
-          </div>
 
-          <!-- Pillar 2: Memory Lane & Scrapbook -->
-          <div class="mc-card p-4 sm:p-5 flex flex-col justify-between space-y-3 cursor-pointer group hover:border-[#8FA9B8] transition-all" onclick="switchTab('journals')">
-            <div class="flex items-center justify-between">
-              <div class="w-8 h-8 rounded-xl bg-[#8FA9B8]/15 border border-[#8FA9B8]/30 text-[#8FA9B8] flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                <i data-lucide="book-open" class="w-4 h-4 text-[#8FA9B8]"></i>
+            <!-- Dynamic Habits Mini Checkoff Feed -->
+            <div id="home-habits-mini-container" class="space-y-2">
+              <div class="text-center py-6 px-4 rounded-2xl border border-dashed border-[var(--mc-border-subtle)] bg-[var(--mc-bg-tertiary)]/50 space-y-2">
+                <p class="text-xs text-[var(--mc-text-secondary)] leading-relaxed">
+                  You don't have any habits yet.<br>Create a habit to build your rhythm.
+                </p>
+                <button type="button" onclick="openNewHabitModal()" class="px-3.5 py-1.5 rounded-xl bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-border-subtle)] text-[var(--mc-text-primary)] text-xs font-bold border border-[var(--mc-border-subtle)] transition-colors cursor-pointer inline-flex items-center gap-1.5">
+                  <i data-lucide="plus" class="w-3.5 h-3.5 text-emerald-500"></i>
+                  <span>+ Add a habit</span>
+                </button>
               </div>
-              <span class="text-[10px] font-mono text-[#8FA9B8] bg-[#8FA9B8]/10 px-2 py-0.5 rounded-full font-semibold">Multi-Track</span>
-            </div>
-            <div>
-              <h3 class="text-sm font-semibold text-[var(--mc-text-primary)] group-hover:text-[#8FA9B8] transition-colors">Memory Lane & Reflections</h3>
-              <p class="text-xs text-[var(--mc-text-secondary)] mt-1 leading-relaxed">Capture journal notes, voice recordings, and photo moments with automatic longitudinal reflection loops.</p>
-            </div>
-            <div class="text-[11px] text-[#8FA9B8] font-semibold flex items-center gap-1 pt-1">
-              <span>View Timeline</span>
-              <i data-lucide="arrow-right" class="w-3 h-3 group-hover:translate-x-1 transition-transform"></i>
             </div>
           </div>
+        </div>
 
-          <!-- Pillar 3: MindPulse Life Intelligence -->
-          <div class="mc-card p-4 sm:p-5 flex flex-col justify-between space-y-3 cursor-pointer group hover:border-[#C5AA78] transition-all" onclick="switchTab('analytics')">
-            <div class="flex items-center justify-between">
-              <div class="w-8 h-8 rounded-xl bg-[#C5AA78]/15 border border-[#C5AA78]/30 text-[#C5AA78] flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                <i data-lucide="activity" class="w-4 h-4 text-[#C5AA78]"></i>
-              </div>
-              <span class="text-[10px] font-mono text-[#C5AA78] bg-[#C5AA78]/10 px-2 py-0.5 rounded-full font-semibold">Analytics</span>
-            </div>
-            <div>
-              <h3 class="text-sm font-semibold text-[var(--mc-text-primary)] group-hover:text-[#C5AA78] transition-colors">MindPulse Life Intelligence</h3>
-              <p class="text-xs text-[var(--mc-text-secondary)] mt-1 leading-relaxed">Holistic radar tracking across Goal Velocity, Habit Streaks, CBT Cognitive Clearance, and Diurnal Flow.</p>
-            </div>
-            <div class="text-[11px] text-[#C5AA78] font-semibold flex items-center gap-1 pt-1">
-              <span>Explore Analytics</span>
-              <i data-lucide="arrow-right" class="w-3 h-3 group-hover:translate-x-1 transition-transform"></i>
-            </div>
-          </div>
+      </div>
 
-          <!-- Pillar 4: Bio Sanctuary -->
-          <div class="mc-card p-4 sm:p-5 flex flex-col justify-between space-y-3 cursor-pointer group hover:border-[#9BB7A5] transition-all" onclick="navigateToSection('journals', 'sanctuary')">
-            <div class="flex items-center justify-between">
-              <div class="w-8 h-8 rounded-xl bg-[#9BB7A5]/15 border border-[#9BB7A5]/30 text-[#9BB7A5] flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                <i data-lucide="heart-pulse" class="w-4 h-4 text-[#9BB7A5]"></i>
-              </div>
-              <span class="text-[10px] font-mono text-[#9BB7A5] bg-[#9BB7A5]/10 px-2 py-0.5 rounded-full font-semibold">Bio Sanctuary</span>
-            </div>
-            <div>
-              <h3 class="text-sm font-semibold text-[var(--mc-text-primary)] group-hover:text-[#9BB7A5] transition-colors">Bio Sanctuary & Vitality</h3>
-              <p class="text-xs text-[var(--mc-text-secondary)] mt-1 leading-relaxed">Align your journaling and deep work with circadian rhythms, diurnal stamina peaks, and cycle intelligence.</p>
-            </div>
-            <div class="text-[11px] text-[#9BB7A5] font-semibold flex items-center gap-1 pt-1">
-              <span>Explore Sanctuary</span>
-              <i data-lucide="arrow-right" class="w-3 h-3 group-hover:translate-x-1 transition-transform"></i>
-            </div>
-          </div>
-
-          <!-- Pillar 5: Zero-Knowledge Private Vault -->
-          <div class="mc-card p-4 sm:p-5 flex flex-col justify-between space-y-3 cursor-pointer group hover:border-[#91B59D] transition-all" onclick="switchTab('security')">
-            <div class="flex items-center justify-between">
-              <div class="w-8 h-8 rounded-xl bg-[#91B59D]/15 border border-[#91B59D]/30 text-[#91B59D] flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                <i data-lucide="shield-check" class="w-4 h-4 text-[#91B59D]"></i>
-              </div>
-              <span class="text-[10px] font-mono text-[#91B59D] bg-[#91B59D]/10 px-2 py-0.5 rounded-full font-semibold">AES-256</span>
-            </div>
-            <div>
-              <h3 class="text-sm font-semibold text-[var(--mc-text-primary)] group-hover:text-[#91B59D] transition-colors">Zero-Knowledge Private Vault</h3>
-              <p class="text-xs text-[var(--mc-text-secondary)] mt-1 leading-relaxed">Client-side AES-256-GCM cipher protection, biometric unlock, and strict isolated tenant storage boundaries.</p>
-            </div>
-            <div class="text-[11px] text-[#91B59D] font-semibold flex items-center gap-1 pt-1">
-              <span>Inspect Vault</span>
-              <i data-lucide="arrow-right" class="w-3 h-3 group-hover:translate-x-1 transition-transform"></i>
-            </div>
-          </div>
+      <!-- ─── 4. ANIMATED SINGLE LINE HORIZONTAL TAG STRIP (SIMPLER TAGS) ─── -->
+      <div class="w-full overflow-hidden py-2 px-1 relative">
+        <div class="flex items-center gap-2.5 overflow-x-auto no-scrollbar py-1" id="home-animated-tags-ticker">
+          <span class="px-3 py-1 rounded-full bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] text-xs text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] font-mono whitespace-nowrap transition-all cursor-pointer" onclick="filterDiaryByTag('DeepWork')">#DeepWork</span>
+          <span class="px-3 py-1 rounded-full bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] text-xs text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] font-mono whitespace-nowrap transition-all cursor-pointer" onclick="filterDiaryByTag('Clarity')">#Clarity</span>
+          <span class="px-3 py-1 rounded-full bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] text-xs text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] font-mono whitespace-nowrap transition-all cursor-pointer" onclick="filterDiaryByTag('Gratitude')">#Gratitude</span>
+          <span class="px-3 py-1 rounded-full bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] text-xs text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] font-mono whitespace-nowrap transition-all cursor-pointer" onclick="filterDiaryByTag('Equilibrium')">#Equilibrium</span>
+          <span class="px-3 py-1 rounded-full bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] text-xs text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] font-mono whitespace-nowrap transition-all cursor-pointer" onclick="filterDiaryByTag('Mindful')">#Mindful</span>
+          <span class="px-3 py-1 rounded-full bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] text-xs text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] font-mono whitespace-nowrap transition-all cursor-pointer" onclick="filterDiaryByTag('ReflectiveBuilder')">#ReflectiveBuilder</span>
+          <span class="px-3 py-1 rounded-full bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] text-xs text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] font-mono whitespace-nowrap transition-all cursor-pointer" onclick="filterDiaryByTag('Vitality')">#Vitality</span>
         </div>
       </div>
 
@@ -4688,5 +4600,7 @@
     </div>
   </div>
 
+  <!-- Core Application Script -->
+  <script src="/static/app.js?v=1788179999" defer></script>
 </body>
 </html>

@@ -1,4 +1,280 @@
 
+// ─── HOME SANCTUARY BENTO CONTROLLERS (INSPIRED BY REFERENCE) ───
+
+let currentHomeSelectedMood = { name: 'Calm', emoji: '😊', class: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' };
+
+function updateHomeGreetingAndDate() {
+  const greetingEl = document.getElementById('home-greeting-salutation');
+  const dateEl = document.getElementById('home-formatted-date');
+
+  const now = new Date();
+  const hour = now.getHours();
+  let timeSalutation = 'Good morning';
+  if (hour >= 12 && hour < 17) timeSalutation = 'Good afternoon';
+  else if (hour >= 17 || hour < 5) timeSalutation = 'Good evening';
+
+  const userName = (state.currentUser && state.currentUser.name) ? state.currentUser.name.split(' ')[0] : 'Vicky';
+  if (greetingEl) {
+    greetingEl.textContent = `${timeSalutation}, ${userName}`;
+  }
+
+  if (dateEl) {
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    dateEl.textContent = `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}`;
+  }
+}
+window.updateHomeGreetingAndDate = updateHomeGreetingAndDate;
+
+function toggleHomeMoodPopover(event) {
+  event?.stopPropagation();
+  const popover = document.getElementById('home-mood-popover');
+  if (popover) {
+    popover.classList.toggle('hidden');
+  }
+}
+window.toggleHomeMoodPopover = toggleHomeMoodPopover;
+
+function selectHomeMood(moodName, emoji, badgeClass) {
+  currentHomeSelectedMood = { name: moodName, emoji, class: badgeClass };
+  const badge = document.getElementById('home-mood-selected-badge');
+  const btnIcon = document.getElementById('home-mood-btn-icon');
+  const btnLabel = document.getElementById('home-mood-btn-label');
+  const popover = document.getElementById('home-mood-popover');
+
+  if (badge) {
+    badge.textContent = `${emoji} ${moodName}`;
+    badge.className = `text-[11px] font-medium px-2.5 py-0.5 rounded-full border ${badgeClass}`;
+    badge.classList.remove('hidden');
+  }
+  if (btnIcon) btnIcon.textContent = emoji;
+  if (btnLabel) btnLabel.textContent = moodName;
+  if (popover) popover.classList.add('hidden');
+}
+window.selectHomeMood = selectHomeMood;
+
+// Close mood popover on outside click
+document.addEventListener('click', (e) => {
+  const popover = document.getElementById('home-mood-popover');
+  const btn = document.getElementById('btn-home-mood');
+  if (popover && !popover.classList.contains('hidden') && !popover.contains(e.target) && !btn?.contains(e.target)) {
+    popover.classList.add('hidden');
+  }
+});
+
+let homeSpeechRec = null;
+let isHomeVoiceRecording = false;
+
+function toggleHomeVoiceRecording() {
+  const btn = document.getElementById('btn-home-voice');
+  const label = document.getElementById('home-voice-label');
+  const textarea = document.getElementById('home-quick-write-textarea');
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    showToast('Speech recognition not supported in this browser.');
+    return;
+  }
+
+  if (isHomeVoiceRecording) {
+    if (homeSpeechRec) homeSpeechRec.stop();
+    isHomeVoiceRecording = false;
+    if (btn) btn.classList.remove('bg-rose-500/20', 'border-rose-500', 'text-rose-500');
+    if (label) label.textContent = 'Voice';
+    showToast('Voice recording stopped.');
+  } else {
+    homeSpeechRec = new SpeechRecognition();
+    homeSpeechRec.continuous = true;
+    homeSpeechRec.interimResults = true;
+
+    homeSpeechRec.onresult = (event) => {
+      let transcript = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        transcript += event.results[i][0].transcript;
+      }
+      if (textarea && transcript) {
+        textarea.value = (textarea.value ? textarea.value + ' ' : '') + transcript;
+      }
+    };
+
+    homeSpeechRec.onerror = () => {
+      isHomeVoiceRecording = false;
+      if (btn) btn.classList.remove('bg-rose-500/20', 'border-rose-500', 'text-rose-500');
+      if (label) label.textContent = 'Voice';
+    };
+
+    homeSpeechRec.start();
+    isHomeVoiceRecording = true;
+    if (btn) btn.classList.add('bg-rose-500/20', 'border-rose-500', 'text-rose-500');
+    if (label) label.textContent = 'Listening...';
+    showToast('Listening... Speak your reflection.');
+  }
+}
+window.toggleHomeVoiceRecording = toggleHomeVoiceRecording;
+
+async function saveHomeQuickReflection() {
+  const textarea = document.getElementById('home-quick-write-textarea');
+  const text = textarea?.value?.trim() || '';
+  if (!text) {
+    showToast('Please write a quick thought first.');
+    return;
+  }
+
+  const title = text.length > 40 ? text.slice(0, 40) + '...' : text;
+  const entry = {
+    id: `journal_${Date.now()}`,
+    title,
+    content: text,
+    mood: currentHomeSelectedMood.name.toLowerCase(),
+    tags: [currentHomeSelectedMood.name, 'QuickReflection'],
+    createdAt: new Date().toISOString(),
+    created_at: new Date().toISOString(),
+    is_encrypted: false
+  };
+
+  try {
+    if (!state.journals) state.journals = [];
+    state.journals.unshift(entry);
+    localStorage.setItem('mind_cave_journals_' + (state.currentUser?.uid || 'guest'), JSON.stringify(state.journals));
+
+    // Also trigger Cloud Firestore background sync if authenticated
+    fetch('/api/journals', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${state.currentUser?.token || 'demo_user'}`
+      },
+      body: JSON.stringify(entry)
+    }).catch(e => console.debug('Firestore sync notice:', e));
+
+    textarea.value = '';
+    showToast('Reflection saved to Living Timeline.');
+    checkGuestSoftAuthTrigger('reflection');
+    renderHomeRecentEntries();
+    updateAllDashboardStats();
+  } catch (err) {
+    showToast('Reflection saved locally.');
+  }
+}
+window.saveHomeQuickReflection = saveHomeQuickReflection;
+
+function renderHomeRecentEntries() {
+  const container = document.getElementById('home-recent-reflections-list');
+  if (!container) return;
+
+  const journals = state.journals || [];
+  if (journals.length === 0) {
+    // Show sample elegant rows
+    container.innerHTML = `
+      <div class="p-3 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] flex items-center justify-between gap-3 hover:border-emerald-500/40 transition-all cursor-pointer" onclick="switchTab('journals')">
+        <div class="min-w-0">
+          <div class="text-[10px] text-[var(--mc-text-muted)] font-mono">Today • 11:15 AM</div>
+          <div class="font-bold text-[var(--mc-text-primary)] truncate mt-0.5">Thinking about today</div>
+        </div>
+        <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shrink-0">Calm</span>
+      </div>
+      <div class="p-3 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] flex items-center justify-between gap-3 hover:border-amber-500/40 transition-all cursor-pointer" onclick="switchTab('journals')">
+        <div class="min-w-0">
+          <div class="text-[10px] text-[var(--mc-text-muted)] font-mono">Yesterday • 8:20 PM</div>
+          <div class="font-bold text-[var(--mc-text-primary)] truncate mt-0.5">A busy day</div>
+        </div>
+        <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 shrink-0">Grateful</span>
+      </div>
+      <div class="p-3 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] flex items-center justify-between gap-3 hover:border-cyan-500/40 transition-all cursor-pointer" onclick="switchTab('journals')">
+        <div class="min-w-0">
+          <div class="text-[10px] text-[var(--mc-text-muted)] font-mono">Aug 29 • 9:15 AM</div>
+          <div class="font-bold text-[var(--mc-text-primary)] truncate mt-0.5">Morning thoughts</div>
+        </div>
+        <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20 shrink-0">Inspired</span>
+      </div>
+    `;
+    return;
+  }
+
+  let html = '';
+  const recent = journals.slice(0, 4);
+  recent.forEach(j => {
+    const d = new Date(j.createdAt || j.created_at || Date.now());
+    const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const timeStr = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    const mood = (j.mood || 'Calm').charAt(0).toUpperCase() + (j.mood || 'Calm').slice(1);
+    
+    let moodBadge = 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20';
+    if (['grateful', 'joy', 'happy'].includes(mood.toLowerCase())) moodBadge = 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20';
+    else if (['inspired', 'excited', 'focused'].includes(mood.toLowerCase())) moodBadge = 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20';
+    else if (['challenged', 'stressed', 'heavy'].includes(mood.toLowerCase())) moodBadge = 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20';
+
+    html += `
+      <div class="p-3 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] flex items-center justify-between gap-3 hover:border-emerald-500/40 transition-all cursor-pointer" onclick="switchTab('journals')">
+        <div class="min-w-0">
+          <div class="text-[10px] text-[var(--mc-text-muted)] font-mono">${dateStr} • ${timeStr}</div>
+          <div class="font-bold text-[var(--mc-text-primary)] truncate mt-0.5">${escapeHtml(j.title || 'Journal Reflection')}</div>
+        </div>
+        <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${moodBadge} border shrink-0">${escapeHtml(mood)}</span>
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+}
+window.renderHomeRecentEntries = renderHomeRecentEntries;
+
+function renderHomeHabitsMini() {
+  const container = document.getElementById('home-habits-mini-container');
+  if (!container) return;
+
+  const habits = state.habitsList || [];
+  if (habits.length === 0) {
+    container.innerHTML = `
+      <div class="text-center py-6 px-4 rounded-2xl border border-dashed border-[var(--mc-border-subtle)] bg-[var(--mc-bg-tertiary)]/50 space-y-2">
+        <p class="text-xs text-[var(--mc-text-secondary)] leading-relaxed">
+          You don't have any habits yet.<br>Create a habit to build your rhythm.
+        </p>
+        <button type="button" onclick="openNewHabitModal()" class="px-3.5 py-1.5 rounded-xl bg-[var(--mc-bg-tertiary)] hover:bg-[var(--mc-border-subtle)] text-[var(--mc-text-primary)] text-xs font-bold border border-[var(--mc-border-subtle)] transition-colors cursor-pointer inline-flex items-center gap-1.5">
+          <i data-lucide="plus" class="w-3.5 h-3.5 text-emerald-500"></i>
+          <span>+ Add a habit</span>
+        </button>
+      </div>
+    `;
+    return;
+  }
+
+  let html = '<div class="space-y-2">';
+  habits.slice(0, 3).forEach(h => {
+    const isDone = Boolean(h.completedToday || (h.history && h.history[(new Date().getDay() + 6) % 7]));
+    html += `
+      <div class="p-3 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] flex items-center justify-between gap-3 hover:border-[var(--mc-border-strong)] transition-all">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <button type="button" onclick="toggleHabitComplete('${h.id}'); renderHomeHabitsMini();" class="w-6 h-6 rounded-lg ${isDone ? 'bg-emerald-600 text-white' : 'bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-default)] text-transparent'} flex items-center justify-center transition-all cursor-pointer">
+            <i data-lucide="check" class="w-3.5 h-3.5"></i>
+          </button>
+          <div class="min-w-0">
+            <div class="text-xs font-bold text-[var(--mc-text-primary)] truncate ${isDone ? 'line-through opacity-70' : ''}">${escapeHtml(h.name)}</div>
+            <div class="text-[10px] text-amber-500 font-mono flex items-center gap-1 mt-0.5">
+              <span>🔥 ${h.streak || 0}d streak</span>
+            </div>
+          </div>
+        </div>
+        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--mc-bg-secondary)] text-[var(--mc-text-muted)] border border-[var(--mc-border-subtle)]">${h.category || 'Ritual'}</span>
+      </div>
+    `;
+  });
+  html += '</div>';
+  container.innerHTML = html;
+  if (window.lucide) refreshIcons();
+}
+window.renderHomeHabitsMini = renderHomeHabitsMini;
+
+function filterDiaryByTag(tagName) {
+  switchTab('journals');
+  const input = document.getElementById('chrono-search-input');
+  if (input) {
+    input.value = `#${tagName}`;
+    if (typeof renderChronoTimeline === 'function') renderChronoTimeline();
+  }
+}
+window.filterDiaryByTag = filterDiaryByTag;
+
+
 function handleGenderChange(val) {
   if (state.currentUser) state.currentUser.gender = val;
   localStorage.setItem('mind_cave_user_gender', val);
@@ -2688,6 +2964,11 @@ function switchTab(tabId) {
     }
   });
 
+  if (tabId === 'overview') {
+    updateHomeGreetingAndDate();
+    renderHomeRecentEntries();
+    renderHomeHabitsMini();
+  }
   if (tabId === 'journals') {
     loadJournals();
     renderChronoTimeline();
@@ -15037,5 +15318,17 @@ window.deleteCaptureItem = deleteCaptureItem;
 window.setNotesFilter = setNotesFilter;
 window.filterNotesAndAlerts = filterNotesAndAlerts;
 window.setDiaryMediaMode = setDiaryMediaMode;
+
+// Auto-initialize Home Bento on load
+window.addEventListener('DOMContentLoaded', () => {
+  updateHomeGreetingAndDate();
+  renderHomeRecentEntries();
+  renderHomeHabitsMini();
+});
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  updateHomeGreetingAndDate();
+  renderHomeRecentEntries();
+  renderHomeHabitsMini();
+}
 window.setChronoViewMode = setChronoViewMode;
 window.setTimelineViewMode = setTimelineViewMode;
