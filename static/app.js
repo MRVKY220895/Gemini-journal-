@@ -2511,23 +2511,35 @@ function updateUserUI() {
 
 
   // Admin RBAC logic
-
   const adminElements = document.querySelectorAll('.admin-only');
-
   adminElements.forEach(el => {
-
-    if (isAdmin) {
-
-      el.classList.remove('hidden');
-
-    } else {
-
-      el.classList.add('hidden');
-
-    }
-
+    if (isAdmin) el.classList.remove('hidden');
+    else el.classList.add('hidden');
   });
 
+  // ─── HEADER PILL SYNC (fixes "Guest" stuck after Google Sign-In) ───
+  const headerName  = document.getElementById('header-user-name');
+  const headerAvatar = document.getElementById('header-user-avatar');
+  const headerBtn   = document.getElementById('btn-header-auth');
+
+  if (state.currentUser && state.currentUser.uid && !state.currentUser.uid.startsWith('guest')) {
+    // Authenticated — show real name & initial
+    const fullName = state.currentUser.name || state.currentUser.email || 'User';
+    const shortName = fullName.includes(' ')
+      ? fullName.split(' ').map(p => p[0]).join('').toUpperCase().slice(0, 2)
+      : fullName.slice(0, 2).toUpperCase();
+    const displayLabel = fullName.length > 16 ? fullName.split(' ')[0] : fullName;
+
+    if (headerName)   headerName.textContent   = displayLabel;
+    if (headerAvatar) headerAvatar.textContent  = shortName;
+    if (headerAvatar) headerAvatar.className    = 'w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-[10px] font-bold';
+    if (headerBtn)    headerBtn.title            = `Signed in as ${fullName}`;
+  } else {
+    // Guest / unauthenticated
+    if (headerName)   headerName.textContent   = 'Guest';
+    if (headerAvatar) headerAvatar.textContent  = 'G';
+    if (headerAvatar) headerAvatar.className    = 'w-5 h-5 rounded-full bg-slate-500/20 text-slate-400 flex items-center justify-center text-[10px] font-bold';
+  }
 }
 
 
