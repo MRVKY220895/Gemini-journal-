@@ -335,33 +335,70 @@ function renderHomeHabitsMini() {
 
   const todayDayIdx = (new Date().getDay() + 6) % 7; // Monday = 0
 
-  let html = '<div class="space-y-2">';
+  let doneCount = 0;
+  let html = '<div class="space-y-2.5">';
+
   habits.slice(0, 4).forEach(h => {
-    const isCounter = h.type === 'counter' || Boolean(h.targetCount);
+    const isCounter = h.type === 'counter' || Boolean(h.targetCount && Number(h.targetCount) > 1);
     const targetCount = Number(h.targetCount) || 1;
     const currentCount = Number(h.currentCount) || 0;
     const isDone = isCounter ? (currentCount >= targetCount) : Boolean(h.history && h.history[todayDayIdx]);
+    if (isDone) doneCount++;
     const habitTitle = h.title || h.name || 'Daily Ritual';
+    const iterPct = isCounter ? Math.min(100, Math.round((currentCount / targetCount) * 100)) : (isDone ? 100 : 0);
 
     html += `
-      <div class="p-2.5 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] flex items-center justify-between gap-3 hover:border-[var(--mc-border-strong)] transition-all">
-        <div class="flex items-center gap-2.5 min-w-0">
-          <button type="button" onclick="toggleHabitComplete('${h.id}')" class="w-6 h-6 rounded-lg ${isDone ? 'bg-emerald-600 text-white' : 'bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-default)] text-transparent'} flex items-center justify-center transition-all cursor-pointer shrink-0">
-            <i data-lucide="check" class="w-3.5 h-3.5 ${isDone ? 'text-white' : ''}"></i>
-          </button>
-          <div class="min-w-0">
-            <div class="text-xs font-bold text-[var(--mc-text-primary)] truncate ${isDone ? 'line-through opacity-70' : ''}">${escapeHtml(habitTitle)}</div>
-            <div class="text-[10px] text-amber-500 font-mono flex items-center gap-1 mt-0.5">
-              <span>🔥 ${h.streak || 0}d streak</span>
-              ${isCounter ? `<span class="text-[var(--mc-text-muted)]">(${currentCount}/${targetCount})</span>` : ''}
+      <div class="p-3 rounded-2xl bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] flex flex-col gap-2 hover:border-[var(--mc-border-strong)] transition-all">
+        <div class="flex items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <button type="button" onclick="toggleHabitComplete('${h.id}')" class="w-6 h-6 rounded-lg ${isDone ? 'bg-emerald-600 text-white shadow-sm' : 'bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-default)] text-transparent'} flex items-center justify-center transition-all cursor-pointer shrink-0">
+              <i data-lucide="check" class="w-3.5 h-3.5 ${isDone ? 'text-white' : ''}"></i>
+            </button>
+            <div class="min-w-0">
+              <div class="text-xs font-bold text-[var(--mc-text-primary)] truncate ${isDone ? 'line-through opacity-70' : ''}">${escapeHtml(habitTitle)}</div>
+              <div class="text-[10px] text-amber-500 font-mono flex items-center gap-1.5 mt-0.5">
+                <span>🔥 ${h.streak || 0}d streak</span>
+                ${isCounter ? `<span class="text-[var(--mc-text-muted)] font-sans">• ${currentCount}/${targetCount} ${escapeHtml(h.unit || 'units')}</span>` : ''}
+              </div>
             </div>
           </div>
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--mc-bg-secondary)] text-[var(--mc-text-muted)] border border-[var(--mc-border-subtle)] shrink-0">${escapeHtml(h.category || 'Ritual')}</span>
         </div>
-        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--mc-bg-secondary)] text-[var(--mc-text-muted)] border border-[var(--mc-border-subtle)] shrink-0">${escapeHtml(h.category || 'Ritual')}</span>
+
+        ${isCounter ? `
+          <!-- Iterative Task Progress Bar & Live Counter Controls -->
+          <div class="pt-1.5 border-t border-[var(--mc-border-subtle)] space-y-1.5">
+            <div class="flex items-center justify-between text-[10px] font-mono">
+              <span class="text-[var(--mc-text-secondary)]">Iterative Progress</span>
+              <span class="font-bold ${isDone ? 'text-emerald-500' : 'text-[var(--mc-text-primary)]'}">${iterPct}% (${currentCount}/${targetCount})</span>
+            </div>
+            <div class="w-full bg-[var(--mc-bg-secondary)] h-1.5 rounded-full overflow-hidden border border-[var(--mc-border-subtle)]">
+              <div class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-300" style="width: ${iterPct}%"></div>
+            </div>
+            <div class="flex items-center justify-end gap-1.5 pt-0.5">
+              <button type="button" onclick="event.stopPropagation(); incrementHabitCount('${h.id}', -1); renderHomeHabitsMini();" class="px-2 py-0.5 rounded-lg bg-[var(--mc-bg-secondary)] hover:bg-[var(--mc-border-subtle)] text-[10px] font-bold border border-[var(--mc-border-subtle)] text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] cursor-pointer transition-colors" title="Decrement">-1</button>
+              <button type="button" onclick="event.stopPropagation(); incrementHabitCount('${h.id}', 1); renderHomeHabitsMini();" class="px-2.5 py-0.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 text-[10px] font-bold border border-emerald-500/20 cursor-pointer transition-colors" title="Increment">+1 ${escapeHtml(h.unit || 'unit')}</button>
+            </div>
+          </div>
+        ` : ''}
       </div>
     `;
   });
-  html += '</div>';
+
+  const totalPct = Math.round((doneCount / habits.length) * 100);
+  html += `
+    <!-- Overall Today's Habit Focus Completion Bar -->
+    <div class="pt-2.5 mt-1 border-t border-[var(--mc-border-subtle)] space-y-1.5">
+      <div class="flex items-center justify-between text-[11px] font-mono">
+        <span class="text-[var(--mc-text-secondary)]">Daily Focus Progress</span>
+        <span class="font-bold text-emerald-500">${doneCount}/${habits.length} Done (${totalPct}%)</span>
+      </div>
+      <div class="w-full bg-[var(--mc-bg-tertiary)] h-2 rounded-full overflow-hidden border border-[var(--mc-border-subtle)]">
+        <div class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-500 shadow-sm" style="width: ${totalPct}%"></div>
+      </div>
+    </div>
+  </div>`;
+
   container.innerHTML = html;
   if (window.lucide) refreshIcons();
 }
