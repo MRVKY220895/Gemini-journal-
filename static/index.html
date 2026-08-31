@@ -1233,7 +1233,11 @@
                 <p class="text-[10px] text-[var(--mc-text-secondary)]">All saved reflections synchronized with zero-knowledge client encryption</p>
               </div>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 flex-wrap">
+              <button type="button" onclick="toggleBulkSelectJournalMode()" id="btn-bulk-select-toggle" class="btn-secondary !py-1 !px-2.5 text-xs font-semibold flex items-center gap-1 cursor-pointer border border-[var(--mc-border-subtle)] hover:border-amber-500/40 transition-all" title="Toggle Bulk Selection Mode">
+                <i data-lucide="check-square" class="w-3.5 h-3.5"></i>
+                <span>Select Multiple</span>
+              </button>
               <button onclick="openNewJournalModal()" class="btn-primary !py-1 !px-2.5 text-xs font-semibold flex items-center gap-1 cursor-pointer">
                 <i data-lucide="plus" class="w-3.5 h-3.5"></i>
                 <span>+ New Log</span>
@@ -1241,7 +1245,23 @@
               <span class="text-[10px] font-mono text-[var(--mc-accent)] bg-[var(--mc-accent-10)] px-2 py-0.5 rounded-full border border-[var(--mc-accent-25)]">AES-256 Vault</span>
             </div>
           </div>
-          <div id="journals-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+
+          <!-- Bulk Selection Action Bar (Hidden by default) -->
+          <div id="bulk-actions-bar" class="hidden p-2.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between gap-3 text-xs">
+            <div class="flex items-center gap-2">
+              <span id="bulk-selected-count" class="font-mono font-bold text-amber-500">0 selected</span>
+              <span class="text-[var(--mc-text-muted)]">•</span>
+              <button type="button" onclick="selectAllJournals()" class="text-amber-500 hover:underline font-semibold cursor-pointer">Select All</button>
+              <span class="text-[var(--mc-text-muted)]">•</span>
+              <button type="button" onclick="deselectAllJournals()" class="text-[var(--mc-text-secondary)] hover:underline font-medium cursor-pointer">Clear</button>
+            </div>
+            <button type="button" onclick="deleteSelectedJournals()" id="btn-bulk-delete" class="px-3 py-1 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-sm transition-all opacity-50 cursor-not-allowed" disabled>
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              <span>Delete Selected</span>
+            </button>
+          </div>
+
+          <div id="journals-grid"  class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             <!-- Rendered via JS -->
           </div>
         </div>
@@ -4390,7 +4410,7 @@
   </div>
 
   <!-- Client Application Script -->
-  <script src="/static/app.js?v=1788199000"></script>
+  <script src="/static/app.js?v=1788200000"></script>
   <script>
     // Initialize Lucide Icons
     lucide.createIcons();
@@ -4800,6 +4820,6 @@
   </div>
 
   <!-- Core Application Script -->
-  <script src="/static/app.js?v=1788199000" defer></script>
+  <script src="/static/app.js?v=1788200000" defer></script>
 </body>
 </html>

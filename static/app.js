@@ -1,4 +1,125 @@
 
+// ─── REFLECTIONS VAULT BULK SELECT & DELETE ENGINE ───
+
+var isBulkSelectJournalMode = false;
+var selectedJournalIds = new Set();
+
+function toggleBulkSelectJournalMode() {
+  isBulkSelectJournalMode = !isBulkSelectJournalMode;
+  selectedJournalIds.clear();
+
+  const toggleBtn = document.getElementById('btn-bulk-select-toggle');
+  const bulkBar = document.getElementById('bulk-actions-bar');
+
+  if (toggleBtn) {
+    if (isBulkSelectJournalMode) {
+      toggleBtn.classList.add('bg-amber-500/20', 'text-amber-400', 'border-amber-500/40');
+      toggleBtn.innerHTML = '<i data-lucide="x" class="w-3.5 h-3.5"></i><span>Cancel Select</span>';
+    } else {
+      toggleBtn.classList.remove('bg-amber-500/20', 'text-amber-400', 'border-amber-500/40');
+      toggleBtn.innerHTML = '<i data-lucide="check-square" class="w-3.5 h-3.5"></i><span>Select Multiple</span>';
+    }
+  }
+
+  if (bulkBar) {
+    if (isBulkSelectJournalMode) bulkBar.classList.remove('hidden');
+    else bulkBar.classList.add('hidden');
+  }
+
+  updateBulkActionsUI();
+  renderJournalCards(state.journalsCache || getUnifiedJournalsList());
+  if (window.lucide) refreshIcons();
+}
+window.toggleBulkSelectJournalMode = toggleBulkSelectJournalMode;
+
+function toggleJournalSelection(jId, event) {
+  if (event) event.stopPropagation();
+  if (selectedJournalIds.has(jId)) {
+    selectedJournalIds.delete(jId);
+  } else {
+    selectedJournalIds.add(jId);
+  }
+  updateBulkActionsUI();
+  const card = document.getElementById(`journal-card-${jId}`);
+  if (card) {
+    const isSelected = selectedJournalIds.has(jId);
+    card.classList.toggle('ring-2', isSelected);
+    card.classList.toggle('ring-emerald-500', isSelected);
+    const cb = card.querySelector('.journal-select-checkbox');
+    if (cb) cb.checked = isSelected;
+  }
+}
+window.toggleJournalSelection = toggleJournalSelection;
+
+function selectAllJournals() {
+  const list = state.journalsCache || getUnifiedJournalsList();
+  list.forEach(j => {
+    if (j.id) selectedJournalIds.add(j.id);
+  });
+  updateBulkActionsUI();
+  renderJournalCards(list);
+}
+window.selectAllJournals = selectAllJournals;
+
+function deselectAllJournals() {
+  selectedJournalIds.clear();
+  updateBulkActionsUI();
+  renderJournalCards(state.journalsCache || getUnifiedJournalsList());
+}
+window.deselectAllJournals = deselectAllJournals;
+
+function updateBulkActionsUI() {
+  const countLbl = document.getElementById('bulk-selected-count');
+  const deleteBtn = document.getElementById('btn-bulk-delete');
+  const count = selectedJournalIds.size;
+
+  if (countLbl) countLbl.textContent = `${count} selected`;
+  if (deleteBtn) {
+    deleteBtn.disabled = count === 0;
+    if (count === 0) {
+      deleteBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    } else {
+      deleteBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+  }
+}
+window.updateBulkActionsUI = updateBulkActionsUI;
+
+async function deleteSelectedJournals() {
+  const count = selectedJournalIds.size;
+  if (count === 0) return;
+
+  if (!confirm(`Are you sure you want to delete ${count} selected reflection(s)? This cannot be undone.`)) {
+    return;
+  }
+
+  const idsToDelete = Array.from(selectedJournalIds);
+  let list = getUnifiedJournalsList();
+  list = list.filter(j => !selectedJournalIds.has(j.id));
+
+  state.journalsCache = list;
+  state.journals = list;
+
+  if (typeof profileStorage !== 'undefined') {
+    profileStorage.setItem('cached_journals', list);
+  }
+  localStorage.setItem('mind_cave_cached_journals', JSON.stringify(list));
+
+  idsToDelete.forEach(id => {
+    fetch(`/api/journal/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    }).catch(e => console.debug('Server bulk delete notice:', e));
+  });
+
+  selectedJournalIds.clear();
+  toggleBulkSelectJournalMode();
+  dispatchGlobalInstantRefresh('bulk_delete');
+  showToast(`Successfully deleted ${count} reflection(s).`);
+}
+window.deleteSelectedJournals = deleteSelectedJournals;
+
+
 // ─── SETTINGS & VAULT SUBTAB CONTROLLER ───
 
 function switchSettingsTab(subtabId, btnElement = null) {
@@ -450,12 +571,18 @@ function renderJournalCards(journals) {
     const moodName = (j.mood || 'Calm').charAt(0).toUpperCase() + (j.mood || 'Calm').slice(1);
     const titleClean = (j.title || 'Untitled Reflection').replace(/\[\d{1,2}:\d{2}\]\s*/, '');
     const jId = j.id || `journal_${idx}`;
+    const isSelected = selectedJournalIds.has(jId);
 
     return `
-      <div id="journal-card-${jId}" data-journal-id="${jId}" class="journal-card p-5 rounded-2xl bg-[var(--mc-bg-secondary)] border border-[var(--mc-border-subtle)] hover:border-emerald-500/40 transition-all flex flex-col justify-between space-y-3 shadow-sm group">
+      <div id="journal-card-${jId}" data-journal-id="${jId}" onclick="${isBulkSelectJournalMode ? `toggleJournalSelection('${jId}', event)` : ''}" class="journal-card p-5 rounded-2xl bg-[var(--mc-bg-secondary)] border ${isSelected ? 'ring-2 ring-emerald-500 border-emerald-500' : 'border-[var(--mc-border-subtle)]'} hover:border-emerald-500/40 transition-all flex flex-col justify-between space-y-3 shadow-sm group ${isBulkSelectJournalMode ? 'cursor-pointer' : ''}">
         <div class="space-y-2">
           <div class="flex items-center justify-between gap-2">
-            <span class="text-[10px] font-mono text-[var(--mc-text-muted)]">${dateFormatted} • ${timeFormatted}</span>
+            <div class="flex items-center gap-2">
+              ${isBulkSelectJournalMode ? `
+                <input type="checkbox" ${isSelected ? 'checked' : ''} onchange="toggleJournalSelection('${jId}', event)" class="journal-select-checkbox w-4 h-4 rounded text-emerald-500 focus:ring-emerald-500 cursor-pointer">
+              ` : ''}
+              <span class="text-[10px] font-mono text-[var(--mc-text-muted)]">${dateFormatted} • ${timeFormatted}</span>
+            </div>
             <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">${escapeHtml(moodName)}</span>
           </div>
           <h4 class="text-sm font-bold text-[var(--mc-text-primary)] group-hover:text-emerald-400 transition-colors line-clamp-1">${escapeHtml(titleClean)}</h4>
@@ -3010,6 +3137,8 @@ function handleTextareaKeydown(event) {
 
 
 async function sendChatMessage(event) {
+  const isGuest = !state.currentUser || !state.currentUser.uid || state.currentUser.uid === 'guest_user' || state.currentUser.uid === 'guest';
+  const guestPromptsUsed = parseInt(localStorage.getItem('mind_cave_guest_ai_prompts') || '0', 10);
   checkGuestSoftAuthTrigger('prompt');
 
   if (event) event.preventDefault();
@@ -3967,27 +4096,21 @@ function toggleLanguageDropdown(event) {
   }
   const menu = document.getElementById('language-dropdown-menu');
   if (!menu) return;
-  const isHidden = menu.classList.contains('hidden') || menu.style.display === 'none';
-  if (isHidden) {
-    menu.classList.remove('hidden');
-    menu.style.display = 'block';
-  } else {
-    menu.classList.add('hidden');
-    menu.style.display = 'none';
-  }
+  menu.classList.toggle('hidden');
 }
 
 function closeLanguageDropdown() {
   const menu = document.getElementById('language-dropdown-menu');
-  if (menu && !menu.classList.contains('hidden')) {
+  if (menu) {
     menu.classList.add('hidden');
+    menu.style.removeProperty('display');
   }
 }
 
-// Close language dropdown on outside click
+// Global click handler to auto-hide all open dropdowns
 document.addEventListener('click', (e) => {
-  const container = document.getElementById('language-picker-container');
-  if (container && !container.contains(e.target)) {
+  const langContainer = document.getElementById('language-picker-container');
+  if (langContainer && !langContainer.contains(e.target)) {
     closeLanguageDropdown();
   }
 });
@@ -9394,64 +9517,67 @@ function stopVoiceSummary() {
 
 
 
-function syncGooglePhotosForDate() {
-
+async function syncGooglePhotosForDate() {
   const d = state.selectedDiaryDate || new Date();
+  const dateFormatted = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  const yyyy = d.getFullYear();
+  const mm = d.getMonth() + 1;
+  const dd = d.getDate();
 
-  const dateFormatted = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-
-  
-
-  const samplePhotos = [
-
-    {
-
-      id: `gphoto_${Date.now()}_1`,
-
-      hour: '09:30',
-
-      url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=700&auto=format&fit=crop&q=80',
-
-      caption: `Morning Light Walk & Reflection (${dateFormatted})`,
-
-      location: 'Connaught Place, New Delhi',
-
-      mood: 'Serene',
-
-      energy: '9/10'
-
-    },
-
-    {
-
-      id: `gphoto_${Date.now()}_2`,
-
-      hour: '15:15',
-
-      url: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=700&auto=format&fit=crop&q=80',
-
-      caption: `Deep Work Workspace Flow (${dateFormatted})`,
-
-      location: 'Studio Workspace',
-
-      mood: 'Focused',
-
-      energy: '8/10'
-
+  const gphotoToken = localStorage.getItem('google_photos_access_token');
+  if (!gphotoToken) {
+    if (confirm(`Google Photos Sync for ${dateFormatted}:\n\nTo retrieve your real-time Google Photos for this date, please authorize your Google Photos account or upload a photo directly.\n\nWould you like to upload a moment photo for this day now?`)) {
+      const uploadInput = document.getElementById('journal-photo-input') || document.getElementById('memory-photo-upload-input');
+      if (uploadInput) uploadInput.click();
     }
+    return;
+  }
 
-  ];
+  showToast(`Querying Google Photos for ${dateFormatted}...`);
+  try {
+    const res = await fetch('https://photoslibrary.googleapis.com/v1/mediaItems:search', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${gphotoToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        filters: {
+          dateFilter: {
+            dates: [{ year: yyyy, month: mm, day: dd }]
+          }
+        },
+        pageSize: 10
+      })
+    });
 
-
-
-  samplePhotos.forEach(p => memoryPhotosList.unshift(p));
-
-  renderMemoryPhotos();
-
-  renderChronoTimeline();
-
-  showToast(`Google Photos: 2 memories pinned to timeline for ${dateFormatted}!`);
-
+    if (res.ok) {
+      const data = await res.json();
+      if (data.mediaItems && data.mediaItems.length > 0) {
+        data.mediaItems.forEach(item => {
+          memoryPhotosList.unshift({
+            id: `gphoto_${item.id}`,
+            hour: new Date(item.mediaMetadata?.creationTime || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            url: item.baseUrl,
+            caption: item.filename || `Photo from ${dateFormatted}`,
+            location: 'Google Photos Cloud',
+            mood: 'Visual Moment',
+            energy: 'Realtime'
+          });
+        });
+        renderMemoryPhotos();
+        renderChronoTimeline(false);
+        showToast(`Synced ${data.mediaItems.length} real photo(s) from Google Photos for ${dateFormatted}!`);
+      } else {
+        showToast(`Google Photos: 0 photos found in your library for ${dateFormatted}.`);
+      }
+    } else {
+      showToast('Google Photos session expired. Please re-authenticate.');
+    }
+  } catch (err) {
+    console.debug('Google Photos Sync Notice:', err);
+    showToast('Unable to connect to Google Photos API.');
+  }
 }
 
 
