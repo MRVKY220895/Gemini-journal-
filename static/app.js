@@ -899,12 +899,16 @@ function loadProfileScopedState() {
     const activeUid = (typeof profileStorage !== 'undefined') ? profileStorage.getUid() : (state.currentUser?.uid || 'guest');
     if (typeof profileStorage !== 'undefined') {
       state.habitsList = profileStorage.getItem('habits_list', []);
+      state.archivedHabits = profileStorage.getItem('archived_habits', []);
       state.todayGoals = profileStorage.getItem('today_goals', []);
+    } else {
+      state.archivedHabits = state.archivedHabits || [];
     }
     state.capturesList = getUnifiedCapturesList();
     state.notesList = state.capturesList;
     state.journals = getUnifiedJournalsList();
     state.journalsCache = state.journals;
+    if (typeof updateArchivedHabitsBadges === 'function') updateArchivedHabitsBadges();
   } catch (e) {
     console.debug('loadProfileScopedState notice:', e);
   }
@@ -11635,92 +11639,71 @@ function renderArchivedHabitsList() {
 
 
 function restoreArchivedHabit(habitId) {
-
   if (!state.archivedHabits) return;
-
   const habit = state.archivedHabits.find(h => h.id === habitId);
-
   if (!habit) return;
 
-
-
   const restored = JSON.parse(JSON.stringify(habit));
-
   delete restored.archivedAt;
 
-
-
+  if (!state.habitsList) state.habitsList = [];
   state.habitsList.unshift(restored);
-
-  profileStorage.setItem('habits_list', state.habitsList);
-
-
+  if (typeof profileStorage !== 'undefined') {
+    profileStorage.setItem('habits_list', state.habitsList);
+  }
 
   state.archivedHabits = state.archivedHabits.filter(h => h.id !== habitId);
-
-  profileStorage.setItem('archived_habits', state.archivedHabits);
-
-
+  if (typeof profileStorage !== 'undefined') {
+    profileStorage.setItem('archived_habits', state.archivedHabits);
+  }
 
   renderHabitTracker();
-
   renderTimelineShortcuts();
-
   renderShortcutsManagerList();
-
   renderArchivedHabitsList();
-
   updateArchivedHabitsBadges();
+  if (typeof renderHomeHabitsMini === 'function') renderHomeHabitsMini();
+  if (typeof renderHomeDashboardInsights === 'function') renderHomeDashboardInsights();
+  if (typeof setMasterDashboardHorizon === 'function') {
+    setMasterDashboardHorizon(currentDashboardHorizon || 'weekly');
+  }
 
-
-
-  showToast(`Restored "${restored.title}" with all historic tracks intact!`);
-
+  showToast(`Restored "${restored.title}" with all historic tracks and streaks intact!`);
 }
-
-
 
 function purgeArchivedHabit(habitId) {
-
   if (!state.archivedHabits) return;
-
   state.archivedHabits = state.archivedHabits.filter(h => h.id !== habitId);
-
-  profileStorage.setItem('archived_habits', state.archivedHabits);
-
-
+  if (typeof profileStorage !== 'undefined') {
+    profileStorage.setItem('archived_habits', state.archivedHabits);
+  }
 
   renderArchivedHabitsList();
-
   updateArchivedHabitsBadges();
-
-  showToast('Habit permanently deleted from archive.');
-
+  showToast('Habit permanently deleted from Archive Vault.');
 }
-
-
 
 function clearAllArchivedHabits() {
-
   if (!state.archivedHabits || state.archivedHabits.length === 0) return;
-
-  if (!confirm('Are you sure you want to permanently clear all archived habits?')) return;
-
-
+  if (!confirm('Are you sure you want to permanently delete all archived habits? This cannot be undone.')) return;
 
   state.archivedHabits = [];
-
-  profileStorage.setItem('archived_habits', state.archivedHabits);
-
-
+  if (typeof profileStorage !== 'undefined') {
+    profileStorage.setItem('archived_habits', state.archivedHabits);
+  }
 
   renderArchivedHabitsList();
-
   updateArchivedHabitsBadges();
-
-  showToast('All archived habits permanently cleared.');
-
+  showToast('All archived habits permanently removed.');
 }
+
+window.openArchivedHabitsModal = openArchivedHabitsModal;
+window.closeArchivedHabitsModal = closeArchivedHabitsModal;
+window.renderArchivedHabitsList = renderArchivedHabitsList;
+window.restoreArchivedHabit = restoreArchivedHabit;
+window.purgeArchivedHabit = purgeArchivedHabit;
+window.clearAllArchivedHabits = clearAllArchivedHabits;
+window.updateArchivedHabitsBadges = updateArchivedHabitsBadges;
 
 
 
