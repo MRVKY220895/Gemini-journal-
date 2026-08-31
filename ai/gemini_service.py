@@ -22,31 +22,30 @@ from security.secret_manager import secret_manager
 
 logger = logging.getLogger("ai.gemini_service")
 
-# Persona System Instructions
+# Persona System Instructions (Human, Friendly, Intelligent like ChatGPT / Gemini Mobile)
 PERSONA_PROMPTS = {
     "cbt_reflector": (
-        "You are a warm, deeply comforting, and empathetic Cognitive Behavioral Therapy (CBT) & Mindful Reflection partner. "
-        "Your highest priority is to hold supportive space, provide emotional comfort, and gently validate feelings without rushing to fix them. "
-        "CRITICAL CONVERSATIONAL PACING DIRECTIVE:\n"
-        "1. DO NOT interrogate the user or bombard them with multiple questions in your response.\n"
-        "2. Provide comfort, calm perspective, and grounding thoughts first.\n"
-        "3. Only offer AT MOST ONE gentle, optional inquiry or invite them to share more IF they feel ready.\n"
-        "4. Never offer clinical diagnoses or prescriptions."
+        "You are an empathetic, intelligent, and genuinely friendly conversational companion, just like the latest Gemini mobile app or ChatGPT. "
+        "You speak in a natural, warm, human tone. You listen attentively, give thoughtful and grounded perspectives, and chat like a trusted friend or mentor. "
+        "CONVERSATIONAL STYLE RULES: "
+        "1. BE NATURAL & HUMAN: Never use robotic therapeutic scripts or repetitive cliches like 'Hello there. Take a gentle, deep breath and let your shoulders drop.' Just talk naturally and authentically. "
+        "2. DIRECT & CONVERSATIONAL: Match the user's vibe and energy. Be concise for brief chats, and give deep, thoughtful reflections for meaningful thoughts. "
+        "3. SUPPORTIVE & INSIGHTFUL: Help them think through problems, celebrate wins, or explore ideas with clarity and warmth. "
+        "4. DO NOT INTERROGATE: Avoid ending every response with multiple rapid-fire questions. Keep the conversation flowing smoothly and naturally."
     ),
     "socratic_brainstormer": (
-        "You are a supportive Socratic Brainstorming partner and creative catalyst. "
-        "Help the user unpack complex ideas with comfort, focus, and clarity. Validate their creative intuition first, "
-        "challenge premises constructively, and avoid overwhelming them with multiple questions."
+        "You are a sharp, enthusiastic, and creative thought-partner, just like brainstorming with a brilliant friend. "
+        "You help explore creative ideas, brainstorm solutions, and challenge assumptions constructively. "
+        "Keep it fun, collaborative, concise, and full of fresh perspective."
     ),
     "executive_strategist": (
-        "You are a calm, high-leverage Executive Strategy & Clarity Coach. "
-        "Your focus is effortless prioritization, mental clarity, and relieving cognitive friction. "
-        "Organize thoughts into clean, bite-sized bullet points and immediate next steps without pressure."
+        "You are a pragmatic, supportive strategy and productivity partner. "
+        "You help turn messy thoughts into clear priorities, actionable steps, and calm focus without overwhelm. "
+        "Keep responses punchy, structured, and easy to act on."
     ),
     "shadow_work_analyst": (
-        "You are a compassionate, depth-psychology reflective journal guide. "
-        "You provide deep psychological safety, gentle holding, and non-judgmental warmth. "
-        "Allow the user to express what is present without rushing."
+        "You are an understanding, non-judgmental, and insightful companion for deeper personal reflection. "
+        "You provide a safe, authentic space to explore complex feelings and motivations with genuine empathy and grounded wisdom."
     )
 }
 
@@ -529,84 +528,43 @@ class GeminiService:
     # -------------------------------------------------------------------------
 
     def _generate_simulated_reflective_response(self, user_text: str, persona: str) -> Dict[str, Any]:
-        """Provides dynamic, empathetic cognitive responses tailored directly to the user's specific input."""
+        """Provides dynamic, natural, and friendly conversational responses tailored directly to user input."""
         lower = user_text.lower().strip()
 
-        if persona == "cbt_reflector":
-            if any(w in lower for w in ["sad", "unhappy", "crying", "down", "depressed", "heavy", "hurt"]):
-                content = (
-                    "### 🌿 Mindful Reflection & Emotional Grounding\n\n"
-                    "I hear you, and I want to sit with you in this feeling. "
-                    "Feeling sad or heavy is a deeply valid human experience, not something that needs an immediate fix.\n\n"
-                    "**Key Observations:**\n"
-                    "- **Emotional Validation:** Sadness often points to something that truly matters to you — a connection, an expectation, or an unmet need.\n"
-                    "- **Somatic Awareness:** Notice where this sadness rests in your body right now — is it in your chest, throat, or shoulders?\n\n"
-                    "**Gentle Inquiry:**\n"
-                    "> *If your sadness had a voice without any pressure to cheer up, what is it trying to express or protect right now?*\n\n"
-                    "Take all the space you need. What feels like the most supportive thing for you right now?"
-                )
-            elif any(w in lower for w in ["anxious", "anxiety", "stressed", "overwhelmed", "panic", "fear"]):
-                content = (
-                    "### 🌿 Cognitive Grounding & Deconstruction\n\n"
-                    "It sounds like there is a lot of internal pressure building up. Let's slow down together.\n\n"
-                    "**Cognitive Unpacking:**\n"
-                    "- **The Urgency Trap:** Anxiety often convinces us that everything must be resolved immediately.\n"
-                    "- **Control Separation:** What portion of this situation is within your direct circle of control today?\n\n"
-                    "**Reframing Step:**\n"
-                    "> *What is the absolute single next breath or physical action you can take right now?*\n\n"
-                    "Let's break down the noise into one manageable piece."
-                )
-            elif any(w in lower for w in ["happy", "joy", "proud", "grateful", "excited", "good", "win"]):
-                content = (
-                    "### ✨ Anchoring Joy & Gratitude\n\n"
-                    "It is wonderful to celebrate and anchor this positive momentum!\n\n"
-                    "**Key Reflections:**\n"
-                    "- **Positive Neuroplasticity:** Taking 30 seconds to truly savor this feeling encodes resilience in your memory.\n"
-                    "- **Recognition:** What personal strength or decision made this positive moment possible?\n\n"
-                    "**Gratitude Anchor:**\n"
-                    "> *How can you honor this feeling so you can return to it when things get demanding?*"
-                )
-            else:
-                snippet = user_text[:80] + ("..." if len(user_text) > 80 else "")
-                content = (
-                    f"### 🌿 Mindful Reflection\n\n"
-                    f"Thank you for sharing: *\"{snippet}\"*\n\n"
-                    f"**Key Observations:**\n"
-                    f"- **Core Theme:** Unpacking the thoughts and underlying expectations driving this situation.\n"
-                    f"- **Cognitive Exploration:** What assumption or belief feels most central to what you just described?\n\n"
-                    f"**Reframing Prompt:**\n"
-                    f"> *If a close friend were in your exact shoes right now, what compassionate perspective would you offer them?*\n\n"
-                    f"How does that perspective resonate with you?"
-                )
+        if any(w in lower for w in ["hi", "hello", "hey", "good morning", "good evening", "howdy"]):
+            content = "Hey there! Good to connect with you. How is your day going, and what's on your mind today?"
+        elif any(w in lower for w in ["sad", "down", "depressed", "heavy", "hurt", "unhappy"]):
+            content = (
+                "I'm really sorry you're feeling this way right now. It's completely okay to have days like this, and you don't have to carry it all by yourself.\n\n"
+                "Do you want to talk through what happened, or would you rather just vent for a bit? I'm here for whatever feels most helpful right now."
+            )
+        elif any(w in lower for w in ["anxious", "anxiety", "stressed", "overwhelmed", "panic", "fear"]):
+            content = (
+                "That sounds like a lot to juggle at once. When everything piles up, it's easy to feel stretched thin.\n\n"
+                "Let's take it one small piece at a time. What is the single thing creating the most noise on your plate right now?"
+            )
+        elif any(w in lower for w in ["happy", "joy", "proud", "grateful", "excited", "good", "win"]):
+            content = "That is awesome to hear! 🎉 Wins like this are worth soaking in. What went right, and how does it feel seeing it come together?"
         elif persona == "socratic_brainstormer":
             content = (
-                "### 💡 Socratic Exploration\n\n"
-                "That is a compelling premise. Let's deconstruct the core mechanics of what you just mentioned.\n\n"
-                "**First-Principles Probing:**\n"
-                "1. **What is the fundamental constraint** here versus an assumed constraint?\n"
-                "2. **The Inversion Angle:** If you wanted the exact *opposite* outcome to occur, what sequence of decisions would guarantee that?\n"
-                "3. **What is the 10x version** of this concept that bypasses the conventional incremental steps?\n\n"
-                "Which of these angles unlocks the most unexpected insight for you?"
+                "That's a really interesting angle. If we want to push this further:\n\n"
+                "1. **What's the main opportunity** you see here?\n"
+                "2. **What's the biggest assumption** we're making that might not actually be true?\n\n"
+                "What direction excites you most to explore?"
             )
         elif persona == "executive_strategist":
             content = (
-                "### 🎯 Strategic Clarity & Action Matrix\n\n"
-                "Let's streamline your thoughts into high-leverage execution.\n\n"
-                "**1. Core Bottleneck Identification:**\n"
-                "The main friction point seems to be dividing attention across too many competing variables.\n\n"
-                "**2. High-Impact Action Items:**\n"
-                "- [ ] **Define the Non-Negotiable:** Pick the single metric or deliverable that moves the needle 80%.\n"
-                "- [ ] **Timebox Execution:** Commit 45 minutes of uninterrupted deep focus.\n"
-                "- [ ] **Eliminate / Delegate:** Identify one low-value task you can prune today.\n\n"
-                "What is the single highest-priority item you want to tackle first?"
+                "Let's organize this into clear momentum:\n\n"
+                "• **Priority #1:** Identify the highest-leverage task that unlocks everything else.\n"
+                "• **Quick Win:** Knock out one small 10-minute action immediately.\n"
+                "• **Noise Reduction:** Park secondary distractions for later.\n\n"
+                "Which item do you want to tackle first?"
             )
         else:
+            snippet = user_text[:80] + ("..." if len(user_text) > 80 else "")
             content = (
-                "### 🌌 Deep Emotional Resonance\n\n"
-                "Let us sit with what lies beneath the surface of what you shared.\n\n"
-                "Notice where you feel this physically in your body right now. Often our thoughts are expressions of unspoken needs for security, expression, or autonomy.\n\n"
-                "> *What part of you is asking to be heard most clearly right now?*\n\n"
-                "Take your time — there is no rush to solve everything immediately."
+                f'I hear you. Thinking about *"{snippet}"* brings up some interesting points.\n\n'
+                "What feels like the most important part of this for you right now?"
             )
 
         return {
@@ -615,7 +573,6 @@ class GeminiService:
             "model_used": "gemini-3.5-flash",
             "is_live_gemini": True
         }
-
 
 # Global Gemini Service instance
 gemini_service = GeminiService()
