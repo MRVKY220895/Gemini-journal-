@@ -2221,14 +2221,32 @@ function switchTab(tabId) {
   }
 
   const views = ['overview', 'journals', 'notes', 'studio', 'analytics', 'security'];
+  const titles = {
+    overview: 'Home Sanctuary',
+    journals: 'Journal & Life Tracks',
+    notes: 'Notes & Capture',
+    studio: 'AI Reflective Studio',
+    analytics: 'MindPulse Insights',
+    security: 'Private Vault & Security'
+  };
+
+  const topbarTitle = document.getElementById('topbar-current-view');
+  if (topbarTitle && titles[tabId]) {
+    topbarTitle.textContent = titles[tabId];
+  }
+
   views.forEach(v => {
     const viewEl = document.getElementById(`view-${v}`);
     const btnEl = document.getElementById(`tab-btn-${v}`);
+    const sidebarBtnEl = document.getElementById(`sidebar-tab-${v}`);
     const mobileBtnEl = document.getElementById(`mobile-tab-${v}`);
 
     if (v === tabId) {
       if (viewEl) viewEl.classList.remove('hidden');
       if (btnEl) btnEl.classList.add('active');
+      if (sidebarBtnEl) {
+        sidebarBtnEl.className = 'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-[var(--mc-text-primary)] bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] transition-all cursor-pointer';
+      }
       if (mobileBtnEl) {
         mobileBtnEl.classList.add('active', 'text-[#9BB7A5]');
         mobileBtnEl.classList.remove('text-[#6F7881]', 'text-slate-400');
@@ -2236,6 +2254,9 @@ function switchTab(tabId) {
     } else {
       if (viewEl) viewEl.classList.add('hidden');
       if (btnEl) btnEl.classList.remove('active');
+      if (sidebarBtnEl) {
+        sidebarBtnEl.className = 'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] hover:bg-[var(--mc-bg-tertiary)] transition-all cursor-pointer';
+      }
       if (mobileBtnEl) {
         mobileBtnEl.classList.remove('active', 'text-[#9BB7A5]', 'text-cyan-400');
         mobileBtnEl.classList.add('text-[#6F7881]');
@@ -2254,6 +2275,8 @@ function switchTab(tabId) {
 
   if (window.lucide) refreshIcons();
 }
+window.switchTab = switchTab;
+
 
 function insertPromptAndOpenStudio(promptText) {
   switchTab('studio');

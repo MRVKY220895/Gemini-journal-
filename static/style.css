@@ -3334,3 +3334,51 @@ html.light #language-dropdown-menu {
     padding: 1rem !important;
   }
 }
+
+
+/* ==========================================================================
+   DESKTOP FIXED SIDEBAR & TOP UTILITY BAR BENTO STYLES
+   ========================================================================== */
+
+#desktop-fixed-sidebar {
+  transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 1px 0 0 0 var(--mc-border-subtle);
+}
+
+#desktop-sidebar-nav button.active {
+  background-color: var(--mc-bg-tertiary) !important;
+  color: var(--mc-text-primary) !important;
+  border-color: var(--mc-border-default) !important;
+  font-weight: 600 !important;
+}
+
+#desktop-sidebar-nav button.active i {
+  color: var(--mc-accent) !important;
+}
+
+/* Centered Bento Glass Card Surface */
+.mc-bento-card, .mc-card {
+  background-color: var(--mc-bg-secondary);
+  border: 1px solid var(--mc-border-default);
+  border-radius: 1rem;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mc-bento-card:hover, .mc-card:hover {
+  border-color: var(--mc-border-strong);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.3);
+}
+
+/* Top Utility Bar */
+header.sticky {
+  box-shadow: 0 1px 0 0 var(--mc-border-subtle);
+}
+
+/* Custom Scrollbar for Sidebar */
+#desktop-fixed-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+#desktop-fixed-sidebar::-webkit-scrollbar-thumb {
+  background: var(--mc-border-subtle);
+  border-radius: 4px;
+}
