@@ -8948,7 +8948,7 @@ async function testAttackSimulation() {
 }
 
 // =============================================================================
-// BANK-GRADE BIOMETRIC WEBAUTHN & DECOY PRIVACY ENGINE
+// BIOMETRIC WEBAUTHN & DECOY PRIVACY ENGINE
 // =============================================================================
 
 function isBiometricsSupported() {
