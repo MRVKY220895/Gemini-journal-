@@ -1,4 +1,34 @@
 
+// ─── SETTINGS & VAULT SUBTAB CONTROLLER ───
+
+function switchSettingsTab(subtabId, btnElement = null) {
+  const tabs = ['security', 'ai', 'data'];
+  tabs.forEach(t => {
+    const el = document.getElementById(`settings-subtab-${t}`);
+    if (el) {
+      if (t === subtabId) el.classList.remove('hidden');
+      else el.classList.add('hidden');
+    }
+  });
+
+  document.querySelectorAll('.settings-subtab-btn').forEach(btn => {
+    btn.className = 'settings-subtab-btn px-3.5 py-1.5 rounded-lg font-semibold text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] cursor-pointer';
+  });
+
+  if (btnElement) {
+    btnElement.className = 'settings-subtab-btn active px-3.5 py-1.5 rounded-lg font-semibold bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] border border-[var(--mc-border-subtle)] cursor-pointer';
+  } else {
+    const buttons = document.querySelectorAll('.settings-subtab-btn');
+    if (subtabId === 'security' && buttons[0]) buttons[0].className = 'settings-subtab-btn active px-3.5 py-1.5 rounded-lg font-semibold bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] border border-[var(--mc-border-subtle)] cursor-pointer';
+    if (subtabId === 'ai' && buttons[1]) buttons[1].className = 'settings-subtab-btn active px-3.5 py-1.5 rounded-lg font-semibold bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] border border-[var(--mc-border-subtle)] cursor-pointer';
+    if (subtabId === 'data' && buttons[2]) buttons[2].className = 'settings-subtab-btn active px-3.5 py-1.5 rounded-lg font-semibold bg-[var(--mc-bg-tertiary)] text-[var(--mc-text-primary)] border border-[var(--mc-border-subtle)] cursor-pointer';
+  }
+
+  if (window.lucide) refreshIcons();
+}
+window.switchSettingsTab = switchSettingsTab;
+
+
 // ─── DYNAMIC DASHBOARD METRICS ENGINE ───
 
 function computeDynamicDashboardMetrics(horizon = 'weekly') {
