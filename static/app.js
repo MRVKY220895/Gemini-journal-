@@ -797,10 +797,11 @@ window.renderJournalCards = renderJournalCards;
 
 function setChronoViewMode(mode) {
   state.chronoViewMode = mode || 'stream';
+  if (typeof timelineViewMode !== 'undefined') timelineViewMode = state.chronoViewMode;
   const streamBtn = document.getElementById('view-mode-stream-btn') || document.getElementById('chrono-view-stream-btn');
   const storyBtn = document.getElementById('view-mode-story-btn') || document.getElementById('chrono-view-story-btn');
   const streamView = document.getElementById('chrono-timeline-list');
-  const storyView = document.getElementById('chrono-story-carousel');
+  const storyView = document.getElementById('chrono-story-view') || document.getElementById('chrono-story-carousel');
   const cardsView = document.getElementById('journals-grid-view') || document.getElementById('journals-grid');
 
   if (mode === 'story') {
@@ -811,10 +812,12 @@ function setChronoViewMode(mode) {
       storyBtn.className = 'px-2.5 py-1 rounded-lg font-semibold bg-[var(--mc-accent-12)] text-[var(--mc-accent)] border border-[var(--mc-accent-25)] text-xs flex items-center gap-1 cursor-pointer';
     }
     if (streamView) streamView.classList.add('hidden');
+    if (cardsView) cardsView.classList.add('hidden');
     if (storyView) {
       storyView.classList.remove('hidden');
-      if (typeof renderStoryCarousel === 'function') renderStoryCarousel();
     }
+    renderChronoTimeline(false);
+    if (typeof initStorySwipeDrag === 'function') initStorySwipeDrag();
   } else if (mode === 'cards') {
     if (streamView) streamView.classList.add('hidden');
     if (storyView) storyView.classList.add('hidden');
@@ -832,11 +835,13 @@ function setChronoViewMode(mode) {
     }
     if (streamView) streamView.classList.remove('hidden');
     if (storyView) storyView.classList.add('hidden');
+    if (cardsView) cardsView.classList.add('hidden');
     renderChronoTimeline(false);
   }
   if (window.lucide) refreshIcons();
 }
 window.setChronoViewMode = setChronoViewMode;
+window.setTimelineViewMode = setChronoViewMode;
 
 
 // ─── INITIAL STORAGE DEDUPLICATION ON STARTUP ───
@@ -3124,7 +3129,7 @@ function switchTab(tabId) {
     notes: 'Notes & Capture',
     studio: 'AI Reflective Studio',
     analytics: 'MindPulse Insights',
-    security: 'Settings & Vault'
+    security: 'Settings'
   };
 
   const topbarTitle = document.getElementById('topbar-current-view');
@@ -3145,8 +3150,7 @@ function switchTab(tabId) {
         sidebarBtnEl.className = 'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-[var(--mc-text-primary)] bg-[var(--mc-bg-tertiary)] border border-[var(--mc-border-subtle)] transition-all cursor-pointer';
       }
       if (mobileBtnEl) {
-        mobileBtnEl.classList.add('active', 'text-[#9BB7A5]');
-        mobileBtnEl.classList.remove('text-[#6F7881]', 'text-slate-400');
+        mobileBtnEl.className = 'mobile-nav-btn active flex flex-col items-center gap-0.5 text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold py-1 px-2.5 rounded-xl transition-all cursor-pointer bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/20';
       }
     } else {
       if (viewEl) viewEl.classList.add('hidden');
@@ -3155,8 +3159,7 @@ function switchTab(tabId) {
         sidebarBtnEl.className = 'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-[var(--mc-text-secondary)] hover:text-[var(--mc-text-primary)] hover:bg-[var(--mc-bg-tertiary)] transition-all cursor-pointer';
       }
       if (mobileBtnEl) {
-        mobileBtnEl.classList.remove('active', 'text-[#9BB7A5]', 'text-cyan-400');
-        mobileBtnEl.classList.add('text-[#6F7881]');
+        mobileBtnEl.className = 'mobile-nav-btn flex flex-col items-center gap-0.5 text-[10px] text-[var(--mc-text-muted)] font-medium py-1 px-2.5 rounded-xl transition-all cursor-pointer hover:text-[var(--mc-text-primary)] bg-transparent border border-transparent';
       }
     }
   });
