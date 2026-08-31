@@ -1,3 +1,42 @@
+const state = {
+  currentUser: {
+    uid: localStorage.getItem('gemini_journal_uid') || 'user_alice',
+    name: localStorage.getItem('gemini_journal_name') || 'Alice (Demo Sandbox)',
+    token: localStorage.getItem('gemini_journal_token') || 'demo_user_alice',
+    gender: localStorage.getItem('mind_cave_user_gender') || 'female'
+  },
+  currentPersona: 'cbt_reflector',
+  currentSessionId: null,
+  radarChart: null,
+  lineChart: null,
+  firebaseApp: null,
+  firebaseAuth: null,
+  timelineRange: localStorage.getItem('mind_cave_timeline_range') || 'day_standard',
+  selectedDiaryDate: new Date(),
+  mediaMode: localStorage.getItem('mind_cave_media_mode') || 'photos',
+  diaryRangeMode: 'single', // 'single' | 'week' | 'all'
+  isSpeakingSummary: false,
+  isRecordingVoice: false,
+  speechRecognition: null,
+  speechUtterance: null,
+  agendaItems: [],
+  todayGoals: [],
+  todayGoal: { text: '', completed: false },
+  habitsList: [],
+  archivedHabits: [],
+  bucketList: [],
+  bucketCategories: safeJSONParse(localStorage.getItem('mind_cave_bucket_categories'), null) || [
+    { id: 'travel', name: 'Travel & World Exploration', color: 'cyan' },
+    { id: 'career', name: 'Career & Mastery', color: 'indigo' },
+    { id: 'adventure', name: 'Adventure & Sports', color: 'amber' },
+    { id: 'wellness', name: 'Wellness & Health', color: 'emerald' },
+    { id: 'creative', name: 'Art & Creation', color: 'purple' },
+    { id: 'wealth', name: 'Financial Freedom', color: 'rose' }
+  ],
+  scrapbookTheme: 'pastel'
+};
+window.state = state;
+
 
 // ─── HOME SANCTUARY BENTO CONTROLLERS (INSPIRED BY REFERENCE) ───
 
@@ -142,7 +181,7 @@ async function saveHomeQuickReflection() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${state.currentUser?.token || 'demo_user'}`
+        'Authorization': 'Bearer ' + (state.currentUser?.token || 'demo_user')
       },
       body: JSON.stringify(entry)
     }).catch(e => console.debug('Firestore sync notice:', e));
@@ -565,44 +604,7 @@ function safeJSONParse(str, fallback = null) {
 window.safeJSONParse = safeJSONParse;
 
 // Application State
-const state = {
-  currentUser: {
-    uid: localStorage.getItem('gemini_journal_uid') || 'user_alice',
-    name: localStorage.getItem('gemini_journal_name') || 'Alice (Demo Sandbox)',
-    token: localStorage.getItem('gemini_journal_token') || 'demo_user_alice',
-    gender: localStorage.getItem('mind_cave_user_gender') || 'female'
-  },
-  currentPersona: 'cbt_reflector',
-  currentSessionId: null,
-  radarChart: null,
-  lineChart: null,
-  firebaseApp: null,
-  firebaseAuth: null,
-  timelineRange: localStorage.getItem('mind_cave_timeline_range') || 'day_standard',
-  selectedDiaryDate: new Date(),
-  mediaMode: localStorage.getItem('mind_cave_media_mode') || 'photos',
-  diaryRangeMode: 'single', // 'single' | 'week' | 'all'
-  isSpeakingSummary: false,
-  isRecordingVoice: false,
-  speechRecognition: null,
-  speechUtterance: null,
-  agendaItems: [],
-  todayGoals: [],
-  todayGoal: { text: '', completed: false },
-  habitsList: [],
-  archivedHabits: [],
-  bucketList: [],
-  bucketCategories: safeJSONParse(localStorage.getItem('mind_cave_bucket_categories'), null) || [
-    { id: 'travel', name: 'Travel & World Exploration', color: 'cyan' },
-    { id: 'career', name: 'Career & Mastery', color: 'indigo' },
-    { id: 'adventure', name: 'Adventure & Sports', color: 'amber' },
-    { id: 'wellness', name: 'Wellness & Health', color: 'emerald' },
-    { id: 'creative', name: 'Art & Creation', color: 'purple' },
-    { id: 'wealth', name: 'Financial Freedom', color: 'rose' }
-  ],
-  scrapbookTheme: 'pastel'
-};
-window.state = state;
+
 
 
 // ─── MASTER SYSTEM & UTILITY EVENT HANDLERS ───
@@ -3934,7 +3936,7 @@ function narrateAIMessage(text, btnElement) {
   // Cancel any prior speech
   stopCurrentNarration();
 
-  const cleanText = text.replace(/[*#_`~\[\]]/g, '').trim();
+  const cleanText = text.replace(/[*#_\`~\[\]]/g, '').trim();
   if (!cleanText) return;
 
   const utterance = new SpeechSynthesisUtterance(cleanText);
@@ -5675,7 +5677,7 @@ function getChronologicalEvents(journals) {
       const isTask = c.type === 'task';
       const isDone = Boolean(c.completed);
       const timeVal = c.dueTime || '11:00';
-      const checklistSummary = isChecklist && c.items ? c.items.map(i => `${i.completed ? '✓' : '○'} ${i.text}`).join(' • ') : '';
+      const checklistSummary = isChecklist && c.items ? c.items.map(i => (i.completed ? '✓ ' : '○ ') + (i.text || '')).join(' • ') : '';
 
       events.push({
         id: `capture_event_${c.id}`,
