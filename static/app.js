@@ -1,4 +1,26 @@
 
+// ─── MASTER SETTINGS & VAULT SUBTAB CONTROLLER ───
+function switchSettingsTab(subtab, btnEl) {
+  const subtabs = ['directory', 'security', 'ai', 'data'];
+  subtabs.forEach(s => {
+    const el = document.getElementById(`settings-subtab-${s}`);
+    if (el) {
+      if (s === subtab) el.classList.remove('hidden');
+      else el.classList.add('hidden');
+    }
+  });
+
+  document.querySelectorAll('.settings-subtab-btn').forEach(b => {
+    b.className = 'settings-subtab-btn px-3.5 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white cursor-pointer';
+  });
+  if (btnEl) {
+    btnEl.className = 'settings-subtab-btn active px-3.5 py-1.5 rounded-lg font-semibold bg-white/10 text-white cursor-pointer';
+  }
+  if (window.lucide) refreshIcons();
+}
+window.switchSettingsTab = switchSettingsTab;
+
+
 // =============================================================================
 // PROFILE STATE LOADER & DYNAMIC PROFILE SWITCHER
 // =============================================================================
