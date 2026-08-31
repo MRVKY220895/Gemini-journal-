@@ -5,44 +5,58 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mind Cave — Cognitive Sanctuary & Reflective Studio</title>
   
-  <!-- Tailwind CSS & Global Exception Shield -->
+  <!-- Tailwind CSS & Global Exception Shield (Capture-Phase v3) -->
   <script>
-    // Global Error & Promise Rejection Shield (Catches browser extension message channel teardowns)
-    window.addEventListener('unhandledrejection', function(event) {
-      if (event && event.reason) {
-        const msg = typeof event.reason === 'string' ? event.reason : (event.reason.message || '');
-        if (
-          msg.includes('message channel closed') ||
-          msg.includes('asynchronous response') ||
-          msg.includes('Extension context invalidated') ||
-          msg.includes('ResizeObserver loop')
-        ) {
+    // ─── CAPTURE-PHASE EXTENSION NOISE SHIELD ───
+    // Intercepts BEFORE any other listener sees the rejection.
+    // Covers all known Chrome / Firefox extension message-channel teardown variants.
+    (function() {
+      var _EXT_PATTERNS = [
+        'message channel closed',
+        'asynchronous response',
+        'listener indicated an asynchronous',
+        'extension context invalidated',
+        'chrome-extension',
+        'moz-extension',
+        'resizeobserver loop',
+        'could not establish connection'
+      ];
+      function _isExtNoise(str) {
+        if (!str) return false;
+        var s = String(str).toLowerCase();
+        for (var i = 0; i < _EXT_PATTERNS.length; i++) {
+          if (s.indexOf(_EXT_PATTERNS[i]) !== -1) return true;
+        }
+        return false;
+      }
+      // Unhandled Promise Rejections (capture phase = true)
+      window.addEventListener('unhandledrejection', function(event) {
+        if (!event) return;
+        var reason = event.reason;
+        var msg = reason
+          ? (typeof reason === 'string' ? reason : (reason.message || reason.toString() || ''))
+          : '';
+        if (_isExtNoise(msg)) {
           event.preventDefault();
           event.stopImmediatePropagation();
-          return;
         }
-      }
-    });
-
-    window.addEventListener('error', function(event) {
-      if (event && event.message) {
-        if (
-          event.message.includes('message channel closed') ||
-          event.message.includes('ResizeObserver loop')
-        ) {
+      }, true);
+      // Synchronous Script Errors (capture phase = true)
+      window.addEventListener('error', function(event) {
+        if (!event) return;
+        var msg = (event.message || '') + ' ' + (event.filename || '');
+        if (_isExtNoise(msg)) {
           event.preventDefault();
           event.stopImmediatePropagation();
-          return;
         }
-      }
-    });
-
-    // Suppress CDN dev warning in browser console
-    const _origWarn = console.warn;
-    console.warn = function(...args) {
-      if (args[0] && typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com')) return;
-      _origWarn.apply(console, args);
-    };
+      }, true);
+      // Silence Tailwind CDN dev warning
+      var _origWarn = console.warn;
+      console.warn = function() {
+        if (arguments[0] && typeof arguments[0] === 'string' && arguments[0].indexOf('cdn.tailwindcss.com') !== -1) return;
+        _origWarn.apply(console, arguments);
+      };
+    })();
   </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -4416,7 +4430,7 @@
   </div>
 
   <!-- Client Application Script -->
-  <script src="/static/app.js?v=1788205000"></script>
+  <script src="/static/app.js?v=1788206000"></script>
   <script>
     // Initialize Lucide Icons
     lucide.createIcons();
@@ -4826,6 +4840,6 @@
   </div>
 
   <!-- Core Application Script -->
-  <script src="/static/app.js?v=1788205000" defer></script>
+  <script src="/static/app.js?v=1788206000" defer></script>
 </body>
 </html>
