@@ -898,8 +898,8 @@ function loadProfileScopedState() {
   try {
     const activeUid = (typeof profileStorage !== 'undefined') ? profileStorage.getUid() : (state.currentUser?.uid || 'guest');
     if (typeof profileStorage !== 'undefined') {
-      state.habitsList = profileStorage.getItem('habits_list', state.habitsList || []);
-      state.todayGoals = profileStorage.getItem('today_goals', state.todayGoals || []);
+      state.habitsList = profileStorage.getItem('habits_list', []);
+      state.todayGoals = profileStorage.getItem('today_goals', []);
     }
     state.capturesList = getUnifiedCapturesList();
     state.notesList = state.capturesList;
@@ -1716,16 +1716,16 @@ function renderHomeHabitsMini() {
   const container = document.getElementById('home-habits-mini-container');
   if (!container) return;
 
-  if (!state.habitsList || state.habitsList.length === 0) {
+  if (state.habitsList === undefined || state.habitsList === null) {
     try {
       if (typeof profileStorage !== 'undefined' && profileStorage.getItem) {
         state.habitsList = profileStorage.getItem('habits_list', []);
+      } else {
+        state.habitsList = [];
       }
-      if (!state.habitsList || state.habitsList.length === 0) {
-        const saved = localStorage.getItem('mind_cave_habits_list');
-        if (saved) state.habitsList = JSON.parse(saved);
-      }
-    } catch (e) {}
+    } catch (e) {
+      state.habitsList = [];
+    }
   }
 
   const habits = state.habitsList || [];
@@ -1740,6 +1740,7 @@ function renderHomeHabitsMini() {
         </button>
       </div>
     `;
+    if (window.lucide) refreshIcons();
     return;
   }
 
@@ -11190,22 +11191,15 @@ function refreshHabitsTracker(btnEl = null) {
 
 
 
-  // Synchronize habits from storage if any external tab updated them
-
+  // Synchronize habits from scoped profile storage
   try {
-
-    const saved = localStorage.getItem('mind_cave_habits_list');
-
-    if (saved) {
-
-      state.habitsList = JSON.parse(saved);
-
+    if (typeof profileStorage !== 'undefined' && profileStorage.getItem) {
+      state.habitsList = profileStorage.getItem('habits_list', []);
+    } else {
+      state.habitsList = state.habitsList || [];
     }
-
   } catch (e) {
-
     console.warn('Storage sync fallback:', e);
-
   }
 
 
@@ -11391,61 +11385,45 @@ var recentlyDeletedHabits = [];
 
 
 function deleteHabit(habitId) {
-
+  if (!state.habitsList) state.habitsList = [];
   const index = state.habitsList.findIndex(h => h.id === habitId);
-
   if (index === -1) return;
-
-
 
   const deletedHabit = state.habitsList[index];
 
-
-
   // Preserve full historic tracks and streak in archivedHabits
-
   const archivedCopy = JSON.parse(JSON.stringify(deletedHabit));
-
   archivedCopy.archivedAt = new Date().toISOString();
 
-
-
   if (!state.archivedHabits) state.archivedHabits = [];
-
   state.archivedHabits = state.archivedHabits.filter(h => h.id !== habitId);
-
   state.archivedHabits.unshift(archivedCopy);
-
-  profileStorage.setItem('archived_habits', state.archivedHabits);
-
-
+  if (typeof profileStorage !== 'undefined') {
+    profileStorage.setItem('archived_habits', state.archivedHabits);
+  }
 
   // Push to transient undo stack
-
   recentlyDeletedHabits.push({ habit: JSON.parse(JSON.stringify(deletedHabit)), index: index });
 
-
-
-  // Remove from active list
-
+  // Remove from active list and persist immediately
   state.habitsList.splice(index, 1);
+  if (typeof profileStorage !== 'undefined') {
+    profileStorage.setItem('habits_list', state.habitsList);
+  }
+  localStorage.removeItem('mind_cave_habits_list');
 
-  profileStorage.setItem('habits_list', state.habitsList);
-
-
-
+  // Synchronize all views
   renderHabitTracker();
-
   renderTimelineShortcuts();
-
   renderShortcutsManagerList();
-
   updateArchivedHabitsBadges();
+  if (typeof renderHomeHabitsMini === 'function') renderHomeHabitsMini();
+  if (typeof renderHomeDashboardInsights === 'function') renderHomeDashboardInsights();
+  if (typeof setMasterDashboardHorizon === 'function') {
+    setMasterDashboardHorizon(currentDashboardHorizon || 'weekly');
+  }
 
-
-
-  showToast(`Moved "${deletedHabit.title}" to Archive. Historical tracks preserved!`);
-
+  showToast(`Deleted "${deletedHabit.title}".`);
 }
 
 
@@ -11841,12 +11819,16 @@ function toggleHabitDay(habitId, dayIndex) {
 
 
   profileStorage.setItem('habits_list', state.habitsList);
+  localStorage.removeItem('mind_cave_habits_list');
 
   renderHabitTracker();
-
   renderTimelineShortcuts();
   if (typeof renderHomeHabitsMini === 'function') renderHomeHabitsMini();
+  if (typeof renderHomeDashboardInsights === 'function') renderHomeDashboardInsights();
   if (typeof updateAllDashboardStats === 'function') updateAllDashboardStats();
+  if (typeof setMasterDashboardHorizon === 'function') {
+    setMasterDashboardHorizon(currentDashboardHorizon || 'weekly');
+  }
 
   showToast(`${habit.title}: ${habit.history[dayIndex] ? 'Completed!' : 'Marked incomplete'}`);
 
@@ -12149,13 +12131,17 @@ function submitNewHabit(event) {
 
 
   profileStorage.setItem('habits_list', state.habitsList);
+  localStorage.removeItem('mind_cave_habits_list');
 
   closeNewHabitModal();
 
   renderHabitTracker();
-
   renderTimelineShortcuts();
-
+  if (typeof renderHomeHabitsMini === 'function') renderHomeHabitsMini();
+  if (typeof renderHomeDashboardInsights === 'function') renderHomeDashboardInsights();
+  if (typeof setMasterDashboardHorizon === 'function') {
+    setMasterDashboardHorizon(currentDashboardHorizon || 'weekly');
+  }
 }
 
 
