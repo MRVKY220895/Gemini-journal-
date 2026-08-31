@@ -1,4 +1,73 @@
 
+// ─── UNIFIED PERSISTENT CAPTURES & NOTES ENGINE ───
+
+function getUnifiedCapturesList() {
+  let list = (state.capturesList && Array.isArray(state.capturesList) && state.capturesList.length > 0) ? state.capturesList : [];
+  if (list.length === 0) {
+    try {
+      const activeUid = (typeof profileStorage !== 'undefined') ? profileStorage.getUid() : (state.currentUser?.uid || 'guest');
+      let saved = (typeof profileStorage !== 'undefined') ? profileStorage.getItem('captures_list', null, activeUid) : null;
+      if (!saved || !Array.isArray(saved) || saved.length === 0) {
+        const localSaved = localStorage.getItem('mind_cave_notes_list') || localStorage.getItem('mind_cave_captures_list');
+        if (localSaved) saved = JSON.parse(localSaved);
+      }
+      if (saved && Array.isArray(saved) && saved.length > 0) {
+        list = saved;
+      }
+    } catch (e) {}
+  }
+
+  if (list.length === 0) {
+    list = [
+      {
+        id: 'cap_1',
+        type: 'checklist',
+        title: 'System Release & Milestone Verification',
+        items: [
+          { id: 'c1', text: 'Fast-path local token verification', completed: true },
+          { id: 'c2', text: 'Living Timeline multi-track integration', completed: true },
+          { id: 'c3', text: 'Interactive Checklist with strikethrough', completed: true },
+          { id: 'c4', text: 'Zero-knowledge client encryption audit', completed: false }
+        ],
+        tag: 'Work',
+        priority: 'high',
+        syncToJournal: true,
+        completed: false,
+        updatedAt: Date.now() - 3600000
+      },
+      {
+        id: 'cap_2',
+        type: 'task',
+        title: 'AWS Cloud Hosting & Database Renewal',
+        content: 'Verify auto-debit invoice and audit bandwidth limits for private cloud instances.',
+        dueDate: new Date(Date.now() + 86400000 * 3).toISOString().split('T')[0],
+        dueTime: '10:00',
+        priority: 'high',
+        tag: 'Finance',
+        syncToJournal: true,
+        completed: false,
+        updatedAt: Date.now() - 7200000
+      },
+      {
+        id: 'cap_3',
+        type: 'note',
+        title: 'Weekly Stoic & Mindfulness Anchors',
+        content: 'Practice 30-min morning deep focus window without notifications. Celebrate small wins daily and maintain 92% cognitive equilibrium.',
+        tag: 'Personal',
+        syncToJournal: false,
+        completed: false,
+        updatedAt: Date.now() - 10800000
+      }
+    ];
+  }
+
+  state.capturesList = list;
+  state.notesList = list;
+  return list;
+}
+window.getUnifiedCapturesList = getUnifiedCapturesList;
+
+
 // ─── CORE LIFECYCLE & JOURNAL RENDER ENGINE ───
 
 function loadProfileScopedState() {
@@ -7,8 +76,9 @@ function loadProfileScopedState() {
     if (typeof profileStorage !== 'undefined') {
       state.habitsList = profileStorage.getItem('habits_list', state.habitsList || []);
       state.todayGoals = profileStorage.getItem('today_goals', state.todayGoals || []);
-      state.capturesList = profileStorage.getItem('captures_list', state.capturesList || []);
     }
+    state.capturesList = getUnifiedCapturesList();
+    state.notesList = state.capturesList;
     state.journals = getUnifiedJournalsList();
     state.journalsCache = state.journals;
   } catch (e) {
@@ -14164,63 +14234,7 @@ state.capturesList = [];
 state.capturesFilter = 'all';
 
 function initNotesAndAlerts() {
-  const activeUid = profileStorage.getUid();
-  const isAlice = activeUid === 'user_alice' || activeUid === 'demo_user_alice';
-  const isReset = Boolean(profileStorage.getItem('is_reset', false, activeUid)) || localStorage.getItem('mind_cave_is_reset') === 'true';
-
-  try {
-    const saved = profileStorage.getItem('captures_list', null, activeUid);
-    if (saved && Array.isArray(saved)) {
-      state.capturesList = saved;
-    } else if (isAlice && !isReset) {
-      state.capturesList = [
-        {
-          id: 'cap_1',
-          type: 'checklist',
-          title: 'System Release & Milestone Verification',
-          items: [
-            { id: 'c1', text: 'Fast-path local token verification', completed: true },
-            { id: 'c2', text: 'Living Timeline multi-track integration', completed: true },
-            { id: 'c3', text: 'Interactive Checklist with strikethrough', completed: false },
-            { id: 'c4', text: 'Zero-knowledge client encryption audit', completed: false }
-          ],
-          tag: 'Work',
-          priority: 'high',
-          syncToJournal: true,
-          completed: false,
-          updatedAt: Date.now() - 3600000
-        },
-        {
-          id: 'cap_2',
-          type: 'task',
-          title: 'AWS Cloud Hosting & Database Renewal',
-          content: 'Verify auto-debit invoice and audit bandwidth limits for private cloud instances.',
-          dueDate: new Date(Date.now() + 86400000 * 3).toISOString().split('T')[0],
-          dueTime: '10:00',
-          priority: 'high',
-          tag: 'Finance',
-          syncToJournal: true,
-          completed: false,
-          updatedAt: Date.now() - 7200000
-        },
-        {
-          id: 'cap_3',
-          type: 'note',
-          title: 'Weekly Stoic & Mindfulness Anchors',
-          content: 'Practice 30-min morning deep focus window without notifications. Celebrate small wins daily and maintain 92% cognitive equilibrium.',
-          tag: 'Personal',
-          syncToJournal: false,
-          completed: false,
-          updatedAt: Date.now() - 10800000
-        }
-      ];
-    } else {
-      state.capturesList = [];
-    }
-  } catch (e) {
-    state.capturesList = [];
-  }
-
+  state.capturesList = getUnifiedCapturesList();
   state.notesList = state.capturesList;
   renderNotesCards();
   startLiveSanctuaryClock();
@@ -14430,8 +14444,12 @@ function deleteCaptureItem(captureId) {
 
 function saveCaptures() {
   state.notesList = state.capturesList;
-  profileStorage.setItem('captures_list', state.capturesList);
+  if (typeof profileStorage !== 'undefined') {
+    profileStorage.setItem('captures_list', state.capturesList);
+  }
   localStorage.setItem('mind_cave_notes_list', JSON.stringify(state.capturesList));
+  localStorage.setItem('mind_cave_captures_list', JSON.stringify(state.capturesList));
+  if (typeof renderChronoTimeline === 'function') renderChronoTimeline(false);
 }
 
 // ─── UNIFIED CAPTURE MODAL LOGIC ───
