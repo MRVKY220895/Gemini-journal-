@@ -284,6 +284,12 @@
           </div>
         </div>
 
+                <!-- Instant Active Page Sync / Refresh Button -->
+        <button type="button" onclick="refreshCurrentActiveView(this)" id="btn-topbar-refresh" class="nav-action-btn font-semibold shrink-0 cursor-pointer flex items-center gap-1.5 text-[var(--mc-text-secondary)] hover:text-emerald-500 hover:border-emerald-500/30 transition-all" title="Refresh current view and sync live data">
+          <i data-lucide="rotate-cw" class="w-3.5 h-3.5 text-emerald-500"></i>
+          <span class="hidden sm:inline text-xs font-semibold">Sync</span>
+        </button>
+
         <!-- Theme Mode Switcher -->
         <button onclick="toggleThemeMode()" class="nav-action-btn font-semibold shrink-0 cursor-pointer" title="Toggle Light/Dark Theme">
           <i data-lucide="sun" class="w-3.5 h-3.5 hidden dark:inline text-amber-400"></i>
@@ -4384,7 +4390,7 @@
   </div>
 
   <!-- Client Application Script -->
-  <script src="/static/app.js?v=1788191000"></script>
+  <script src="/static/app.js?v=1788192000"></script>
   <script>
     // Initialize Lucide Icons
     lucide.createIcons();
@@ -4794,6 +4800,6 @@
   </div>
 
   <!-- Core Application Script -->
-  <script src="/static/app.js?v=1788191000" defer></script>
+  <script src="/static/app.js?v=1788192000" defer></script>
 </body>
 </html>

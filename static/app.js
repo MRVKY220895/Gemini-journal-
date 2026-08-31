@@ -1,4 +1,65 @@
 
+// ─── TOPBAR MANUAL REFRESH & ONBOARDING SYSTEM ───
+
+function checkFirstTimeOnboarding() {
+  try {
+    const hasSeen = localStorage.getItem('mind_cave_onboarding_completed');
+    if (!hasSeen) {
+      localStorage.setItem('mind_cave_onboarding_completed', 'true');
+    }
+  } catch (e) {}
+}
+window.checkFirstTimeOnboarding = checkFirstTimeOnboarding;
+
+function refreshCurrentActiveView(btnElement = null) {
+  if (btnElement) {
+    const icon = btnElement.querySelector('i') || btnElement.querySelector('svg');
+    if (icon) {
+      icon.classList.add('animate-spin');
+      setTimeout(() => icon.classList.remove('animate-spin'), 600);
+    }
+  }
+
+  let activeTab = 'overview';
+  const views = ['overview', 'journals', 'notes', 'studio', 'analytics', 'security'];
+  for (const v of views) {
+    const el = document.getElementById(`view-${v}`);
+    if (el && !el.classList.contains('hidden')) {
+      activeTab = v;
+      break;
+    }
+  }
+
+  dispatchGlobalInstantRefresh(`manual_refresh_${activeTab}`);
+
+  if (activeTab === 'overview') {
+    updateHomepageRealtimeData();
+    renderHomeRecentEntries();
+    renderHomeHabitsMini();
+    showToast('Home Sanctuary Refreshed');
+  } else if (activeTab === 'journals') {
+    loadJournals();
+    renderChronoTimeline(false);
+    showToast('Living Timeline Refreshed');
+  } else if (activeTab === 'studio') {
+    restoreChatHistory();
+    showToast('Reflective Studio Refreshed');
+  } else if (activeTab === 'analytics') {
+    loadAnalytics();
+    updateAllDashboardStats();
+    showToast('MindPulse Analytics Refreshed');
+  } else if (activeTab === 'security') {
+    loadSecurityAudit();
+    showToast('Security Vault Refreshed');
+  } else {
+    showToast('View Refreshed');
+  }
+
+  if (window.lucide) refreshIcons();
+}
+window.refreshCurrentActiveView = refreshCurrentActiveView;
+
+
 // ─── CHRONO DATE DISPLAY & NAVIGATION ENHANCEMENT ───
 
 function updateChronoDateDisplay() {
