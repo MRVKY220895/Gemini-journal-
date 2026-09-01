@@ -53,6 +53,9 @@ async function switchUserProfile(uid, displayName, token = null) {
     token: cleanToken
   };
 
+  state.currentSessionId = null;
+  state.chatHistory = [];
+
   localStorage.setItem('gemini_journal_uid', cleanUid);
   localStorage.setItem('gemini_journal_name', cleanName);
   localStorage.setItem('gemini_journal_token', cleanToken);
@@ -65,6 +68,8 @@ async function switchUserProfile(uid, displayName, token = null) {
   updateUserUI();
   clearStateForNewUser(cleanUid);
   loadProfileScopedState();
+  if (typeof loadProfileDetails === 'function') loadProfileDetails();
+  if (typeof restoreChatHistory === 'function') restoreChatHistory();
   dispatchGlobalInstantRefresh('profile_switch');
 
   if (typeof loadJournals === 'function') loadJournals();
@@ -4254,12 +4259,36 @@ function appendChatMessage(role, content, authorName, modelTag, cognitiveData = 
 function restoreChatHistory() {
   const userKey = 'mind_cave_chat_history_' + (state.currentUser?.uid || 'guest');
   const saved = localStorage.getItem(userKey);
-  if (!saved) return;
+  const container = document.getElementById('chat-messages');
+
+  const renderEmptyHero = () => {
+    state.chatHistory = [];
+    if (container) {
+      container.className = "flex-1 flex flex-col justify-center overflow-y-auto space-y-6 px-1 py-4 mb-2";
+      container.innerHTML = `
+        <div id="empty-hero-stage" class="text-center py-10 px-4 max-w-md mx-auto space-y-4 animate-fade-in">
+          <div class="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center mx-auto shadow-inner">
+            <i data-lucide="sparkles" class="w-7 h-7"></i>
+          </div>
+          <div class="space-y-1">
+            <h3 class="text-base font-bold text-[var(--mc-text-primary)]">Reflective AI Studio</h3>
+            <p class="text-xs text-[var(--mc-text-secondary)]">Explore thoughts, reframe challenges, or brainstorm strategies with cognitive AI guidance.</p>
+          </div>
+        </div>
+      `;
+      if (window.lucide) refreshIcons();
+    }
+  };
+
+  if (!saved) {
+    renderEmptyHero();
+    return;
+  }
+
   try {
     const history = JSON.parse(saved);
     if (Array.isArray(history) && history.length > 0) {
       state.chatHistory = history;
-      const container = document.getElementById('chat-messages');
       if (container) {
         const hero = document.getElementById('empty-hero-stage');
         if (hero) hero.remove();
@@ -4272,9 +4301,12 @@ function restoreChatHistory() {
         if (lastUser) updateSessionTitle(lastUser.content);
         scrollChatToBottom(true);
       }
+    } else {
+      renderEmptyHero();
     }
   } catch (e) {
     console.warn('Failed to restore chat history:', e);
+    renderEmptyHero();
   }
 }
 
@@ -14767,10 +14799,17 @@ function saveProfileDetails() {
   const fname = document.getElementById('profile-first-name')?.value || '';
   const dob = document.getElementById('profile-dob')?.value || '';
   const gender = document.getElementById('profile-gender-select')?.value || 'unspecified';
+  const cycle = document.getElementById('profile-toggle-cycle')?.checked || false;
+  const circadian = document.getElementById('profile-toggle-circadian')?.checked || false;
   
+  if (typeof profileStorage !== 'undefined') {
+    profileStorage.setItem('profile_name', fname);
+    profileStorage.setItem('profile_dob', dob);
+    profileStorage.setItem('user_gender', gender);
+    profileStorage.setItem('vitality_cycle', cycle);
+    profileStorage.setItem('vitality_circadian', circadian);
+  }
   localStorage.setItem('mind_cave_profile_name', fname);
-  localStorage.setItem('mind_cave_profile_dob', dob);
-  localStorage.setItem('mind_cave_user_gender', gender);
   
   if (state.currentUser && fname) {
     state.currentUser.name = fname;
@@ -14782,9 +14821,12 @@ function saveProfileDetails() {
 }
 
 function loadProfileDetails() {
-  let fname = localStorage.getItem('mind_cave_profile_name') || state.currentUser?.name || '';
-  let dob = localStorage.getItem('mind_cave_profile_dob') || '';
-  let gender = localStorage.getItem('mind_cave_user_gender') || 'unspecified';
+  const activeUid = (typeof profileStorage !== 'undefined') ? profileStorage.getUid() : (state.currentUser?.uid || 'guest');
+  let fname = (typeof profileStorage !== 'undefined') ? profileStorage.getItem('profile_name', state.currentUser?.name || '') : (state.currentUser?.name || '');
+  let dob = (typeof profileStorage !== 'undefined') ? profileStorage.getItem('profile_dob', '') : '';
+  let gender = (typeof profileStorage !== 'undefined') ? profileStorage.getItem('user_gender', 'unspecified') : 'unspecified';
+  let cycle = (typeof profileStorage !== 'undefined') ? profileStorage.getItem('vitality_cycle', false) : false;
+  let circadian = (typeof profileStorage !== 'undefined') ? profileStorage.getItem('vitality_circadian', false) : false;
 
   if (document.getElementById('profile-first-name')) {
     document.getElementById('profile-first-name').value = fname;
@@ -14795,20 +14837,33 @@ function loadProfileDetails() {
   if (document.getElementById('profile-gender-select')) {
     document.getElementById('profile-gender-select').value = gender;
   }
+  if (document.getElementById('profile-toggle-cycle')) {
+    document.getElementById('profile-toggle-cycle').checked = Boolean(cycle);
+  }
+  if (document.getElementById('profile-toggle-circadian')) {
+    document.getElementById('profile-toggle-circadian').checked = Boolean(circadian);
+  }
   updateAgeBadge();
 }
 
 function getProfileContext() {
-  const dob = localStorage.getItem('mind_cave_profile_dob') || '';
+  const activeUid = (typeof profileStorage !== 'undefined') ? profileStorage.getUid() : (state.currentUser?.uid || 'guest');
+  const fname = (typeof profileStorage !== 'undefined') ? profileStorage.getItem('profile_name', state.currentUser?.name || 'User') : (state.currentUser?.name || 'User');
+  const dob = (typeof profileStorage !== 'undefined') ? profileStorage.getItem('profile_dob', '') : '';
+  const gender = (typeof profileStorage !== 'undefined') ? profileStorage.getItem('user_gender', 'unspecified') : 'unspecified';
+  const cycle = (typeof profileStorage !== 'undefined') ? profileStorage.getItem('vitality_cycle', false) : false;
+  const circadian = (typeof profileStorage !== 'undefined') ? profileStorage.getItem('vitality_circadian', false) : false;
   const age = calculateAge(dob);
+
   return {
-    first_name: localStorage.getItem('mind_cave_profile_name') || state.currentUser?.name || 'User',
+    user_id: activeUid,
+    first_name: fname,
     date_of_birth: dob || 'Unspecified',
     calculated_age: age !== null ? age : 'Unspecified',
-    gender_track: document.getElementById('profile-gender-select')?.value || localStorage.getItem('mind_cave_user_gender') || 'unspecified',
+    gender_track: gender,
     vitality_tracks: {
-      cycle_intelligence: document.getElementById('profile-toggle-cycle')?.checked || false,
-      circadian_energy: document.getElementById('profile-toggle-circadian')?.checked || false
+      cycle_intelligence: Boolean(cycle),
+      circadian_energy: Boolean(circadian)
     }
   };
 }

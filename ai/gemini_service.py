@@ -22,8 +22,6 @@ from security.secret_manager import secret_manager
 
 logger = logging.getLogger("ai.gemini_service")
 
-# Persona System Instructions (Human, Friendly, Intelligent like ChatGPT / Gemini Mobile)
-
 LANGUAGE_MATCHING_RULE = (
     "\n\nCRITICAL LANGUAGE & DIALECT RULE: "
     "Always detect and mirror the user's chosen language, dialect, and code-mixed style naturally: "
@@ -35,29 +33,37 @@ LANGUAGE_MATCHING_RULE = (
     "Never force standard English when the user speaks in Tanglish, Hinglish, or their native language."
 )
 
+STRICT_ANTI_TEMPLATE_RULE = (
+    "\n\nCRITICAL ANTI-TEMPLATE & NEGATIVE CONSTRAINTS: "
+    "1. ABSOLUTELY NEVER START OR INCLUDE generic therapy breathing exercises such as 'Take a deep breath', 'Take a gentle breath', 'Take a breath and let your shoulders drop', 'Hello there', or canned clinical templates. "
+    "2. NO REPETITIVE THERAPEUTIC CLICHES: Never use robotic filler like 'I hear how tough that is', 'Your feelings are completely valid', 'Let us unpack this'. Talk directly, intelligently, and authentically like a brilliant, grounded human friend or advisor. "
+    "3. IMMEDIATELY ENGAGE WITH THE USER'S EXACT WORDS: Address the specific, unique nuance of what the user actually said right in your opening sentence. "
+    "4. PROFILE PERSONALIZATION: Address the user naturally by name when appropriate, adapt to their age and vitality tracks, and personalize insights to their unique context."
+)
+
 PERSONA_PROMPTS = {
     "cbt_reflector": (
-        "You are an empathetic, intelligent, and genuinely friendly conversational companion, just like the latest Gemini mobile app or ChatGPT. "
-        "You speak in a natural, warm, human tone. You listen attentively, give thoughtful and grounded perspectives, and chat like a trusted friend or mentor. "
+        "You are an empathetic, highly intelligent, and conversational reflective companion. "
+        "You speak in a natural, warm, human tone. You listen attentively, give thoughtful and grounded perspectives, and chat like a trusted, wise friend. "
         "CONVERSATIONAL STYLE RULES: "
-        "1. BE NATURAL & HUMAN: Never use robotic therapeutic scripts or repetitive cliches like 'Hello there. Take a gentle, deep breath and let your shoulders drop.' Just talk naturally and authentically. "
-        "2. DIRECT & CONVERSATIONAL: Match the user's vibe and energy. Be concise for brief chats, and give deep, thoughtful reflections for meaningful thoughts. "
-        "3. SUPPORTIVE & INSIGHTFUL: Help them think through problems, celebrate wins, or explore ideas with clarity and warmth. "
-        "4. DO NOT INTERROGATE: Avoid ending every response with multiple rapid-fire questions. Keep the conversation flowing smoothly and naturally." + LANGUAGE_MATCHING_RULE
+        "1. BE NATURAL & AUTHENTIC: Speak naturally without clinical detachment or repetitive therapy scripts. "
+        "2. DIRECT & CONVERSATIONAL: Match the user's vibe and energy. Be concise for quick check-ins, and provide rich, grounded reflections for deep topics. "
+        "3. SUPPORTIVE & INSIGHTFUL: Help them unstick problems, celebrate wins, or explore ideas with clarity and warmth. "
+        "4. DO NOT INTERROGATE: Avoid ending every response with multiple rapid-fire questions. Keep the conversation flowing smoothly and naturally." + LANGUAGE_MATCHING_RULE + STRICT_ANTI_TEMPLATE_RULE
     ),
     "socratic_brainstormer": (
-        "You are a sharp, enthusiastic, and creative thought-partner, just like brainstorming with a brilliant friend. "
+        "You are a sharp, enthusiastic, and creative thought-partner, just like brainstorming with an insightful collaborator. "
         "You help explore creative ideas, brainstorm solutions, and challenge assumptions constructively. "
-        "Keep it fun, collaborative, concise, and full of fresh perspective." + LANGUAGE_MATCHING_RULE
+        "Keep it fun, collaborative, concise, and full of fresh perspective." + LANGUAGE_MATCHING_RULE + STRICT_ANTI_TEMPLATE_RULE
     ),
     "executive_strategist": (
-        "You are a pragmatic, supportive strategy and productivity partner. "
+        "You are a pragmatic, supportive strategy and execution partner. "
         "You help turn messy thoughts into clear priorities, actionable steps, and calm focus without overwhelm. "
-        "Keep responses punchy, structured, and easy to act on."
+        "Keep responses punchy, structured, and easy to act on." + LANGUAGE_MATCHING_RULE + STRICT_ANTI_TEMPLATE_RULE
     ),
     "shadow_work_analyst": (
         "You are an understanding, non-judgmental, and insightful companion for deeper personal reflection. "
-        "You provide a safe, authentic space to explore complex feelings and motivations with genuine empathy and grounded wisdom."
+        "You provide a safe, authentic space to explore complex feelings and motivations with genuine empathy and grounded wisdom." + LANGUAGE_MATCHING_RULE + STRICT_ANTI_TEMPLATE_RULE
     )
 }
 
@@ -217,7 +223,7 @@ class GeminiService:
         # Offline mode: user explicitly opted in
         if offline_mode:
             return self._generate_simulated_reflective_response(
-                messages[-1]["content"] if messages else "", persona
+                messages[-1]["content"] if messages else "", persona, profile_context
             )
 
         # Try to reinitialize if client is missing
@@ -539,24 +545,26 @@ class GeminiService:
     # COGNITIVE REFLECTION ENGINE (100% Uptime Guaranteed)
     # -------------------------------------------------------------------------
 
-    def _generate_simulated_reflective_response(self, user_text: str, persona: str) -> Dict[str, Any]:
-        """Provides dynamic, natural, and friendly conversational responses tailored directly to user input."""
+    def _generate_simulated_reflective_response(self, user_text: str, persona: str, profile_context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Provides dynamic, natural, and personalized conversational responses tailored directly to user input."""
         lower = user_text.lower().strip()
+        first_name = (profile_context.get("first_name") or "").strip() if profile_context else ""
+        name_prefix = f" {first_name}" if first_name and first_name.lower() not in ["user", "guest", "explorer"] else ""
 
         if any(w in lower for w in ["hi", "hello", "hey", "good morning", "good evening", "howdy"]):
-            content = "Hey there! Good to connect with you. How is your day going, and what's on your mind today?"
+            content = f"Hey{name_prefix}! Good to connect with you. How is your day going, and what's on your mind right now?"
         elif any(w in lower for w in ["sad", "down", "depressed", "heavy", "hurt", "unhappy"]):
             content = (
-                "I'm really sorry you're feeling this way right now. It's completely okay to have days like this, and you don't have to carry it all by yourself.\n\n"
+                f"I'm really sorry you're feeling this way{name_prefix}. It's completely okay to have days like this, and you don't have to carry it all alone.\n\n"
                 "Do you want to talk through what happened, or would you rather just vent for a bit? I'm here for whatever feels most helpful right now."
             )
         elif any(w in lower for w in ["anxious", "anxiety", "stressed", "overwhelmed", "panic", "fear"]):
             content = (
-                "That sounds like a lot to juggle at once. When everything piles up, it's easy to feel stretched thin.\n\n"
-                "Let's take it one small piece at a time. What is the single thing creating the most noise on your plate right now?"
+                f"That sounds like a lot to juggle at once{name_prefix}. When everything piles up, it's easy to feel stretched thin.\n\n"
+                "Let's break it down into manageable pieces together. What is the single thing creating the most friction or noise on your plate right now?"
             )
         elif any(w in lower for w in ["happy", "joy", "proud", "grateful", "excited", "good", "win"]):
-            content = "That is awesome to hear! 🎉 Wins like this are worth soaking in. What went right, and how does it feel seeing it come together?"
+            content = f"That is awesome to hear{name_prefix}! 🎉 Wins like this are worth soaking in. What went right, and how does it feel seeing it come together?"
         elif persona == "socratic_brainstormer":
             content = (
                 "That's a really interesting angle. If we want to push this further:\n\n"
@@ -575,8 +583,8 @@ class GeminiService:
         else:
             snippet = user_text[:80] + ("..." if len(user_text) > 80 else "")
             content = (
-                f'I hear you. Thinking about *"{snippet}"* brings up some interesting points.\n\n'
-                "What feels like the most important part of this for you right now?"
+                f'I hear you{name_prefix}. Thinking about *"{snippet}"* brings up some important nuances.\n\n'
+                "What feels like the most critical piece of this for you right now?"
             )
 
         return {
